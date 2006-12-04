@@ -1,0 +1,69 @@
+.... OpenID4Java Library - TODO
+
+========================================================================
+
+=> Documentation and Packaging
+
+ - Complete JavaDocs
+ - do we package 256 bit libs?
+
+=> Tests
+
+=> Samples
+
+  - Sample code
+  - Documentation
+
+=> Implementation
+
+  - Updated based on finialized versions of the following:
+    - OpenID Attribute Exchange 1.0
+    - OpenID Relying Party Identity 1.0
+    - OpenID Authentication Age 1.0
+
+  - Logging: Log4j
+    debug   everything else
+    ->info  general protocol flow
+    warn    recoverable exceptions
+    error   transaction failures
+    fatal   cannot function at all
+
+  (Do not) Allow extensions in openid 1 messages?
+
+  Simple registration extension (email verifier, Dick should advise)
+
+  - Error responses:
+    - currently we throw exceptions when errors are encountered;
+    - must be examined and, where appropriate, convert them to error
+      response messages as required by the specs.
+
+  - Compatibility mode:
+    - out-of-band RP nonce method
+        - RP needs to self-sign nonces
+    - check limits defined in v1
+
+  - How to determine which of GET/POST the endpoint supports?
+    - direct messages:
+            POST only, both v1 and v2
+    - indirect messages:
+            HTTP redirect (GET): v1, v2 compatibility
+            FORM redirect: v2 only, POST not enforced
+
+========================================================================
+Copyright 2006 Sxip Identity Corporation
+
+Package distribution:
+  => http://code.sxip.com
+
+Source code and defect management:
+  => http://code.google.com/p/openid4java
+
+For support, please join the Google Groups!
+  => http://groups.google.com/group/openid4java
+
+OpenID
+  => http://openid.net
+
+Released under the Apache License 2.0
+  => see LICENSE
+
