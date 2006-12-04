@@ -9,7 +9,7 @@ Please see the TODO for outstanding items.
     - http://code.google.com/p/openid4java
 
 
-20061203: First public release, version 0.9.0.x
+20061203: First public release, version 0.9.1.x
     - supports OpenID Authentication 2.0, draft 10:
         http://openid.net/specs/openid-authentication-2_0-10.html
     - supports OpenID Attribute Exhcange 1.0, draft 3
