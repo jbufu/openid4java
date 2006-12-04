@@ -79,13 +79,25 @@ public abstract class ServerAssociationStoreTest extends TestCase
         assertNull(_associationStore.load(handle));
     }
 
-    public void testRemove() throws AssociationException, InterruptedException
+    public void testRemove() throws AssociationException
     {
         String handle = _associationStore.generate(Association.TYPE_HMAC_SHA1, 1).getHandle();
 
         assertNotNull(_associationStore.load(handle));
         _associationStore.remove(handle);
         assertNull(_associationStore.load(handle));
+    }
+
+    public void testCleanup() throws AssociationException, InterruptedException
+    {
+        _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
+        _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
+        _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
+        _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
+
+        Thread.sleep(1000);
+
+        _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
     }
 
     public static Test suite()

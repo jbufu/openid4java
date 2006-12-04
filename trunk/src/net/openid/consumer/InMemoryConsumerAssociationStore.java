@@ -6,9 +6,7 @@ package net.openid.consumer;
 
 import net.openid.association.Association;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -95,6 +93,7 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
 
     private synchronized void removeExpired()
     {
+        Set idpToRemove = new HashSet();
         Iterator idpUrls = _idpMap.keySet().iterator();
         while (idpUrls.hasNext())
         {
@@ -102,6 +101,7 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
 
             Map handleMap = (Map) _idpMap.get(idpUrl);
 
+            Set handleToRemove = new HashSet();
             Iterator handles = handleMap.keySet().iterator();
             while (handles.hasNext())
             {
@@ -111,12 +111,45 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
 
                 if (association.hasExpired())
                 {
-                    handleMap.remove(handle);
-
-                    if (handleMap.size() == 0)
-                        _idpMap.remove(idpUrl);
+                    handleToRemove.add(handle);
                 }
             }
+
+            handles = handleToRemove.iterator();
+            while (handles.hasNext())
+            {
+                String handle = (String) handles.next();
+
+                handleMap.remove(handle);
+            }
+
+            if (handleMap.size() == 0)
+                idpToRemove.add(idpUrl);
         }
+
+        idpUrls = idpToRemove.iterator();
+        while (idpUrls.hasNext())
+        {
+            String idpUrl = (String) idpUrls.next();
+
+            _idpMap.remove(idpUrl);
+        }
+    }
+
+    protected synchronized int size()
+    {
+        int total = 0;
+
+        Iterator idpUrls = _idpMap.keySet().iterator();
+        while (idpUrls.hasNext())
+        {
+            String idpUrl = (String) idpUrls.next();
+
+            Map handleMap = (Map) _idpMap.get(idpUrl);
+
+            total += handleMap.size();
+        }
+
+        return total;
     }
 }

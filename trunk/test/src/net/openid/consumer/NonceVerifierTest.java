@@ -8,6 +8,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
 import net.openid.util.InternetDateFormat;
+import net.openid.server.NonceGenerator;
+import net.openid.server.IncrementalNonceGenerator;
 
 import java.util.Date;
 
@@ -60,6 +62,26 @@ public abstract class NonceVerifierTest extends TestCase
         String nonce = _dateFormat.format(past) + "abc";
 
         assertEquals(NonceVerifier.TOO_OLD, _nonceVerifier.seen("idp1", nonce));
+    }
+
+    public void testNonceCleanup() throws Exception
+    {
+        NonceGenerator nonceGenerator = new IncrementalNonceGenerator();
+        _nonceVerifier = createVerifier(1);
+
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.com", nonceGenerator.next()));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.com", nonceGenerator.next()));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.com", nonceGenerator.next()));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.com", nonceGenerator.next()));
+
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.net", nonceGenerator.next()));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.net", nonceGenerator.next()));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.net", nonceGenerator.next()));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.net", nonceGenerator.next()));
+
+        Thread.sleep(1000);
+
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("http://example.org", nonceGenerator.next()));
     }
 
     public static Test suite()
