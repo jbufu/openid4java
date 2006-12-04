@@ -73,12 +73,14 @@ public class InMemoryNonceVerifier implements NonceVerifier
 
     private synchronized void removeAged(Date now) throws ParseException
     {
+        Set idpToRemove = new HashSet();
         Iterator idpUrls = _idpMap.keySet().iterator();
         while (idpUrls.hasNext())
         {
             String idpUrl = (String) idpUrls.next();
 
             Set seenSet = (Set) _idpMap.get(idpUrl);
+            Set nonceToRemove = new HashSet();
 
             Iterator nonces = seenSet.iterator();
             while (nonces.hasNext())
@@ -89,12 +91,28 @@ public class InMemoryNonceVerifier implements NonceVerifier
 
                 if (isTooOld(now, nonceDate))
                 {
-                    seenSet.remove(nonce);
-
-                    if (seenSet.size() == 0)
-                        _idpMap.remove(idpUrl);
+                    nonceToRemove.add(nonce);
                 }
             }
+
+            nonces = nonceToRemove.iterator();
+            while (nonces.hasNext())
+            {
+                String nonce = (String) nonces.next();
+
+                seenSet.remove(nonce);
+            }
+
+            if (seenSet.size() == 0)
+                idpToRemove.add(idpUrl);
+        }
+
+        idpUrls = idpToRemove.iterator();
+        while (idpUrls.hasNext())
+        {
+            String idpUrl = (String) idpUrls.next();
+            
+            _idpMap.remove(idpUrl);
         }
     }
 
