@@ -14,8 +14,6 @@ import net.openid.server.IncrementalNonceGenerator;
  */
 public class InMemoryNonceVerifierTest extends NonceVerifierTest
 {
-    private NonceGenerator _nonceGenerator = new IncrementalNonceGenerator();
-
     public InMemoryNonceVerifierTest(String name)
     {
         super(name);
@@ -28,21 +26,11 @@ public class InMemoryNonceVerifierTest extends NonceVerifierTest
 
     public void testNonceCleanup() throws Exception
     {
-        NonceVerifier verifier = createVerifier(1);
+        super.testNonceCleanup();
 
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.com", _nonceGenerator.next()));
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.com", _nonceGenerator.next()));
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.com", _nonceGenerator.next()));
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.com", _nonceGenerator.next()));
+        InMemoryNonceVerifier inMemoryVerifier = (InMemoryNonceVerifier) _nonceVerifier;
 
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.net", _nonceGenerator.next()));
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.net", _nonceGenerator.next()));
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.net", _nonceGenerator.next()));
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.net", _nonceGenerator.next()));
-
-        Thread.sleep(1000);
-
-        assertEquals(NonceVerifier.OK, verifier.seen("http://example.org", _nonceGenerator.next()));
+        assertEquals(1, inMemoryVerifier.size());
     }
 
     public static Test suite()

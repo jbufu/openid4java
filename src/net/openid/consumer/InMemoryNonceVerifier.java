@@ -111,7 +111,7 @@ public class InMemoryNonceVerifier implements NonceVerifier
         while (idpUrls.hasNext())
         {
             String idpUrl = (String) idpUrls.next();
-            
+
             _idpMap.remove(idpUrl);
         }
     }
@@ -121,5 +121,22 @@ public class InMemoryNonceVerifier implements NonceVerifier
         long age = now.getTime() - nonce.getTime();
 
         return age > _maxAge;
+    }
+
+    protected synchronized int size()
+    {
+        int total = 0;
+
+        Iterator idpUrls = _idpMap.keySet().iterator();
+        while (idpUrls.hasNext())
+        {
+            String idpUrl = (String) idpUrls.next();
+
+            Set seenSet = (Set) _idpMap.get(idpUrl);
+
+            total += seenSet.size();
+        }
+
+        return total;
     }
 }

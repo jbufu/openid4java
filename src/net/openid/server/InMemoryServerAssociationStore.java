@@ -7,10 +7,7 @@ package net.openid.server;
 import net.openid.association.Association;
 import net.openid.association.AssociationException;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -57,6 +54,7 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
 
     private synchronized void removeExpired()
     {
+        Set handleToRemove = new HashSet();
         Iterator handles = _handleMap.keySet().iterator();
         while (handles.hasNext())
         {
@@ -65,7 +63,20 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
             Association association = (Association) _handleMap.get(handle);
 
             if (association.hasExpired())
-                _handleMap.remove(handle);
+                handleToRemove.add(handle);
         }
+
+        handles = handleToRemove.iterator();
+        while (handles.hasNext())
+        {
+            String handle = (String) handles.next();
+
+            _handleMap.remove(handle);
+        }
+    }
+
+    protected synchronized int size()
+    {
+        return _handleMap.size();
     }
 }
