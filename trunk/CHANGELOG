@@ -1,0 +1,37 @@
+.... OpenID4Java Library - CHANGELOG
+
+========================================================================
+
+This document highlights of the major changes in the OpenID4Java library. 
+Please see the TODO for outstanding items.
+
+    For the detailed logs please see the commit comments at:
+    - http://code.google.com/p/openid4java
+
+
+20061110: First public release, version 0.9.0.x
+    - supports OpenID Authentication 2.0, draft 10:
+        http://openid.net/specs/openid-authentication-2_0-10.html
+    - supports OpenID Attribute Exhcange 1.0, draft 3
+    - (few outstanding spec issues remain)
+
+
+
+========================================================================
+Copyright 2006 Sxip Identity Corporation
+
+Package distribution:
+  => http://code.sxip.com
+          
+Source code and defect management:
+  => http://code.google.com/p/openid4java
+          
+For support, please join the Google Groups!
+  => http://groups.google.com/group/openid4java
+
+OpenID
+  => http://openid.net 
+
+Released under the Apache License 2.0
+  => see LICENSE
+

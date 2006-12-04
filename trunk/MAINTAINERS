@@ -1,0 +1,43 @@
+.... OpenID4Java Library - MAINTAINERS
+
+========================================================================
+
+- M: Maintainer
+- S: Status:
+          - supported      : someone paid to look after this
+          - maintained     : someone looks after this
+          - fixes/patches  : someone that has contributed fixes/patches
+          - orphan         : no current maintainer, help needed!
+
+------------------------------------------------------------------------
+
+Entire Library, including documentation:
+
+  M: Marius Scurtescu <marius@sxip.com>
+  S: supported
+
+  M: Johnny Bufu <johnny@sxip.com>
+  S: supported
+
+  M: David Huska <huska@sxip.com>
+  S: supported
+
+
+
+========================================================================
+Copyright 2006 Sxip Identity Corporation
+
+Package distribution:
+  => http://code.sxip.com
+
+Source code and defect management:
+  => http://code.google.com/p/openid4java
+
+For support, please join the Google Groups!
+  => http://groups.google.com/group/openid4java
+
+OpenID
+  => http://openid.net 
+
+Released under the Apache License 2.0
+  => see LICENSE
