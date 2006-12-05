@@ -7,6 +7,7 @@ package net.openid.discovery;
 import org.openxri.xml.*;
 import org.openxri.resolve.Resolver;
 import org.openxri.resolve.TrustType;
+import org.openxri.resolve.ResolverState;
 import org.w3c.dom.Element;
 
 import java.util.regex.Pattern;
@@ -30,7 +31,42 @@ public class Discovery
     private static final Pattern XRI_PATTERN =
             Pattern.compile("^(xri://|[!=@\\$\\+])", Pattern.CASE_INSENSITIVE);
 
+    final private static String ROOT_DEF_EQ_URI   = "http://equal.xri.net";
+    final private static String ROOT_DEF_AT_URI   = "http://at.xri.net";
+    final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
+
     private static Resolver _resolver = new Resolver();
+
+    static
+    {
+        // populate the root with whatever trustType the user requested
+        String trustParam = ";trust=none";
+
+        XRD eqRoot = new XRD();
+        Service eqAuthService = new Service();
+        eqAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
+        eqAuthService.addType(Tags.SERVICE_AUTH_RES);
+        eqAuthService.addURI(ROOT_DEF_EQ_URI);
+        eqRoot.addService(eqAuthService);
+
+        XRD atRoot = new XRD();
+        Service atAuthService = new Service();
+        atAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
+        atAuthService.addType(Tags.SERVICE_AUTH_RES);
+        atAuthService.addURI(ROOT_DEF_AT_URI);
+        atRoot.addService(atAuthService);
+
+        XRD bangRoot = new XRD();
+        Service bangAuthService = new Service();
+        bangAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
+        bangAuthService.addType(Tags.SERVICE_AUTH_RES);
+        bangAuthService.addURI(ROOT_DEF_BANG_URI);
+        bangRoot.addService(bangAuthService);
+
+        _resolver.setAuthority("=", eqRoot);
+        _resolver.setAuthority("@", atRoot);
+        _resolver.setAuthority("!", bangRoot);
+    }
 
     public static Identifier parseIdentifier(String identifier)
             throws DiscoveryException
@@ -77,23 +113,25 @@ public class Discovery
             {
                 TrustType trustAll = new TrustType(TrustType.TRUST_NONE);
                 xrds = _resolver.resolveAuthToXRDS(
-                        xriIdentifier.getXriIdentifier(), trustAll, true);
+                        xriIdentifier.getXriIdentifier(), trustAll, true, new ResolverState());
 
                 XRD xrd = xrds.getFinalXRD();
                 CanonicalID canonical = xrd.getCanonicalidAt(0);
 
+/*
                 if (! isProviderAuthoritative(xrd.getProviderID(), canonical))
                 {
                     Identifier canonicalId =
                             new XriIdentifier(canonical.getValue());
                     XRDS newXrds = _resolver.resolveAuthToXRDS(
-                            canonicalId.getIdentifier(), trustAll, true);
+                            canonicalId.getIdentifier(), trustAll, true, new ResolverState());
 
                     //todo: not sure what to compare from user / canonical XRDS
                     // provider id / canonical id ?
                     // service endpoints ?
                     // everything ?
                 }
+*/
             }
             catch (Exception e)
             {
@@ -166,6 +204,9 @@ public class Discovery
                     service, identifier,
                     xrd.getCanonicalidAt(0), xrd.getProviderID());
 
+            if (discovery == null)
+                continue;
+
             String version = discovery.getVersion();
 
             if (DiscoveryInformation.OPENID2_OP.equals(version))
@@ -232,7 +273,7 @@ public class Discovery
         }
         else
         {
-            throw new DiscoveryException("Not an OpenID service: " + service);
+            return null;
         }
 
         return new DiscoveryInformation(idpEndpointUrl, claimedIdentifier,
