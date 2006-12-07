@@ -90,6 +90,7 @@ API Usage and Examples:
   The main interaction points between a web application acting as a
   Relying Party (Consumer) and the library are the Discovery and
   ConsumerManager classes.
+  See also the SampleConsumer.java implementation in the consumer package.
 
         // instantiate a ConsumerManager object
         public static manager = new ConsumerManager();
@@ -98,10 +99,10 @@ API Usage and Examples:
 
         // determine a return_to URL where your application will receive
         // the authentication responses from the OpenID provider
-        String returnToUrl = "http://example.com/openid"
+        String returnToUrl = "http://example.com/openid";
 
         // build an Identifier instance from the user-supplied identifier
-        Identifier identifier = new Identifier(userSuppliedString);
+        Identifier identifier = Discovery.parseIdentifier(userSuppliedString);
 
         // perform discovery on the user-supplied identifier
         List discoveries = Discovery.discover(identifier);
@@ -126,15 +127,16 @@ API Usage and Examples:
         authReq.addExtensionParams(fetch);
 
         // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
-        authReq.getRedirectUrl();
+        return authReq.getRedirectUrl();
 
         // Option 2: HTML FORM Redirection
         // <FORM action="OpenID Provider's service endpoint">
         // see samples/formredirection.jsp for a JSP example
-        authReq.getOPEndpoint();
+        //authReq.getOPEndpoint();
 
         // build a HTML FORM with the message parameters
-        authReq.getParameterMap();
+        //authReq.getParameterMap();
+
 
         // --- processing the authentication response
 
@@ -144,7 +146,7 @@ API Usage and Examples:
 
         // retrieve the previously stored discovery information
         DiscoveryInformation discovered
-                 = (DiscoveryInformation) session.getAttribute("openid-disco");
+                = (DiscoveryInformation) session.getAttribute("openid-disco");
 
         // verify the response; ConsumerManager needs to be the same
         // (static) instance used to place the authentication request
@@ -153,19 +155,24 @@ API Usage and Examples:
         // examine the verification result and extract the verified identifier
         Identifier verified = verification.getVerifiedId();
         if (verified != null)
-            return verified;  // success
-
-        // Attribute Exchange example: retrieving the fetched "email" attribute
-        AuthSuccess authSuccess = new AuthSuccess(openidResp);
-        MessageExtension ext = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-        if (ext != null)
         {
-            FetchResponse fetchResp = new FetchResponse(ext.getParameters());
-            String email = fetchResp.getParameter("email");
+            // Attribute Exchange example: retrieving the fetched "email" attribute
+            AuthSuccess authSuccess = AuthSuccess.createAuthSuccess(response);
+            MessageExtension ext =
+                    authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+            if (ext != null)
+            {
+                FetchResponse fetchResp =
+                        new FetchResponse(ext.getParameters());
+                String email = fetchResp.getParameter("email");
+            }
+
+            return verified;  // success
         }
 
   The main interaction point between a web application acting as a
   OpenID Provider (Server) and the library is the ServerManager class.
+  See also the SampleServer.java implementation in the server package.
 
         // instantiate a ServerManager object
         public static ServerManager manager = new ServerManager();
@@ -173,36 +180,42 @@ API Usage and Examples:
         // extract the parameters from the request
         ParameterList request = new ParameterList(httpReq.getParameterMap());
 
-        String mode = request.hasParameter("openid.mode")  ?
-                    request.getParameterValue("openid.mode") : null;
+        String mode = request.hasParameter("openid.mode") ?
+                request.getParameterValue("openid.mode") : null;
 
         Message response;
         String responseText;
 
-        if ("associate".equals(mode) )
+        if ("associate".equals(mode))
         {
             // --- process an association request ---
-            response = manager.associationResponse(request)
+            response = manager.associationResponse(request);
             responseText = response.keyValueFormEncoding();
-        }
-        else if ("checkid_setup".equals(mode)
-                || "checkid_immediate".equals(mode) )
+        } else if ("checkid_setup".equals(mode)
+                || "checkid_immediate".equals(mode))
         {
+            // interact with the user and obtain data needed to continue
+            List userData = userInteraction(request);
+
+            String userSelectedId = (String) userData.get(0);
+            String userSelectedClaimedId = (String) userData.get(1);
+            Boolean authenticatedAndApproved = (Boolean) userData.get(2);
+
             // --- process an authentication request ---
-            response = manager.authResponse(request, userSelectedId,
-                               userSelectedClaimedId, authenticatedAndApproved);
+            response = manager.authResponse(request,
+                    userSelectedId,
+                    userSelectedClaimedId,
+                    authenticatedAndApproved.booleanValue());
             responseText = response.wwwFormEncoding();
-        }
-        else if ("check_authentication".equals(mode) )
+        } else if ("check_authentication".equals(mode))
         {
             // --- processing a verification request ---
             response = manager.verify(request);
             responseText = response.keyValueFormEncoding();
-        }
-        else
+        } else
         {
             // --- error response ---
-            response = new DirectError("Unknown request");
+            response = DirectError.createDirectError("Unknown request");
             responseText = response.keyValueFormEncoding();
         }
 
