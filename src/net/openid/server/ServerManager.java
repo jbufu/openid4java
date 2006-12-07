@@ -293,7 +293,8 @@ public class ServerManager
         try
         {
             // build request message from response params (+ integrity check)
-            AssociationRequest assocReq = new AssociationRequest(requestParams);
+            AssociationRequest assocReq =
+                    AssociationRequest.createAssociationRequest(requestParams);
 
             isVersion2 = assocReq.isVersion2();
 
@@ -313,7 +314,7 @@ public class ServerManager
                 Association assoc = _sharedAssociations.generate(
                         type.getAssociationType(), _expireIn);
 
-                return new AssociationResponse(assocReq, assoc);
+                return AssociationResponse.createAssociationResponse(assocReq, assoc);
             }
         }
         catch (OpenIDException e)
@@ -321,7 +322,8 @@ public class ServerManager
             // association failed, respond accordingly
             if (isVersion2)
             {
-                return new AssociationError(e.getMessage(), _prefAssocSessEnc);
+                return AssociationError.createAssociationError(
+                        e.getMessage(), _prefAssocSessEnc);
             }
             else
             {
@@ -332,10 +334,11 @@ public class ServerManager
                 Association dummyAssoc = _sharedAssociations.generate(
                         Association.TYPE_HMAC_SHA1, 0);
 
-                AssociationRequest dummyRequest = new AssociationRequest(
+                AssociationRequest dummyRequest =
+                        AssociationRequest.createAssociationRequest(
                         AssociationSessionType.NO_ENCRYPTION_COMPAT_SHA1MAC);
 
-                return new AssociationResponse(dummyRequest, dummyAssoc);
+                return AssociationResponse.createAssociationResponse(dummyRequest, dummyAssoc);
                 }
                 catch (OpenIDException ee)
                 {
@@ -383,7 +386,8 @@ public class ServerManager
         try
         {
             // build request message from response params (+ integrity check)
-            AuthRequest authReq = new AuthRequest(requestParams);
+            AuthRequest authReq = AuthRequest.createAuthRequest(
+                    requestParams, _realmVerifier);
             isVersion2 = authReq.isVersion2();
 
             String id;
@@ -423,7 +427,7 @@ public class ServerManager
                             _expireIn);
 
                 if (authReq.getReturnTo() != null)
-                    return new AuthSuccess(
+                    return AuthSuccess.createAuthSuccess(
                             claimed, id, !authReq.isVersion2(),
                             authReq.getReturnTo(), _nonceGenerator.next(),
                             invalidateHandle, assoc, _signList);
@@ -433,8 +437,8 @@ public class ServerManager
             } else // negative response
             {
                 if (authReq.isImmediate())
-                    return new AuthImmediateFailure(_userSetupUrl,
-                            !authReq.isVersion2());
+                    return AuthImmediateFailure.createAuthImmediateFailure(
+                            _userSetupUrl, !authReq.isVersion2());
                 else
                     return new AuthFailure(! authReq.isVersion2());
             }
@@ -442,11 +446,11 @@ public class ServerManager
         catch (OpenIDException e)
         {
             if (requestParams.hasParameter("openid.return_to"))
-                return new IndirectError( e.getMessage(),
+                return IndirectError.createIndirectError(e.getMessage(),
                         requestParams.getParameterValue("openid.return_to"),
                         ! isVersion2 );
             else
-                return new DirectError( e.getMessage(), isVersion2 );
+                return DirectError.createDirectError( e.getMessage(), isVersion2 );
         }
     }
 
@@ -465,7 +469,7 @@ public class ServerManager
         try
         {
             // build request message from response params (+ ntegrity check)
-            VerifyRequest vrfyReq = new VerifyRequest(requestParams);
+            VerifyRequest vrfyReq = VerifyRequest.createVerifyRequest(requestParams);
             isVersion2 = vrfyReq.isVersion2();
             String handle = vrfyReq.getHandle();
 
@@ -484,7 +488,7 @@ public class ServerManager
             }
 
             VerifyResponse vrfyResp =
-                    new VerifyResponse(! vrfyReq.isVersion2());
+                    VerifyResponse.createVerifyResponse(! vrfyReq.isVersion2());
 
             vrfyResp.setSignatureVerified(verified);
 
@@ -496,7 +500,7 @@ public class ServerManager
         }
         catch (OpenIDException e)
         {
-            return new DirectError(e.getMessage(), ! isVersion2);
+            return DirectError.createDirectError(e.getMessage(), ! isVersion2);
         }
     }
 }

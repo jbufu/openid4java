@@ -23,7 +23,7 @@ public class AuthImmediateFailure extends Message
             "openid.user_setup_url"
     });
 
-    public AuthImmediateFailure(String url, boolean compatibility)
+    protected AuthImmediateFailure(String url, boolean compatibility)
     {
         set("openid.mode", MODE_IDRES);
 
@@ -33,9 +33,31 @@ public class AuthImmediateFailure extends Message
             set("openid.ns", OPENID2_NS);
     }
 
-    public AuthImmediateFailure(ParameterList params) throws MessageException
+    protected AuthImmediateFailure(ParameterList params)
     {
         super(params);
+    }
+
+    public static AuthImmediateFailure createAuthImmediateFailure(
+            String url, boolean compatibility) throws MessageException
+    {
+        AuthImmediateFailure fail = new AuthImmediateFailure(url, compatibility);
+
+        if (! fail.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return fail;
+    }
+
+    public static AuthImmediateFailure createAuthImmediateFailure(ParameterList params)
+            throws MessageException
+    {
+        AuthImmediateFailure fail = new AuthImmediateFailure(params);
+
+        if (! fail.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return fail;
     }
 
     public List getRequiredFields()

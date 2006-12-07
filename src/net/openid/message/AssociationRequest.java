@@ -54,8 +54,7 @@ public class AssociationRequest extends Message
      *
      * @see #AssociationRequest(AssociationSessionType, DiffieHellmanSession)
      */
-    public AssociationRequest(AssociationSessionType type)
-            throws MessageException
+    protected AssociationRequest(AssociationSessionType type)
     {
         this(type, null);
     }
@@ -67,18 +66,9 @@ public class AssociationRequest extends Message
      * @param dhSess    Diffie-Hellman session to be used for this association;
      *                  if null, a "no-encryption" session is created.
      */
-    public AssociationRequest(AssociationSessionType type,
+    protected AssociationRequest(AssociationSessionType type,
                               DiffieHellmanSession dhSess)
-            throws MessageException
     {
-        // make sure the association / session type matches the dhSess
-        if ( type == null ||
-                (dhSess == null && type.getHAlgorithm() != null) ||
-                (dhSess != null && ! dhSess.getType().equals(type) ) )
-            throw new MessageException(
-                    "Invalid association / session combination specified: " +
-                            type + "DH session: " + dhSess);
-
         if (type.isVersion2())
             set("openid.ns", OPENID2_NS);
 
@@ -100,13 +90,46 @@ public class AssociationRequest extends Message
      * Constructs an AssociationRequest message from a parameter list.
      * <p>
      * Useful for processing incoming messages.
-     *
-     * @throws MessageException         if the message is not a valid
-     *                                  association request.
      */
-    public AssociationRequest(ParameterList params) throws MessageException
+    protected AssociationRequest(ParameterList params)
     {
         super(params);
+    }
+
+    public static AssociationRequest createAssociationRequest(
+            AssociationSessionType type) throws MessageException
+    {
+        return createAssociationRequest(type, null);
+    }
+
+    public static AssociationRequest createAssociationRequest(
+            AssociationSessionType type, DiffieHellmanSession dhSess)
+            throws MessageException
+    {
+        AssociationRequest req = new AssociationRequest(type, dhSess);
+
+        // make sure the association / session type matches the dhSess
+        if ( type == null ||
+                (dhSess == null && type.getHAlgorithm() != null) ||
+                (dhSess != null && ! dhSess.getType().equals(type) ) )
+            throw new MessageException(
+                    "Invalid association / session combination specified: " +
+                            type + "DH session: " + dhSess);
+
+        if ( !req.isValid() ) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return req;
+    }
+    public static AssociationRequest createAssociationRequest(
+            ParameterList params) throws MessageException
+    {
+        AssociationRequest req = new AssociationRequest(params);
+
+        if ( !req.isValid() ) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return req;
     }
 
     public List getRequiredFields()

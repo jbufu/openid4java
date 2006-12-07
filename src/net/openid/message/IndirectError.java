@@ -11,11 +11,11 @@ public class IndirectError extends Message
 {
     private String _returnTo;
 
-    public IndirectError(String msg, String returnTo)
+    protected IndirectError(String msg, String returnTo)
     {
         this(msg, returnTo, false);
     }
-    public IndirectError(String msg, String returnTo, boolean compatibility)
+    protected IndirectError(String msg, String returnTo, boolean compatibility)
     {
         set("openid.mode", "error");
         set("openid.error", msg);
@@ -23,6 +23,41 @@ public class IndirectError extends Message
 
         if (! compatibility)
             set("ns", OPENID2_NS);
+    }
+
+    protected IndirectError(ParameterList params)
+    {
+        super(params);
+    }
+
+    public static IndirectError createIndirectError(String msg, String returnTo)
+    {
+        return createIndirectError(msg, returnTo, false);
+    }
+
+    public static IndirectError createIndirectError(String msg, String returnTo,
+                                                    boolean compatibility)
+    {
+        IndirectError err = new IndirectError(msg, returnTo, compatibility);
+
+        if (! err.isValid())
+        {
+            //todo: log
+        }
+
+        return err;
+    }
+
+    public static IndirectError createIndirectError(ParameterList params)
+    {
+        IndirectError err = new IndirectError(params);
+
+        if (! err.isValid())
+        {
+            //todo: log
+        }
+
+        return err;
     }
 
     public String getReturnTo()

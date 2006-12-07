@@ -43,8 +43,8 @@ public class AssociationResponse extends Message
      * @param assoc         The association which will be used to sign
      *                      authentication responses.
      */
-    public AssociationResponse(AssociationRequest assocReq, Association assoc)
-            throws AssociationException, MessageException
+    protected AssociationResponse(AssociationRequest assocReq, Association assoc)
+            throws AssociationException
     {
         if (assocReq.isVersion2()) set("ns", OPENID2_NS);
 
@@ -72,25 +72,39 @@ public class AssociationResponse extends Message
         {
             setMacKey(assoc.getMacKey().toString());
         }
-
-        // todo: self-check in unit test
-        if (! isValid())
-            throw new MessageException(
-                    "Cannot generate valid association response: " +
-                    this.wwwFormEncoding());
     }
 
     /**
      * Constructs an AssociationResponse message from a parameter list.
      * <p>
      * Useful for processing incoming messages.
-     *
-     * @throws MessageException         if the message is not a valid
-     *                                  association response.
      */
-    public AssociationResponse(ParameterList params) throws MessageException
+    protected AssociationResponse(ParameterList params)
     {
         super(params);
+    }
+
+    public static AssociationResponse createAssociationResponse(
+            AssociationRequest assocReq, Association assoc)
+            throws MessageException, AssociationException
+    {
+        AssociationResponse resp = new AssociationResponse(assocReq, assoc);
+
+        if (! resp.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return resp;
+    }
+
+    public static AssociationResponse createAssociationResponse(ParameterList params)
+            throws MessageException
+    {
+        AssociationResponse resp = new AssociationResponse(params);
+
+        if (! resp.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return resp;
     }
 
     public List getRequiredFields()

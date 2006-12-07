@@ -27,7 +27,7 @@ public class AssociationError extends DirectError
             "assoc_type"
     });
 
-    public AssociationError(String msg, AssociationSessionType type)
+    protected AssociationError(String msg, AssociationSessionType type)
     {
         super(msg);
 
@@ -37,9 +37,34 @@ public class AssociationError extends DirectError
         set("assoc_type", type.getAssociationType());
     }
 
-    public AssociationError(ParameterList params) throws MessageException
+    protected AssociationError(ParameterList params)
     {
         super(params);
+    }
+
+    public static AssociationError createAssociationError(
+            String msg, AssociationSessionType type)
+    {
+        AssociationError err = new AssociationError(msg, type);
+
+        if (! err.isValid())
+        {
+            //todo: log
+        }
+
+        return err;
+    }
+
+    public static AssociationError createAssociationError(ParameterList params)
+    {
+        AssociationError err = new AssociationError(params);
+
+        if (! err.isValid())
+        {
+            //todo: log
+        }
+
+        return err;
     }
 
     public List getRequiredFields()

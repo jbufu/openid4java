@@ -36,7 +36,7 @@ public class AuthSuccess extends Message
     });
 
 
-    public AuthSuccess(String claimedId, String delegate, boolean compatibility,
+    protected AuthSuccess(String claimedId, String delegate, boolean compatibility,
                        String returnTo, String nonce,
                        String invalidateHandle, Association assoc,
                        String signList)
@@ -60,9 +60,35 @@ public class AuthSuccess extends Message
         setSignature(assoc.sign(getSignedText()));
     }
 
-    public AuthSuccess(ParameterList params) throws MessageException
+    protected AuthSuccess(ParameterList params)
     {
         super(params);
+    }
+
+    public static AuthSuccess createAuthSuccess(String claimedId, String delegate,
+                       boolean compatibility, String returnTo, String nonce,
+                       String invalidateHandle, Association assoc,
+                       String signList)
+            throws MessageException, AssociationException
+    {
+        AuthSuccess resp = new AuthSuccess(claimedId, delegate, compatibility,
+                returnTo, nonce, invalidateHandle, assoc, signList);
+
+        if (! resp.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return resp;
+    }
+
+    public static AuthSuccess createAuthSuccess(ParameterList params)
+            throws MessageException
+    {
+        AuthSuccess resp = new AuthSuccess(params);
+
+        if (! resp.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return resp;
     }
 
     public List getRequiredFields()

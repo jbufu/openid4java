@@ -22,7 +22,7 @@ public class VerifyResponse extends Message
             "invalidate_handle"
     });
 
-    public VerifyResponse(boolean compatibility)
+    protected VerifyResponse(boolean compatibility)
     {
         set("mode", MODE_IDRES);
         setSignatureVerified(false);
@@ -31,9 +31,31 @@ public class VerifyResponse extends Message
             set("ns", OPENID2_NS);
     }
 
-    public VerifyResponse(ParameterList params) throws MessageException
+    protected VerifyResponse(ParameterList params)
     {
         super(params);
+    }
+
+    public static VerifyResponse createVerifyResponse(boolean compatibility)
+            throws MessageException
+    {
+        VerifyResponse resp = new VerifyResponse(compatibility);
+
+        if (! resp.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return resp;
+    }
+
+    public static VerifyResponse createVerifyResponse(ParameterList params)
+            throws MessageException
+    {
+        VerifyResponse resp = new VerifyResponse(params);
+
+        if (! resp.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return resp;
     }
 
     public List getRequiredFields()

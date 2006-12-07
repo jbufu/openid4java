@@ -610,7 +610,8 @@ public class ConsumerManager
                 {
                     AssociationResponse assocResp;
 
-                    assocResp = new AssociationResponse(respParams);
+                    assocResp = AssociationResponse
+                            .createAssociationResponse(respParams);
 
                     // valid association response
                     Association assoc =
@@ -636,7 +637,7 @@ public class ConsumerManager
                     // retrieve fallback sess/assoc/encryption params set by IdP
                     // and queue a new attempt
                     AssociationError assocErr =
-                            new AssociationError(respParams);
+                            AssociationError.createAssociationError(respParams);
 
                     AssociationSessionType idpType =
                             AssociationSessionType.create(
@@ -697,14 +698,14 @@ public class ConsumerManager
                 if (DiffieHellmanSession.isDhSupported(type)
                         &&
                         Association.isHmacSupported(type.getAssociationType()))
-                    assocReq = new AssociationRequest(type, dhSess);
+                    assocReq = AssociationRequest.createAssociationRequest(type, dhSess);
             } else // no-enc session
             {
                 if ((_allowNoEncHttpSess ||
                         idpUrl.getProtocol().equals("https"))
                         &&
                         Association.isHmacSupported(type.getAssociationType()))
-                    assocReq = new AssociationRequest(type);
+                    assocReq = AssociationRequest.createAssociationRequest(type);
             }
 
             return assocReq;
@@ -868,7 +869,7 @@ public class ConsumerManager
             throw new ConsumerException("Authentication cannot be performed: " +
                     "no association available and stateless mode is disabled");
 
-        AuthRequest authReq = new AuthRequest(claimedId, delegate,
+        AuthRequest authReq = AuthRequest.createAuthRequest(claimedId, delegate,
                 ! discovered.isVersion2(), returnToUrl, handle, realm, _realmVerifier);
 
         authReq.setOPEndpoint(discovered.getIdpEndpoint());
@@ -926,7 +927,7 @@ public class ConsumerManager
         // non-immediate negative response
         if ( "cancel".equals(response.getParameterValue("openid.mode")) )
         {
-            result.setAuthResponse(new AuthFailure(response));
+            result.setAuthResponse(AuthFailure.createAuthFailure(response));
             return result;
         }
 
@@ -934,13 +935,14 @@ public class ConsumerManager
         if ( ("id_res".equals(response.getParameterValue("openid.mode"))
                 && response.hasParameter("openid.user_setup_url") ) )
         {
-            AuthImmediateFailure fail = new AuthImmediateFailure(response);
+            AuthImmediateFailure fail =
+                    AuthImmediateFailure.createAuthImmediateFailure(response);
             result.setAuthResponse(fail);
             result.setIdpSetupUrl(fail.getUserSetupUrl());
             return result;
         }
 
-        AuthSuccess authResp = new AuthSuccess(response);
+        AuthSuccess authResp = AuthSuccess.createAuthSuccess(response);
         if (!authResp.isValid())
             throw new MessageException("Invalid Authentication Response: " +
                     authResp.wwwFormEncoding());
@@ -1165,14 +1167,15 @@ public class ConsumerManager
 
         } else // no association, verify with the IdP
         {
-            VerifyRequest vrfy = new VerifyRequest(authResp);
+            VerifyRequest vrfy = VerifyRequest.createVerifyRequest(authResp);
 
             ParameterList responseParams = new ParameterList();
 
             int respCode = call(idp.toString(), vrfy, responseParams);
             if (HttpStatus.SC_OK == respCode)
             {
-                VerifyResponse vrfyResp = new VerifyResponse(responseParams);
+                VerifyResponse vrfyResp =
+                        VerifyResponse.createVerifyResponse(responseParams);
 
                 if (vrfyResp.isValid() & vrfyResp.isSignatureVerified())
                 {
