@@ -24,14 +24,14 @@ public class Message
     private Map _extAliases;
 
 
-    public Message()
+    protected Message()
     {
         _params = new ParameterList();
         _extCounter = 0;
         _extAliases = new HashMap();
     }
 
-    public Message (ParameterList params) throws MessageException
+    protected Message (ParameterList params)
     {
         this._params = params;
         this._extAliases = new HashMap();
@@ -46,10 +46,27 @@ public class Message
                         key.substring(10));
         }
         _extCounter = _extAliases.size();
+    }
 
-        if (! isValid()) throw new MessageException(
+    public static Message createMessage() throws MessageException
+    {
+        Message message = new Message();
+
+        if (! message.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
+        return message;
+    }
+
+    public static Message createMessage(ParameterList params)
+            throws MessageException
+    {
+        Message message = new Message(params);
+
+        if (! message.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return message;
     }
 
     protected Parameter getParameter(String name)

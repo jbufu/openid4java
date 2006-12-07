@@ -15,7 +15,7 @@ public class VerifyRequest extends AuthSuccess
 {
     public static final String MODE_CHKAUTH = "check_authentication";
 
-    public VerifyRequest(AuthSuccess authResp) throws MessageException
+    protected VerifyRequest(AuthSuccess authResp)
     {
         super(convertAuthSuccessParams(authResp));
     }
@@ -29,9 +29,31 @@ public class VerifyRequest extends AuthSuccess
         return params;
     }
 
-    public VerifyRequest(ParameterList params) throws MessageException
+    protected VerifyRequest(ParameterList params)
     {
         super(params);
+    }
+
+    public static VerifyRequest createVerifyRequest(AuthSuccess authResp)
+            throws MessageException
+    {
+        VerifyRequest req = new VerifyRequest(authResp);
+
+        if (! req.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return req;
+    }
+
+    public static VerifyRequest createVerifyRequest(ParameterList params)
+            throws MessageException
+    {
+        VerifyRequest req = new VerifyRequest(params);
+
+        if (! req.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return req;
     }
 
     public String getHandle()

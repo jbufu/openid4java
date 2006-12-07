@@ -29,9 +29,20 @@ public class AuthFailure extends Message
             set("openid.ns", OPENID2_NS);
     }
 
-    public AuthFailure(ParameterList params) throws MessageException
+    protected AuthFailure(ParameterList params)
     {
         super(params);
+    }
+
+    public static AuthFailure createAuthFailure(ParameterList params) throws
+            MessageException
+    {
+        AuthFailure fail = new AuthFailure(params);
+
+        if (! fail.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return fail;
     }
 
     public List getRequiredFields()

@@ -43,7 +43,7 @@ public class AuthRequest extends Message
 
     private RealmVerifier _realmVerifier;
 
-    public AuthRequest(String claimedId, String delegate, boolean compatibility,
+    protected AuthRequest(String claimedId, String delegate, boolean compatibility,
                        String returnToUrl, String handle, RealmVerifier verifier)
             throws MessageException
     {
@@ -52,8 +52,9 @@ public class AuthRequest extends Message
 
     }
 
-    public AuthRequest(String claimedId, String delegate, boolean compatibility,
-                       String returnToUrl, String handle, String realm, RealmVerifier verifier)
+    protected AuthRequest(String claimedId, String delegate, boolean compatibility,
+                       String returnToUrl, String handle, String realm,
+                       RealmVerifier verifier)
             throws MessageException
     {
         if (! compatibility)
@@ -78,9 +79,46 @@ public class AuthRequest extends Message
                     this.wwwFormEncoding());
     }
 
-    public AuthRequest(ParameterList params) throws MessageException
+    protected AuthRequest(ParameterList params)
     {
         super(params);
+    }
+
+    public static AuthRequest createAuthRequest(String claimedId, String delegate,
+                       boolean compatibility, String returnToUrl,
+                       String handle, RealmVerifier verifier)
+            throws MessageException
+    {
+        return createAuthRequest(claimedId, delegate, compatibility,
+                returnToUrl, handle, returnToUrl, verifier);
+    }
+
+    public static AuthRequest createAuthRequest(String claimedId, String delegate,
+                       boolean compatibility, String returnToUrl,
+                       String handle, String realm, RealmVerifier verifier)
+            throws MessageException
+    {
+        AuthRequest req = new AuthRequest(claimedId, delegate, compatibility,
+                returnToUrl, handle, realm, verifier);
+
+        if (! req.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return req;
+    }
+
+    public static AuthRequest createAuthRequest(ParameterList params,
+                                                RealmVerifier realmVerifier)
+            throws MessageException
+    {
+        AuthRequest req = new AuthRequest(params);
+
+        req.setRealmVerifier(realmVerifier);
+
+        if (! req.isValid()) throw new MessageException(
+                "Invalid set of parameters for the requested message type");
+
+        return req;
     }
 
     public List getRequiredFields()
