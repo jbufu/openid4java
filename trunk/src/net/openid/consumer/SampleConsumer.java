@@ -56,7 +56,7 @@ public class SampleConsumer
         AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
 
         // attach the extension to the authentication request
-        authReq.addExtensionParams(fetch);
+        authReq.addExtension(fetch);
 
         // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
         return authReq.getRedirectUrl();
