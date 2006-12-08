@@ -20,8 +20,16 @@ public class StoreResponse extends AxMessage
     /**
      * Constructs a Store Response with an empty parameter list.
      */
-    public StoreResponse()
+    protected StoreResponse()
     {
+    }
+
+    /**
+     * Constructs a Store Response with an empty parameter list.
+     */
+    public static StoreResponse createStoreResponse()
+    {
+        return new StoreResponse();
     }
 
     /**
@@ -31,12 +39,27 @@ public class StoreResponse extends AxMessage
      * getExtensionParams method of the Message class, and MUST NOT contain
      * the "openid.<alias>." prefix.
      */
-    public StoreResponse(ParameterList params) throws MessageException
+    protected StoreResponse(ParameterList params)
     {
         super(params);
+    }
 
-        if (! isValid())
+    /**
+     * Constructs a StoreResponse from a parameter list.
+     * <p>
+     * The parameter list can be extracted from a received message with the
+     * getExtensionParams method of the Message class, and MUST NOT contain
+     * the "openid.<alias>." prefix.
+     */
+    public static StoreResponse createStoreResponse(ParameterList params)
+            throws MessageException
+    {
+        StoreResponse resp = new StoreResponse(params);
+
+        if (! resp.isValid())
             throw new MessageException("Invalid parameters for a store response");
+
+        return resp;
     }
 
     /**
@@ -46,7 +69,7 @@ public class StoreResponse extends AxMessage
      * @param       description     Describes the error condition leading to
      *                              the failure response
      */
-    public void setFailure(String description)
+    protected void setFailure(String description)
     {
         _parameters.set(new Parameter("status", "failure"));
 

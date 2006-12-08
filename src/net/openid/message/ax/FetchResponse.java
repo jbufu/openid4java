@@ -22,7 +22,7 @@ public class FetchResponse extends AxMessage
     /**
      * Constructs a Fetch Response with an empty parameter list.
      */
-    public FetchResponse()
+    protected FetchResponse()
     {
     }
 
@@ -41,12 +41,20 @@ public class FetchResponse extends AxMessage
      * getExtensionParams method of the Message class, and MUST NOT contain
      * the "openid.<alias>." prefix.
      */
-    public FetchResponse(ParameterList params) throws MessageException
+    protected FetchResponse(ParameterList params)
     {
         _parameters = params;
+    }
 
-        if (! isValid())
+    public static FetchResponse createFetchResponse(ParameterList params)
+            throws MessageException
+    {
+        FetchResponse resp = new FetchResponse(params);
+
+        if (! resp.isValid())
             throw new MessageException("Invalid parameters for a fetch response");
+
+        return resp;
     }
 
     /**
