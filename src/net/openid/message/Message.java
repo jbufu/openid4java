@@ -7,7 +7,6 @@ package net.openid.message;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.net.URLEncoder;
-import java.net.URI;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -22,6 +21,7 @@ public class Message
     private ParameterList _params;
     private int _extCounter;
     private Map _extAliases;
+    private Map _extesion;
 
 
     protected Message()
@@ -29,6 +29,7 @@ public class Message
         _params = new ParameterList();
         _extCounter = 0;
         _extAliases = new HashMap();
+        _extesion   = new HashMap();
     }
 
     protected Message (ParameterList params)
@@ -191,30 +192,20 @@ public class Message
     // ------------ extensions implementation ------------
 
     /**
-     * Retrieves or generates the extension alias for the protocol extension
+     * Retrieves the extension alias for the protocol extension
      * specified by the given URI string.
      * <p>
      * If the message doesn't contain already any parameters for the specified
-     * extension, a new extension alias will be generated, making sure it will
-     * not conflict with other existing extensions used in the message.
+     * extension, null will be returned.
      *
      * @param extensionTypeUri      The URI that identifies the extension
      * @return                      The extension alias associated with the
      *                              extension specifid by the Type URI
      */
-    private String getExtensionAlias(String extensionTypeUri)
+    public String getExtensionAlias(String extensionTypeUri)
     {
-        String extensionAlias = (String) _extAliases.get(extensionTypeUri);
-
-        if (extensionAlias == null)
-        {
-            extensionAlias = "ext" + new Integer(++ _extCounter);
-            _extAliases.put(extensionTypeUri, extensionAlias);
-        }
-
-        return extensionAlias;
+        return (String) _extAliases.get(extensionTypeUri);
     }
-
 
     /**
      * Gets a set of extension Type URIs that are present in the message.
@@ -234,13 +225,18 @@ public class Message
      * @param extension             A MessageExtension containing parameters
      *                              to be added to the message
      */
-    public void addExtensionParams(MessageExtension extension)
+    public void addExtension(MessageExtension extension) throws MessageException
     {
-        URI typeUri = extension.getTypeUri();
+        String typeUri = extension.getTypeUri().toString();
 
-        String alias = getExtensionAlias(typeUri.toString());
+        if (hasExtension(typeUri))
+            throw new MessageException("Extension already present: " + typeUri);
 
-        set("openid.ns." + alias, typeUri.toString());
+        String alias = "ext" + Integer.toString(++ _extCounter);
+
+        _extAliases.put(typeUri, alias);
+
+        set("openid.ns." + alias, typeUri);
 
         Iterator iter = extension.getParameters().getParameters().iterator();
         while (iter.hasNext())
@@ -265,7 +261,7 @@ public class Message
      * @return                      A ParameterList with all parameters
      *                              associated with the specified extension
      */
-    public ParameterList getExtensionParams(String extensionTypeUri)
+    private ParameterList getExtensionParams(String extensionTypeUri)
     {
         ParameterList extension = new ParameterList();
 
@@ -309,16 +305,21 @@ public class Message
      *
      * @param typeUri               The Type URI that identifies a extension.
      */
-    public MessageExtension getExtension(String typeUri)
+    public MessageExtension getExtension(String typeUri) throws MessageException
     {
-        MessageExtension extension = null;
-
-        if (MessageExtensionFactory.hasExtension(typeUri))
+        if (!_extesion.containsKey(typeUri))
         {
-            extension = MessageExtensionFactory.getExtension(typeUri);
-            extension.setParameters(getExtensionParams(typeUri));
+            if (MessageExtensionFactory.hasExtension(typeUri))
+            {
+                MessageExtension extension = MessageExtensionFactory.getExtension(typeUri);
+                extension.setParameters(getExtensionParams(typeUri));
+
+                _extesion.put(typeUri, extension);
+            }
+            else
+                throw new MessageException("Cannot instantiate extension: " + typeUri);
         }
 
-        return extension;
+        return (MessageExtension) _extesion.get(typeUri);
     }
 }
