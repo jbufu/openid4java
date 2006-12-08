@@ -42,6 +42,11 @@ import java.util.List;
 public class ConsumerManager
 {
     /**
+     * Discovery process manager.
+     */
+    Discovery _discovery = new Discovery();
+
+    /**
      * Store for keeping track of the established associations.
      */
     private ConsumerAssociationStore _associations;
@@ -49,8 +54,7 @@ public class ConsumerManager
     /**
      * Consumer-side nonce generator, needed for compatibility with OpenID 1.1.
      */
-    private static NonceGenerator _consumerNonceGenerator
-            = new IncrementalNonceGenerator();
+    private static NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
 
     // todo: private association for encrypting consumer nonces
 
@@ -146,6 +150,26 @@ public class ConsumerManager
     {
         _httpClient = new HttpClient();
         _realmVerifier = new RealmVerifier();
+    }
+
+    /**
+     * Returns discovery process manager.
+     *
+     * @return discovery process manager.
+     */
+    public Discovery getDiscovery()
+    {
+        return _discovery;
+    }
+
+    /**
+     * Sets discovery process manager.
+     *
+     * @param discovery discovery process manager.
+     */
+    public void setDiscovery(Discovery discovery)
+    {
+        _discovery = discovery;
     }
 
     /**
@@ -426,6 +450,19 @@ public class ConsumerManager
     public long getMaxNonceAge()
     {
         return _nonceVerifier.getMaxAge();
+    }
+
+    /**
+     * Does discover on an identifier. It delegates the call to its discovery manager.
+     *
+     * @return A List of {@link DiscoveryInformation} objects. The list could be empty if no discovery
+     * information can be retrieved.
+     *
+     * @throws DiscoveryException if the discovery process runs into errors.
+     */
+    public List discover(String identifier) throws DiscoveryException
+    {
+        return _discovery.discover(identifier);
     }
 
     /**
@@ -1092,7 +1129,7 @@ public class ConsumerManager
         DiscoveryInformation newDiscovery = null;
 
         // perform discovery on the claim identifier in the assertion
-        List discoveries = Discovery.discover(respClaim);
+        List discoveries = _discovery.discover(respClaim);
 
         // try to determine which service endpoint to use
         // - OP-specific ID in discovery must match with the assertedID
