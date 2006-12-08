@@ -10,6 +10,8 @@ import junit.framework.TestCase;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -19,13 +21,17 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.Element;
 
+import javax.servlet.ServletException;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class RealmVerifierTest extends TestCase
 {
-    private static final String TEST_DATA_FILE = "net/openid/server/RealmTestData.xml";
+    private static final String TEST_DATA_FILE = "RealmTestData.xml";
     private static final Map _resultCodes = new HashMap();
+
+    private String _testDataPath;
 
     static
     {
@@ -42,9 +48,15 @@ public class RealmVerifierTest extends TestCase
 
     private RealmVerifier _realmVerifier;
 
-    public RealmVerifierTest(String name)
+    public RealmVerifierTest(String name) throws ServletException
     {
         super(name);
+
+        _testDataPath = System.getProperty("TEST_DATA");
+
+        if (_testDataPath == null)
+            throw new ServletException("TEST_DATA path not initialized");
+
     }
 
     public void setUp() throws Exception
@@ -54,7 +66,8 @@ public class RealmVerifierTest extends TestCase
 
     public void testXmlFile() throws IOException, JDOMException
     {
-        InputStream in = getClass().getClassLoader().getResourceAsStream(TEST_DATA_FILE);
+        InputStream in = new BufferedInputStream(
+                new FileInputStream(_testDataPath + "/server/" + TEST_DATA_FILE));
 
         assertNotNull("XML data file could not be loaded: " + TEST_DATA_FILE, in);
 
