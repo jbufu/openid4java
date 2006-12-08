@@ -3,7 +3,7 @@
  */
 
 package net.openid.message;
-   
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
@@ -50,8 +50,8 @@ public class ParameterListTest extends TestCase
         parameterList2 = new ParameterList();
 
         parameterList2.set(new Parameter("key2", "value1"));
-        parameterList2.set(new Parameter("key1", "value2"));
         parameterList2.set(new Parameter("key1", "value1"));
+        parameterList2.set(new Parameter("key1", "value2"));
         parameterList2.set(new Parameter("key3", "value1"));
         parameterList2.set(new Parameter("key3", "value2"));
         parameterList2.set(new Parameter("key3", "value1"));
@@ -83,8 +83,8 @@ public class ParameterListTest extends TestCase
         parameterList2 = new ParameterList();
 
         parameterList2.set(new Parameter("key2", "value1"));
-        parameterList2.set(new Parameter("key1", "value2"));
         parameterList2.set(new Parameter("key1", "value1"));
+        parameterList2.set(new Parameter("key1", "value2"));
         parameterList2.set(new Parameter("key3", "value1"));
         parameterList2.set(new Parameter("key3", "value2"));
         parameterList2.set(new Parameter("key3", "value1"));
@@ -98,22 +98,22 @@ public class ParameterListTest extends TestCase
     {
         ParameterList parameterList2 = new ParameterList(_parameterList);
 
-        assertEquals(3, _parameterList.getParameters().size());
-        assertEquals(3, parameterList2.getParameters().size());
+        assertEquals(2, _parameterList.getParameters().size());
+        assertEquals(2, parameterList2.getParameters().size());
 
         _parameterList.removeParameters("key1");
 
         assertEquals(1, _parameterList.getParameters().size());
-        assertEquals(3, parameterList2.getParameters().size());
+        assertEquals(2, parameterList2.getParameters().size());
     }
 
     public void testAdd() throws Exception
     {
+        assertEquals(2, _parameterList.getParameters().size());
+
+        _parameterList.set(new Parameter("key3", "value1"));
+
         assertEquals(3, _parameterList.getParameters().size());
-
-        _parameterList.set(new Parameter("key2", "value1"));
-
-        assertEquals(4, _parameterList.getParameters().size());
     }
 
     public void testGetParameter() throws Exception
@@ -122,19 +122,6 @@ public class ParameterListTest extends TestCase
 
         assertNotNull(parameter);
         assertEquals("value1", parameter.getValue());
-    }
-
-    public void testGetParameterMulti() throws Exception
-    {
-        try
-        {
-            _parameterList.getParameter("key1");
-
-            fail("Exception expected if retrieving single value from multi value parameter!");
-        }
-        catch (IllegalStateException ignore)
-        {
-        }
     }
 
     public void testGetParameterNull() throws Exception
@@ -152,24 +139,11 @@ public class ParameterListTest extends TestCase
         assertEquals("value1", value);
     }
 
-    public void testGetParameterValueMulti() throws Exception
-    {
-        try
-        {
-            _parameterList.getParameterValue("key1");
-
-            fail("Exception expected if retrieving single value from multi value parameter!");
-        }
-        catch (IllegalStateException ignore)
-        {
-        }
-    }
-
     public void testGetParameters() throws Exception
     {
         List parameters = _parameterList.getParameters();
 
-        assertEquals(3, parameters.size());
+        assertEquals(2, parameters.size());
     }
 
 
@@ -191,19 +165,9 @@ public class ParameterListTest extends TestCase
 
     public void testReplaceParameters() throws Exception
     {
-        try
-        {
-            _parameterList.set(
-                new Parameter("key2", "value3"));
+        _parameterList.set(new Parameter("key2", "value3"));
 
-            fail("A exception should be thrown when trying to set an existing parameter");
-
-        } catch (IllegalArgumentException expected)
-        {
-            assertTrue(true);
-        }
-
-        assertEquals("value1", _parameterList.getParameter("key2").getValue());
+        assertEquals("value3", _parameterList.getParameter("key2").getValue());
     }
 
     public void testHasParameter() throws Exception
