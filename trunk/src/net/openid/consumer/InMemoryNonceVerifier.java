@@ -4,69 +4,43 @@
 
 package net.openid.consumer;
 
-import net.openid.util.InternetDateFormat;
-
 import java.util.*;
 import java.text.ParseException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public class InMemoryNonceVerifier implements NonceVerifier
+public class InMemoryNonceVerifier extends AbstractNonceVerifier
 {
-    private static InternetDateFormat _dateFormat = new InternetDateFormat();
     private Map _idpMap = new HashMap();
-    private long _maxAge;
 
-    /**
-     * @param maxAge maximum token age in seconds
-     */
     public InMemoryNonceVerifier(int maxAge)
     {
-        _maxAge = maxAge * 1000;
+        super(maxAge);
     }
 
-    public int getMaxAge()
+    protected synchronized int seen(Date now, String idpUrl, String nonce)
     {
-        return (int) (_maxAge / 1000);
+        removeAged(now);
+
+        Set seenSet = (Set) _idpMap.get(idpUrl);
+
+        if (seenSet == null)
+        {
+            seenSet = new HashSet();
+
+            _idpMap.put(idpUrl, seenSet);
+        }
+
+        if (seenSet.contains(nonce))
+            return SEEN;
+
+        seenSet.add(nonce);
+
+        return OK;
     }
 
-    public synchronized int seen(String idpUrl, String nonce)
-    {
-        Date now = new Date();
-
-        try
-        {
-            removeAged(now);
-
-            Date nonceDate = _dateFormat.parse(nonce);
-
-            if (isTooOld(now, nonceDate))
-                return TOO_OLD;
-
-            Set seenSet = (Set) _idpMap.get(idpUrl);
-
-            if (seenSet == null)
-            {
-                seenSet = new HashSet();
-
-                _idpMap.put(idpUrl, seenSet);
-            }
-
-            if (seenSet.contains(nonce))
-                return SEEN;
-
-            seenSet.add(nonce);
-
-            return OK;
-        }
-        catch (ParseException e)
-        {
-            return INVALID_TIMESTAMP;
-        }
-    }
-
-    private synchronized void removeAged(Date now) throws ParseException
+    private synchronized void removeAged(Date now)
     {
         Set idpToRemove = new HashSet();
         Iterator idpUrls = _idpMap.keySet().iterator();
@@ -82,9 +56,16 @@ public class InMemoryNonceVerifier implements NonceVerifier
             {
                 String nonce = (String) nonces.next();
 
-                Date nonceDate = _dateFormat.parse(nonce);
+                try
+                {
+                    Date nonceDate = _dateFormat.parse(nonce);
 
-                if (isTooOld(now, nonceDate))
+                    if (isTooOld(now, nonceDate))
+                    {
+                        nonceToRemove.add(nonce);
+                    }
+                }
+                catch (ParseException e)
                 {
                     nonceToRemove.add(nonce);
                 }
@@ -109,13 +90,6 @@ public class InMemoryNonceVerifier implements NonceVerifier
 
             _idpMap.remove(idpUrl);
         }
-    }
-
-    private boolean isTooOld(Date now, Date nonce)
-    {
-        long age = now.getTime() - nonce.getTime();
-
-        return age > _maxAge;
     }
 
     protected synchronized int size()
