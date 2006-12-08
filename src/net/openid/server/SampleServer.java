@@ -20,6 +20,7 @@ public class SampleServer
     public static ServerManager manager = new ServerManager();
 
     public String processRequest(HttpServletRequest httpReq)
+            throws ServerException
     {
         // extract the parameters from the request
         ParameterList request = new ParameterList(httpReq.getParameterMap());
@@ -67,9 +68,8 @@ public class SampleServer
         return responseText;
     }
 
-    private List userInteraction(ParameterList request)
+    private List userInteraction(ParameterList request) throws ServerException
     {
-        return null;
+        throw new ServerException("User-interaction not implemented.");
     }
-
 }

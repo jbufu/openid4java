@@ -156,7 +156,7 @@ API Usage and Examples:
         Identifier verified = verification.getVerifiedId();
         if (verified != null)
         {
-            // Attribute Exchange example: retrieving the fetched "email" attribute
+            // Attribute Exchange: retrieving the fetched "email" attribute
             AuthSuccess authSuccess = AuthSuccess.createAuthSuccess(response);
             MessageExtension ext =
                     authSuccess.getExtension(AxMessage.OPENID_NS_AX);
