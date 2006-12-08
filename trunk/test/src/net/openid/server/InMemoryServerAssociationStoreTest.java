@@ -11,7 +11,7 @@ import net.openid.association.AssociationException;
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public class InMemoryServerAssociationStoreTest extends ServerAssociationStoreTest
+public class InMemoryServerAssociationStoreTest extends AbstractServerAssociationStoreTest
 {
     public InMemoryServerAssociationStoreTest(String name)
     {

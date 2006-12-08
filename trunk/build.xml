@@ -3,7 +3,7 @@
 <project name="OpenID4Java Library" default="dist" basedir=".">
 
     <property environment="env"/>
-
+    <property file="local.properties"/>
     <property file="project.properties"/>
 
     <target name="create_paths">
@@ -55,7 +55,7 @@
         <fail unless=".html.file.to.browse"/>
         <exec command="${browser.cmd} ${.html.file.to.browse}" spawn="yes"/>
     </target>
-    
+
     <target name="compile" depends="prepare" description="Compiles main code">
         <mkdir dir="${classes}"/>
         <javac srcdir="${src}"
@@ -160,6 +160,7 @@
                 <formatter type="xml"/>
                 <fileset dir="${test.src}">
                     <include name="**/*Test.java"/>
+                    <exclude name="**/Abstract*.java"/>
                 </fileset>
             </batchtest>
         </junit>

@@ -18,12 +18,12 @@ import net.openid.util.InternetDateFormat;
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public abstract class NonceGeneratorTest extends TestCase
+public abstract class AbstractNonceGeneratorTest extends TestCase
 {
     protected InternetDateFormat _dateFormat = new InternetDateFormat();
     protected NonceGenerator _nonceGenerator;
 
-    public NonceGeneratorTest(String name)
+    public AbstractNonceGeneratorTest(String name)
     {
         super(name);
     }
@@ -72,6 +72,6 @@ public abstract class NonceGeneratorTest extends TestCase
 
     public static Test suite()
     {
-        return new TestSuite(NonceGeneratorTest.class);
+        return new TestSuite(AbstractNonceGeneratorTest.class);
     }
 }
