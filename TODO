@@ -28,6 +28,11 @@
     error   transaction failures
     fatal   cannot function at all
 
+  Update HTML discovery (rev 154)
+  IsProviderAuthoritative (rev 165)
+  Verification for return_to (rev 166)
+  op_endpoint in auth responses (rev 171)
+
   (Do not) Allow extensions in openid 1 messages?
 
   Simple registration extension (email verifier, Dick should advise)
