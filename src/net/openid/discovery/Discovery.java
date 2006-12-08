@@ -276,15 +276,16 @@ public class Discovery
                 claimedIdentifier = parseIdentifier(canonicalId.getValue());
             }
 
-            delegateIdentifier = getDelegate(service);
+            delegateIdentifier = getDelegate(service, false);
         }
+        // todo: remove else, return one endpoint for all v1/v2 entries?
         else if (matchType(service, DiscoveryInformation.OPENID10) ||
                 matchType(service, DiscoveryInformation.OPENID11))
         {
             version = DiscoveryInformation.OPENID11;
             idpEndpointUrl = getOPEndpoint(service);
             claimedIdentifier = identifier;
-            delegateIdentifier = getDelegate(service);
+            delegateIdentifier = getDelegate(service, true);
         }
         else
         {
@@ -308,16 +309,30 @@ public class Discovery
         }
     }
 
-    public static Identifier getDelegate(Service service) throws DiscoveryException
+    public static Identifier getDelegate(Service service, boolean compatibility)
+            throws DiscoveryException
     {
         Identifier delegate = null;
+        String delegateTag;
+        String delegateNs;
 
-        Vector delegateTags = service.getOtherTagValues("Delegate");
+        if (compatibility)
+        {
+            delegateTag = "Delegate";
+            delegateNs = "http://openid.net/xmlns/1.0";
+        }
+        else
+        {
+            delegateTag = "LocalID";
+            delegateNs = "xri://$xrds";
+        }
+
+        Vector delegateTags = service.getOtherTagValues(delegateTag);
         for (int i = 0; delegateTags != null && i < delegateTags.size(); i++)
         {
             Element element = (Element) delegateTags.elementAt(i);
 
-            if ("http://openid.net/xmlns/1.0"
+            if (delegateNs
                     .equals(element.getNamespaceURI()))
             {
                 String delegateStr = element.getFirstChild().getNodeValue();

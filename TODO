@@ -35,7 +35,7 @@
 
   (Do not) Allow extensions in openid 1 messages?
 
-  Simple registration extension (email verifier, Dick should advise)
+  Simple registration extension
 
   - Error responses:
     - currently we throw exceptions when errors are encountered;
