@@ -35,9 +35,11 @@ public class Discovery
     final private static String ROOT_DEF_AT_URI   = "http://at.xri.net";
     final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
 
-    private static Resolver _resolver = new Resolver();
+    private Resolver _xriResolver = new Resolver();
+    private YadisResolver _yadisResolver = new YadisResolver();
+    private HtmlResolver _htmlResolver = new HtmlResolver();
 
-    static
+    public Discovery()
     {
         // populate the root with whatever trustType the user requested
         String trustParam = ";trust=none";
@@ -63,9 +65,24 @@ public class Discovery
         bangAuthService.addURI(ROOT_DEF_BANG_URI);
         bangRoot.addService(bangAuthService);
 
-        _resolver.setAuthority("=", eqRoot);
-        _resolver.setAuthority("@", atRoot);
-        _resolver.setAuthority("!", bangRoot);
+        _xriResolver.setAuthority("=", eqRoot);
+        _xriResolver.setAuthority("@", atRoot);
+        _xriResolver.setAuthority("!", bangRoot);
+    }
+
+    public void setXriResolver(Resolver xriResolver)
+    {
+        _xriResolver = xriResolver;
+    }
+
+    public void setYadisResolver(YadisResolver yadisResolver)
+    {
+        _yadisResolver = yadisResolver;
+    }
+
+    public void setHtmlResolver(HtmlResolver htmlResolver)
+    {
+        _htmlResolver = htmlResolver;
     }
 
     public static Identifier parseIdentifier(String identifier)
@@ -94,13 +111,13 @@ public class Discovery
     }
 
 
-    public static List discover(String identifier)
+    public List discover(String identifier)
             throws DiscoveryException
     {
         return discover(parseIdentifier(identifier));
     }
 
-    public static List discover(Identifier identifier)
+    public List discover(Identifier identifier)
             throws DiscoveryException
     {
 
@@ -112,7 +129,7 @@ public class Discovery
             try
             {
                 TrustType trustAll = new TrustType(TrustType.TRUST_NONE);
-                xrds = _resolver.resolveAuthToXRDS(
+                xrds = _xriResolver.resolveAuthToXRDS(
                         xriIdentifier.getXriIdentifier(), trustAll, true, new ResolverState());
 
                 XRD xrd = xrds.getFinalXRD();
@@ -123,7 +140,7 @@ public class Discovery
                 {
                     Identifier canonicalId =
                             new XriIdentifier(canonical.getValue());
-                    XRDS newXrds = _resolver.resolveAuthToXRDS(
+                    XRDS newXrds = _xriResolver.resolveAuthToXRDS(
                             canonicalId.getIdentifier(), trustAll, true, new ResolverState());
 
                     //todo: not sure what to compare from user / canonical XRDS
@@ -145,8 +162,7 @@ public class Discovery
         {
             UrlIdentifier urlId = (UrlIdentifier) identifier;
 
-            YadisResult yadis = (new YadisResolver()).discover(
-                    urlId.getUrlIdentifier().toString());
+            YadisResult yadis = _yadisResolver.discover(urlId.getUrlIdentifier().toString());
 
             if (YadisResult.OK == yadis.getStatus())
             {
@@ -161,8 +177,7 @@ public class Discovery
                 //                + yadis.getStatusMessage());
 
                 // attempt HTML-based discovery
-                HtmlResolver resolver = new HtmlResolver();
-                DiscoveryInformation info = resolver.discover(urlId);
+                DiscoveryInformation info = _htmlResolver.discover(urlId);
                 List result = new ArrayList();
                 result.add(info);
 

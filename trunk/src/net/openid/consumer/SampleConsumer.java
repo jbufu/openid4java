@@ -5,7 +5,6 @@
 package net.openid.consumer;
 
 import net.openid.discovery.Identifier;
-import net.openid.discovery.Discovery;
 import net.openid.discovery.DiscoveryInformation;
 import net.openid.discovery.DiscoveryException;
 import net.openid.message.ax.FetchRequest;
@@ -37,11 +36,8 @@ public class SampleConsumer
         // the authentication responses from the OpenID provider
         String returnToUrl = "http://example.com/openid";
 
-        // build an Identifier instance from the user-supplied identifier
-        Identifier identifier = Discovery.parseIdentifier(userSuppliedString);
-
         // perform discovery on the user-supplied identifier
-        List discoveries = Discovery.discover(identifier);
+        List discoveries = manager.discover(userSuppliedString);
 
         // attempt to associate with an OpenID provider
         // and retrieve one service endpoint for authentication
