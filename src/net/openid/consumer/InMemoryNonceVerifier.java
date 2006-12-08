@@ -26,14 +26,9 @@ public class InMemoryNonceVerifier implements NonceVerifier
         _maxAge = maxAge * 1000;
     }
 
-    public long getMaxAge()
+    public int getMaxAge()
     {
-        return _maxAge / 1000;
-    }
-
-    public void setMaxAge(long age)
-    {
-        _maxAge = age * 1000;
+        return (int) (_maxAge / 1000);
     }
 
     public synchronized int seen(String idpUrl, String nonce)
