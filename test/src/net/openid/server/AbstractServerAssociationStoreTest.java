@@ -13,11 +13,11 @@ import net.openid.association.AssociationException;
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public abstract class ServerAssociationStoreTest extends TestCase
+public abstract class AbstractServerAssociationStoreTest extends TestCase
 {
     protected ServerAssociationStore _associationStore;
 
-    public ServerAssociationStoreTest(String name)
+    public AbstractServerAssociationStoreTest(String name)
     {
         super(name);
     }
@@ -102,6 +102,6 @@ public abstract class ServerAssociationStoreTest extends TestCase
 
     public static Test suite()
     {
-        return new TestSuite(ServerAssociationStoreTest.class);
+        return new TestSuite(AbstractServerAssociationStoreTest.class);
     }
 }

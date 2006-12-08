@@ -12,7 +12,7 @@ import net.sf.ehcache.Cache;
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public class EhcacheNonceVerifierTest extends NonceVerifierTest
+public class EhcacheNonceVerifierTest extends AbstractNonceVerifierTest
 {
     private CacheManager _cacheManager;
 

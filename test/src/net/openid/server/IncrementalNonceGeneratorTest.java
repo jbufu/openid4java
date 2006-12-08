@@ -10,7 +10,7 @@ import junit.framework.TestSuite;
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public class IncrementalNonceGeneratorTest extends NonceGeneratorTest
+public class IncrementalNonceGeneratorTest extends AbstractNonceGeneratorTest
 {
     public IncrementalNonceGeneratorTest(String name)
     {

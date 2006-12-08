@@ -16,13 +16,13 @@ import java.util.Date;
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public abstract class NonceVerifierTest extends TestCase
+public abstract class AbstractNonceVerifierTest extends TestCase
 {
     protected NonceVerifier _nonceVerifier;
     protected InternetDateFormat _dateFormat = new InternetDateFormat();
     public static final int MAX_AGE = 60;
 
-    public NonceVerifierTest(String name)
+    public AbstractNonceVerifierTest(String name)
     {
         super(name);
     }
@@ -86,6 +86,6 @@ public abstract class NonceVerifierTest extends TestCase
 
     public static Test suite()
     {
-        return new TestSuite(NonceVerifierTest.class);
+        return new TestSuite(AbstractNonceVerifierTest.class);
     }
 }
