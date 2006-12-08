@@ -27,10 +27,19 @@ public class FetchResponse extends AxMessage
     }
 
     /**
+     * Constructs a Fetch Response with an empty parameter list.
+     */
+    public static FetchResponse createFetchResponse()
+    {
+        return new FetchResponse();
+    }
+
+    /**
      * Constructs a FetchResponse from a parameter list.
      * <p>
-     * The parameter list should be extracted from a received message with the
-     * getExtensionParams method of the Message class.
+     * The parameter list can be extracted from a received message with the
+     * getExtensionParams method of the Message class, and MUST NOT contain
+     * the "openid.<alias>." prefix.
      */
     public FetchResponse(ParameterList params) throws MessageException
     {

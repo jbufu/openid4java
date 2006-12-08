@@ -27,8 +27,9 @@ public class StoreResponse extends AxMessage
     /**
      * Constructs a StoreResponse from a parameter list.
      * <p>
-     * The parameter list should be extracted from a received message with the
-     * getExtensionParams method of the Message class.
+     * The parameter list can be extracted from a received message with the
+     * getExtensionParams method of the Message class, and MUST NOT contain
+     * the "openid.<alias>." prefix.
      */
     public StoreResponse(ParameterList params) throws MessageException
     {

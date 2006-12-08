@@ -146,8 +146,9 @@
         <delete dir="${build}/test/junit/xml"/>
         <mkdir dir="${build}/test/junit/xml"/>
         <junit printsummary="yes" fork="no" failureproperty="test.failed">
-            <sysproperty key="TEST_DATA" value="${build}/test/data"/>
+            <sysproperty key="YADIS_TEST_DATA" value="${build}/test/data"/>
             <sysproperty key="SERVLET_PORT" value="${test.servlet.port}"/>
+            <sysproperty key="DISCOVERY_TEST_DATA" value="${test.src}/net/openid/discovery/"/>
             <classpath>
                 <pathelement location="${classes.test}"/>
                 <pathelement location="${classes}"/>

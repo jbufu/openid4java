@@ -27,8 +27,9 @@ public class StoreRequest extends AxMessage
     /**
      * Constructs a StoreRequest from a parameter list.
      * <p>
-     * The parameter list should be extracted from a received message with the
-     * getExtensionParams method of the Message class.
+     * The parameter list can be extracted from a received message with the
+     * getExtensionParams method of the Message class, and MUST NOT contain
+     * the "openid.<alias>." prefix.
      */
     public StoreRequest(ParameterList params) throws MessageException
     {

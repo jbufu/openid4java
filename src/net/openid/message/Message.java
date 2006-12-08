@@ -259,7 +259,7 @@ public class Message
      * Retrieves the parameters associated with a protocol extension,
      * specified by the given Type URI string.
      * <p>
-     * The "openid.ns.<alias>" parameter is included in the returned list.
+     * The "openid.ns.<alias>" parameter is NOT included in the returned list.
      *
      * @param extensionTypeUri      The Type URI that identifies the extension
      * @return                      A ParameterList with all parameters

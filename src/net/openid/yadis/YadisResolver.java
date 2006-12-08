@@ -274,7 +274,7 @@ public class YadisResolver
             int statusCode = client.executeMethod(get);
             if (statusCode != HttpStatus.SC_OK)
                 throw new YadisException(
-                        "GET failed on " + result.getXrdsLocation().toString(),
+                        "GET failed on " + getUrl,
                         YadisResult.GET_ERROR);
 
             // check first if there's a XRDS download stream available
