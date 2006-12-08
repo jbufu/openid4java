@@ -1,3 +1,7 @@
+/*
+ * Copyright 2006 Sxip Identity Corporation
+ */
+
 package net.openid.consumer;
 
 import junit.framework.Test;

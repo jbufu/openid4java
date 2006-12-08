@@ -75,7 +75,7 @@ public abstract class AbstractServerAssociationStoreTest extends TestCase
         String handle = _associationStore.generate(Association.TYPE_HMAC_SHA1, 1).getHandle();
 
         assertNotNull(_associationStore.load(handle));
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         assertNull(_associationStore.load(handle));
     }
 
@@ -95,7 +95,7 @@ public abstract class AbstractServerAssociationStoreTest extends TestCase
         _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
         _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         _associationStore.generate(Association.TYPE_HMAC_SHA1, 1);
     }

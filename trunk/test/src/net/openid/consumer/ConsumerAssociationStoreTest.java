@@ -60,7 +60,7 @@ public abstract class ConsumerAssociationStoreTest extends TestCase
         _associationStore.save("http://example.net", Association.generateHmacSha256("b", 1));
         _associationStore.save("http://example.net", Association.generateHmacSha1("c", 1));
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         _associationStore.save("http://example.org", Association.generateHmacSha1("d", 1));
     }
