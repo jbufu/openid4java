@@ -20,8 +20,16 @@ public class StoreRequest extends AxMessage
     /**
      * Constructs a Store Request with an empty parameter list.
      */
-    public StoreRequest()
+    protected StoreRequest()
     {
+    }
+
+    /**
+     * Constructs a Store Request with an empty parameter list.
+     */
+    public static StoreRequest createStoreRequest()
+    {
+        return new StoreRequest();
     }
 
     /**
@@ -31,13 +39,27 @@ public class StoreRequest extends AxMessage
      * getExtensionParams method of the Message class, and MUST NOT contain
      * the "openid.<alias>." prefix.
      */
-    public StoreRequest(ParameterList params) throws MessageException
+    protected StoreRequest(ParameterList params)
     {
         _parameters = params;
+    }
 
-        if (! isValid())
+    /**
+     * Constructs a StoreRequest from a parameter list.
+     * <p>
+     * The parameter list can be extracted from a received message with the
+     * getExtensionParams method of the Message class, and MUST NOT contain
+     * the "openid.<alias>." prefix.
+     */
+    public static StoreRequest createStoreRequest(ParameterList params)
+            throws MessageException
+    {
+        StoreRequest req = new StoreRequest(params);
+
+        if (! req.isValid())
             throw new MessageException("Invalid parameters for a store request");
 
+        return req;
     }
 
     /**

@@ -44,7 +44,7 @@ public class FetchRequest extends AxMessage
      * getExtensionParams method of the Message class, and MUST NOT contain
      * the "openid.<alias>." prefix.
      */
-    public FetchRequest(ParameterList params)
+    protected FetchRequest(ParameterList params)
     {
         _parameters = params;
 
@@ -57,7 +57,7 @@ public class FetchRequest extends AxMessage
      * getExtensionParams method of the Message class, and MUST NOT contain
      * the "openid.<alias>." prefix.
      */
-    protected static FetchRequest createFetchRequest(ParameterList params)
+    public static FetchRequest createFetchRequest(ParameterList params)
             throws MessageException
     {
         FetchRequest req = new FetchRequest(params);
