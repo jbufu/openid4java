@@ -30,11 +30,11 @@ public class DiscoveryTest extends TestCase
     public DiscoveryTest(String name) throws ServletException
     {
         super(name);
-        _testDataPath = System.getProperty("DISCOVERY_TEST_DATA");
+
+        _testDataPath = System.getProperty("TEST_DATA");
 
         if (_testDataPath == null)
-            throw new ServletException("DISCOVERY_TEST_DATA path not initialized");
-
+            throw new ServletException("TEST_DATA path not initialized");
     }
 
     public void testParseUrl() throws DiscoveryException
@@ -85,7 +85,7 @@ public class DiscoveryTest extends TestCase
 
 
         InputStream inputStream = new BufferedInputStream(
-                new FileInputStream(_testDataPath + xmlFileName));
+                new FileInputStream(_testDataPath + "/discovery/" + xmlFileName));
 
         Document document = documentBuilder.parse(inputStream);
 
