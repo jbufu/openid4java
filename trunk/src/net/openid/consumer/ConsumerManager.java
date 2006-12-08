@@ -429,20 +429,6 @@ public class ConsumerManager
     }
 
     /**
-     * Sets the maximum age (in seconds) the ConsumerManager will keep track
-     * of nonce tokens.
-     * <p>
-     * Nonces older than the max age will be removed from the store and
-     * authentication responses will be considered failures.
-     * <p>
-     * Default: 7200
-     */
-    public void setMaxNonceAge(long maxNonceAge)
-    {
-        _nonceVerifier.setMaxAge(maxNonceAge);
-    }
-
-    /**
      * Makes a HTTP call to the specified URL with the parameters specified
      * in the Message
      *
