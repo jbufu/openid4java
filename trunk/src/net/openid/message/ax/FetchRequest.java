@@ -25,22 +25,47 @@ public class FetchRequest extends AxMessage
     /**
      * Constructs a Fetch Request with an empty parameter list.
      */
-    public FetchRequest()
+    protected FetchRequest()
     {
+    }
+
+    /**
+     * Constructs a Fetch Request with an empty parameter list.
+     */
+    public static FetchRequest createFetchRequest()
+    {
+        return new FetchRequest();
     }
 
     /**
      * Constructs a FetchRequest from a parameter list.
      * <p>
-     * The parameter list should be extracted from a received message with the
-     * getExtensionParams method of the Message class.
+     * The parameter list can be extracted from a received message with the
+     * getExtensionParams method of the Message class, and MUST NOT contain
+     * the "openid.<alias>." prefix.
      */
-    public FetchRequest(ParameterList params) throws MessageException
+    public FetchRequest(ParameterList params)
     {
         _parameters = params;
 
-        if (! isValid())
+    }
+
+    /**
+     * Constructs a FetchRequest from a parameter list.
+     * <p>
+     * The parameter list can be extracted from a received message with the
+     * getExtensionParams method of the Message class, and MUST NOT contain
+     * the "openid.<alias>." prefix.
+     */
+    protected static FetchRequest createFetchRequest(ParameterList params)
+            throws MessageException
+    {
+        FetchRequest req = new FetchRequest(params);
+
+        if (! req.isValid())
             throw new MessageException("Invalid parameters for a fetch request");
+
+        return req;
     }
 
     /**

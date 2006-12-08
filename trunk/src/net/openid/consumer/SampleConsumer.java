@@ -11,6 +11,7 @@ import net.openid.discovery.DiscoveryException;
 import net.openid.message.ax.FetchRequest;
 import net.openid.message.ax.FetchResponse;
 import net.openid.message.ax.AxMessage;
+import net.openid.message.ax.StoreResponse;
 import net.openid.message.*;
 import net.openid.association.AssociationException;
 
@@ -50,7 +51,7 @@ public class SampleConsumer
         session.setAttribute("openid-disco", discovered);
 
         // Attribute Exchange example: fetching the 'email' attribute
-        FetchRequest fetch = new FetchRequest();
+        FetchRequest fetch = FetchRequest.createFetchRequest();
         fetch.addAttribute("email",                         // attribute alias
                 "http://schema.openid.net/contact/email",   // type URI
                 true);                                      // required
@@ -96,14 +97,40 @@ public class SampleConsumer
         {
             // Attribute Exchange example: retrieving the fetched "email" attribute
             AuthSuccess authSuccess = AuthSuccess.createAuthSuccess(response);
-            MessageExtension ext =
-                    authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-            if (ext != null)
+            //MessageExtension ext =
+            //        authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+            //if (ext != null)
+            //{
+            //    FetchResponse fetchResp =
+            //            new FetchResponse(ext.getParameters());
+            //    String email = fetchResp.getParameter("email");
+            //}
+
+            if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
             {
-                FetchResponse fetchResp =
-                        new FetchResponse(ext.getParameters());
-                String email = fetchResp.getParameter("email");
+                //FetchResponse resp = new FetchResponse(
+                //        authSuccess.getExtensionParams(AxMessage.OPENID_NS_AX));
+
+                //FetchResponse resp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+
+                MessageExtension resp = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+
+                if (resp instanceof FetchResponse)
+                {
+
+                }
+                else if (resp instanceof StoreResponse)
+                {
+
+                }
+                else
+                {
+
+                }
             }
+
+
+
 
             return verified;  // success
         }

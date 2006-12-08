@@ -10,11 +10,14 @@ import junit.framework.TestCase;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.servlet.ServletException;
 
 import org.w3c.dom.Document;
 import org.openxri.xml.XRDS;
 
 import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.util.List;
 
 /**
@@ -22,9 +25,16 @@ import java.util.List;
  */
 public class DiscoveryTest extends TestCase
 {
-    public DiscoveryTest(String name)
+    private String _testDataPath;
+
+    public DiscoveryTest(String name) throws ServletException
     {
         super(name);
+        _testDataPath = System.getProperty("DISCOVERY_TEST_DATA");
+
+        if (_testDataPath == null)
+            throw new ServletException("DISCOVERY_TEST_DATA path not initialized");
+
     }
 
     public void testParseUrl() throws DiscoveryException
@@ -73,7 +83,9 @@ public class DiscoveryTest extends TestCase
 
         assertTrue(documentBuilder.isNamespaceAware());
 
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("net/openid/discovery/" + xmlFileName);
+
+        InputStream inputStream = new BufferedInputStream(
+                new FileInputStream(_testDataPath + xmlFileName));
 
         Document document = documentBuilder.parse(inputStream);
 

@@ -40,15 +40,14 @@ public class MessageTest extends TestCase
 
     public void testKeyValueFormEncoding() throws Exception
     {
-        String keyValueForm = "key1:value1\nkey1:value2\nkey2:value1\n";
+        String keyValueForm = "key1:value2\nkey2:value1\n";
 
-        assertEquals(URLEncoder.encode(keyValueForm, "UTF-8"),
-                _msg.keyValueFormEncoding());
+        assertEquals(keyValueForm, _msg.keyValueFormEncoding());
     }
 
     public void testWwwFormEncoding() throws Exception
     {
-        String wwwForm = "openid.key1=value1&openid.key1=value2&openid.key2=value1";
+        String wwwForm = "openid.key1=value2&openid.key2=value1";
 
         assertEquals(wwwForm, _msg.wwwFormEncoding());
     }

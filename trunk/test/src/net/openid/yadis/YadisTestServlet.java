@@ -23,10 +23,10 @@ public class YadisTestServlet extends HttpServlet
 
     public YadisTestServlet() throws ServletException
     {
-        _testDataPath = System.getProperty("TEST_DATA");
+        _testDataPath = System.getProperty("YADIS_TEST_DATA");
 
         if (_testDataPath == null)
-            throw new ServletException("TEST_DATA path not initialized");
+            throw new ServletException("YADIS_TEST_DATA path not initialized");
     }
 
     public void doHead(HttpServletRequest request, HttpServletResponse response)
