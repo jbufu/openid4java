@@ -141,6 +141,13 @@ public class RealmVerifier
         return realmPort == returnToPort;
     }
 
+    /**
+     * Does the URL's path equal to or a sub-directory of the realm's path.
+     * 
+     * @param realmUrl
+     * @param returnToUrl
+     * @return If equals or a sub-direcotory return true.
+     */
     private boolean pathMatch(URL realmUrl, URL returnToUrl)
     {
         String realmPath = realmUrl.getPath();
@@ -152,7 +159,8 @@ public class RealmVerifier
         if (!returnToPath.endsWith("/"))
             returnToPath += "/";
 
-        return realmPath.startsWith(returnToPath);
+        // return realmPath.startsWith(returnToPath);
+        return returnToPath.startsWith(realmPath);
     }
 
     private boolean domainMatch(String realmDomain, String returnToDomain)
