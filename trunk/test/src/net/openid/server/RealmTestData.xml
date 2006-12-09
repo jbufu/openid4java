@@ -106,13 +106,13 @@
     <test result="OK" realm="http://example.com/sub/folder" returnTo="http://example.com/sub/folder/"
         message="Same path, slash difference."/>
 
-    <test result="OK" realm="http://example.com/sub/folder/" returnTo="http://example.com/sub/"
+    <test result="OK" realm="http://example.com/sub/" returnTo="http://example.com/sub/folder/"
         message="Sub-directory."/>
-    <test result="OK" realm="http://example.com/sub/folder/" returnTo="http://example.com/sub"
+    <test result="OK" realm="http://example.com/sub" returnTo="http://example.com/sub/folder/"
         message="Sub-directory."/>
-    <test result="OK" realm="http://example.com/sub/folder" returnTo="http://example.com/sub/"
+    <test result="OK" realm="http://example.com/sub/" returnTo="http://example.com/sub/folder"
         message="Sub-directory."/>
-    <test result="OK" realm="http://example.com/sub/folder" returnTo="http://example.com/sub"
+    <test result="OK" realm="http://example.com/sub" returnTo="http://example.com/sub/folder"
         message="Sub-directory."/>
 
     <test result="PATH_MISMATCH" realm="http://example.com/sub/folder/" returnTo="http://example.com/sub/fold"
