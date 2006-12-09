@@ -4,8 +4,6 @@
 
 package net.openid.message;
 
-import java.net.URI;
-
 /**
  * Interface for building OpenID extensions.
  * <p>
@@ -20,7 +18,7 @@ public interface MessageExtension
     /**
      * Gets the TypeURI that identifies a extension to the OpenID protocol.
      */
-    public URI getTypeUri();
+    public String getTypeUri();
 
     /**
      * Gets the extension-specific parameters.
