@@ -270,10 +270,19 @@ public class AuthSuccess extends Message
             while (iter.hasNext())
             {
                 String typeUri = iter.next().toString();
-                if (MessageExtensionFactory.providesIdentifier(typeUri))
+
+                try
                 {
-                    hasAuthExt = true;
-                    break;
+                    MessageExtension extension = getExtension(typeUri);
+
+                    if (extension.providesIdentifier())
+                    {
+                        hasAuthExt = true;
+                        break;
+                    }
+                }
+                catch (MessageException ignore)
+                {
                 }
             }
             if (! hasAuthExt)
