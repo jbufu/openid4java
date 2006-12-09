@@ -110,7 +110,6 @@ public class Discovery
         }
     }
 
-
     public List discover(String identifier)
             throws DiscoveryException
     {
@@ -162,7 +161,7 @@ public class Discovery
         {
             UrlIdentifier urlId = (UrlIdentifier) identifier;
 
-            YadisResult yadis = _yadisResolver.discover(urlId.getUrlIdentifier().toString());
+            YadisResult yadis = _yadisResolver.discover(urlId.getUrl().toString());
 
             if (YadisResult.OK == yadis.getStatus())
             {
@@ -177,11 +176,7 @@ public class Discovery
                 //                + yadis.getStatusMessage());
 
                 // attempt HTML-based discovery
-                DiscoveryInformation info = _htmlResolver.discover(urlId);
-                List result = new ArrayList();
-                result.add(info);
-
-                return result;
+                return extractDiscoveryInformation(_htmlResolver.discover(urlId));
             }
         }
         else
@@ -189,6 +184,28 @@ public class Discovery
             throw new DiscoveryException(
                     "Unknown identifier type: " + identifier.toString());
         }
+    }
+
+    private List extractDiscoveryInformation(HtmlResult htmlResult)
+            throws DiscoveryException
+    {
+        ArrayList htmlList = new ArrayList();
+
+        if (htmlResult.getIdp2Endpoint() != null)
+                htmlList.add(new DiscoveryInformation(
+                        htmlResult.getIdp2Endpoint(),
+                        htmlResult.getClaimedId(),
+                        htmlResult.getDelegate2(),
+                        DiscoveryInformation.OPENID2));
+
+        if (htmlResult.getIdp1Endpoint() != null)
+                htmlList.add(new DiscoveryInformation(
+                        htmlResult.getIdp1Endpoint(),
+                        htmlResult.getClaimedId(),
+                        htmlResult.getDelegate1(),
+                        DiscoveryInformation.OPENID11));
+
+        return htmlList;
     }
 
     protected static List extractDiscoveryInformation(YadisResult yadisResult)
@@ -278,7 +295,7 @@ public class Discovery
 
             delegateIdentifier = getDelegate(service, false);
         }
-        // todo: remove else, return one endpoint for all v1/v2 entries?
+        // todo: remove else, return one endpoint for each v1/v2 entry?
         else if (matchType(service, DiscoveryInformation.OPENID10) ||
                 matchType(service, DiscoveryInformation.OPENID11))
         {

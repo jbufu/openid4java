@@ -54,7 +54,7 @@ public class DiscoveryTest extends TestCase
         assertTrue(Discovery.parseIdentifier("example.com/a/b?q=1#end") instanceof UrlIdentifier);
 
         UrlIdentifier identifier = (UrlIdentifier) Discovery.parseIdentifier("example.com");
-        assertEquals("http", identifier.getUrlIdentifier().getProtocol());
+        assertEquals("http", identifier.getUrl().getProtocol());
     }
 
     public void testParseXri() throws DiscoveryException

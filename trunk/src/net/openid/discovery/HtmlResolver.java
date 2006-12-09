@@ -110,14 +110,37 @@ public class HtmlResolver
         this._socketTimeout = socketTimeout;
     }
 
-    public DiscoveryInformation discover(UrlIdentifier identifier)
+    /**
+     * Performs HTML discovery on the supplied URL identifier.
+     *
+     * @param identifier        The URL identifier.
+     * @return                  HTML discovery data obtained from the URL.
+     */
+    public HtmlResult discover(UrlIdentifier identifier)
             throws DiscoveryException
     {
-        // results of the HTML discovery
-        URL idpEndpoint = null;
-        Identifier claimed;
-        Identifier delegate = null;
+        // initialize the results of the HTML discovery
+        HtmlResult result = new HtmlResult();
 
+        // get the HTML data (and set the claimed identifier)
+        String htmlData = call(identifier.getUrl(), result);
+
+        parseHtml(htmlData, result);
+
+        return result;
+    }
+
+    /**
+     * Performs a HTTP call on the provided URL identifier.
+     *
+     * @param url       The URL identifier.
+     * @param result    The HTML discovery result, in which the claimed
+     *                  identifier is set to the input URL after following
+     *                  redirects.
+     * @return          The retrieved HTML data.
+     */
+    private String call(URL url, HtmlResult result) throws DiscoveryException
+    {
         HttpClient client = new HttpClient();
         client.getParams().setParameter("http.protocol.max-redirects",
                 new Integer(_maxRedirects));
@@ -127,7 +150,7 @@ public class HtmlResolver
         client.getHttpConnectionManager()
                 .getParams().setConnectionTimeout(_connTimeout);
 
-        GetMethod get = new GetMethod(identifier.getIdentifier());
+        GetMethod get = new GetMethod(url.toString());
         get.setFollowRedirects(true);
 
         try
@@ -135,14 +158,14 @@ public class HtmlResolver
             int statusCode = client.executeMethod(get);
             if (statusCode != HttpStatus.SC_OK)
                 throw new DiscoveryException(
-                        "GET failed on " + identifier.getIdentifier());
+                        "GET failed on " + url.toString());
 
-            claimed = new UrlIdentifier(get.getURI().toString());
+            result.setClaimed( new UrlIdentifier(get.getURI().toString()) );
 
             InputStream htmlInput = get.getResponseBodyAsStream();
             if (htmlInput == null)
                 throw new DiscoveryException("Cannot download HTML mesage from "
-                        + identifier.getIdentifier());
+                        + url.toString());
 
             byte data[] = new byte[_maxHtmlSize];
 
@@ -153,14 +176,42 @@ public class HtmlResolver
             if (bytesRead <= 0)
                 throw new DiscoveryException("No data read from the HTML message");
 
-            Parser parser = Parser.createParser(new String(data, 0, bytesRead), null);
+            return new String(data, 0, bytesRead);
+
+        } catch (IOException e)
+        {
+            throw new DiscoveryException("Fatal transport error: ", e);
+        }
+        finally
+        {
+            get.releaseConnection();
+        }
+    }
+
+    /**
+     * Parses the HTML data and stores in the result the discovered
+     * openid information.
+     *
+     * @param htmlData          HTML data obtained from the URL identifier.
+     * @param result            The HTML result.
+     */
+    private void parseHtml(String htmlData, HtmlResult result)
+            throws DiscoveryException
+    {
+        URL idp1Endpoint = null;
+        URL idp2Endpoint = null;
+        UrlIdentifier delegate1 = null;
+        UrlIdentifier delegate2 = null;
+
+        try
+        {
+            Parser parser = Parser.createParser(htmlData, null);
 
             NodeList heads = parser.parse(new TagNameFilter("HEAD"));
             if (heads.size() != 1)
                 throw new DiscoveryException(
                         "HTML response must have exactly one HEAD element, " +
                                 "found " + heads.size() + " : " + heads.toHtml());
-
             Node head = heads.elementAt(0);
             for (NodeIterator i = head.getChildren().elements();
                  i.hasMoreNodes();)
@@ -174,12 +225,13 @@ public class HtmlResolver
 
                     if ("openid.server".equals(rel))
                     {
-                        if (idpEndpoint != null)
+                        if (idp1Endpoint != null)
                             throw new DiscoveryException(
                                     "More than one openid.server entries found");
                         try
                         {
-                            idpEndpoint = new URL(href);
+                            idp1Endpoint = new URL(href);
+                            result.setEndpoint1(idp1Endpoint);
 
                         } catch (MalformedURLException e)
                         {
@@ -190,30 +242,46 @@ public class HtmlResolver
 
                     if ("openid.delegate".equals(rel))
                     {
-                        if (idpEndpoint != null)
+                        if (delegate1 != null)
                             throw new DiscoveryException(
                                     "More than one openid.delegate entries found");
 
-                        delegate = new UrlIdentifier(href);
+                        delegate1 = new UrlIdentifier(href);
+                        result.setDelegate1(delegate1);
+                    }
+                    // todo: "openid2.provider" and "openid.server" may appear in the same "rel" attribute.
+                    if ("openid2.provider".equals(rel))
+                    {
+                        if (idp2Endpoint != null)
+                            throw new DiscoveryException(
+                                    "More than one openid.server entries found");
+                        try
+                        {
+                            idp2Endpoint = new URL(href);
+                            result.setEndpoint2(idp2Endpoint);
+
+                        } catch (MalformedURLException e)
+                        {
+                            throw new DiscoveryException(
+                                    "Invalid openid2.provider URL: " + href);
+                        }
+                    }
+
+                    if ("openid2.local_id".equals(rel))
+                    {
+                        if (delegate2 != null)
+                            throw new DiscoveryException(
+                                    "More than one openid2.local_id entries found");
+
+                        delegate2 = new UrlIdentifier(href);
+                        result.setDelegate2(delegate2);
                     }
                 }
             }
-
-            return new DiscoveryInformation(idpEndpoint, claimed, delegate,
-                    DiscoveryInformation.OPENID11);
-
-
-        } catch (IOException e)
-        {
-            throw new DiscoveryException("Fatal transport error: ", e);
-        } catch (ParserException e)
+        }
+        catch (ParserException e)
         {
             throw new DiscoveryException("Error parsing HTML message", e);
         }
-        finally
-        {
-            get.releaseConnection();
-        }
-
     }
 }
