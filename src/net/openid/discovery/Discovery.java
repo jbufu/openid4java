@@ -134,20 +134,8 @@ public class Discovery
                 XRD xrd = xrds.getFinalXRD();
                 CanonicalID canonical = xrd.getCanonicalidAt(0);
 
-/*
                 if (! isProviderAuthoritative(xrd.getProviderID(), canonical))
-                {
-                    Identifier canonicalId =
-                            new XriIdentifier(canonical.getValue());
-                    XRDS newXrds = _xriResolver.resolveAuthToXRDS(
-                            canonicalId.getIdentifier(), trustAll, true, new ResolverState());
-
-                    //todo: not sure what to compare from user / canonical XRDS
-                    // provider id / canonical id ?
-                    // service endpoints ?
-                    // everything ?
-                }
-*/
+                    return new ArrayList();
             }
             catch (Exception e)
             {
@@ -371,22 +359,27 @@ public class Discovery
 
     }
 
-    private static boolean isProviderAuthoritative(String providerId,
+    private boolean isProviderAuthoritative(String providerId,
                                                    CanonicalID canonicalId)
     {
-        if (canonicalId != null && canonicalId.getValue() != null)
-        {
-            // from JanRain's implementation:
-            int lastbang = canonicalId.getValue().lastIndexOf("!");
-            String parent  = lastbang > -1 ?
-                    canonicalId.getValue().substring(0, lastbang) :
-                    canonicalId.getValue();
-
-            return parent.equals(providerId);
-        }
-        else
-        {
+        // todo: also handle xri delegation / community names
+        if (canonicalId == null || canonicalId.getValue() == null)
             return false;
-        }
+
+        String auth = canonicalId.getValue().substring(0,1);
+        XRD rootAuth = _xriResolver.getAuthority(auth);
+
+        if ( ! rootAuth.getProviderID().equals(providerId) )
+                return false;
+
+        int lastbang = canonicalId.getValue().lastIndexOf("!");
+        String parent = lastbang > -1 ?
+                canonicalId.getValue().substring(0, lastbang) :
+                canonicalId.getValue();
+
+        String parentNoPrefix = parent.startsWith("xri://") ?
+                parent.substring(6) : parent;
+
+        return parentNoPrefix.equals(providerId);
     }
 }
