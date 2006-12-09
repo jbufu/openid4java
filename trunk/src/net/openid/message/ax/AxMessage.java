@@ -24,7 +24,7 @@ import java.net.URISyntaxException;
  * @see Message MessageExtension
  * @author Marius Scurtescu, Johnny Bufu
  */
-public class AxMessage implements MessageExtension
+public class AxMessage implements MessageExtension, MessageExtensionFactory
 {
     /**
      * The Attribute Exchange Type URI
@@ -149,4 +149,23 @@ public class AxMessage implements MessageExtension
         return false;
     }
 
+    public MessageExtension create(String alias, ParameterList parameterList) throws MessageException
+    {
+        if (parameterList.hasParameter("openid." + alias + ".if_available") || parameterList.hasParameter("openid." + alias + ".update_url"))
+        {
+            return FetchRequest.createFetchRequest(parameterList);
+        }
+        else if (parameterList.hasParameter("openid." + alias + ".update_url"))
+        {
+            return FetchResponse.createFetchResponse(parameterList);
+        }
+        else if (parameterList.hasParameter("openid." + alias + ".status"))
+        {
+            return StoreResponse.createStoreResponse(parameterList);
+        }
+        else
+        {
+            return StoreRequest.createStoreRequest(parameterList);
+        }
+    }
 }

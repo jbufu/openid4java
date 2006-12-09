@@ -285,10 +285,19 @@ public class AuthRequest extends Message
             while (iter.hasNext())
             {
                 String typeUri = iter.next().toString();
-                if (MessageExtensionFactory.providesIdentifier(typeUri))
+
+                try
                 {
-                    hasAuthProvider = true;
-                    break;
+                    MessageExtension extension = getExtension(typeUri);
+
+                    if (extension.providesIdentifier())
+                    {
+                        hasAuthProvider = true;
+                        break;
+                    }
+                }
+                catch (MessageException ignore)
+                {
                 }
             }
 
@@ -299,7 +308,7 @@ public class AuthRequest extends Message
             if ( hasParameter("openid.claimed_id") )
                 return false;
         }
-        else if ( ! compatibility && 
+        else if ( ! compatibility &&
                 ( ! hasParameter("openid.claimed_id") ) )
             return false;
 

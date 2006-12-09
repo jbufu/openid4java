@@ -4,6 +4,8 @@
 
 package net.openid.message;
 
+import net.openid.message.ax.AxMessage;
+
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.net.URLEncoder;
@@ -23,6 +25,12 @@ public class Message
     private Map _extAliases;
     private Map _extesion;
 
+    private static Map _extensionFactories = new HashMap();
+
+    static
+    {
+        _extensionFactories.put(AxMessage.OPENID_NS_AX, AxMessage.class);
+    }
 
     protected Message()
     {
@@ -190,6 +198,56 @@ public class Message
 
 
     // ------------ extensions implementation ------------
+    /**
+     * Adds a new extension factory.
+     *
+     * @param typeUri       The URI that identifies the extension.
+     * @param clazz         The implementation class for the extension.
+     */
+    public static void addExtensionFactory(String typeUri, Class clazz)
+    {
+        _extensionFactories.put(typeUri, clazz);
+    }
+
+    /**
+     * Returns true if there is an extension factory available for extension
+     * identified by the specified Type URI, or false otherwise.
+     *
+     * @param typeUri   The Type URI that identifies an extension.
+     */
+    public static boolean hasExtensionFactory(String typeUri)
+    {
+        return _extensionFactories.containsKey(typeUri);
+    }
+
+    /**
+     * Gets a MessageExtension for the specified Type URI
+     * if an implementation is available, or null otherwise.
+     * <p>
+     * The returned object has an empty parameter list.
+     *
+     * @param typeUri   The Type URI that identifies a extension.
+     * @see             MessageExtension Message
+     */
+    public static MessageExtensionFactory getExtensionFactory(String typeUri)
+    {
+        if (! hasExtensionFactory(typeUri))
+            return null;
+
+        MessageExtensionFactory extensionFactory;
+
+        try
+        {
+            Class extensionClass = (Class) _extensionFactories.get(typeUri);
+            extensionFactory = (MessageExtensionFactory) extensionClass.newInstance();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+
+        return extensionFactory;
+    }
 
     /**
      * Retrieves the extension alias for the protocol extension
@@ -309,10 +367,14 @@ public class Message
     {
         if (!_extesion.containsKey(typeUri))
         {
-            if (MessageExtensionFactory.hasExtension(typeUri))
+            if (hasExtensionFactory(typeUri))
             {
-                MessageExtension extension = MessageExtensionFactory.getExtension(typeUri);
-                extension.setParameters(getExtensionParams(typeUri));
+                MessageExtensionFactory extensionFactory = getExtensionFactory(typeUri);
+
+                MessageExtension extension = extensionFactory.create(
+                        getExtensionAlias(typeUri),
+                        getExtensionParams(typeUri)
+                );
 
                 _extesion.put(typeUri, extension);
             }
