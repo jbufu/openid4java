@@ -6,9 +6,6 @@ package net.openid.message.ax;
 
 import net.openid.message.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 /**
  * Base class for the Attribute Exchange implementation.
  * <p>
@@ -62,16 +59,9 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
      * Gets the Type URI that identifies the Attribute Exchange extension,
      * or null if it is not a valid URI.
      */
-    public URI getTypeUri()
+    public String getTypeUri()
     {
-        try
-        {
-            return new URI(OPENID_NS_AX);
-        }
-        catch (URISyntaxException e)
-        {
-            return null;
-        }
+        return OPENID_NS_AX;
     }
 
     /**

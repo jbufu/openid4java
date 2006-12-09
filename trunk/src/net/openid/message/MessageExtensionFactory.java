@@ -5,8 +5,7 @@
 package net.openid.message;
 
 /**
- * Keeps track of the OpenID extension for which there is an implementation
- * available.
+ * Factory that creates message extension objects for a specific URI.
  *
  * @see MessageExtension
  * @see Message
@@ -14,5 +13,7 @@ package net.openid.message;
  */
 public interface MessageExtensionFactory
 {
+    public String getTypeUri();
+
     public MessageExtension create(String alias, ParameterList parameterList) throws MessageException;
 }

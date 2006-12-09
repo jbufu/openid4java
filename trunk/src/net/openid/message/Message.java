@@ -201,12 +201,21 @@ public class Message
     /**
      * Adds a new extension factory.
      *
-     * @param typeUri       The URI that identifies the extension.
-     * @param clazz         The implementation class for the extension.
+     * @param clazz         The implementation class for the extension factory,
+     * must implement {@link MessageExtensionFactory}.
      */
-    public static void addExtensionFactory(String typeUri, Class clazz)
+    public static void addExtensionFactory(Class clazz) throws MessageException
     {
-        _extensionFactories.put(typeUri, clazz);
+        try
+        {
+            MessageExtensionFactory extensionFactory = (MessageExtensionFactory) clazz.newInstance();
+
+            _extensionFactories.put(extensionFactory.getTypeUri(), clazz);
+        }
+        catch (Exception e)
+        {
+            throw new MessageException("Cannot instantiante message extension factory class: " + clazz.getName());
+        }
     }
 
     /**
@@ -285,7 +294,7 @@ public class Message
      */
     public void addExtension(MessageExtension extension) throws MessageException
     {
-        String typeUri = extension.getTypeUri().toString();
+        String typeUri = extension.getTypeUri();
 
         if (hasExtension(typeUri))
             throw new MessageException("Extension already present: " + typeUri);
