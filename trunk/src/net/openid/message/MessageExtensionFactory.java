@@ -15,5 +15,7 @@ public interface MessageExtensionFactory
 {
     public String getTypeUri();
 
-    public MessageExtension create(String alias, ParameterList parameterList) throws MessageException;
+    public MessageExtension createRequest(ParameterList parameterList) throws MessageException;
+
+    public MessageExtension createResponse(ParameterList parameterList) throws MessageException;
 }

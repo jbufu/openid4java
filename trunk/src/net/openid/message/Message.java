@@ -323,6 +323,7 @@ public class Message
      * specified by the given Type URI string.
      * <p>
      * The "openid.ns.<alias>" parameter is NOT included in the returned list.
+     * Also, the returned parameter names will have the "openid.<alias>." prefix removed.
      *
      * @param extensionTypeUri      The Type URI that identifies the extension
      * @return                      A ParameterList with all parameters
@@ -380,10 +381,18 @@ public class Message
             {
                 MessageExtensionFactory extensionFactory = getExtensionFactory(typeUri);
 
-                MessageExtension extension = extensionFactory.create(
-                        getExtensionAlias(typeUri),
-                        getExtensionParams(typeUri)
-                );
+                MessageExtension extension;
+
+                String mode = getParameterValue("openid.mode");
+
+                if (mode.startsWith("checkid_"))
+                {
+                    extension = extensionFactory.createRequest(getExtensionParams(typeUri));
+                }
+                else
+                {
+                    extension = extensionFactory.createResponse(getExtensionParams(typeUri));
+                }
 
                 _extesion.put(typeUri, extension);
             }
