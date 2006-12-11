@@ -6,6 +6,8 @@ package net.openid.message.ax;
 
 import net.openid.message.*;
 
+import java.util.Iterator;
+
 /**
  * Base class for the Attribute Exchange implementation.
  * <p>
@@ -139,23 +141,31 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
         return false;
     }
 
-    public MessageExtension create(String alias, ParameterList parameterList) throws MessageException
+    public MessageExtension createRequest(ParameterList parameterList) throws MessageException
     {
-        if (parameterList.hasParameter("openid." + alias + ".if_available") || parameterList.hasParameter("openid." + alias + ".update_url"))
+        if (parameterList.hasParameter("if_available") || parameterList.hasParameter("update_url"))
         {
             return FetchRequest.createFetchRequest(parameterList);
-        }
-        else if (parameterList.hasParameter("openid." + alias + ".update_url"))
-        {
-            return FetchResponse.createFetchResponse(parameterList);
-        }
-        else if (parameterList.hasParameter("openid." + alias + ".status"))
-        {
-            return StoreResponse.createStoreResponse(parameterList);
         }
         else
         {
             return StoreRequest.createStoreRequest(parameterList);
         }
+    }
+
+    public MessageExtension createResponse(ParameterList parameterList) throws MessageException
+    {
+        Iterator parameters = parameterList.getParameters().iterator();
+        while (parameters.hasNext())
+        {
+            Parameter parameter = (Parameter) parameters.next();
+
+            if (parameter.getKey().startsWith("type."))
+            {
+                return FetchResponse.createFetchResponse(parameterList);
+            }
+        }
+
+        return StoreResponse.createStoreResponse(parameterList);
     }
 }
