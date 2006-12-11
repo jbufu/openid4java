@@ -319,17 +319,17 @@ public class Discovery
     {
         Identifier delegate = null;
         String delegateTag;
-        String delegateNs;
+        String nsPattern;
 
         if (compatibility)
         {
             delegateTag = "Delegate";
-            delegateNs = "http://openid.net/xmlns/1.0";
+            nsPattern = "http://openid\\.net/xmlns/1\\.0";
         }
         else
         {
             delegateTag = "LocalID";
-            delegateNs = "xri://$xrds";
+            nsPattern = "xri://\\$xrd(\\*\\(\\$v\\*2\\.0\\))*";
         }
 
         Vector delegateTags = service.getOtherTagValues(delegateTag);
@@ -337,8 +337,7 @@ public class Discovery
         {
             Element element = (Element) delegateTags.elementAt(i);
 
-            if (delegateNs
-                    .equals(element.getNamespaceURI()))
+            if (Pattern.matches(nsPattern, element.getNamespaceURI()))
             {
                 String delegateStr = element.getFirstChild().getNodeValue();
                 delegate = parseIdentifier(delegateStr);
