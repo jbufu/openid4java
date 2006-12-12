@@ -29,6 +29,7 @@ public class AuthSuccess extends Message
 
     protected final static List optionalFields = Arrays.asList( new String[] {
             "openid.ns",
+            "openid.op_endpoint",
             "openid.claimed_id",
             "openid.identity",
             "openid.response_nonce",
@@ -36,7 +37,8 @@ public class AuthSuccess extends Message
     });
 
 
-    protected AuthSuccess(String claimedId, String delegate, boolean compatibility,
+    protected AuthSuccess(String opEndpoint, String claimedId, String delegate,
+                       boolean compatibility,
                        String returnTo, String nonce,
                        String invalidateHandle, Association assoc,
                        String signList)
@@ -50,6 +52,7 @@ public class AuthSuccess extends Message
 
         set("openid.mode", MODE_IDRES);
 
+        setOpEndpoint(opEndpoint);
         setIdentity(delegate);
         setReturnTo(returnTo);
         setNonce(nonce);
@@ -65,14 +68,16 @@ public class AuthSuccess extends Message
         super(params);
     }
 
-    public static AuthSuccess createAuthSuccess(String claimedId, String delegate,
-                       boolean compatibility, String returnTo, String nonce,
+    public static AuthSuccess createAuthSuccess(
+                       String opEndpoint, String claimedId, String delegate,
+                       boolean compatibility,
+                       String returnTo, String nonce,
                        String invalidateHandle, Association assoc,
                        String signList)
             throws MessageException, AssociationException
     {
-        AuthSuccess resp = new AuthSuccess(claimedId, delegate, compatibility,
-                returnTo, nonce, invalidateHandle, assoc, signList);
+        AuthSuccess resp = new AuthSuccess(opEndpoint, claimedId, delegate,
+                compatibility, returnTo, nonce, invalidateHandle, assoc, signList);
 
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
@@ -113,6 +118,16 @@ public class AuthSuccess extends Message
     public String getMode()
     {
         return getParameterValue("openid.mode");
+    }
+
+    public void setOpEndpoint(String opEndpoint)
+    {
+        set("openid.op_endpoint", opEndpoint);
+    }
+
+    public String getOpEndpoint()
+    {
+        return getParameterValue("openid.op_endpoint");
     }
 
     public void setIdentity(String id)
@@ -231,12 +246,20 @@ public class AuthSuccess extends Message
         if ( compatibility && hasParameter("openid.ns") )
             return false;
 
-        // return_to must be a valid URL, if present
+        if ( ! compatibility && ! hasParameter("openid.op_endpoint"))
+            return false;
+
         try
         {
+            // return_to must be a valid URL, if present
             if (getReturnTo() != null)
                 new URL(getReturnTo());
-        } catch (MalformedURLException e)
+
+            // op_endpoint must be a valid URL, if present
+            if (getOpEndpoint() != null)
+                new URL(getOpEndpoint());
+        }
+        catch (MalformedURLException e)
         {
             return false;
         }
@@ -305,22 +328,30 @@ public class AuthSuccess extends Message
             return false;
         }
 
-        // return_to and nonce must be signed if signed-list is used
         List signedFields = Arrays.asList(
                 getParameterValue("openid.signed").split(","));
 
+        // return_to must be signed
         if (!signedFields.contains("return_to"))
             return false;
 
         // either compatibility mode or nonce signed
-        if (! (compatibility ^ signedFields.contains("response_nonce")))
+        if ( compatibility == signedFields.contains("response_nonce") )
+            return false;
+
+        // either compatibility mode or op_endpoint signed
+        if ( compatibility == signedFields.contains("op_endpoint") )
+            return false;
+
+        // assoc_handle must be signed in v2
+        if ( ! compatibility && ! signedFields.contains("assoc_handle") )
             return false;
 
         // if the IdP is making an assertion about an Identifier,
-        // the "identity" field MUST be present in the signed list
+        // the "identity" and "claimed_id" fields MUST be signed
         return ( hasParameter("openid.identity") ==
-                 signedFields.contains("identity") );
-
+                 (signedFields.contains("identity") &&
+                  signedFields.contains("claimed_id")) );
     }
 }
 

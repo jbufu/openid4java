@@ -354,6 +354,9 @@ public class ServerManager
     /**
      * Processes a Authentication Request received from a consumer site.
      *
+     * todo: how is the opEndpoint obtained?
+     * @param opEndpoint        The endpoint URL where the OP accepts OpenID
+     *                          authentication requests.
      * @param requestParams     The parameters contained
      *                          in the authentication request message received
      *                          from a consumer site.
@@ -376,7 +379,8 @@ public class ServerManager
      *                          <li> Null if there was no return_to parameter
      *                          specified in the AuthRequest.</ul>
      */
-    public Message authResponse(ParameterList requestParams,
+    public Message authResponse(String opEndpoint,
+                                ParameterList requestParams,
                                 String userSelId,
                                 String userSelClaimed,
                                 boolean authenticatedAndApproved)
@@ -428,7 +432,7 @@ public class ServerManager
 
                 if (authReq.getReturnTo() != null)
                     return AuthSuccess.createAuthSuccess(
-                            claimed, id, !authReq.isVersion2(),
+                            opEndpoint, claimed, id, !authReq.isVersion2(),
                             authReq.getReturnTo(), _nonceGenerator.next(),
                             invalidateHandle, assoc, _signList);
                 else

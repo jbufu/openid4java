@@ -1158,20 +1158,20 @@ public class ConsumerManager
         Identifier assertId = Discovery.parseIdentifier(authResp.getIdentity());
 
         // claimed identifier in the AuthResponse
-        Identifier respClaim = authResp.getClaimed() != null ?
-                Discovery.parseIdentifier(authResp.getClaimed()) : assertId;
+        Identifier respClaim = Discovery.parseIdentifier(authResp.getClaimed());
 
 
         // was the claimed identifier in the assertion previously discovered?
         if (discovered != null && discovered.hasClaimedIdentifier() &&
-                discovered.getClaimedIdentifier().equals(respClaim))
+                discovered.getClaimedIdentifier().equals(respClaim) )
         {
-            // OP-specific ID and protocol version must also match
+            // OP-endpoint, OP-specific ID and protocol version must match
             Identifier opSpecific = discovered.hasDelegateIdentifier() ?
                     discovered.getDelegateIdentifier() :
                     discovered.getClaimedIdentifier();
 
-            if ( assertId.equals(opSpecific) &&
+            if ( discovered.getIdpEndpoint().equals(authResp.getOpEndpoint()) &&
+                    assertId.equals(opSpecific) &&
                     (discovered.isVersion2() == authResp.isVersion2()) )
                     return discovered;
         }
@@ -1182,31 +1182,32 @@ public class ConsumerManager
         // perform discovery on the claim identifier in the assertion
         List discoveries = _discovery.discover(respClaim);
 
-        // try to determine which service endpoint to use
-        // - OP-specific ID in discovery must match with the assertedID
+        // find the newly discovered service endpoint that matches the assertion
+        // - OP endpoint, OP-specific ID and protocol version must match
         // - prefer (first = highest priority) endpoint with an association
         Iterator iter = discoveries.iterator();
         while (iter.hasNext())
         {
-            DiscoveryInformation endpoint =
-                    (DiscoveryInformation) iter.next();
+            DiscoveryInformation service = (DiscoveryInformation) iter.next();
 
-            Identifier opSpecific = endpoint.hasDelegateIdentifier() ?
-                    endpoint.getDelegateIdentifier() :
-                    endpoint.getClaimedIdentifier();
+            Identifier opSpecific = service.hasDelegateIdentifier() ?
+                    service.getDelegateIdentifier() :
+                    service.getClaimedIdentifier();
 
-            if (! assertId.equals(opSpecific))
+            if ( ! authResp.getOpEndpoint().equals(service.getIdpEndpoint()) ||
+                    ! assertId.equals(opSpecific) ||
+                    authResp.isVersion2() != service.isVersion2())
                 continue;
 
-            // take the first endpoint that matches, for fallback
-            if (newDiscovery == null) newDiscovery = endpoint;
+            // take the first endpoint that matches
+            if (newDiscovery == null) newDiscovery = service;
 
             Association assoc = _associations.load(
-                    endpoint.getIdpEndpoint().toString(),
+                    service.getIdpEndpoint().toString(),
                     authResp.getHandle());
 
             // don't look further if there is an association for it
-            if (assoc != null) return endpoint;
+            if (assoc != null) return service;
         }
 
         return newDiscovery;
