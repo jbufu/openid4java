@@ -47,7 +47,8 @@ public class SampleServer
             Boolean authenticatedAndApproved = (Boolean) userData.get(2);
 
             // --- process an authentication request ---
-            response = manager.authResponse(request,
+            response = manager.authResponse(httpReq.getRequestURL().toString(),
+                    request,
                     userSelectedId,
                     userSelectedClaimedId,
                     authenticatedAndApproved.booleanValue());
