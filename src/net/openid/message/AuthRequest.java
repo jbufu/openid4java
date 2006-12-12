@@ -298,6 +298,7 @@ public class AuthRequest extends Message
                 }
                 catch (MessageException ignore)
                 {
+                    // do nothing
                 }
             }
 

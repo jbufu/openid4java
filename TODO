@@ -28,8 +28,8 @@
     error   transaction failures
     fatal   cannot function at all
 
-  Verification for return_to (rev 166)
   op_endpoint in auth responses (rev 171)
+  nonce restrictions (rev 179)
 
   (Do not) Allow extensions in openid 1 messages?
 

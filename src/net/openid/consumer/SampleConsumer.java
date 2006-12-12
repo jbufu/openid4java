@@ -85,7 +85,9 @@ public class SampleConsumer
 
         // verify the response; ConsumerManager needs to be the same
         // (static) instance used to place the authentication request
-        VerificationResult verification = manager.verify(response, discovered);
+        VerificationResult verification = manager.verify(
+                httpReq.getRequestURL().toString(),
+                response, discovered);
 
         // examine the verification result and extract the verified identifier
         Identifier verified = verification.getVerifiedId();
