@@ -26,10 +26,7 @@ import javax.crypto.spec.DHParameterSpec;
 import java.net.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.LinkedHashMap;
-import java.util.Iterator;
-import java.util.Stack;
-import java.util.List;
+import java.util.*;
 
 /**
  * Manages OpenID communications with an OpenID Provider (Server).
@@ -930,6 +927,8 @@ public class ConsumerManager
      *                              otherwise
      * </ul>
      *
+     * @param receivingUrl  The URL where the Consumer (Relying Party) has
+     *                      accepted the incoming message.
      * @param response      ParameterList of the authentication response
      *                      being verified.
      * @param discovered    Previously discovered information (which can
@@ -941,7 +940,8 @@ public class ConsumerManager
      *                      identifier; the verified identifier is null if
      *                      the verification failed).
      */
-    public VerificationResult verify(ParameterList response,
+    public VerificationResult verify(String receivingUrl,
+                                     ParameterList response,
                                      DiscoveryInformation discovered)
             throws MessageException, DiscoveryException, AssociationException
     {
@@ -971,29 +971,70 @@ public class ConsumerManager
                     authResp.wwwFormEncoding());
         result.setAuthResponse(authResp);
 
-        // [1/3] : nonce verification
-        // todo: nonce should be checked by the agent checking the signature
+        // [1/4] return_to verification
+        if (! verifyReturnTo(receivingUrl, authResp))
+        {
+            result.setStatusMsg("Return_To URL verification failed.");
+            return result;
+        }
+
+        // [2/4] : nonce verification
         if (! verifyNonce(authResp, discovered))
         {
             result.setStatusMsg("Nonce verificaton failed.");
             return result;
         }
 
-        // [2/3] : discovered info verification
+        // [3/4] : discovered info verification
         discovered = verifyDiscovered(authResp, discovered);
         if (discovered == null || ! discovered.hasClaimedIdentifier())
         {
-            result.setStatusMsg("Discovered information verification failed");
+            result.setStatusMsg("Discovered information verification failed.");
             return result;
         }
 
-        // [3/3] : signature verification
+        // [4/4] : signature verification
         if (verifySignature(authResp, discovered))  // mark verification success
             result.setVerifiedId(discovered.getClaimedIdentifier());
         else
             result.setStatusMsg("Signature verification failed.");
 
         return result;
+    }
+
+    /**
+     * Verifies that the URL where the Consumer (Relying Party) received the
+     * authentication response matches the value of the "openid.return_to"
+     * parameter in the authentication response.
+     *
+     * @param receivingUrl      The URL where the Consumer received the
+     *                          authentication response.
+     * @param response          The authentication response.
+     * @return                  True if the two URLs match, false otherwise.
+     */
+    public boolean verifyReturnTo(String receivingUrl, AuthSuccess response)
+    {
+        URL receiving;
+        URL returnTo;
+        try
+        {
+            receiving = new URL(receivingUrl);
+            returnTo = new URL(response.getReturnTo());
+        }
+        catch (MalformedURLException e)
+        {
+            return false;
+        }
+
+        if ( ! receiving.getProtocol().equals(returnTo.getProtocol()) ||
+                ! receiving.getAuthority().equals(returnTo.getAuthority()) ||
+                ! receiving.getPath().equals(returnTo.getPath()) )
+            return false;
+
+        List returnToParams = Arrays.asList(returnTo.getQuery().split("&"));
+        List receivingParams = Arrays.asList(receiving.getQuery().split("&"));
+
+        return receivingParams.containsAll(returnToParams);
     }
 
     /**
@@ -1011,7 +1052,7 @@ public class ConsumerManager
         String nonce = authResp.getNonce();
 
         if (nonce == null) // compatibility mode
-            nonce = extractConsumerNonce(authResp.getReturnToUrl());
+            nonce = extractConsumerNonce(authResp.getReturnTo());
 
         // using the same nonce verifier for both server and consumer nonces
         return (NonceVerifier.OK == _nonceVerifier.seen(
@@ -1052,13 +1093,23 @@ public class ConsumerManager
      * Extracts the consumer-side nonce from the return_to parameter in
      * authentication response from a OpenID 1.1 Provider.
      *
-     * @param returnToUrl   return_to URL from the authentication response
+     * @param returnTo      return_to URL from the authentication response
      * @return              The nonce found in the return_to URL, or null if
      *                      it wasn't found.
      */
-    public String extractConsumerNonce(URL returnToUrl)
+    public String extractConsumerNonce(String returnTo)
     {
-        if (returnToUrl == null) return null;
+        if (returnTo == null) return null;
+
+        URL returnToUrl;
+        try
+        {
+            returnToUrl = new URL(returnTo);
+        }
+        catch (MalformedURLException e)
+        {
+            return null;
+        }
 
         String query = returnToUrl.getQuery();
 

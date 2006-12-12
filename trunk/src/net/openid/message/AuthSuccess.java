@@ -156,18 +156,6 @@ public class AuthSuccess extends Message
         return return_to + initialChar + wwwFormEncoding();
     }
 
-    // todo: remove getReturnToUrl()
-    public URL getReturnToUrl()
-    {
-        try
-        {
-            return new URL(getReturnTo());
-        } catch (MalformedURLException e)
-        {
-            return null;
-        }
-    }
-
     public void setNonce(String nonce)
     {
         set("openid.response_nonce", nonce);
@@ -283,6 +271,7 @@ public class AuthSuccess extends Message
                 }
                 catch (MessageException ignore)
                 {
+                    // do nothing
                 }
             }
             if (! hasAuthExt)
