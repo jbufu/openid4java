@@ -53,7 +53,7 @@ public class ConsumerManager
      */
     private static NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
 
-    // todo: private association for encrypting consumer nonces
+    // todo: private association for signing consumer nonces
 
     /**
      * Verifier for the nonces in authentication responses;
@@ -450,10 +450,12 @@ public class ConsumerManager
     }
 
     /**
-     * Does discover on an identifier. It delegates the call to its discovery manager.
+     * Does discover on an identifier. It delegates the call to its
+     * discovery manager.
      *
-     * @return A List of {@link DiscoveryInformation} objects. The list could be empty if no discovery
-     * information can be retrieved.
+     * @return      A List of {@link DiscoveryInformation} objects.
+     *              The list could be empty if no discovery information can
+     *              be retrieved.
      *
      * @throws DiscoveryException if the discovery process runs into errors.
      */
@@ -464,7 +466,7 @@ public class ConsumerManager
 
     /**
      * Makes a HTTP call to the specified URL with the parameters specified
-     * in the Message
+     * in the Message.
      *
      * @param url       URL endpoint for the HTTP call
      * @param request   Message containing the parameters
@@ -763,7 +765,7 @@ public class ConsumerManager
      */
     public AuthRequest authenticate(List discoveries,
                                     String returnToUrl)
-            throws ConsumerException, AssociationException, MessageException
+            throws ConsumerException, MessageException
     {
         return authenticate(discoveries, returnToUrl, returnToUrl);
     }
@@ -800,7 +802,7 @@ public class ConsumerManager
      */
     public AuthRequest authenticate(List discoveries,
                                     String returnToUrl, String realm)
-            throws ConsumerException, AssociationException, MessageException
+            throws ConsumerException, MessageException
     {
         // try to associate with one OP in the discovered list
         DiscoveryInformation discovered = associate(discoveries);
@@ -833,7 +835,7 @@ public class ConsumerManager
      */
     public AuthRequest authenticate(DiscoveryInformation discovered,
                                     String returnToUrl)
-            throws MessageException, ConsumerException, AssociationException
+            throws MessageException, ConsumerException
     {
         return authenticate(discovered, returnToUrl, returnToUrl);
     }

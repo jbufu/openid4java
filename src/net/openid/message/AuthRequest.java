@@ -45,7 +45,6 @@ public class AuthRequest extends Message
 
     protected AuthRequest(String claimedId, String delegate, boolean compatibility,
                        String returnToUrl, String handle, RealmVerifier verifier)
-            throws MessageException
     {
         this(claimedId, delegate, compatibility,
                 returnToUrl, handle, returnToUrl, verifier);
@@ -55,7 +54,6 @@ public class AuthRequest extends Message
     protected AuthRequest(String claimedId, String delegate, boolean compatibility,
                        String returnToUrl, String handle, String realm,
                        RealmVerifier verifier)
-            throws MessageException
     {
         if (! compatibility)
         {
@@ -72,11 +70,6 @@ public class AuthRequest extends Message
         setImmediate(false);
 
         _realmVerifier = verifier;
-
-        if (! isValid())
-            throw new MessageException(
-                    "Cannot generate valid authentication request: " +
-                    this.wwwFormEncoding());
     }
 
     protected AuthRequest(ParameterList params)
