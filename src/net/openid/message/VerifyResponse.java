@@ -13,7 +13,6 @@ import java.util.Arrays;
 public class VerifyResponse extends Message
 {
     protected final static List requiredFields = Arrays.asList(new String[] {
-            //todo: "mode", is mandatory, JanRain implementations ommit it, also see below
             "is_valid"
     });
 
@@ -24,7 +23,6 @@ public class VerifyResponse extends Message
 
     protected VerifyResponse(boolean compatibility)
     {
-        set("mode", MODE_IDRES);
         setSignatureVerified(false);
 
         if (! compatibility)
@@ -91,10 +89,6 @@ public class VerifyResponse extends Message
     public boolean isValid()
     {
         if (! super.isValid()) return false;
-
-        //todo: "mode" is mandatory, JanRain implementations ommit it, also see above
-//        if (! MODE_IDRES.equals(getParameterValue("openid.mode")))
-//            return false;
 
         return "true".equals(getParameterValue("is_valid")) ||
                 "false".equals(getParameterValue("is_valid"));
