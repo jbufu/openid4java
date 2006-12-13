@@ -11,6 +11,9 @@ import net.openid.association.DiffieHellmanSession;
 import net.openid.association.Association;
 import net.openid.OpenIDException;
 
+import java.net.URL;
+import java.net.MalformedURLException;
+
 /**
  * Manages OpenID communications with an OpenID Relying Party (Consumer).
  *
@@ -71,6 +74,17 @@ public class ServerManager
      * Used to perform verify realms against return_to URLs.
      */
     private RealmVerifier _realmVerifier;
+
+    /**
+     * The OpenID Provider's endpoint URL, where it accepts OpenID
+     * authentication requests.
+     * <p>
+     * This is a global setting for the ServerManager; can also be set on a
+     * per message basis.
+     *
+     * @see #authResponse(net.openid.message.ParameterList, String, String, boolean, String)
+     */
+    private String _opEndpointUrl;
 
 
     /**
@@ -267,6 +281,34 @@ public class ServerManager
     }
 
     /**
+     * Gets OpenID Provider's endpoint URL, where it accepts OpenID
+     * authentication requests.
+     * <p>
+     * This is a global setting for the ServerManager; can also be set on a
+     * per message basis.
+     *
+     * @see #authResponse(net.openid.message.ParameterList, String, String, boolean, String)
+     */
+    public String getOPEndpointUrl()
+    {
+        return _opEndpointUrl;
+    }
+
+    /**
+     * Sets the OpenID Provider's endpoint URL, where it accepts OpenID
+     * authentication requests.
+     * <p>
+     * This is a global setting for the ServerManager; can also be set on a
+     * per message basis.
+     *
+     * @see #authResponse(net.openid.message.ParameterList, String, String, boolean, String)
+     */
+    public void setOPEndpointUrl(String opEndpointUrl)
+    {
+        this._opEndpointUrl = opEndpointUrl;
+    }
+
+    /**
      * Constructs a ServerManager with default settings.
      */
     public ServerManager()
@@ -353,8 +395,23 @@ public class ServerManager
 
     /**
      * Processes a Authentication Request received from a consumer site.
+     * <p>
+     * Uses ServerManager's global OpenID Provider endpoint URL.
      *
-     * todo: how is the opEndpoint obtained?
+     * @see #authResponse(net.openid.message.ParameterList, String, String, boolean, String)
+     */
+    public Message authResponse(ParameterList requestParams,
+                                String userSelId,
+                                String userSelClaimed,
+                                boolean authenticatedAndApproved)
+    {
+        return authResponse(requestParams, userSelId, userSelClaimed,
+                authenticatedAndApproved, _opEndpointUrl);
+
+    }
+    /**
+     * Processes a Authentication Request received from a consumer site.
+     *
      * @param opEndpoint        The endpoint URL where the OP accepts OpenID
      *                          authentication requests.
      * @param requestParams     The parameters contained
@@ -379,13 +436,24 @@ public class ServerManager
      *                          <li> Null if there was no return_to parameter
      *                          specified in the AuthRequest.</ul>
      */
-    public Message authResponse(String opEndpoint,
-                                ParameterList requestParams,
+    public Message authResponse(ParameterList requestParams,
                                 String userSelId,
                                 String userSelClaimed,
-                                boolean authenticatedAndApproved)
+                                boolean authenticatedAndApproved,
+                                String opEndpoint)
     {
         boolean isVersion2 = true;
+
+        try
+        {
+            new URL(opEndpoint);
+        }
+        catch (MalformedURLException e)
+        {
+            return DirectError.createDirectError(
+                    "Invalid OpenID Provider endpoint URL; " +
+                            "cannot issue authentication response", isVersion2);
+        }
 
         try
         {
