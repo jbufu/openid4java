@@ -126,17 +126,25 @@ API Usage and Examples:
         // attach the extension to the authentication request
         authReq.addExtensionParams(fetch);
 
-        // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
-        return authReq.getRedirectUrl();
+        if (! discovered.isVersion2() )
+        {
+            // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
+            // The only method supported in OpenID 1.x
+            // redirect-URL usually limited to 255 bytes
+            return authReq.getRedirectUrl();
+        }
+        else
+        {
+            // Option 2: HTML FORM Redirection
+            // Allows payloads > 255 bytes
 
-        // Option 2: HTML FORM Redirection
-        // <FORM action="OpenID Provider's service endpoint">
-        // see samples/formredirection.jsp for a JSP example
-        //authReq.getOPEndpoint();
+            // <FORM action="OpenID Provider's service endpoint">
+            // see samples/formredirection.jsp for a JSP example
+            authReq.getOPEndpoint();
 
-        // build a HTML FORM with the message parameters
-        //authReq.getParameterMap();
-
+            // build a HTML FORM with the message parameters
+            authReq.getParameterMap();
+        }
 
         // --- processing the authentication response
 
@@ -199,7 +207,8 @@ API Usage and Examples:
             // --- process an association request ---
             response = manager.associationResponse(request);
             responseText = response.keyValueFormEncoding();
-        } else if ("checkid_setup".equals(mode)
+        }
+        else if ("checkid_setup".equals(mode)
                 || "checkid_immediate".equals(mode))
         {
             // interact with the user and obtain data needed to continue
@@ -214,13 +223,19 @@ API Usage and Examples:
                     userSelectedId,
                     userSelectedClaimedId,
                     authenticatedAndApproved.booleanValue());
+
+            // caller will need to decide which of the following to use:
+            // - GET HTTP-redirect to the return_to URL
+            // - HTML FORM Redirection
             responseText = response.wwwFormEncoding();
-        } else if ("check_authentication".equals(mode))
+        }
+        else if ("check_authentication".equals(mode))
         {
             // --- processing a verification request ---
             response = manager.verify(request);
             responseText = response.keyValueFormEncoding();
-        } else
+        }
+        else
         {
             // --- error response ---
             response = DirectError.createDirectError("Unknown request");

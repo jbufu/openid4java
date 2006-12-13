@@ -16,10 +16,15 @@
 
 => Implementation
 
-  - Updated based on finialized versions of the following:
+  - Update based on finialized versions of the following:
+    - OpenID Authentication 2.0
     - OpenID Attribute Exchange 1.0
-    - OpenID Relying Party Identity 1.0
+
+  - Extensions to implement:
+    - OpenID Signed Assertions 1.0
     - OpenID Authentication Age 1.0
+    - OpenID Relying Party Identity 1.0
+    - Simple Registration
 
   - Logging: Log4j
     debug   everything else
@@ -28,23 +33,16 @@
     error   transaction failures
     fatal   cannot function at all
 
-  nonce restrictions (rev 179)
-
-  (Do not) Allow extensions in openid 1 messages?
-
-  Simple registration extension
-
   - Compatibility mode:
     - out-of-band RP nonce method
         - RP needs to self-sign nonces
     - check limits defined in v1
 
-  - How to determine which of GET/POST the endpoint supports?
-    - direct messages:
-            POST only, both v1 and v2
-    - indirect messages:
-            HTTP redirect (GET): v1, v2 compatibility
-            FORM redirect: v2 only, POST not enforced
+  - Allow extensions in openid 1 messages?
+
+  - nonce restrictions (rev 179)
+
+
 
 ========================================================================
 Copyright 2006 Sxip Identity Corporation

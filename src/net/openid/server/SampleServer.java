@@ -41,7 +41,8 @@ public class SampleServer
             // --- process an association request ---
             response = manager.associationResponse(request);
             responseText = response.keyValueFormEncoding();
-        } else if ("checkid_setup".equals(mode)
+        }
+        else if ("checkid_setup".equals(mode)
                 || "checkid_immediate".equals(mode))
         {
             // interact with the user and obtain data needed to continue
@@ -56,13 +57,19 @@ public class SampleServer
                     userSelectedId,
                     userSelectedClaimedId,
                     authenticatedAndApproved.booleanValue());
+
+            // caller will need to decide which of the following to use:
+            // - GET HTTP-redirect to the return_to URL
+            // - HTML FORM Redirection
             responseText = response.wwwFormEncoding();
-        } else if ("check_authentication".equals(mode))
+        }
+        else if ("check_authentication".equals(mode))
         {
             // --- processing a verification request ---
             response = manager.verify(request);
             responseText = response.keyValueFormEncoding();
-        } else
+        }
+        else
         {
             // --- error response ---
             response = DirectError.createDirectError("Unknown request");
