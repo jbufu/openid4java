@@ -29,8 +29,9 @@ public class Discovery
     private static final Pattern URL_PATTERN =
             Pattern.compile("^https?://", Pattern.CASE_INSENSITIVE);
     private static final Pattern XRI_PATTERN =
-            Pattern.compile("^(xri://|[!=@\\$\\+])", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^(xri://|[!=@\\$\\+\\(])", Pattern.CASE_INSENSITIVE);
 
+    // todo: root authorities for + $ ( ?
     final private static String ROOT_DEF_EQ_URI   = "http://equal.xri.net";
     final private static String ROOT_DEF_AT_URI   = "http://at.xri.net";
     final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
