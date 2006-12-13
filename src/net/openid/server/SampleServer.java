@@ -19,6 +19,11 @@ public class SampleServer
     // instantiate a ServerManager object
     public static ServerManager manager = new ServerManager();
 
+    static
+    {
+        manager.setOPEndpointUrl("Http://my.openidprovider.com/server");
+    }
+
     public String processRequest(HttpServletRequest httpReq)
             throws ServerException
     {
@@ -47,8 +52,7 @@ public class SampleServer
             Boolean authenticatedAndApproved = (Boolean) userData.get(2);
 
             // --- process an authentication request ---
-            response = manager.authResponse(httpReq.getRequestURL().toString(),
-                    request,
+            response = manager.authResponse(request,
                     userSelectedId,
                     userSelectedClaimedId,
                     authenticatedAndApproved.booleanValue());
