@@ -9,6 +9,9 @@ import net.openid.message.Parameter;
 import net.openid.message.ParameterList;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Implements the extension for Attribute Exchange store requests.
@@ -90,6 +93,26 @@ public class StoreRequest extends AxMessage
 
         _parameters.set(newParam);
     }
+
+    /**
+     * Returns a list with the attribute value(s) associated with the specified
+     * alias.
+     *
+     * @param id        Attribute alias.
+     * @return          List of attribute values.
+     */
+    public List getAttributeValues(String id)
+    {
+        List decodedAttrs = new ArrayList();
+
+        List attrs = Arrays.asList(getParameterValue("value." + id).split(","));
+        Iterator iter = attrs.iterator();
+        while (iter.hasNext())
+            decodedAttrs.add(multivalDecode((String) iter.next()));
+
+        return decodedAttrs;
+    }
+
 
     /**
      * Checks the validity of the extension.

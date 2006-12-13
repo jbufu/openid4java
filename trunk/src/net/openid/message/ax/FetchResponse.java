@@ -10,7 +10,7 @@ import net.openid.message.Parameter;
 
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Implements the extension for Attribute Exchange fetch responses.
@@ -84,6 +84,25 @@ public class FetchResponse extends AxMessage
         }
 
         _parameters.set(newParam);
+    }
+
+    /**
+     * Returns a list with the attribute value(s) associated with the specified
+     * alias.
+     *
+     * @param id        Attribute alias.
+     * @return          List of attribute values.
+     */
+    public List getAttributeValues(String id)
+    {
+        List decodedAttrs = new ArrayList();
+
+        List attrs = Arrays.asList(getParameterValue("value." + id).split(","));
+        Iterator iter = attrs.iterator();
+        while (iter.hasNext())
+            decodedAttrs.add(multivalDecode((String) iter.next()));
+
+        return decodedAttrs;
     }
 
     /**
