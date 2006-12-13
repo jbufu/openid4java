@@ -34,8 +34,6 @@
 
   Simple registration extension
 
-  - Document exception handling: ConsumerManager's authenticate() and verify().
-
   - Compatibility mode:
     - out-of-band RP nonce method
         - RP needs to self-sign nonces
