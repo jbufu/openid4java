@@ -55,7 +55,7 @@ public class AssociationResponse extends Message
 
         Long expiryIn = new Long( ( assoc.getExpiry().getTime() -
                                     System.currentTimeMillis() ) / 1000 );
-        setExpire(expiryIn.toString());
+        setExpire(expiryIn);
 
         if (type.getHAlgorithm() != null) // DH session, encrypt the MAC key
         {
@@ -167,10 +167,9 @@ public class AssociationResponse extends Message
     /**
      * Sets the lifetime, in seconds, of the association.
      */
-    public void setExpire(String seconds)
+    public void setExpire(Long seconds)
     {
-        // todo: change to int
-        set("expires_in", seconds);
+        set("expires_in", seconds.toString());
     }
 
     /**
