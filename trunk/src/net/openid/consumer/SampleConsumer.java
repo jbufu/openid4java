@@ -57,16 +57,25 @@ public class SampleConsumer
             // attach the extension to the authentication request
             authReq.addExtension(fetch);
 
-            // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
-            return authReq.getRedirectUrl();
+            if (! discovered.isVersion2() )
+            {
+                // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
+                // The only method supported in OpenID 1.x
+                // redirect-URL usually limited to 255 bytes
+                return authReq.getRedirectUrl();
+            }
+            else
+            {
+                // Option 2: HTML FORM Redirection
+                // Allows payloads > 255 bytes
 
-            // Option 2: HTML FORM Redirection
-            // <FORM action="OpenID Provider's service endpoint">
-            // see samples/formredirection.jsp for a JSP example
-            //authReq.getOPEndpoint();
+                // <FORM action="OpenID Provider's service endpoint">
+                // see samples/formredirection.jsp for a JSP example
+                authReq.getOPEndpoint();
 
-            // build a HTML FORM with the message parameters
-            //authReq.getParameterMap();
+                // build a HTML FORM with the message parameters
+                authReq.getParameterMap();
+            }
         }
         catch (OpenIDException e)
         {
