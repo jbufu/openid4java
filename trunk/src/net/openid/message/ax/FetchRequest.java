@@ -79,8 +79,7 @@ public class FetchRequest extends AxMessage
      */
     public void addAttribute(String id, String attrName, boolean required)
     {
-        _parameters.set(
-                new Parameter("fetch." + id, attrName));
+        _parameters.set(new Parameter("fetch." + id, attrName));
 
         String level = required ? "required" : "if_available";
 
