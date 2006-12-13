@@ -67,10 +67,23 @@ public class FetchResponse extends AxMessage
      */
     public void addAttribute(String id, String attrName, String value)
     {
-        _parameters.set(new Parameter("type." + id, attrName));
+        Parameter existing = _parameters.getParameter(id);
+        Parameter newParam;
 
-        // todo: check for possible multiple values for this attribute / param
-        _parameters.set(new Parameter("value." + id, value));
+        if (existing == null)
+        {
+            _parameters.set(new Parameter("type." + id, attrName));
+            newParam = new Parameter("value." + id, value);
+        }
+        else
+        {
+            // assume the existing one is of the same typeURI
+            newParam = new Parameter("value." + id,
+                    existing.getValue() + "," + multivalEncode(value));
+            _parameters.removeParameters("value." + id);
+        }
+
+        _parameters.set(newParam);
     }
 
     /**

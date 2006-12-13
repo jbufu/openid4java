@@ -29,7 +29,6 @@
     fatal   cannot function at all
 
   nonce restrictions (rev 179)
-  "mode" optional in direct responses (rev 183)
 
   (Do not) Allow extensions in openid 1 messages?
 

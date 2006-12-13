@@ -101,7 +101,7 @@ public class SampleConsumer
             //{
             //    FetchResponse fetchResp =
             //            new FetchResponse(ext.getParameters());
-            //    String email = fetchResp.getParameter("email");
+            //    String email = fetchResp.getParameterValue("email");
             //}
 
             if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))

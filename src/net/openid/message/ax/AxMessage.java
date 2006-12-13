@@ -89,7 +89,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
      *                  without the openid.<alias> prefix.
      * @return          The parameter value, or null if not found.
      */
-    public String getParameter(String name)
+    public String getParameterValue(String name)
     {
         return _parameters.getParameterValue("value." + name);
     }
