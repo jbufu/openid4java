@@ -179,6 +179,12 @@ API Usage and Examples:
         // instantiate a ServerManager object
         public static ServerManager manager = new ServerManager();
 
+        // configure the OpenID Provider's endpoint URL
+        static
+        {
+            manager.setOPEndpointUrl("Http://my.openidprovider.com/server");
+        }
+
         // extract the parameters from the request
         ParameterList request = new ParameterList(httpReq.getParameterMap());
 
