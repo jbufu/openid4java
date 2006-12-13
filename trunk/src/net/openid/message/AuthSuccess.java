@@ -47,12 +47,12 @@ public class AuthSuccess extends Message
         if (! compatibility)
         {
             set("openid.ns", OPENID2_NS);
+            setOpEndpoint(opEndpoint);
             setClaimed(claimedId);
         }
 
         set("openid.mode", MODE_IDRES);
 
-        setOpEndpoint(opEndpoint);
         setIdentity(delegate);
         setReturnTo(returnTo);
         setNonce(nonce);
