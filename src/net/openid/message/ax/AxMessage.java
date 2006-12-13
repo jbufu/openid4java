@@ -91,7 +91,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
      */
     public String getParameterValue(String name)
     {
-        return _parameters.getParameterValue("value." + name);
+        return _parameters.getParameterValue(name);
     }
 
     /**
