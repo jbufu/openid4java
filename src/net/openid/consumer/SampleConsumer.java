@@ -10,7 +10,6 @@ import net.openid.discovery.DiscoveryException;
 import net.openid.message.ax.FetchRequest;
 import net.openid.message.ax.FetchResponse;
 import net.openid.message.ax.AxMessage;
-import net.openid.message.ax.StoreResponse;
 import net.openid.message.*;
 import net.openid.association.AssociationException;
 
@@ -93,42 +92,15 @@ public class SampleConsumer
         Identifier verified = verification.getVerifiedId();
         if (verified != null)
         {
-            // Attribute Exchange example: retrieving the fetched "email" attribute
             AuthSuccess authSuccess = AuthSuccess.createAuthSuccess(response);
-            //MessageExtension ext =
-            //        authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-            //if (ext != null)
-            //{
-            //    FetchResponse fetchResp =
-            //            new FetchResponse(ext.getParameters());
-            //    String email = fetchResp.getParameterValue("email");
-            //}
 
             if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
             {
-                //FetchResponse resp = new FetchResponse(
-                //        authSuccess.getExtensionParams(AxMessage.OPENID_NS_AX));
+                FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
 
-                //FetchResponse resp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-
-                MessageExtension resp = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-
-                if (resp instanceof FetchResponse)
-                {
-
-                }
-                else if (resp instanceof StoreResponse)
-                {
-
-                }
-                else
-                {
-
-                }
+                List emails = fetchResp.getAttributeValues("email");
+                String email = (String) emails.get(0);
             }
-
-
-
 
             return verified;  // success
         }
