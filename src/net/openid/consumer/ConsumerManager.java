@@ -1159,30 +1159,35 @@ public class ConsumerManager
         // asserted identifier in the AuthResponse
         Identifier assertId = Discovery.parseIdentifier(authResp.getIdentity());
 
-        // claimed identifier in the AuthResponse
-        Identifier respClaim = Discovery.parseIdentifier(authResp.getClaimed());
+        // claimed identifier in the AuthResponse; can be null in v1 messages
+        Identifier respClaimed = authResp.getClaimed() != null ?
+                Discovery.parseIdentifier(authResp.getClaimed()) : assertId;
 
+        // the OP endpoint sent in the response; can be null in v1 messages
+        String respEndpoint = authResp.getOpEndpoint();
 
         // was the claimed identifier in the assertion previously discovered?
         if (discovered != null && discovered.hasClaimedIdentifier() &&
-                discovered.getClaimedIdentifier().equals(respClaim) )
+                discovered.getClaimedIdentifier().equals(respClaimed) )
         {
             // OP-endpoint, OP-specific ID and protocol version must match
             Identifier opSpecific = discovered.hasDelegateIdentifier() ?
                     discovered.getDelegateIdentifier() :
                     discovered.getClaimedIdentifier();
 
-            if ( discovered.getIdpEndpoint().equals(authResp.getOpEndpoint()) &&
-                    assertId.equals(opSpecific) &&
-                    (discovered.isVersion2() == authResp.isVersion2()) )
+            if ( assertId.equals(opSpecific) &&
+                    (discovered.isVersion2() == authResp.isVersion2()) &&
+                    // only check OP-endpoint vor v2 messages
+                    (! authResp.isVersion2() ||
+                            discovered.getIdpEndpoint().equals(respEndpoint)))
                     return discovered;
         }
 
         // stateless, bare response, or the user changed the ID at the OP
-        DiscoveryInformation newDiscovery = null;
+        DiscoveryInformation firstServiceMatch = null;
 
         // perform discovery on the claim identifier in the assertion
-        List discoveries = _discovery.discover(respClaim);
+        List discoveries = _discovery.discover(respClaimed);
 
         // find the newly discovered service endpoint that matches the assertion
         // - OP endpoint, OP-specific ID and protocol version must match
@@ -1196,13 +1201,15 @@ public class ConsumerManager
                     service.getDelegateIdentifier() :
                     service.getClaimedIdentifier();
 
-            if ( ! authResp.getOpEndpoint().equals(service.getIdpEndpoint()) ||
-                    ! assertId.equals(opSpecific) ||
-                    authResp.isVersion2() != service.isVersion2())
+            if ( ! assertId.equals(opSpecific) ||
+                    authResp.isVersion2() != service.isVersion2() ||
+                    // only check the OP endpoint for v2 messages
+                    (authResp.isVersion2() &&
+                            ! service.getIdpEndpoint().equals(respEndpoint)) )
                 continue;
 
             // take the first endpoint that matches
-            if (newDiscovery == null) newDiscovery = service;
+            if (firstServiceMatch == null) firstServiceMatch = service;
 
             Association assoc = _associations.load(
                     service.getIdpEndpoint().toString(),
@@ -1212,7 +1219,7 @@ public class ConsumerManager
             if (assoc != null) return service;
         }
 
-        return newDiscovery;
+        return firstServiceMatch;
     }
 
     /**
