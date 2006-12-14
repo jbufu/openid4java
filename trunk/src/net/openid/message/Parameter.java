@@ -17,18 +17,21 @@ public class Parameter implements Comparable, Serializable
     private String _key;
     private String _value;
 
-    public Parameter(String key, String value) throws IllegalArgumentException
+    public Parameter(String key, String value)
     {
-        // todo: move check somewhere else?
-        if ( (key != null && key.indexOf(':') > -1) ||
-                (key != null && key.indexOf('\n') > -1)  ||
-                (value != null && value.indexOf('\n') >-1) )
-            throw new IllegalArgumentException(
-                    "Invalid characters (colon or newline) found in the " +
-                    "key and/or value: \nkey=" + key + "\nvalue=" +value );
-
         _key   = key;
         _value = value;
+    }
+
+    public boolean isValid()
+    {
+        return !((_key != null && _key.indexOf(':') > -1) ||
+                (_key != null && _key.indexOf('\n') > -1) ||
+                (_value != null && _value.indexOf('\n') > -1));
+
+        //throw new IllegalArgumentException(
+        //        "Invalid characters (colon or newline) found in the " +
+        //        "key and/or value: \nkey=" + _key + "\nvalue=" + _value );
     }
 
     public boolean equals(Object obj)

@@ -136,6 +136,14 @@ public class Message
                 return false;
         }
 
+        Iterator paramIter = _params.getParameters().iterator();
+        while (paramIter.hasNext())
+        {
+            Parameter param = (Parameter) paramIter.next();
+            if (!param.isValid())
+                return false;
+        }
+
         return true;
     }
 
