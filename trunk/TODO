@@ -38,13 +38,26 @@
         - RP needs to self-sign nonces
     - check limits defined in v1
 
-  - Allow extensions in openid 1 messages?
-
   - javadoc: add overview / package description (use code sample from INSTALL)
 
-  - hide openid modes (check_*, etc) from the library user
+  - Allow extensions in openid 1 messages?
 
-  - nonce restrictions (rev 179)
+  --> Nice to have, but not essential:
+
+    - don't normalize the url before redirects (not needed, extra cost)
+
+    - Auth* class hierarchy reorganization
+
+    - factory method for incoming messages
+    - review consumer verification flow
+
+    - make isValid() throw exceptions
+
+    - interface for saving discovered information
+        - into session, db, url/return_to, etc.
+            - saveDiscoveryInfo(... , session, return_to)
+            - loadDiscoveryInfo(httpRequest)
+
 
 
 ========================================================================
