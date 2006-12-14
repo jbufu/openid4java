@@ -44,15 +44,15 @@ public class SampleConsumer
             // store the discovery information in the user's session
             session.setAttribute("openid-disco", discovered);
 
+            // obtain a AuthRequest message to be sent to the OpenID provider
+            AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
+
             // Attribute Exchange example: fetching the 'email' attribute
             FetchRequest fetch = FetchRequest.createFetchRequest();
             fetch.addAttribute("email",
                     // attribute alias
                     "http://schema.openid.net/contact/email",   // type URI
                     true);                                      // required
-
-            // obtain a AuthRequest message to be sent to the OpenID provider
-            AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
 
             // attach the extension to the authentication request
             authReq.addExtension(fetch);
@@ -61,13 +61,13 @@ public class SampleConsumer
             {
                 // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
                 // The only method supported in OpenID 1.x
-                // redirect-URL usually limited to 255 bytes
+                // redirect-URL usually limited ~2048 bytes
                 return authReq.getRedirectUrl();
             }
             else
             {
                 // Option 2: HTML FORM Redirection
-                // Allows payloads > 255 bytes
+                // Allows payloads > 2048 bytes
 
                 // <FORM action="OpenID Provider's service endpoint">
                 // see samples/formredirection.jsp for a JSP example
@@ -97,8 +97,7 @@ public class SampleConsumer
                     new ParameterList(httpReq.getParameterMap());
 
             // retrieve the previously stored discovery information
-            DiscoveryInformation discovered
-                    =
+            DiscoveryInformation discovered =
                     (DiscoveryInformation) session.getAttribute("openid-disco");
 
             // verify the response; ConsumerManager needs to be the same
@@ -125,7 +124,6 @@ public class SampleConsumer
 
                 return verified;  // success
             }
-
         }
         catch (OpenIDException e)
         {
