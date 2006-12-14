@@ -330,7 +330,7 @@ public class Discovery
         else
         {
             delegateTag = "LocalID";
-            nsPattern = "xri://\\$xrd(\\*\\(\\$v\\*2\\.0\\))*";
+            nsPattern = "xri://\\$xrd\\*\\(\\$v\\*2\\.0\\)";
         }
 
         Vector delegateTags = service.getOtherTagValues(delegateTag);
