@@ -40,8 +40,11 @@
 
   - Allow extensions in openid 1 messages?
 
-  - nonce restrictions (rev 179)
+  - javadoc: add overview / package description (use code sample from INSTALL)
 
+  - hide openid modes (check_*, etc) from the library user
+
+  - nonce restrictions (rev 179)
 
 
 ========================================================================
