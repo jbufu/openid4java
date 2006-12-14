@@ -323,6 +323,10 @@ public class AuthSuccess extends Message
             {
                 return false;
             }
+
+            if (nonce.length() >255)
+                return false;
+
         } else if (nonce != null)
         {
             return false;
