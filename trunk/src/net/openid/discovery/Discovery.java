@@ -31,7 +31,6 @@ public class Discovery
     private static final Pattern XRI_PATTERN =
             Pattern.compile("^(xri://|[!=@\\$\\+\\(])", Pattern.CASE_INSENSITIVE);
 
-    // todo: root authorities for + $ ( ?
     final private static String ROOT_DEF_EQ_URI   = "http://equal.xri.net";
     final private static String ROOT_DEF_AT_URI   = "http://at.xri.net";
     final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
@@ -210,109 +209,148 @@ public class Discovery
                                                       Identifier identifier)
             throws DiscoveryException
     {
-        ArrayList idpSelectList = new ArrayList();
+        ArrayList opSelectList = new ArrayList();
         ArrayList signonList = new ArrayList();
         ArrayList openid1 = new ArrayList();
 
         XRD xrd = xrds.getFinalXRD();
 
-        Iterator iter = xrd.getPrioritizedServices().iterator();
-        while (iter.hasNext())
+        Service service;
+        URL opEndpointUrl;
+        Identifier claimedIdentifier;
+        CanonicalID canonicalId;
+        String providerId;
+
+        // iterate through all services
+        Iterator iterS = xrd.getPrioritizedServices().iterator();
+        while (iterS.hasNext())
         {
-            Service service = (Service) iter.next();
+            service = (Service) iterS.next();
 
-            DiscoveryInformation discovery = extractDiscoveryInformation(
-                    service, identifier,
-                    xrd.getCanonicalidAt(0), xrd.getProviderID());
+            //iterate through all URIs in the service
+            Iterator iter = service.getPrioritizedURIs().iterator();
+            while (iter.hasNext())
+            {
+                try
+                {
+                    opEndpointUrl = ((SEPUri) iter.next()).getURI().toURL();
+                } catch (MalformedURLException e)
+                {
+                    continue;
+                }
 
-            if (discovery == null)
-                continue;
+                if (matchType(service, DiscoveryInformation.OPENID2_OP))
+                {
+                    opSelectList.add(new DiscoveryInformation(opEndpointUrl));
+                }
 
-            String version = discovery.getVersion();
+                if (matchType(service, DiscoveryInformation.OPENID2))
+                {
+                    claimedIdentifier = identifier;
+                    canonicalId = xrd.getCanonicalidAt(0);
+                    providerId = xrd.getProviderID();
 
-            if (DiscoveryInformation.OPENID2_OP.equals(version))
-                idpSelectList.add(discovery);
-            else if (DiscoveryInformation.OPENID2.equals(version))
-                signonList.add(discovery);
-            else if (DiscoveryInformation.OPENID10.equals(version) ||
-                    DiscoveryInformation.OPENID11.equals(version))
-                openid1.add(discovery);
+                    if (identifier instanceof XriIdentifier)
+                    {
+                        if (canonicalId == null)
+                            throw new DiscoveryException(
+                                    "No CanonicalID found after XRI resolution of: " +
+                                            identifier.getIdentifier());
+
+                        if (providerId == null || providerId.length() == 0)
+                            throw new DiscoveryException(
+                                    "No Provider ID found after XRI resolution of: " +
+                                            identifier.getIdentifier());
+
+                        claimedIdentifier = parseIdentifier(canonicalId.getValue());
+                    }
+
+                    signonList.add(new DiscoveryInformation(opEndpointUrl,
+                            claimedIdentifier, getDelegate(service, false)));
+                }
+
+                if (matchType(service, DiscoveryInformation.OPENID10) ||
+                        matchType(service, DiscoveryInformation.OPENID11))
+                {
+                    openid1.add(new DiscoveryInformation(opEndpointUrl,
+                            identifier, getDelegate(service, true),
+                            DiscoveryInformation.OPENID11));
+                }
+            }
         }
 
-        idpSelectList.addAll(signonList);
-        idpSelectList.addAll(openid1);
-        return idpSelectList;
+        opSelectList.addAll(signonList);
+        opSelectList.addAll(openid1);
+        return opSelectList;
     }
 
 
-    protected static DiscoveryInformation extractDiscoveryInformation(
+    protected static List extractDiscoveryInformation(
             Service service, Identifier identifier,
             CanonicalID canonicalId, String providerId)
             throws DiscoveryException
     {
-        URL idpEndpointUrl;
-        Identifier claimedIdentifier = null;
-        Identifier delegateIdentifier = null;
-        String version;
+        ArrayList opSelectList = new ArrayList();
+        ArrayList signonList = new ArrayList();
+        ArrayList openid1 = new ArrayList();
 
-        if (matchType(service, DiscoveryInformation.OPENID2_OP))
+        URL opEndpointUrl;
+        Identifier claimedIdentifier;
+        Identifier delegateIdentifier;
+
+        Iterator iter = service.getPrioritizedURIs().iterator();
+        while (iter.hasNext())
         {
-            version = DiscoveryInformation.OPENID2_OP;
-            idpEndpointUrl = getOPEndpoint(service);
-        }
-        else if (matchType(service, DiscoveryInformation.OPENID2))
-        {
-            version = DiscoveryInformation.OPENID2;
-            idpEndpointUrl = getOPEndpoint(service);
-
-            claimedIdentifier = identifier;
-
-            if (identifier instanceof XriIdentifier)
+            try
             {
-                if (canonicalId == null)
-                    throw new DiscoveryException(
-                            "No CanonicalID found after XRI resolution of: " +
-                                    identifier.getIdentifier());
-
-                if (providerId == null || providerId.length() == 0)
-                    throw new DiscoveryException(
-                            "No Provider ID found after XRI resolution of: " +
-                                    identifier.getIdentifier());
-
-                claimedIdentifier = parseIdentifier(canonicalId.getValue());
+                opEndpointUrl = ((SEPUri) iter.next()).getURI().toURL();
+            } catch (MalformedURLException e)
+            {
+                continue;
             }
 
-            delegateIdentifier = getDelegate(service, false);
-        }
-        // todo: remove else, return one endpoint for each v1/v2 entry?
-        else if (matchType(service, DiscoveryInformation.OPENID10) ||
-                matchType(service, DiscoveryInformation.OPENID11))
-        {
-            version = DiscoveryInformation.OPENID11;
-            idpEndpointUrl = getOPEndpoint(service);
-            claimedIdentifier = identifier;
-            delegateIdentifier = getDelegate(service, true);
-        }
-        else
-        {
-            return null;
+            if (matchType(service, DiscoveryInformation.OPENID2_OP))
+            {
+                opSelectList.add(new DiscoveryInformation(opEndpointUrl));
+            }
+
+            if (matchType(service, DiscoveryInformation.OPENID2))
+            {
+                claimedIdentifier = identifier;
+
+                if (identifier instanceof XriIdentifier)
+                {
+                    if (canonicalId == null)
+                        throw new DiscoveryException(
+                                "No CanonicalID found after XRI resolution of: " +
+                                        identifier.getIdentifier());
+
+                    if (providerId == null || providerId.length() == 0)
+                        throw new DiscoveryException(
+                                "No Provider ID found after XRI resolution of: " +
+                                        identifier.getIdentifier());
+
+                    claimedIdentifier = parseIdentifier(canonicalId.getValue());
+                }
+
+                delegateIdentifier = getDelegate(service, false);
+
+                signonList.add(new DiscoveryInformation(opEndpointUrl,
+                        claimedIdentifier, delegateIdentifier));
+            }
+
+            if (matchType(service, DiscoveryInformation.OPENID10) ||
+                    matchType(service, DiscoveryInformation.OPENID11))
+            {
+                openid1.add(new DiscoveryInformation(opEndpointUrl,
+                        identifier, getDelegate(service, true),
+                        DiscoveryInformation.OPENID11));
+            }
         }
 
-        return new DiscoveryInformation(idpEndpointUrl, claimedIdentifier,
-                                        delegateIdentifier, version);
-    }
-
-    public static URL getOPEndpoint(Service service) throws DiscoveryException
-    {
-        try
-        {
-            // todo: use all service endpoints
-            return service.getURIAt(0).getURI().toURL();
-        }
-        catch (MalformedURLException e)
-        {
-            throw new DiscoveryException("Bad IdP Endpoint URL!", e);
-        }
+        opSelectList.addAll(signonList);
+        opSelectList.addAll(openid1);
+        return opSelectList;
     }
 
     public static Identifier getDelegate(Service service, boolean compatibility)
