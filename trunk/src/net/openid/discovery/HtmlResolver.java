@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -220,10 +222,14 @@ public class HtmlResolver
                 if (node instanceof TagNode)
                 {
                     TagNode link = (TagNode) node;
-                    String rel = link.getAttribute("rel");
                     String href = link.getAttribute("href");
 
-                    if ("openid.server".equals(rel))
+                    String rel = link.getAttribute("rel");
+                    if (rel == null) continue;
+                    List relations = Arrays.asList(rel.split(" "));
+                    if (relations == null) continue;
+
+                    if (relations.contains("openid.server"))
                     {
                         if (idp1Endpoint != null)
                             throw new DiscoveryException(
@@ -240,7 +246,7 @@ public class HtmlResolver
                         }
                     }
 
-                    if ("openid.delegate".equals(rel))
+                    if (relations.contains("openid.delegate"))
                     {
                         if (delegate1 != null)
                             throw new DiscoveryException(
@@ -249,8 +255,7 @@ public class HtmlResolver
                         delegate1 = new UrlIdentifier(href);
                         result.setDelegate1(delegate1);
                     }
-                    // todo: "openid2.provider" and "openid.server" may appear in the same "rel" attribute.
-                    if ("openid2.provider".equals(rel))
+                    if (relations.contains("openid2.provider"))
                     {
                         if (idp2Endpoint != null)
                             throw new DiscoveryException(
@@ -267,7 +272,7 @@ public class HtmlResolver
                         }
                     }
 
-                    if ("openid2.local_id".equals(rel))
+                    if (relations.contains("openid2.local_id"))
                     {
                         if (delegate2 != null)
                             throw new DiscoveryException(
