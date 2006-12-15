@@ -105,11 +105,14 @@ public class StoreRequest extends AxMessage
     {
         List decodedAttrs = new ArrayList();
 
-        List attrs = Arrays.asList(getParameterValue("value." + id).split(","));
-        Iterator iter = attrs.iterator();
-        while (iter.hasNext())
-            decodedAttrs.add(multivalDecode((String) iter.next()));
-
+        String value = getParameterValue("value." + id);
+        if (value != null)
+        {
+            List attrs = Arrays.asList(value.split(","));
+            Iterator iter = attrs.iterator();
+            while (iter.hasNext())
+                decodedAttrs.add(multivalDecode((String) iter.next()));
+        }
         return decodedAttrs;
     }
 
