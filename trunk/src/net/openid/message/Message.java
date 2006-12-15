@@ -42,8 +42,8 @@ public class Message
 
     protected Message (ParameterList params)
     {
+        this();
         this._params = params;
-        this._extAliases = new HashMap();
 
         //build the extension list when creating a message from a param list
         Iterator iter = _params.getParameters().iterator();

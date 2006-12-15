@@ -270,7 +270,7 @@ public class AuthSuccess extends Message
         if ( compatibility && ! hasParameter("openid.identity") )
             return false;
 
-        // figure out if 'identity' and 'signed' are optional
+        // figure out if 'identity' is optional
         if ( ! hasParameter("openid.identity") )
         {
             // not optional in v1
@@ -351,11 +351,16 @@ public class AuthSuccess extends Message
         if ( ! compatibility && ! signedFields.contains("assoc_handle") )
             return false;
 
-        // if the IdP is making an assertion about an Identifier,
-        // the "identity" and "claimed_id" fields MUST be signed
-        return ( hasParameter("openid.identity") ==
-                 (signedFields.contains("identity") &&
-                  signedFields.contains("claimed_id")) );
+        // 'identity' and 'claimed_id' must be signed if present
+        if (hasParameter("openid.identity") &&
+                ! signedFields.contains("identity"))
+            return false;
+
+        if (hasParameter("openid.claimed_id") &&
+                ! signedFields.contains("claimed_id"))
+            return false;
+
+        return true;
     }
 }
 
