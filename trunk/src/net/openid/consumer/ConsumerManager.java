@@ -53,7 +53,11 @@ public class ConsumerManager
      */
     private static NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
 
-    // todo: private association for signing consumer nonces
+    /**
+     * Private association used for signing consumer nonces when operating in
+     * compatibility (v1.x) mode.
+     */
+    private static Association _privateAssociation;
 
     /**
      * Verifier for the nonces in authentication responses;
@@ -88,8 +92,7 @@ public class ConsumerManager
     /**
      * The preferred association session type; will be attempted first.
      */
-    private AssociationSessionType _prefAssocSessEnc
-            = AssociationSessionType.DH_SHA256;
+    private AssociationSessionType _prefAssocSessEnc;
 
     /**
      * Flag for allowing / disallowing no-encryption association session
@@ -147,6 +150,21 @@ public class ConsumerManager
     {
         _httpClient = new HttpClient();
         _realmVerifier = new RealmVerifier();
+
+        if (Association.isHmacSha256Supported())
+            _prefAssocSessEnc = AssociationSessionType.DH_SHA256;
+        else
+            _prefAssocSessEnc = AssociationSessionType.DH_SHA1;
+
+        try
+        {
+            // initialize the private association for compat consumer nonces
+            _privateAssociation = Association.generate(
+                    getPrefAssocSessEnc().getAssociationType(), "", 0);
+        } catch (AssociationException e)
+        {
+            // todo: log
+        }
     }
 
     /**
@@ -462,6 +480,36 @@ public class ConsumerManager
     public List discover(String identifier) throws DiscoveryException
     {
         return _discovery.discover(identifier);
+    }
+
+    /**
+     * Configures a private association for signing consumer nonces.
+     * <p>
+     * Consumer nonces are needed to prevent replay attacks in compatibility
+     * mode, because OpenID 1.x Providers to not attach nonces to
+     * authentication responses.
+     * <p>
+     * One way for the Consumer to know that a consumer nonce in an
+     * authentication response was indeed issued by itself (and thus prevent
+     * denial of service attacks), is by signing them.
+     *
+     * @param assoc     The association to be used for signing consumer nonces;
+     *                  signing can be deactivated by setting this to null.
+     *                  Signing is enabled by default.
+     */
+    public void setPrivateAssociation(Association assoc)
+    {
+        _privateAssociation = assoc;
+    }
+
+    /**
+     * Gets the private association used for signing consumer nonces.
+     *
+     * @see #setPrivateAssociation(net.openid.association.Association)
+     */
+    public Association getPrivateAssociation()
+    {
+        return _privateAssociation;
     }
 
     /**
@@ -1069,7 +1117,7 @@ public class ConsumerManager
      * OpenID 1.1 OpenID Providers do not generate nonces in authentication
      * responses.
      *
-     * @param returnTo       The return_to URL to which a custom nonce
+     * @param returnTo          The return_to URL to which a custom nonce
      *                          parameter will be added.
      * @return                  The return_to URL containing the nonce.
      */
@@ -1077,18 +1125,28 @@ public class ConsumerManager
     {
         String nonce = _consumerNonceGenerator.next();
 
-        // todo: sign nonce
-
         returnTo += (returnTo.indexOf('?') != -1) ? '&' : '?';
 
         try
         {
-            return returnTo + "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
+            returnTo += "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
         }
         catch (UnsupportedEncodingException e)
         {
             return null;
         }
+
+        try
+        {
+            if (_privateAssociation != null)
+                returnTo += "openid.rpsig=" + _privateAssociation.sign(returnTo);
+        }
+        catch (AssociationException e)
+        {
+            return null;
+        }
+
+        return returnTo;
     }
 
     /**
@@ -1102,6 +1160,9 @@ public class ConsumerManager
     public String extractConsumerNonce(String returnTo)
     {
         if (returnTo == null) return null;
+
+        String nonce = null;
+        String signature = null;
 
         URL returnToUrl;
         try
@@ -1119,20 +1180,40 @@ public class ConsumerManager
 
         for (int i=0; i < params.length; i++)
         {
-            String p[] = params[i].split("=", 2);
-            if (p.length == 2 && "openid.rpnonce".equals(p[0]))
-                try
-                {
-                    String nonce = URLDecoder.decode(p[1], "UTF-8");
-                    // todo: check nonce signature
-                    return nonce;
-                } catch (UnsupportedEncodingException e)
-                {
-                    return null;
-                }
+            String keyVal[] = params[i].split("=", 2);
+
+            try
+            {
+                if (keyVal.length == 2 && "openid.rpnonce".equals(keyVal[0]))
+                    nonce = URLDecoder.decode(keyVal[1], "UTF-8");
+
+                if (keyVal.length == 2 && "openid.rpsig".equals(keyVal[0]))
+                    signature = URLDecoder.decode(keyVal[1], "UTF-8");
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                return null;
+            }
         }
 
-        return null;
+        // don't check the signature if no private association is configured
+        if (_privateAssociation == null)
+                return nonce;
+
+        // check the signature
+        if (signature == null) return null;
+
+        String signed = returnTo.substring(0, returnTo.indexOf("openid.rpsig="));
+        try
+        {
+            if (_privateAssociation.verifySignature(signed, signature))
+                return nonce;
+            else
+                return null;
+        } catch (AssociationException e)
+        {
+            return null;
+        }
     }
 
     /**

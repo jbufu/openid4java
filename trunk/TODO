@@ -33,10 +33,7 @@
     error   transaction failures
     fatal   cannot function at all
 
-  - Compatibility mode:
-    - out-of-band RP nonce method
-        - RP needs to self-sign nonces
-    - check limits defined in v1
+  - Compatibility mode - check/enforce limits defined in v1
 
   - javadoc: add overview / package description (use code sample from INSTALL)
 
@@ -57,7 +54,6 @@
         - into session, db, url/return_to, etc.
             - saveDiscoveryInfo(... , session, return_to)
             - loadDiscoveryInfo(httpRequest)
-
 
 
 ========================================================================
