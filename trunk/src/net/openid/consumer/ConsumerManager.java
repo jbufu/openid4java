@@ -1081,10 +1081,13 @@ public class ConsumerManager
                 ! receiving.getPath().equals(returnTo.getPath()) )
             return false;
 
-        List returnToParams = Arrays.asList(returnTo.getQuery().split("&"));
-        List receivingParams = Arrays.asList(receiving.getQuery().split("&"));
+        List returnToParams = returnTo.getQuery() != null ?
+                Arrays.asList(returnTo.getQuery().split("&")) : null;
+        List receivingParams = receiving.getQuery() != null ?
+                Arrays.asList(receiving.getQuery().split("&")) : null;
 
-        return receivingParams.containsAll(returnToParams);
+        return (receivingParams == null && returnToParams == null) ||
+                (receivingParams != null && receivingParams.containsAll(returnToParams) );
     }
 
     /**
@@ -1139,7 +1142,7 @@ public class ConsumerManager
         try
         {
             if (_privateAssociation != null)
-                returnTo += "openid.rpsig=" + _privateAssociation.sign(returnTo);
+                returnTo += "&openid.rpsig=" + _privateAssociation.sign(returnTo);
         }
         catch (AssociationException e)
         {
