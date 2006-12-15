@@ -1281,6 +1281,9 @@ public class ConsumerManager
         {
             DiscoveryInformation service = (DiscoveryInformation) iter.next();
 
+            if (DiscoveryInformation.OPENID2_OP.equals(service.getVersion()))
+                continue;
+
             Identifier opSpecific = service.hasDelegateIdentifier() ?
                     service.getDelegateIdentifier() :
                     service.getClaimedIdentifier();
