@@ -99,6 +99,7 @@
         <javadoc
             failonerror="yes"
             sourcepath="${src}"
+            overview="${src}/overview.html"    
             packagenames="*"
             destdir="${apidoc}"
             classpathref="classpath"
