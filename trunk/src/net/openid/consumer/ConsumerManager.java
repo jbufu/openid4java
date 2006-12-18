@@ -1076,18 +1076,82 @@ public class ConsumerManager
             return false;
         }
 
+        // [1/2] schema, authority and path
         if ( ! receiving.getProtocol().equals(returnTo.getProtocol()) ||
                 ! receiving.getAuthority().equals(returnTo.getAuthority()) ||
                 ! receiving.getPath().equals(returnTo.getPath()) )
             return false;
 
-        List returnToParams = returnTo.getQuery() != null ?
-                Arrays.asList(returnTo.getQuery().split("&")) : null;
-        List receivingParams = receiving.getQuery() != null ?
-                Arrays.asList(receiving.getQuery().split("&")) : null;
+        // [2/2] query parameters
+        try
+        {
+            Map returnToParams = extractQueryParams(returnTo);
+            Map receivingParams = extractQueryParams(receiving);
 
-        return (receivingParams == null && returnToParams == null) ||
-                (receivingParams != null && receivingParams.containsAll(returnToParams) );
+            if (returnToParams == null) return true;
+
+            if (receivingParams == null) return false;
+
+            Iterator iter = returnToParams.keySet().iterator();
+            while (iter.hasNext())
+            {
+                String key = (String) iter.next();
+                List receivingValues = (List) receivingParams.get(key);
+
+                if ( receivingValues == null ||
+                        ! receivingValues.containsAll( (List) returnToParams.get(key)) )
+                    return false;
+            }
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns a Map(key, List(values)) with the URL's query params, or null if
+     * the URL doesn't have a query string.
+     */
+    public Map extractQueryParams(URL url) throws UnsupportedEncodingException
+    {
+        if (url.getQuery() == null) return null;
+
+        Map paramsMap = new HashMap();
+
+        List paramList = Arrays.asList(url.getQuery().split("&"));
+
+        Iterator iter = paramList.iterator();
+        while (iter.hasNext())
+        {
+            String keyValue = (String) iter.next();
+            int equalPos = keyValue.indexOf("=");
+
+            // todo: is URLDecode() really needed?
+            String key = equalPos > -1 ?
+                    URLDecoder.decode(keyValue.substring(0, equalPos), "UTF-8") :
+                    URLDecoder.decode(keyValue, "UTF-8");
+            String value;
+            if (equalPos <= -1)
+                value = null;
+            else if (equalPos + 1 > keyValue.length())
+                value = "";
+            else
+                value = URLDecoder.decode(keyValue.substring(equalPos + 1), "UTF-8");
+
+            List existingValues = (List) paramsMap.get(key);
+            if (existingValues == null)
+            {
+                List newValues = new ArrayList();
+                newValues.add(value);
+                paramsMap.put(key, newValues);
+            } else
+                existingValues.add(value);
+        }
+
+        return paramsMap;
     }
 
     /**
