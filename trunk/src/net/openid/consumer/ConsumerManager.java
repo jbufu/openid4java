@@ -1076,10 +1076,21 @@ public class ConsumerManager
             return false;
         }
 
-        // [1/2] schema, authority and path
+        // [1/2] schema, authority (includes port) and path
+
+        // deal manually with the trailing slash in the path
+        StringBuffer receivingPath = new StringBuffer(receiving.getPath());
+        if ( receivingPath.length() > 0 &&
+                receivingPath.charAt(receivingPath.length() -1) != '/')
+            receivingPath.append('/');
+        StringBuffer returnToPath = new StringBuffer(returnTo.getPath());
+        if ( returnToPath.length() > 0 &&
+                returnToPath.charAt(returnToPath.length() -1) != '/')
+            returnToPath.append('/');
+
         if ( ! receiving.getProtocol().equals(returnTo.getProtocol()) ||
                 ! receiving.getAuthority().equals(returnTo.getAuthority()) ||
-                ! receiving.getPath().equals(returnTo.getPath()) )
+                ! receivingPath.toString().equals(returnToPath.toString()) )
             return false;
 
         // [2/2] query parameters
@@ -1097,9 +1108,11 @@ public class ConsumerManager
             {
                 String key = (String) iter.next();
                 List receivingValues = (List) receivingParams.get(key);
+                List returnToValues = (List) returnToParams.get(key);
 
                 if ( receivingValues == null ||
-                        ! receivingValues.containsAll( (List) returnToParams.get(key)) )
+                        receivingValues.size() != returnToValues.size() ||
+                        ! receivingValues.containsAll( returnToValues ) )
                     return false;
             }
         }
@@ -1129,7 +1142,6 @@ public class ConsumerManager
             String keyValue = (String) iter.next();
             int equalPos = keyValue.indexOf("=");
 
-            // todo: is URLDecode() really needed?
             String key = equalPos > -1 ?
                     URLDecoder.decode(keyValue.substring(0, equalPos), "UTF-8") :
                     URLDecoder.decode(keyValue, "UTF-8");
@@ -1270,7 +1282,7 @@ public class ConsumerManager
         // check the signature
         if (signature == null) return null;
 
-        String signed = returnTo.substring(0, returnTo.indexOf("openid.rpsig="));
+        String signed = returnTo.substring(0, returnTo.indexOf("&openid.rpsig="));
         try
         {
             if (_privateAssociation.verifySignature(signed, signature))
