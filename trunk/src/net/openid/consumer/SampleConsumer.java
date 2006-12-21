@@ -117,7 +117,7 @@ public class SampleConsumer
             if (verified != null)
             {
                 AuthSuccess authSuccess =
-                        AuthSuccess.createAuthSuccess(response);
+                        (AuthSuccess) verification.getAuthResponse();
 
                 if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
                 {
