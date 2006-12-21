@@ -1209,16 +1209,14 @@ public class ConsumerManager
         try
         {
             returnTo += "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
+
+            if (_privateAssociation != null)
+                returnTo += "&openid.rpsig=" +
+                        URLEncoder.encode(_privateAssociation.sign(returnTo), "UTF-8");
         }
         catch (UnsupportedEncodingException e)
         {
             return null;
-        }
-
-        try
-        {
-            if (_privateAssociation != null)
-                returnTo += "&openid.rpsig=" + _privateAssociation.sign(returnTo);
         }
         catch (AssociationException e)
         {
