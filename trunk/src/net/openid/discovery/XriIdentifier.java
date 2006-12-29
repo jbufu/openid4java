@@ -6,6 +6,8 @@ package net.openid.discovery;
 
 import org.openxri.XRI;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
@@ -13,8 +15,15 @@ public class XriIdentifier implements Identifier
 {
     private XRI _xriIdentifier;
 
-    public XriIdentifier(String identifier)
+    public XriIdentifier(String identifier) throws DiscoveryException
     {
+        // must be in the canonical form
+        if (! Pattern.matches("^[!=@\\$\\+\\(]", identifier))
+            throw new DiscoveryException(
+                    "XRI identifiers must be in the canonical form " +
+                    "(no xri:// prefix, and starting with a GCS): " +
+                    identifier);
+
         _xriIdentifier = new XRI(identifier);
     }
 

@@ -29,7 +29,7 @@ public class Discovery
     private static final Pattern URL_PATTERN =
             Pattern.compile("^https?://", Pattern.CASE_INSENSITIVE);
     private static final Pattern XRI_PATTERN =
-            Pattern.compile("^(xri://|[!=@\\$\\+\\(])", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^[!=@\\$\\+\\(]", Pattern.CASE_INSENSITIVE);
 
     final private static String ROOT_DEF_EQ_URI   = "http://equal.xri.net";
     final private static String ROOT_DEF_AT_URI   = "http://at.xri.net";
@@ -90,6 +90,10 @@ public class Discovery
     {
         try
         {
+            // strip the xri:// prefix if it exists
+            if (identifier.toLowerCase().startsWith("xri://"))
+                identifier = identifier.substring(6);
+
             if (URL_PATTERN.matcher(identifier).find())
             {
                 return new UrlIdentifier(identifier);
