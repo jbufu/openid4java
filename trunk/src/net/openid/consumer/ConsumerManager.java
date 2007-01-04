@@ -1029,18 +1029,18 @@ public class ConsumerManager
             return result;
         }
 
-        // [2/4] : nonce verification
-        if (! verifyNonce(authResp, discovered))
-        {
-            result.setStatusMsg("Nonce verificaton failed.");
-            return result;
-        }
-
-        // [3/4] : discovered info verification
+        // [2/4] : discovered info verification
         discovered = verifyDiscovered(authResp, discovered);
         if (discovered == null || ! discovered.hasClaimedIdentifier())
         {
             result.setStatusMsg("Discovered information verification failed.");
+            return result;
+        }
+
+        // [3/4] : nonce verification
+        if (! verifyNonce(authResp, discovered))
+        {
+            result.setStatusMsg("Nonce verificaton failed.");
             return result;
         }
 
