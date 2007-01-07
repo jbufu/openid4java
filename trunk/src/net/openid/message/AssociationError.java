@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 public class AssociationError extends DirectError
 {
-    public static final String ASSOC_ERR = "unsopported-type";
+    public static final String ASSOC_ERR = "unsupported-type";
 
     protected final static List requiredFields = Arrays.asList( new String[] {
             "ns",
