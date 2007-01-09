@@ -1184,6 +1184,8 @@ public class ConsumerManager
         if (nonce == null) // compatibility mode
             nonce = extractConsumerNonce(authResp.getReturnTo());
 
+        if (nonce == null) return false;
+
         // using the same nonce verifier for both server and consumer nonces
         return (NonceVerifier.OK == _nonceVerifier.seen(
                 discovered.getIdpEndpoint().toString(), nonce));
