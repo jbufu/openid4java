@@ -33,7 +33,13 @@
     error   transaction failures
     fatal   cannot function at all
 
-  - Normalization : strip xri:// prefix from user's input
+  - Normalization : review XRI parsing to mach the latest spec / XRI syntax 2.1
+
+  - Immediate mode failure (spec rev 277).
+
+  - MessageExtension.providesIdentifier()
+    - review interface to allow exchange of messages with identifiers at all
+    - review affected message validation logic
 
   - Compatibility mode - check/enforce limits defined in v1
 
@@ -49,6 +55,8 @@
     - Review consumer verification flow
 
     - Make isValid() throw exceptions
+
+    - rename IdP to OP (cosmetic)
 
     - Interface for saving discovered information
         - into session, db, url/return_to, etc.
