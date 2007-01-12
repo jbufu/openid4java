@@ -22,17 +22,17 @@ public class ParameterList implements Serializable
 
     public ParameterList()
     {
-        _parameterMap  = new HashMap();
+        _parameterMap  = new LinkedHashMap();
     }
 
     public ParameterList(ParameterList that)
     {
-        this._parameterMap = new HashMap(that._parameterMap);
+        this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
 
     public ParameterList(Map parameterMap)
     {
-        _parameterMap  = new HashMap();
+        _parameterMap  = new LinkedHashMap();
 
         Iterator keysIter = parameterMap.keySet().iterator();
         while (keysIter.hasNext())
@@ -61,7 +61,7 @@ public class ParameterList implements Serializable
 
     public void copyOf(ParameterList that)
     {
-        this._parameterMap = new HashMap(that._parameterMap);
+        this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
 
     public boolean equals(Object obj)

@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * Implements the extension for Attribute Exchange fetch requests.
@@ -138,7 +139,7 @@ public class FetchRequest extends AxMessage
      */
     public Map getAttributes(boolean required)
     {
-        HashMap reqAttrs = new HashMap();
+        HashMap reqAttrs = new LinkedHashMap();
 
         String level = required ? "required" : "if_available";
 
