@@ -106,7 +106,7 @@ public class Message
 
     public Map getParameterMap()
     {
-        Map params = new HashMap();
+        Map params = new LinkedHashMap();
 
         Iterator iter = _params.getParameters().iterator();
         while (iter.hasNext())
