@@ -1005,8 +1005,8 @@ public class ConsumerManager
         }
 
         // immediate negative response
-        // todo: determine v2 immediate negative responses 
-        if ( ("id_res".equals(response.getParameterValue("openid.mode"))
+        if ( "setup_needed".equals(response.getParameterValue("openid.mode")) ||
+                ("id_res".equals(response.getParameterValue("openid.mode"))
                 && response.hasParameter("openid.user_setup_url") ) )
         {
             AuthImmediateFailure fail =
