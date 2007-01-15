@@ -125,6 +125,14 @@ public class Message
     {
         List requiredFields = getRequiredFields();
 
+        Iterator paramIter = _params.getParameters().iterator();
+        while (paramIter.hasNext())
+        {
+            Parameter param = (Parameter) paramIter.next();
+            if (!param.isValid())
+                return false;
+        }
+
         if (requiredFields == null)
             return true;
 
@@ -133,14 +141,6 @@ public class Message
         {
             String required = (String) reqIter.next();
             if (! hasParameter(required))
-                return false;
-        }
-
-        Iterator paramIter = _params.getParameters().iterator();
-        while (paramIter.hasNext())
-        {
-            Parameter param = (Parameter) paramIter.next();
-            if (!param.isValid())
                 return false;
         }
 

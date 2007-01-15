@@ -120,47 +120,6 @@ public class ParameterTest extends TestCase
         assertEquals("value", parameter.getValue());
     }
 
-    public void testNotAllowedChars()
-    {
-        try
-        {
-            // semicolon in key
-            new Parameter("some:key", "value");
-            fail("A MessageException should be thrown " +
-                    "if the key/values contain invalid characters");
-        } catch (IllegalArgumentException expected) {
-            assertTrue(true);
-        }
-        try
-        {
-            // newline in key
-            new Parameter("some\nkey\n", "value");
-            fail("A MessageException should be thrown " +
-                    "if the key/values contain invalid characters");
-        } catch (IllegalArgumentException expected) {
-            assertTrue(true);
-        }
-        try
-        {
-            // newline in value
-            new Parameter("key", "val\nue");
-            fail("A MessageException should be thrown " +
-                    "if the key/values contain invalid characters");
-        } catch (IllegalArgumentException expected) {
-            assertTrue(true);
-        }
-        try
-        {
-            // all of the above
-            new Parameter("some:\nkey", "value\n");
-            fail("A MessageException should be thrown " +
-                    "if the key/values contain invalid characters");
-        } catch (IllegalArgumentException expected) {
-            assertTrue(true);
-        }
-    }
-
-
     public static Test suite()
     {
         return new TestSuite(ParameterTest.class);
