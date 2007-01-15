@@ -60,7 +60,7 @@ public class DiscoveryTest extends TestCase
     public void testParseXri() throws DiscoveryException
     {
         assertTrue(Discovery.parseIdentifier("xri://=example") instanceof XriIdentifier);
-        assertTrue(Discovery.parseIdentifier("xri://example") instanceof XriIdentifier);
+        assertTrue(Discovery.parseIdentifier("xri://example") instanceof UrlIdentifier);
     }
 
     public void testParseXriNoProtocol() throws DiscoveryException

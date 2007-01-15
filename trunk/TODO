@@ -34,6 +34,7 @@
     fatal   cannot function at all
 
   - Normalization : review XRI parsing to mach the latest spec / XRI syntax 2.1
+    (when when syntax 2.1 goes out)
 
   - MessageExtension.providesIdentifier()
     - review interface to allow exchange of messages with identifiers at all
