@@ -22,7 +22,7 @@ public class AuthRequest extends Message
     public static final String MODE_IMMEDIATE = "checkid_immediate";
 
     public static final String SELECT_ID =
-            "http://openid.net/identifier_select/2.0";
+            "http://specs.openid.net/auth/2.0/identifier_select";
 
     protected final static List requiredFields = Arrays.asList( new String[] {
             "openid.mode"

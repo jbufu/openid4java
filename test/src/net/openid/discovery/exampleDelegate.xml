@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)" xmlns:openid="http://openid.net/xmlns/1.0">
+<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
     <XRD>
         <Service>
-            <Type>http://openid.net/signon/2.0</Type>
+            <Type>http://specs.openid.net/auth/2.0/signon</Type>
             <URI>http://idp.example.com</URI>
             <LocalID>http://idp.example.com/user</LocalID>
         </Service>

@@ -33,8 +33,6 @@
     error   transaction failures
     fatal   cannot function at all
 
-  - openid.net URL strings (spec rev 281)
-
   - Normalization : review XRI parsing to mach the latest spec / XRI syntax 2.1
 
   - MessageExtension.providesIdentifier()
