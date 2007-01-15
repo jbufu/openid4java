@@ -17,13 +17,7 @@ public class XriIdentifier implements Identifier
 
     public XriIdentifier(String identifier) throws DiscoveryException
     {
-        // must be in the canonical form
-        if (! Pattern.matches("^[!=@\\$\\+\\(]", identifier))
-            throw new DiscoveryException(
-                    "XRI identifiers must be in the canonical form " +
-                    "(no xri:// prefix, and starting with a GCS): " +
-                    identifier);
-
+        // should be in the canonical form
         _xriIdentifier = new XRI(identifier);
     }
 
