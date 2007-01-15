@@ -18,7 +18,7 @@ public class Message
     // message constants
     public static final String MODE_IDRES = "id_res";
     public static final String MODE_CANCEL = "cancel";
-    public static final String OPENID2_NS = "http://openid.net/signon/2.0";
+    public static final String OPENID2_NS = "http://specs.openid.net/auth/2.0";
 
     private ParameterList _params;
     private int _extCounter;

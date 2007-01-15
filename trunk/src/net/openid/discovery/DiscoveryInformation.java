@@ -19,8 +19,8 @@ public class DiscoveryInformation implements Serializable
 
     public final static String OPENID10 = "http://openid.net/signon/1.0";
     public final static String OPENID11 = "http://openid.net/signon/1.1";
-    public final static String OPENID2 = "http://openid.net/signon/2.0";
-    public final static String OPENID2_OP = "http://openid.net/server/2.0";
+    public final static String OPENID2 = "http://specs.openid.net/auth/2.0/signon";
+    public final static String OPENID2_OP = "http://specs.openid.net/auth/2.0/server";
 
 
     public DiscoveryInformation(URL idpEndpoint) throws DiscoveryException
