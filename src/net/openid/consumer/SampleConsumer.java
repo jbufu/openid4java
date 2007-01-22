@@ -30,19 +30,19 @@ public class SampleConsumer
     {
         try
         {
-            // determine a return_to URL where your application will receive
+            // configure the return_to URL where your application will receive
             // the authentication responses from the OpenID provider
             String returnToUrl = "http://example.com/openid";
 
             // perform discovery on the user-supplied identifier
             List discoveries = manager.discover(userSuppliedString);
 
-            // attempt to associate with an OpenID provider
+            // attempt to associate with the OpenID provider
             // and retrieve one service endpoint for authentication
             DiscoveryInformation discovered = manager.associate(discoveries);
 
             // store the discovery information in the user's session
-            session.setAttribute("openid-disco", discovered);
+            session.setAttribute("openid-disc", discovered);
 
             // obtain a AuthRequest message to be sent to the OpenID provider
             AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
@@ -85,11 +85,11 @@ public class SampleConsumer
         return null;
     }
 
+    // --- processing the authentication response ---
     public Identifier verifyResponse(HttpServletRequest httpReq, HttpSession session)
     {
         try
         {
-            // --- processing the authentication response
 
             // extract the parameters from the authentication response
             // (which comes in as a HTTP request from the OpenID provider)
@@ -98,7 +98,7 @@ public class SampleConsumer
 
             // retrieve the previously stored discovery information
             DiscoveryInformation discovered =
-                    (DiscoveryInformation) session.getAttribute("openid-disco");
+                    (DiscoveryInformation) session.getAttribute("openid-disc");
 
             // extract the receiving URL from the HTTP request
             StringBuffer receivingURL = httpReq.getRequestURL();
