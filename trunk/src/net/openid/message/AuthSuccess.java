@@ -49,13 +49,13 @@ public class AuthSuccess extends Message
             set("openid.ns", OPENID2_NS);
             setOpEndpoint(opEndpoint);
             setClaimed(claimedId);
+            setNonce(nonce);
         }
 
         set("openid.mode", MODE_IDRES);
 
         setIdentity(delegate);
         setReturnTo(returnTo);
-        setNonce(nonce);
         if (invalidateHandle != null) setInvalidateHandle(invalidateHandle);
         setHandle(assoc.getHandle());
         setSigned(signList);
