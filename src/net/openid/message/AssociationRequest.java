@@ -25,7 +25,7 @@ public class AssociationRequest extends Message
 
     protected final static List requiredFields = Arrays.asList( new String[] {
             "openid.mode",
-            "opneid.session_type",
+            "openid.session_type",
     });
 
     protected final static List optionalFields = Arrays.asList( new String[] {
