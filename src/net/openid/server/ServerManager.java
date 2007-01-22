@@ -500,8 +500,9 @@ public class ServerManager
 
                 if (authReq.getReturnTo() != null)
                     return AuthSuccess.createAuthSuccess(
-                            opEndpoint, claimed, id, !authReq.isVersion2(),
-                            authReq.getReturnTo(), _nonceGenerator.next(),
+                            opEndpoint, claimed, id, !isVersion2,
+                            authReq.getReturnTo(),
+                            isVersion2 ? _nonceGenerator.next() : null,
                             invalidateHandle, assoc, _signList);
                 else
                     return null;
@@ -510,9 +511,9 @@ public class ServerManager
             {
                 if (authReq.isImmediate())
                     return AuthImmediateFailure.createAuthImmediateFailure(
-                            _userSetupUrl, !authReq.isVersion2());
+                            _userSetupUrl, ! isVersion2);
                 else
-                    return new AuthFailure(! authReq.isVersion2());
+                    return new AuthFailure(! isVersion2);
             }
         }
         catch (OpenIDException e)
