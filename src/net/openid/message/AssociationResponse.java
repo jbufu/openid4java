@@ -293,9 +293,9 @@ public class AssociationResponse extends Message
         Association assoc;
 
         if (Association.TYPE_HMAC_SHA1.equals(type.getAssociationType()))
-            assoc = Association.createHmacSha256(handle, macKey, expiresIn);
-        else if (Association.TYPE_HMAC_SHA256.equals(type.getAssociationType()))
             assoc = Association.createHmacSha1(handle, macKey, expiresIn);
+        else if (Association.TYPE_HMAC_SHA256.equals(type.getAssociationType()))
+            assoc = Association.createHmacSha256(handle, macKey, expiresIn);
         else
             throw new AssociationException("Unknown association type: " + type);
 
