@@ -246,7 +246,10 @@ public class ServerManager
      * Sets the list of parameters that the OpenID Provider will sign when
      * generating authentication responses.
      * <p>
-     * Coma-separated list, in the desired order.
+     * The fields in the list must be coma-separated and must not include the
+     * 'openid.' prefix. Fields that are required to be signed are automatically
+     * added by the underlying logic, so that a valid message is generated,
+     * regardles if they are included in the user-supplied list or not.
      */
     public void setSignList(String _signList)
     {
@@ -257,7 +260,7 @@ public class ServerManager
      * Gets the list of parameters that the OpenID Provider will sign when
      * generating authentication responses.
      * <p>
-     * Coma-separated list, in the desired order.
+     * Coma-separated list.
      */
     public String getSignList()
     {

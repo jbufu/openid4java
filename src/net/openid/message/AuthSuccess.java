@@ -36,6 +36,17 @@ public class AuthSuccess extends Message
             "openid.invalidate_handle"
     });
 
+    // required signed list in OpenID 1.x
+    protected final static String signRequired1 = "return_to,identity";
+
+    // required signed list in OpenID 2.0 with claimed identifier
+    protected final static String signRequired2 =
+            "op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle";
+
+    // required signed list in OpenID 2.0 with no claimed identifier
+    protected final static String signRequired3 =
+            "op_endpoint,return_to,response_nonce,assoc_handle";
+
 
     protected AuthSuccess(String opEndpoint, String claimedId, String delegate,
                        boolean compatibility,
@@ -201,9 +212,26 @@ public class AuthSuccess extends Message
         return getParameterValue("openid.assoc_handle");
     }
 
-    public void setSigned(String signed)
+    public void setSigned(String userSuppliedList)
     {
-        set("openid.signed", signed);
+        String toSign = ! isVersion2() ? signRequired1 :
+                hasParameter("openid.identity") ? signRequired2 : signRequired3;
+
+        if (userSuppliedList != null)
+        {
+            List req = Arrays.asList(toSign.split(","));
+            List user = Arrays.asList(toSign.split(","));
+
+            Iterator iter = user.iterator();
+            while (iter.hasNext())
+            {
+                String field = (String) iter.next();
+                if (! req.contains(field))
+                    toSign += "," + field;
+            }
+        }
+
+        set("openid.signed", toSign);
     }
 
     public void setSignature(String sig)
