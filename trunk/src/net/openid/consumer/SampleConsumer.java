@@ -22,7 +22,7 @@ import java.util.List;
 public class SampleConsumer
 {
     // instantiate a ConsumerManager object
-    public static ConsumerManager manager = new ConsumerManager();
+    public ConsumerManager manager = new ConsumerManager();
 
 
     // --- placing the authentication request ---

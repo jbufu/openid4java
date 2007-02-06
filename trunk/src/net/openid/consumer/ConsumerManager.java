@@ -51,13 +51,13 @@ public class ConsumerManager
     /**
      * Consumer-side nonce generator, needed for compatibility with OpenID 1.1.
      */
-    private static NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
+    private NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
 
     /**
      * Private association used for signing consumer nonces when operating in
      * compatibility (v1.x) mode.
      */
-    private static Association _privateAssociation;
+    private Association _privateAssociation;
 
     /**
      * Verifier for the nonces in authentication responses;
