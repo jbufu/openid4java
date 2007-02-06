@@ -17,9 +17,9 @@ import java.util.List;
 public class SampleServer
 {
     // instantiate a ServerManager object
-    public static ServerManager manager = new ServerManager();
+    public ServerManager manager = new ServerManager();
 
-    static
+    public SampleServer()
     {
         manager.setOPEndpointUrl("Http://my.openidprovider.com/server");
     }

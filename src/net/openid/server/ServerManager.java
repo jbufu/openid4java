@@ -24,19 +24,18 @@ public class ServerManager
     /**
      * Keeps track of the associations established with consumer sites.
      */
-    private static ServerAssociationStore _sharedAssociations;
+    private ServerAssociationStore _sharedAssociations;
 
     /**
      * Keeps track of private (internal) associations created for signing
      * authentication responses for stateless consumer sites.
      */
-    private static ServerAssociationStore _privateAssociations;
+    private ServerAssociationStore _privateAssociations;
 
     /**
      * Nonce generator implementation.
      */
-    private static NonceGenerator _nonceGenerator
-            = new IncrementalNonceGenerator();
+    private NonceGenerator _nonceGenerator = new IncrementalNonceGenerator();
 
     // --- association preferences ---
 
@@ -93,7 +92,7 @@ public class ServerManager
      *
      * @see ServerAssociationStore
      */
-    public static ServerAssociationStore getSharedAssociations()
+    public ServerAssociationStore getSharedAssociations()
     {
         return _sharedAssociations;
     }
@@ -105,10 +104,9 @@ public class ServerManager
      * @param sharedAssociations       ServerAssociationStore implementation
      * @see ServerAssociationStore
      */
-    public static void setSharedAssociations(
-            ServerAssociationStore sharedAssociations)
+    public void setSharedAssociations(ServerAssociationStore sharedAssociations)
     {
-        ServerManager._sharedAssociations = sharedAssociations;
+        _sharedAssociations = sharedAssociations;
     }
 
     /**
@@ -118,7 +116,7 @@ public class ServerManager
      *
      * @see ServerAssociationStore
      */
-    public static ServerAssociationStore getPrivateAssociations()
+    public ServerAssociationStore getPrivateAssociations()
     {
         return _privateAssociations;
     }
@@ -131,10 +129,9 @@ public class ServerManager
      * @param privateAssociations       ServerAssociationStore implementation
      * @see ServerAssociationStore
      */
-    public static void setPrivateAssociations(
-            ServerAssociationStore privateAssociations)
+    public void setPrivateAssociations(ServerAssociationStore privateAssociations)
     {
-        ServerManager._privateAssociations = privateAssociations;
+        _privateAssociations = privateAssociations;
     }
 
     /**
@@ -153,7 +150,7 @@ public class ServerManager
      *
      * @see NonceGenerator
      */
-    public static NonceGenerator getNonceGenerator()
+    public NonceGenerator getNonceGenerator()
     {
         return _nonceGenerator;
     }
@@ -164,9 +161,9 @@ public class ServerManager
      *
      * @see NonceGenerator
      */
-    public static void setNonceGenerator(NonceGenerator nonceGenerator)
+    public void setNonceGenerator(NonceGenerator nonceGenerator)
     {
-        ServerManager._nonceGenerator = nonceGenerator;
+        _nonceGenerator = nonceGenerator;
     }
 
     /**
