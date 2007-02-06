@@ -273,9 +273,12 @@ public class YadisResolver
         {
             int statusCode = client.executeMethod(get);
             if (statusCode != HttpStatus.SC_OK)
-                throw new YadisException(
-                        "GET failed on " + getUrl,
+                throw new YadisException("GET failed on " + getUrl,
                         YadisResult.GET_ERROR);
+
+            // store the normalized / after redirects URL, if not already set
+            if (result.getNormalizedUrl() == null)
+                    result.setNormalizedUrl(get.getURI().toString());
 
             // check first if there's a XRDS download stream available
             Header contentType = get.getResponseHeader("content-type");
@@ -284,8 +287,8 @@ public class YadisResolver
                     .split(";")[0].equalsIgnoreCase(YADIS_CONTENT_TYPE) )
             {
                 XRDS xrds = parseXrds(get.getResponseBodyAsStream());
-                if (result.getXrdsLocation() == null)
-                    result.setNormalizedUrl(get.getURI().toString());
+                // todo: only if not set? could be different if redirects were followed
+                // if (result.getXrdsLocation == null)
                 result.setXrdsLocation(get.getURI().toString(),
                         YadisResult.GET_INVALID_RESPONSE);
                 result.setContentType(YADIS_ACCEPT_HEADER);
@@ -311,7 +314,6 @@ public class YadisResolver
 
                 result.setXrdsLocation(xrdsLocation,
                         YadisResult.GET_INVALID_RESPONSE);
-                //result.setNormalizedUrl(get.getURI().toString());
 
                 getXrds(client, result, true);
 
