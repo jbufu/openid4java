@@ -24,13 +24,13 @@ public class ServerManager
     /**
      * Keeps track of the associations established with consumer sites.
      */
-    private ServerAssociationStore _sharedAssociations;
+    private ServerAssociationStore _sharedAssociations = new InMemoryServerAssociationStore();
 
     /**
      * Keeps track of private (internal) associations created for signing
      * authentication responses for stateless consumer sites.
      */
-    private ServerAssociationStore _privateAssociations;
+    private ServerAssociationStore _privateAssociations = new InMemoryServerAssociationStore();
 
     /**
      * Nonce generator implementation.

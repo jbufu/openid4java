@@ -41,12 +41,12 @@ public class ConsumerManager
     /**
      * Discovery process manager.
      */
-    Discovery _discovery = new Discovery();
+    private Discovery _discovery = new Discovery();
 
     /**
      * Store for keeping track of the established associations.
      */
-    private ConsumerAssociationStore _associations;
+    private ConsumerAssociationStore _associations = new InMemoryConsumerAssociationStore();
 
     /**
      * Consumer-side nonce generator, needed for compatibility with OpenID 1.1.
@@ -63,7 +63,7 @@ public class ConsumerManager
      * Verifier for the nonces in authentication responses;
      * prevents replay attacks.
      */
-    private NonceVerifier _nonceVerifier;
+    private NonceVerifier _nonceVerifier = new InMemoryNonceVerifier(60);
 
     /**
      * Handles HTTP calls to the Server / OpenID Provider.
