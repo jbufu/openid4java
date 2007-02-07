@@ -16,6 +16,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
@@ -208,6 +209,10 @@ public class YadisResolver
                 new Integer(_maxRedirects));
         client.getParams().setParameter("http.protocol.allow-circular-redirects",
                 Boolean.TRUE);
+        client.getParams().setParameter("http.protocol.cookie-policy",
+                CookiePolicy.IGNORE_COOKIES);
+        
+
         client.getParams().setSoTimeout(_socketTimeout);
         client.getHttpConnectionManager()
                 .getParams().setConnectionTimeout(_connTimeout);
