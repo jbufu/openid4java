@@ -66,7 +66,7 @@ public class StoreRequest extends AxMessage
     }
 
     /**
-     * Adds an attribute to the fetch request.
+     * Adds an attribute to the store request.
      *
      * @param       id          The identifier that will be associated with the
      *                          attribute name URI
