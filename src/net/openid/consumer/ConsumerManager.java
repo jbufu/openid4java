@@ -6,6 +6,7 @@ package net.openid.consumer;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import net.openid.message.*;
@@ -149,6 +150,13 @@ public class ConsumerManager
     public ConsumerManager()
     {
         _httpClient = new HttpClient();
+
+        // global httpclient configuration parameters
+        _httpClient.getParams().setParameter(
+                "http.protocol.allow-circular-redirects", Boolean.FALSE);
+        _httpClient.getParams().setParameter(
+                "http.protocol.cookie-policy", CookiePolicy.IGNORE_COOKIES);
+
         _realmVerifier = new RealmVerifier();
 
         if (Association.isHmacSha256Supported())
@@ -525,10 +533,9 @@ public class ConsumerManager
     private int call(String url, Message request, ParameterList response)
             throws MessageException
     {
+        // custom httpclient configuration
         _httpClient.getParams().setParameter(
                 "http.protocol.max-redirects", new Integer(_maxRedirects));
-        _httpClient.getParams().setParameter(
-                "http.protocol.allow-circular-redirects", Boolean.FALSE);
         _httpClient.getParams().setSoTimeout(_socketTimeout);
         _httpClient.getHttpConnectionManager()
                 .getParams().setConnectionTimeout(_connectTimeout);

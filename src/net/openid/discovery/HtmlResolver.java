@@ -6,6 +6,7 @@ package net.openid.discovery;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.htmlparser.Parser;
 import org.htmlparser.Node;
@@ -148,6 +149,9 @@ public class HtmlResolver
                 new Integer(_maxRedirects));
         client.getParams().setParameter("http.protocol.allow-circular-redirects",
                 Boolean.TRUE);
+        client.getParams().setParameter("http.protocol.cookie-policy", 
+                CookiePolicy.IGNORE_COOKIES);
+
         client.getParams().setSoTimeout(_socketTimeout);
         client.getHttpConnectionManager()
                 .getParams().setConnectionTimeout(_connTimeout);
