@@ -80,7 +80,7 @@ public class FetchRequest extends AxMessage
      */
     public void addAttribute(String id, String attrName, boolean required)
     {
-        _parameters.set(new Parameter("fetch." + id, attrName));
+        _parameters.set(new Parameter("type." + id, attrName));
 
         String level = required ? "required" : "if_available";
 
@@ -151,7 +151,7 @@ public class FetchRequest extends AxMessage
             {
                 String attrId = multivalDecode(values[i]);
                 reqAttrs.put(attrId,
-                        _parameters.getParameterValue("fetch." + attrId));
+                        _parameters.getParameterValue("type." + attrId));
             }
         }
 
@@ -177,7 +177,7 @@ public class FetchRequest extends AxMessage
             for (int i = 0; i < values.length; i++)
             {
                 String value = multivalDecode(values[i]);
-                if ( ! _parameters.hasParameter("fetch." + value) )
+                if ( ! _parameters.hasParameter("type." + value) )
                     return false;
             }
         }
@@ -188,7 +188,7 @@ public class FetchRequest extends AxMessage
             for (int i = 0; i < values.length; i++)
             {
                 String value = multivalDecode(values[i]);
-                if ( ! _parameters.hasParameter("fetch." + value) )
+                if ( ! _parameters.hasParameter("type." + value) )
                     return false;
             }
         }
@@ -197,7 +197,7 @@ public class FetchRequest extends AxMessage
         while (it.hasNext())
         {
             String paramName = ((Parameter) it.next()).getKey();
-            if (! paramName.startsWith("fetch.") &&
+            if (! paramName.startsWith("type.") &&
                     ! paramName.equals("required") &&
                     ! paramName.equals("if_available") &&
                     ! paramName.equals("update_url"))
