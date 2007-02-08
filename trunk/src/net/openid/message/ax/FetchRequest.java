@@ -133,7 +133,7 @@ public class FetchRequest extends AxMessage
 
     /**
      * Returns the number of values requested for the specified attribute alias,
-     * or 1 (the default number) if the count.<attribute_alias> parameter is
+     * or 1 (the default number) if the count.< alias > parameter is
      * absent.
      *
      * @param alias     The attribute alias.
