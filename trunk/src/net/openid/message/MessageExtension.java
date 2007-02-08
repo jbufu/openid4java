@@ -24,7 +24,7 @@ public interface MessageExtension
      * Gets the extension-specific parameters.
      * <p>
      * Implementations MUST NOT prefix the parameter names with
-     * "openid.<alias>". The alias is managed internally by the Message class,
+     * "openid.<extension_alias>". The alias is managed internally by the Message class,
      * when a extension is attached to an OpenID messaage.
      *
      * @see Message
@@ -35,7 +35,7 @@ public interface MessageExtension
      * Sets the extension-specific parameters.
      * <p>
      * Implementations MUST NOT prefix the parameter names with
-     * "openid.<alias>". The alias is managed internally by the Message class,
+     * "openid.<extension_alias>". The alias is managed internally by the Message class,
      * when a extension is attached to an OpenID messaage.
 
      * @param params

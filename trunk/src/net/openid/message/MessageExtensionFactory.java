@@ -5,7 +5,8 @@
 package net.openid.message;
 
 /**
- * Factory that creates message extension objects for a specific URI.
+ * Factory interface for creating message extension objects for a specific
+ * message extension type URI.
  *
  * @see MessageExtension
  * @see Message
@@ -13,9 +14,29 @@ package net.openid.message;
  */
 public interface MessageExtensionFactory
 {
+
+    /**
+     * Gets the extension type URI of the extension factory.
+     */
     public String getTypeUri();
 
-    public MessageExtension createRequest(ParameterList parameterList) throws MessageException;
-
-    public MessageExtension createResponse(ParameterList parameterList) throws MessageException;
+    /**
+     * Builds a MessageExtension from a parameter list containing the
+     * extension-specific parameters.
+     * <p>
+     * The parameters MUST NOT contain the openid.<extension_alias> prefix.
+     *
+     * @param parameterList     The extension parameters with the
+     *                          openid.<extension_alias> prefix removed.
+     * @param isRequest         Indicates whether the parameters were extracted
+     *                          from an openid request (true), or from an openid
+     *                          response (false). This may assist the factory
+     *                          implementation in determining what object type
+     *                          to instantiate.
+     * @return                  MessageExtension implementation for the supplied
+     *                          extension parameters.
+     */
+    public MessageExtension getExtension(
+            ParameterList parameterList, boolean isRequest)
+            throws MessageException;
 }
