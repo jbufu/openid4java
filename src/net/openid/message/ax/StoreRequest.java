@@ -202,7 +202,7 @@ public class StoreRequest extends AxMessage
      */
     private void setCount(String alias, int count)
     {
-        // make sure that count.<alias>.1 is removed
+        // make sure that count.< alias >.1 is removed
         _parameters.removeParameters("count." + alias);
 
         if (count > 1)
