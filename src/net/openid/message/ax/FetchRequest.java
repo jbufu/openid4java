@@ -28,6 +28,7 @@ public class FetchRequest extends AxMessage
      */
     protected FetchRequest()
     {
+        _parameters.set(new Parameter("mode", "fetch_request"));
     }
 
     /**
@@ -43,7 +44,7 @@ public class FetchRequest extends AxMessage
      * <p>
      * The parameter list can be extracted from a received message with the
      * getExtensionParams method of the Message class, and MUST NOT contain
-     * the "openid.<alias>." prefix.
+     * the "openid.<extension_alias>." prefix.
      */
     protected FetchRequest(ParameterList params)
     {
@@ -56,7 +57,7 @@ public class FetchRequest extends AxMessage
      * <p>
      * The parameter list can be extracted from a received message with the
      * getExtensionParams method of the Message class, and MUST NOT contain
-     * the "openid.<alias>." prefix.
+     * the "openid.<extension_alias>." prefix.
      */
     public static FetchRequest createFetchRequest(ParameterList params)
             throws MessageException
@@ -72,15 +73,17 @@ public class FetchRequest extends AxMessage
     /**
      * Adds an attribute to the fetch request.
      *
-     * @param       id          The identifier that will be associated with the
-     *                          attribute name URI
-     * @param       attrName    The attribute name URI
-     * @param       required    Marks the attribute as 'required';
+     * @param       alias       The attribute alias that will be associated
+     *                          with the attribute type URI
+     * @param       typeUri     The attribute type URI
+     * @param       required    If true, marks the attribute as 'required';
      *                          'if_available' otherwise.
+     * @param       count       The number of attribute values requested.
      */
-    public void addAttribute(String id, String attrName, boolean required)
+    public void addAttribute(String alias, String typeUri,
+                             boolean required, int count)
     {
-        _parameters.set(new Parameter("type." + id, attrName));
+        _parameters.set(new Parameter("type." + alias, typeUri));
 
         String level = required ? "required" : "if_available";
 
@@ -89,20 +92,62 @@ public class FetchRequest extends AxMessage
 
         if (param == null)
         {
-            newParam = new Parameter(level, multivalEncode(id));
+            newParam = new Parameter(level, multivalEncode(alias));
         }
         else
         {
             newParam = new Parameter(level,
-                    param.getValue() + "," + multivalEncode(id));
+                    param.getValue() + "," + multivalEncode(alias));
             _parameters.removeParameters(level);
         }
 
         _parameters.set(newParam);
+
+        if (count > 1)
+            _parameters.set(
+                    new Parameter("count." + alias, Integer.toString(count)));
     }
 
     /**
-     * Sets the optional 'update_url' parameter where the IdP can later re-post
+     * Adds an attribute to the fetch request, with a default value-count of 1.
+     *
+     * @see #addAttribute(String, String, boolean, int)
+     */
+    public void addAttribute(String alias, String typeUri, boolean required)
+    {
+        addAttribute(alias, typeUri, required, 1);
+    }
+
+    /**
+     * Sets the desired number of attribute vaules requested for the specified
+     * attribute alias.
+     *
+     * @param alias     The attribute alias.
+     */
+    public void setCount(String alias, int count)
+    {
+        if (count > 1)
+            _parameters.set(
+                    new Parameter("count." + alias, Integer.toString(count)));
+    }
+
+    /**
+     * Returns the number of values requested for the specified attribute alias,
+     * or 1 (the default number) if the count.<attribute_alias> parameter is
+     * absent.
+     *
+     * @param alias     The attribute alias.
+     */
+    public int getCount(String alias)
+    {
+        if (_parameters.hasParameter("count." + alias))
+            return Integer.parseInt(_parameters.getParameterValue("count." + alias));
+        else
+            return 1;
+    }
+
+    /**
+     * Sets the optional 'update_url' parameter where the OP can later re-post
      * fetch-response updates to the values of the requested attributes.
      *
      * @param       updateUrl   The URL where the RP accepts later updates
@@ -131,11 +176,12 @@ public class FetchRequest extends AxMessage
     }
 
     /**
-     * Returns a map of attribute IDs -> attribute name URIs.
+     * Returns a map with the requested attributes.
      *
      * @param       required    If set to true the list of 'required' attributes
      *                          is returned, otherwise the list of 'if_available'
      *                          attributes.
+     * @return      Map of attribute aliases -> attribute type URIs.
      */
     public Map getAttributes(boolean required)
     {
@@ -149,9 +195,9 @@ public class FetchRequest extends AxMessage
             String[] values = param.getValue().split(",");
             for (int i = 0; i < values.length; i++)
             {
-                String attrId = multivalDecode(values[i]);
-                reqAttrs.put(attrId,
-                        _parameters.getParameterValue("type." + attrId));
+                String alias = multivalDecode(values[i]);
+                reqAttrs.put(alias,
+                        _parameters.getParameterValue("type." + alias));
             }
         }
 
@@ -169,6 +215,10 @@ public class FetchRequest extends AxMessage
     {
         if ( ! _parameters.hasParameter("required") &&
                 ! _parameters.hasParameter("if_available") )
+            return false;
+
+        if ( ! _parameters.hasParameter("mode") ||
+                ! "fetch_request".equals(_parameters.getParameterValue("mode")))
             return false;
 
         if (_parameters.hasParameter("required"))
@@ -197,7 +247,8 @@ public class FetchRequest extends AxMessage
         while (it.hasNext())
         {
             String paramName = ((Parameter) it.next()).getKey();
-            if (! paramName.startsWith("type.") &&
+            if (! paramName.equals("mode") &&
+                    ! paramName.startsWith("type.") &&
                     ! paramName.equals("required") &&
                     ! paramName.equals("if_available") &&
                     ! paramName.equals("update_url"))

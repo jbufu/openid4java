@@ -6,8 +6,6 @@ package net.openid.message.ax;
 
 import net.openid.message.*;
 
-import java.util.Iterator;
-
 /**
  * Base class for the Attribute Exchange implementation.
  * <p>
@@ -26,7 +24,7 @@ import java.util.Iterator;
 public class AxMessage implements MessageExtension, MessageExtensionFactory
 {
     /**
-     * The Attribute Exchange Type URI
+     * The Attribute Exchange Type URI.
      */
     public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0";
 
@@ -58,8 +56,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
-     * Gets the Type URI that identifies the Attribute Exchange extension,
-     * or null if it is not a valid URI.
+     * Gets the Type URI that identifies the Attribute Exchange extension.
      */
     public String getTypeUri()
     {
@@ -73,7 +70,8 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
      * The openid.<extension_alias> prefix is not part of the parameter names,
      * as it is handled internally by the Message class.
      * <p>
-     * The openid.ns. parameter is also handled by the Message class.
+     * The openid.ns.<extension_type_uri> parameter is also handled by
+     * the Message class.
      *
      * @see Message
      */
@@ -86,7 +84,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
      * Gets a the value of the parameter with the specified name.
      *
      * @param name      The name of the parameter,
-     *                  without the openid.<alias> prefix.
+     *                  without the openid.<extension_alias> prefix.
      * @return          The parameter value, or null if not found.
      */
     public String getParameterValue(String name)
@@ -95,17 +93,15 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
-     * Constructs an Attribute Exchange extension with a specified list of
-     * parameters.
+     * Sets the extension's parameters to the supplied list.
      * <p>
      * The parameter names in the list should not contain the
-     * openid.<extension_alias>.
+     * openid.<extension_alias> prefix.
      */
     public void setParameters(ParameterList params)
     {
         _parameters = params;
     }
-
 
     /**
      * Encodes a string value according to the conventions for supporting
@@ -141,31 +137,42 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
         return false;
     }
 
-    public MessageExtension createRequest(ParameterList parameterList) throws MessageException
+    /**
+     * Instantiates the apropriate Attribute Exchange object (fetch / store -
+     * request / response) for the supplied parameter list.
+     *
+     * @param parameterList         The Attribute Exchange specific parameters
+     *                              extracted from the openid message.
+     * @param isRequest             Indicates whether the parameters were
+     *                              extracted from an OpenID request (true),
+     *                              or from an OpenID response.
+     * @return                      MessageExtension implementation for
+     *                              the supplied extension parameters.
+     * @throws MessageException     If a Attribute Exchange object could not be
+     *                              instantiated from the supplied parameter list.
+     */
+    public MessageExtension getExtension(
+            ParameterList parameterList, boolean isRequest)
+            throws MessageException
     {
-        if (parameterList.hasParameter("if_available") || parameterList.hasParameter("update_url"))
+        String axMode = null;
+        if (parameterList.hasParameter("ax.mode"))
         {
-            return FetchRequest.createFetchRequest(parameterList);
-        }
-        else
-        {
-            return StoreRequest.createStoreRequest(parameterList);
-        }
-    }
+            axMode = parameterList.getParameterValue("mode");
 
-    public MessageExtension createResponse(ParameterList parameterList) throws MessageException
-    {
-        Iterator parameters = parameterList.getParameters().iterator();
-        while (parameters.hasNext())
-        {
-            Parameter parameter = (Parameter) parameters.next();
+            if ("fetch_request".equals(axMode))
+                return FetchRequest.createFetchRequest(parameterList);
 
-            if (parameter.getKey().startsWith("type."))
-            {
+            else if ("fetch_response".equals(axMode))
                 return FetchResponse.createFetchResponse(parameterList);
-            }
+
+            else if ("store_request".equals(axMode))
+                return StoreRequest.createStoreRequest(parameterList);
+
+            else if ("store_response".equals(axMode))
+                return StoreResponse.createStoreResponse(parameterList);
         }
 
-        return StoreResponse.createStoreResponse(parameterList);
+        throw new MessageException("Invalid value for ax.mode: " + axMode);
     }
 }

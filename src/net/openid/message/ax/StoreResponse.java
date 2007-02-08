@@ -22,6 +22,7 @@ public class StoreResponse extends AxMessage
      */
     protected StoreResponse()
     {
+        _parameters.set(new Parameter("mode", "store_response"));
     }
 
     /**
@@ -37,7 +38,7 @@ public class StoreResponse extends AxMessage
      * <p>
      * The parameter list can be extracted from a received message with the
      * getExtensionParams method of the Message class, and MUST NOT contain
-     * the "openid.<alias>." prefix.
+     * the "openid.<extension_alias>." prefix.
      */
     protected StoreResponse(ParameterList params)
     {
@@ -49,7 +50,7 @@ public class StoreResponse extends AxMessage
      * <p>
      * The parameter list can be extracted from a received message with the
      * getExtensionParams method of the Message class, and MUST NOT contain
-     * the "openid.<alias>." prefix.
+     * the "openid.<extension_alias>." prefix.
      */
     public static StoreResponse createStoreResponse(ParameterList params)
             throws MessageException
@@ -125,7 +126,8 @@ public class StoreResponse extends AxMessage
             Parameter param = (Parameter) it.next();
             String paramName = param.getKey();
 
-            if (! paramName.equals("status") &&
+            if (! paramName.equals("mode") &&
+                    ! paramName.equals("status") &&
                     ! paramName.equals("status.description"))
                 return false;
 
