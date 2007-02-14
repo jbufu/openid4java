@@ -83,6 +83,13 @@ public class Association implements Serializable
         return new Association(TYPE_HMAC_SHA1, handle, macKey, expiryIn);
     }
 
+    public static Association createHmacSha1(String handle, byte[] macKeyBytes, Date expDate)
+    {
+        SecretKey macKey = createMacKey(HMAC_SHA1_ALGORITHM, macKeyBytes);
+
+        return new Association(TYPE_HMAC_SHA1, handle, macKey, expDate);
+    }
+
     public static Association generateHmacSha256(String handle, int expiryIn)
     {
         SecretKey macKey = generateMacSha256Key();
@@ -95,6 +102,13 @@ public class Association implements Serializable
         SecretKey macKey = createMacKey(HMAC_SHA256_ALGORITHM, macKeyBytes);
 
         return new Association(TYPE_HMAC_SHA256, handle, macKey, expiryIn);
+    }
+
+    public static Association createHmacSha256(String handle, byte[] macKeyBytes, Date expDate)
+    {
+        SecretKey macKey = createMacKey(HMAC_SHA256_ALGORITHM, macKeyBytes);
+
+        return new Association(TYPE_HMAC_SHA256, handle, macKey, expDate);
     }
 
     protected static SecretKey generateMacKey(String algorithm, int keySize)

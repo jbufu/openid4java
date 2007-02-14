@@ -62,19 +62,17 @@ public class SampleConsumer
                 // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
                 // The only method supported in OpenID 1.x
                 // redirect-URL usually limited ~2048 bytes
-                return authReq.getRedirectUrl();
+                return authReq.getDestinationUrl(true);
             }
             else
             {
-                // Option 2: HTML FORM Redirection
-                // Allows payloads > 2048 bytes
+                // Option 2: HTML FORM Redirection (Allows payloads >2048 bytes)
 
-                // <FORM action="OpenID Provider's service endpoint">
-                // see samples/formredirection.jsp for a JSP example
-                authReq.getOPEndpoint();
-
-                // build a HTML FORM with the message parameters
-                authReq.getParameterMap();
+                //RequestDispatcher dispatcher =
+                //        getServletContext().getRequestDispatcher("formredirection.jsp");
+                //httpReq.setAttribute("prameterMap", response.getParameterMap());
+                //httpReq.setAttribute("destinationUrl", response.getDestinationUrl(false));
+                //dispatcher.forward(request, response);
             }
         }
         catch (OpenIDException e)

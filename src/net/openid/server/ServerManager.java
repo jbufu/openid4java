@@ -511,9 +511,9 @@ public class ServerManager
             {
                 if (authReq.isImmediate())
                     return AuthImmediateFailure.createAuthImmediateFailure(
-                            _userSetupUrl, ! isVersion2);
+                            _userSetupUrl, authReq.getReturnTo(), ! isVersion2);
                 else
-                    return new AuthFailure(! isVersion2);
+                    return new AuthFailure(! isVersion2, authReq.getReturnTo());
             }
         }
         catch (OpenIDException e)

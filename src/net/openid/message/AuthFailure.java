@@ -12,7 +12,6 @@ import java.util.Arrays;
  */
 public class AuthFailure extends Message
 {
-
     protected final static List requiredFields = Arrays.asList( new String[] {
             "openid.mode"
     });
@@ -21,12 +20,14 @@ public class AuthFailure extends Message
             "openid.ns"
     });
 
-    public AuthFailure(boolean compatibility)
+    public AuthFailure(boolean compatibility, String returnTo)
     {
         set("openid.mode", MODE_CANCEL);
 
         if (! compatibility)
             set("openid.ns", OPENID2_NS);
+
+        _destinationUrl = returnTo;
     }
 
     protected AuthFailure(ParameterList params)

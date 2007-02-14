@@ -9,7 +9,13 @@ import net.openid.message.Message;
 import net.openid.message.DirectError;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.RequestDispatcher;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.IOException;
 
 /**
  * Sample Server (OpenID Provider) implementation.
@@ -24,8 +30,9 @@ public class SampleServer
         manager.setOPEndpointUrl("Http://my.openidprovider.com/server");
     }
 
-    public String processRequest(HttpServletRequest httpReq)
-            throws ServerException
+    public String processRequest(HttpServletRequest httpReq,
+                                 HttpServletResponse httpResp)
+            throws Exception
     {
         // extract the parameters from the request
         ParameterList request = new ParameterList(httpReq.getParameterMap());
@@ -58,10 +65,23 @@ public class SampleServer
                     userSelectedClaimedId,
                     authenticatedAndApproved.booleanValue());
 
-            // caller will need to decide which of the following to use:
-            // - GET HTTP-redirect to the return_to URL
-            // - HTML FORM Redirection
-            responseText = response.wwwFormEncoding();
+            if (response instanceof DirectError)
+                return directResponse(httpResp, response.keyValueFormEncoding());
+            else
+            {
+                // caller will need to decide which of the following to use:
+
+                // option1: GET HTTP-redirect to the return_to URL
+                return response.getDestinationUrl(true);
+
+                // option2: HTML FORM Redirection
+                //RequestDispatcher dispatcher =
+                //        getServletContext().getRequestDispatcher("formredirection.jsp");
+                //httpReq.setAttribute("prameterMap", response.getParameterMap());
+                //httpReq.setAttribute("destinationUrl", response.getDestinationUrl(false));
+                //dispatcher.forward(request, response);
+                //return null;
+            }
         }
         else if ("check_authentication".equals(mode))
         {
@@ -83,5 +103,15 @@ public class SampleServer
     private List userInteraction(ParameterList request) throws ServerException
     {
         throw new ServerException("User-interaction not implemented.");
+    }
+
+    private String directResponse(HttpServletResponse httpResp, String response)
+            throws IOException
+    {
+        ServletOutputStream os = httpResp.getOutputStream();
+        os.write(response.getBytes());
+        os.close();
+
+        return null;
     }
 }
