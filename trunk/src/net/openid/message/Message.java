@@ -29,6 +29,10 @@ public class Message
     // extension type URI -> MessageExtensions : extracted extension objects
     private Map _extesion;
 
+    // the URL where this message should be sent, where applicable
+    // should remain null for received messages (created from param lists)
+    protected String _destinationUrl;
+
     // type URI -> message extension factory : supported extensions
     private static Map _extensionFactories = new HashMap();
 
@@ -294,6 +298,35 @@ public class Message
     public Set getExtensions()
     {
         return _extAliases.keySet();
+    }
+
+    /**
+     * Gets the URL where the message should be sent, where applicable.
+     * Null for received messages.
+     *
+     * @param   httpGet     If true, the wwwFormEncoding() is appended to the
+     *                      destination URL; the return value should be used
+     *                      with a GET-redirect.
+     *                      If false, the verbatim destination URL is returned,
+     *                      which should be used with a FORM POST redirect.
+     *
+     * @see #wwwFormEncoding()
+     */
+    public String getDestinationUrl(boolean httpGet)
+    {
+        if (_destinationUrl == null)
+            throw new IllegalStateException("Destination URL not set; " +
+                    "is this a received message?");
+
+        if (httpGet)  // append wwwFormEncoding to the destination URL
+        {
+            boolean hasQuery = _destinationUrl.indexOf("?") > 0;
+            String initialChar = hasQuery ? "&" : "?";
+
+            return _destinationUrl + initialChar + wwwFormEncoding();
+        }
+        else  // should send the keyValueFormEncoding in POST data
+            return _destinationUrl;
     }
 
     /**

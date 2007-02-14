@@ -122,20 +122,12 @@ public class AuthRequest extends Message
     public void setOPEndpoint(URL opEndpoint)
     {
         if (opEndpoint != null)
-            _opEndpoint = opEndpoint.toString();
+            _destinationUrl = opEndpoint.toString();
     }
 
     public String getOPEndpoint()
     {
-        return _opEndpoint;
-    }
-
-    public String getRedirectUrl()
-    {
-        boolean hasQuery = _opEndpoint.indexOf("?") > 0;
-        String initialChar = hasQuery ? "&" : "?";
-
-        return _opEndpoint + initialChar + wwwFormEncoding();
+        return _destinationUrl;
     }
 
     public void setImmediate(boolean immediate)

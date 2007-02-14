@@ -23,7 +23,8 @@ public class AuthImmediateFailure extends Message
             "openid.user_setup_url"
     });
 
-    protected AuthImmediateFailure(String url, boolean compatibility)
+    protected AuthImmediateFailure(String url, String returnTo,
+                                   boolean compatibility)
     {
         set("openid.mode", MODE_IDRES);
 
@@ -31,6 +32,8 @@ public class AuthImmediateFailure extends Message
             set("openid.user_setup_url", url);
         else
             set("openid.ns", OPENID2_NS);
+
+        _destinationUrl = returnTo;
     }
 
     protected AuthImmediateFailure(ParameterList params)
@@ -39,9 +42,10 @@ public class AuthImmediateFailure extends Message
     }
 
     public static AuthImmediateFailure createAuthImmediateFailure(
-            String url, boolean compatibility) throws MessageException
+            String url, String returnTo, boolean compatibility)
+            throws MessageException
     {
-        AuthImmediateFailure fail = new AuthImmediateFailure(url, compatibility);
+        AuthImmediateFailure fail = new AuthImmediateFailure(url, returnTo, compatibility);
 
         if (! fail.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");

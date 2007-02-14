@@ -46,7 +46,7 @@
     </target>
 
 
-    <target name="echoproperties"
+    <target name="echoproperties" depends="create_paths"
             description="Displays properties; useful for debugging">
         <echoproperties/>
     </target>

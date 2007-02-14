@@ -164,22 +164,12 @@ public class AuthSuccess extends Message
     public void setReturnTo(String returnTo)
     {
         set("openid.return_to", returnTo);
+        _destinationUrl = returnTo;
     }
 
     public String getReturnTo()
     {
         return getParameterValue("openid.return_to");
-    }
-
-    public String getRedirectUrl()
-    {
-        String return_to = getReturnTo();
-        if (return_to == null) return null;
-
-        boolean hasQuery = getReturnTo().indexOf("?") > 0;
-        String initialChar = hasQuery ? "&" : "?";
-
-        return return_to + initialChar + wwwFormEncoding();
     }
 
     public void setNonce(String nonce)

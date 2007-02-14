@@ -8,6 +8,15 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20060212:
+    - Message.getDestinationUrl() replaces the following:
+        AuthRequest.getRedirectUrl()
+        AuthSuccess.getRedirectUrl()
+        IndirectError.getReturnTo()
+
+20060208:
+    - supports OpenID Attribute Exchange draft 4
+
 20060115:
     - supports OpenID Authentication 2.0 draft 11
 

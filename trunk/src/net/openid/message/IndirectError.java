@@ -9,8 +9,6 @@ package net.openid.message;
  */
 public class IndirectError extends Message
 {
-    private String _returnTo;
-
     protected IndirectError(String msg, String returnTo)
     {
         this(msg, returnTo, false);
@@ -19,7 +17,7 @@ public class IndirectError extends Message
     {
         set("openid.mode", "error");
         set("openid.error", msg);
-        _returnTo = returnTo;
+        _destinationUrl = returnTo;
 
         if (! compatibility)
             set("ns", OPENID2_NS);
@@ -58,11 +56,6 @@ public class IndirectError extends Message
         }
 
         return err;
-    }
-
-    public String getReturnTo()
-    {
-        return _returnTo;
     }
 
     public void setErrorMsg(String msg)
