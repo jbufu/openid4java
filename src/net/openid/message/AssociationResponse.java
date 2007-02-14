@@ -70,7 +70,8 @@ public class AssociationResponse extends Message
         }
         else // no-encryption session, unecrypted MAC key
         {
-            setMacKey(assoc.getMacKey().toString());
+            setMacKey(new String(
+                    Base64.encodeBase64(assoc.getMacKey().getEncoded())));
         }
     }
 
