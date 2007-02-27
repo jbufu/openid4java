@@ -173,7 +173,7 @@ public class AuthRequest extends Message
 
     public String getHandle()
     {
-        return getParameterValue("openid.handle");
+        return getParameterValue("openid.assoc_handle");
     }
 
     public void setReturnTo(String returnTo)
