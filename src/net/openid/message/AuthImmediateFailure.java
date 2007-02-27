@@ -86,17 +86,17 @@ public class AuthImmediateFailure extends Message
 
         boolean compatibility = ! isVersion2();
 
-        try
+        if (compatibility)
         {
-            new URL(getUserSetupUrl());
+            try
+            {
+                new URL(getUserSetupUrl());
+            }
+            catch (MalformedURLException e)
+            {
+                return false;
+            }
         }
-        catch (MalformedURLException e)
-        {
-            return false;
-        }
-
-        if (compatibility && ! hasParameter("openid.user_setup_url"))
-            return false;
 
         return MODE_IDRES.equals(getParameterValue("openid.mode"));
     }

@@ -59,8 +59,13 @@ public class ServerManager
     // --- authentication preferences ---
 
     /**
-     * The URL at the OpenID Provider where the user should be directed when
-     * a immediate authentication request fails.
+     * In OpenID 1.x compatibility mode, the URL at the OpenID Provider where
+     * the user should be directed when a immediate authentication request
+     * fails.
+     * <p>
+     * MUST be configured in order for the OpenID provider to be able to
+     * respond correctly with AuthImmediateFailure messages in compatibility
+     * mode.
      */
     private String _userSetupUrl = null;
 
