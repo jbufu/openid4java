@@ -20,7 +20,6 @@ import org.htmlparser.util.NodeIterator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -244,24 +243,14 @@ public class HtmlResolver
 
                     if (relations.contains("openid.server"))
                     {
-                        if (idp1Endpoint != null)
+                        if (result.getIdp1Endpoint() != null)
                             throw new DiscoveryException(
                                     "More than one openid.server entries found");
 
-                        // todo: refactor : move to HtmlResult
-                        try
-                        {
-                            idp1Endpoint = new URL(href);
-                            if (DEBUG)
-                                _log.debug("Found OpenID1 endpoint: " + idp1Endpoint);
-                            result.setEndpoint1(idp1Endpoint);
+                        if (DEBUG)
+                            _log.debug("Found OpenID1 endpoint: " + idp1Endpoint);
 
-                        }
-                        catch (MalformedURLException e)
-                        {
-                            throw new DiscoveryException(
-                                    "Invalid openid.server URL: " + href);
-                        }
+                        result.setEndpoint1(href);
                     }
 
                     if (relations.contains("openid.delegate"))
@@ -272,25 +261,19 @@ public class HtmlResolver
 
                         if (DEBUG)
                             _log.debug("Found OpenID1 delegate: " + href);
+
                         result.setDelegate1(href);
                     }
                     if (relations.contains("openid2.provider"))
                     {
-                        if (idp2Endpoint != null)
+                        if (result.getIdp2Endpoint() != null)
                             throw new DiscoveryException(
                                     "More than one openid.server entries found");
-                        try
-                        {
-                            idp2Endpoint = new URL(href);
-                            if (DEBUG)
-                                _log.debug("Found OpenID2 endpoint: " + idp2Endpoint);
-                            result.setEndpoint2(idp2Endpoint);
 
-                        } catch (MalformedURLException e)
-                        {
-                            throw new DiscoveryException(
-                                    "Invalid openid2.provider URL: " + href);
-                        }
+                        if (DEBUG)
+                            _log.debug("Found OpenID2 endpoint: " + idp2Endpoint);
+
+                        result.setEndpoint2(href);
                     }
 
                     if (relations.contains("openid2.local_id"))
@@ -301,6 +284,7 @@ public class HtmlResolver
 
                         if (DEBUG)
                             _log.debug("Found OpenID2 localID: " + href);
+
                         result.setDelegate2(href);
                     }
                 }
