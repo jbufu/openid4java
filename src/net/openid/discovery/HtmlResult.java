@@ -5,6 +5,7 @@
 package net.openid.discovery;
 
 import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * Holds information obtained by performing HTML discovery on an URL.
@@ -41,9 +42,21 @@ public class HtmlResult
         return _claimedId;
     }
 
-    public void setEndpoint1(URL idp1Endpoint)
+    public void setEndpoint1(String idp1Endpoint) throws DiscoveryException
     {
-        _idp1Endpoint = idp1Endpoint;
+        URL url;
+        try
+        {
+            url = new URL(idp1Endpoint);
+
+            _idp1Endpoint = url;
+        }
+        catch (MalformedURLException e)
+        {
+            throw new DiscoveryException(
+                    "Invalid openid.server URL: " + idp1Endpoint);
+        }
+
     }
 
     public URL getIdp1Endpoint()
@@ -61,9 +74,21 @@ public class HtmlResult
         return _delegate1;
     }
 
-    public void setEndpoint2(URL idp2Endpoint)
+    public void setEndpoint2(String idp2Endpoint) throws DiscoveryException
     {
-        _idp2Endpoint = idp2Endpoint;
+        URL url;
+        try
+        {
+            url = new URL(idp2Endpoint);
+
+            _idp2Endpoint = url;
+
+        } catch (MalformedURLException e)
+        {
+            throw new DiscoveryException(
+                    "Invalid openid2.provider URL: " + idp2Endpoint);
+        }
+
     }
 
     public URL getIdp2Endpoint()
