@@ -177,7 +177,7 @@ public class ConsumerManager
         catch (AssociationException e)
         {
             throw new ConsumerException(
-                    "Cannot initialize private associations, " +
+                    "Cannot initialize private association, " +
                     "needed for consumer nonces.");
         }
     }
@@ -515,7 +515,13 @@ public class ConsumerManager
      *                  Signing is enabled by default.
      */
     public void setPrivateAssociation(Association assoc)
+            throws ConsumerException
     {
+        if (assoc == null)
+            throw new ConsumerException(
+                    "Cannot set null private association, " +
+                    "needed for consumer nonces.");
+
         _privateAssociation = assoc;
     }
 
@@ -1312,16 +1318,13 @@ public class ConsumerManager
         {
             returnTo += "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
 
-            // todo: make consumer nonces required
-            if (_privateAssociation != null)
-            {
-                returnTo += "&openid.rpsig=" +
-                        URLEncoder.encode(_privateAssociation.sign(returnTo), "UTF-8");
+            returnTo += "&openid.rpsig=" +
+                    URLEncoder.encode(_privateAssociation.sign(returnTo),
+                            "UTF-8");
 
-                _log.info("Inserted consumer nonce.");
+            _log.info("Inserted consumer nonce.");
 
-                if (DEBUG) _log.debug("return_to:" + returnTo);
-            }
+            if (DEBUG) _log.debug("return_to:" + returnTo);
         }
         catch (Exception e)
         {
@@ -1388,11 +1391,6 @@ public class ConsumerManager
                 return null;
             }
         }
-
-        // todo: make consumer nonce required
-        // don't check the signature if no private association is configured
-        if (_privateAssociation == null)
-                return nonce;
 
         // check the signature
         if (signature == null)
