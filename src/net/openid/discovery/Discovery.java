@@ -189,10 +189,11 @@ public class Discovery
                 result = extractDiscoveryInformation(yadis.getXrds(),
                         new UrlIdentifier(yadis.getNormalizedUrl()) );
             }
-            // todo: proper fall-back to html discovery
-            else
+
+            if (result.size() == 0)
             {
-                _log.info("No Yadis result discovered; attempting HTML discovery...");
+                _log.info("No OpenID service endpoints discovered through Yadis;" +
+                        " attempting HTML discovery...");
 
                 result = extractDiscoveryInformation(_htmlResolver.discover(urlId));
             }
