@@ -14,7 +14,7 @@ public class DiscoveryInformation implements Serializable
 {
     URL _idpEndpoint;
     Identifier _claimedIdentifier;
-    Identifier _delegateIdentifier;
+    String _delegate;
     String _version;
 
     public final static String OPENID10 = "http://openid.net/signon/1.0";
@@ -42,25 +42,18 @@ public class DiscoveryInformation implements Serializable
     }
 
     public DiscoveryInformation(URL idpEndpoint, Identifier claimedIdentifier,
-                                Identifier delegateIdentifier)
-            throws DiscoveryException
-    {
-        this(idpEndpoint, claimedIdentifier, delegateIdentifier, OPENID2);
-    }
-
-    public DiscoveryInformation(URL idpEndpoint, Identifier claimedIdentifier,
-                                Identifier delegateIdentifier, String version)
+                                String delegate, String version)
             throws DiscoveryException
     {
         _idpEndpoint = idpEndpoint;
         _claimedIdentifier = claimedIdentifier;
         _version = version;
-        _delegateIdentifier = delegateIdentifier;
+        _delegate = delegate;
 
         if (_idpEndpoint == null)
             throw new DiscoveryException("Null OpenID Provider endpoint.");
 
-        if (_delegateIdentifier != null && _claimedIdentifier == null)
+        if (_delegate != null && _claimedIdentifier == null)
             throw new DiscoveryException("Claimed ID must be present " +
                     "if delegated ID is used.");
     }
@@ -72,7 +65,7 @@ public class DiscoveryInformation implements Serializable
 
     public boolean hasDelegateIdentifier()
     {
-        return _delegateIdentifier != null;
+        return _delegate != null;
     }
 
     public URL getIdpEndpoint()
@@ -85,9 +78,9 @@ public class DiscoveryInformation implements Serializable
         return _claimedIdentifier;
     }
 
-    public Identifier getDelegateIdentifier()
+    public String getDelegateIdentifier()
     {
-        return _delegateIdentifier;
+        return _delegate;
     }
 
     public String getVersion()
@@ -107,9 +100,9 @@ public class DiscoveryInformation implements Serializable
 
     public String toString()
     {
-        return (isVersion2() ? "OpenID2" : "OpenID1") 
+        return (isVersion2() ? "OpenID2" : "OpenID1")
                 + "\nOP-endpoint:" + _idpEndpoint
                 + "\nClaimedID:" + _claimedIdentifier
-                + "\nDelegate:" + _delegateIdentifier;
+                + "\nDelegate:" + _delegate;
     }
 }

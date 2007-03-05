@@ -215,8 +215,6 @@ public class HtmlResolver
     {
         URL idp1Endpoint = null;
         URL idp2Endpoint = null;
-        UrlIdentifier delegate1 = null;
-        UrlIdentifier delegate2 = null;
 
         if (DEBUG) _log.debug("Parsing HTML data: " + htmlData);
 
@@ -268,14 +266,13 @@ public class HtmlResolver
 
                     if (relations.contains("openid.delegate"))
                     {
-                        if (delegate1 != null)
+                        if (result.getDelegate1() != null)
                             throw new DiscoveryException(
                                     "More than one openid.delegate entries found");
 
-                        delegate1 = new UrlIdentifier(href);
                         if (DEBUG)
-                            _log.debug("Found OpenID1 delegate: " + delegate1);
-                        result.setDelegate1(delegate1);
+                            _log.debug("Found OpenID1 delegate: " + href);
+                        result.setDelegate1(href);
                     }
                     if (relations.contains("openid2.provider"))
                     {
@@ -298,14 +295,13 @@ public class HtmlResolver
 
                     if (relations.contains("openid2.local_id"))
                     {
-                        if (delegate2 != null)
+                        if (result.getDelegate2() != null)
                             throw new DiscoveryException(
                                     "More than one openid2.local_id entries found");
 
-                        delegate2 = new UrlIdentifier(href);
                         if (DEBUG)
-                            _log.debug("Found OpenID2 localID: " + delegate2);
-                        result.setDelegate2(delegate2);
+                            _log.debug("Found OpenID2 localID: " + href);
+                        result.setDelegate2(href);
                     }
                 }
             }
