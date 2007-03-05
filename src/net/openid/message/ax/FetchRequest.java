@@ -96,18 +96,17 @@ public class FetchRequest extends AxMessage
 
         String level = required ? "required" : "if_available";
 
-        //todo: rename param -> levelParam
-        Parameter param = _parameters.getParameter(level);
+        Parameter levelParam = _parameters.getParameter(level);
         Parameter newParam;
 
-        if (param == null)
+        if (levelParam == null)
         {
             newParam = new Parameter(level, multivalEncode(alias));
         }
         else
         {
             newParam = new Parameter(level,
-                    param.getValue() + "," + multivalEncode(alias));
+                    levelParam.getValue() + "," + multivalEncode(alias));
             _parameters.removeParameters(level);
         }
 
