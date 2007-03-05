@@ -4,6 +4,8 @@
 
 package net.openid.message;
 
+import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.Arrays;
 
@@ -12,6 +14,9 @@ import java.util.Arrays;
  */
 public class DirectError extends Message
 {
+    private static Logger _log = Logger.getLogger(DirectError.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     protected final static List requiredFields = Arrays.asList( new String[] {
             "ns",
             "error"
@@ -52,8 +57,11 @@ public class DirectError extends Message
 
         if (! err.isValid())
         {
-            //todo: log
+            _log.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
+                       " direct error message created for message: " + msg);
         }
+
+        _log.debug("Created direct error message: " + err.keyValueFormEncoding());
 
         return err;
     }
@@ -64,8 +72,11 @@ public class DirectError extends Message
 
         if (! err.isValid())
         {
-            //todo: log
+            _log.error("Invalid direct error message created: "
+                       + err.keyValueFormEncoding() );
         }
+
+        _log.debug("Created direct error message: " + err.keyValueFormEncoding());
 
         return err;
     }

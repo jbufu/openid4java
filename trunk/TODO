@@ -26,18 +26,11 @@
     - OpenID Relying Party Identity 1.0
     - Simple Registration
 
-  - Logging: Log4j
-    debug   everything else
-    ->info  general protocol flow
-    warn    recoverable exceptions
-    error   transaction failures
-    fatal   cannot function at all
-
   - Normalization : review XRI parsing to mach the latest spec / XRI syntax 2.1
     (when when syntax 2.1 goes out)
 
   - MessageExtension.providesIdentifier()
-    - review interface to allow exchange of messages with identifiers at all
+    - review interface to allow exchange of messages with no identifiers at all
     - review affected message validation logic
 
   - Compatibility mode - check/enforce limits defined in v1

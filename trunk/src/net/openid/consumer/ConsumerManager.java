@@ -9,6 +9,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.log4j.Logger;
 import net.openid.message.*;
 import net.openid.association.Association;
 import net.openid.association.DiffieHellmanSession;
@@ -39,6 +40,9 @@ import java.util.*;
  */
 public class ConsumerManager
 {
+    private static Logger _log = Logger.getLogger(ConsumerManager.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * Discovery process manager.
      */
@@ -147,7 +151,7 @@ public class ConsumerManager
     /**
      * Instantiates a ConsumerManager with default settings.
      */
-    public ConsumerManager()
+    public ConsumerManager() throws ConsumerException
     {
         _httpClient = new HttpClient();
 
@@ -169,9 +173,12 @@ public class ConsumerManager
             // initialize the private association for compat consumer nonces
             _privateAssociation = Association.generate(
                     getPrefAssocSessEnc().getAssociationType(), "", 0);
-        } catch (AssociationException e)
+        }
+        catch (AssociationException e)
         {
-            // todo: log
+            throw new ConsumerException(
+                    "Cannot initialize private associations, " +
+                    "needed for consumer nonces.");
         }
     }
 
@@ -284,6 +291,8 @@ public class ConsumerManager
             throw new IllegalArgumentException(
                     "Associations and stateless mode " +
                     "cannot be both disabled at the same time.");
+
+        if (_maxAssocAttempts == 0) _log.info("Associations disabled.");
     }
 
     /**
@@ -552,14 +561,18 @@ public class ConsumerManager
                     "application/x-www-form-urlencoded", "UTF-8"));
 
             // place the http call to the IdP
+            if (DEBUG) _log.debug("Performing HTTP POST on " + url);
             responseCode = _httpClient.executeMethod(post);
 
-            response.copyOf(ParameterList.
-                    createFromKeyValueForm(post.getResponseBodyAsString()) );
-        } catch (IOException e)
+            String postResponse = post.getResponseBodyAsString();
+            response.copyOf(ParameterList.createFromKeyValueForm(postResponse));
+
+            if (DEBUG) _log.debug("Retrived response:" + postResponse);
+        }
+        catch (IOException e)
         {
-            System.out.println("Failed to establish association with: " + url +
-                " message: " + request.wwwFormEncoding());
+            _log.error("Error talking to " + url +
+                    " response code: " + responseCode, e);
         }
 
         return responseCode;
@@ -602,9 +615,20 @@ public class ConsumerManager
                 return discovered;
         }
 
-        // no association established, return the first service endpoint
-        return discoveries.size() > 0 ?
-                (DiscoveryInformation) discoveries.get(0) : null;
+        if (discoveries.size() > 0)
+        {
+            // no association established, return the first service endpoint
+            DiscoveryInformation d0 = (DiscoveryInformation) discoveries.get(0);
+            _log.warn("Association failed; using first entry: " +
+                      d0.getIdpEndpoint());
+
+            return d0;
+        }
+        else
+        {
+            _log.error("Association attempt, but no discovey endpoints provided.");
+            return null;
+        }
     }
 
     /**
@@ -623,9 +647,16 @@ public class ConsumerManager
         URL idpUrl = discovered.getIdpEndpoint();
         String idpEndpoint = idpUrl.toString();
 
+        _log.info("Trying to associate with " + idpEndpoint +
+                " attempts left: " + maxAttempts);
+
         // check if there's an already established association
         Association a = _associations.load(idpEndpoint);
-        if (a != null && a.getHandle() != null) return 0;
+        if (a != null && a.getHandle() != null)
+        {
+            _log.info("Found an existing association.");
+            return 0;
+        }
 
         String handle = Association.FAILED_ASSOC_HANDLE;
 
@@ -638,7 +669,8 @@ public class ConsumerManager
             requests.put(AssociationSessionType.NO_ENCRYPTION_SHA256MAC, null);
             requests.put(AssociationSessionType.DH_SHA1, null);
             requests.put(AssociationSessionType.DH_SHA256, null);
-        } else
+        }
+        else
         {
             requests.put(AssociationSessionType.NO_ENCRYPTION_COMPAT_SHA1MAC, null);
             requests.put(AssociationSessionType.DH_COMPAT_SHA1, null);
@@ -672,9 +704,15 @@ public class ConsumerManager
                 AssociationRequest assocReq =
                         (AssociationRequest) reqStack.pop();
 
+                if (DEBUG)
+                    _log.debug("Trying association type: " + assocReq.getType());
+
                 // was this association / session type attempted already?
                 if (alreadyTried.keySet().contains(assocReq.getType()))
+                {
+                    if (DEBUG) _log.debug("Already tried.");
                     continue;
+                }
 
                 // mark the current request type as already tried
                 alreadyTried.put(assocReq.getType(), null);
@@ -695,22 +733,26 @@ public class ConsumerManager
                             assocResp.getAssociation(assocReq.getDHSess());
                     handle = assoc.getHandle();
 
-
-                    if ( assocResp.getType().equals(assocReq.getType()) ||
+                    AssociationSessionType respType = assocResp.getType();
+                    if ( respType.equals(assocReq.getType()) ||
                             // v1 IdPs may return a success no-encryption resp
                             ( ! discovered.isVersion2() &&
-                              assocResp.getType().getHAlgorithm() == null &&
-                              createAssociationRequest(
-                                      assocResp.getType(), idpUrl) != null ) )
+                              respType.getHAlgorithm() == null &&
+                              createAssociationRequest(respType,idpUrl) != null))
                     {
                         // store the association and do no try alternatives
                         _associations.save(idpEndpoint, assoc);
+                        _log.info("Associated with " + discovered.getIdpEndpoint()
+                                + " handle: " + assoc.getHandle());
                         break;
                     }
-
-                } else
-                if (status == HttpStatus.SC_BAD_REQUEST) // error response
+                    else
+                        _log.info("Discarding, not matching consumer criteria");
+                }
+                else if (status == HttpStatus.SC_BAD_REQUEST) // error response
                 {
+                    _log.info("Association attempt failed.");
+
                     // retrieve fallback sess/assoc/encryption params set by IdP
                     // and queue a new attempt
                     AssociationError assocErr =
@@ -729,11 +771,18 @@ public class ConsumerManager
                             createAssociationRequest(idpType, idpUrl);
 
                     if (newReq != null)
+                    {
+                        if (DEBUG) _log.debug("Retrieved association type " +
+                                              "from the association error: " +
+                                              newReq.getType());
+
                         reqStack.push(newReq);
+                    }
                 }
-            } catch (OpenIDException e)
+            }
+            catch (OpenIDException e)
             {
-                // todo: log association attempt failure
+                _log.error("Error encountered during association attempt.", e);
             }
         }
 
@@ -773,10 +822,10 @@ public class ConsumerManager
             {
                 dhSess = DiffieHellmanSession.create(type, _dhParams);
                 if (DiffieHellmanSession.isDhSupported(type)
-                        &&
-                        Association.isHmacSupported(type.getAssociationType()))
+                    && Association.isHmacSupported(type.getAssociationType()))
                     assocReq = AssociationRequest.createAssociationRequest(type, dhSess);
-            } else // no-enc session
+            }
+            else // no-enc session
             {
                 if ((_allowNoEncHttpSess ||
                         idpUrl.getProtocol().equals("https"))
@@ -789,6 +838,7 @@ public class ConsumerManager
         }
         catch (OpenIDException e)
         {
+            _log.error("Error trying to create association request.", e);
             return null;
         }
     }
@@ -862,10 +912,6 @@ public class ConsumerManager
         // try to associate with one OP in the discovered list
         DiscoveryInformation discovered = associate(discoveries);
 
-        if (discovered == null)
-            throw new ConsumerException("Authentication cannot continue: " +
-                    "null discovery information provided.");
-
         return authenticate(discovered, returnToUrl, realm);
     }
 
@@ -922,6 +968,10 @@ public class ConsumerManager
                                     String returnToUrl, String realm)
             throws MessageException, ConsumerException
     {
+        if (discovered == null)
+            throw new ConsumerException("Authentication cannot continue: " +
+                    "no discovery information provided.");
+
         associate(discovered, _maxAssocAttempts);
 
         Association assoc =
@@ -945,6 +995,11 @@ public class ConsumerManager
         if ( !_allowStateless && Association.FAILED_ASSOC_HANDLE.equals(handle))
             throw new ConsumerException("Authentication cannot be performed: " +
                     "no association available and stateless mode is disabled");
+
+        _log.info("Creating authentication request for" +
+                " OP-endpoint: " + discovered.getIdpEndpoint() +
+                " claimedID: " + claimedId +
+                " OP-specific ID: " + delegate);
 
         AuthRequest authReq = AuthRequest.createAuthRequest(claimedId, delegate,
                 ! discovered.isVersion2(), returnToUrl, handle, realm, _realmVerifier);
@@ -1003,11 +1058,13 @@ public class ConsumerManager
             throws MessageException, DiscoveryException, AssociationException
     {
         VerificationResult result = new VerificationResult();
+        _log.info("Verifying authentication response...");
 
         // non-immediate negative response
         if ( "cancel".equals(response.getParameterValue("openid.mode")) )
         {
             result.setAuthResponse(AuthFailure.createAuthFailure(response));
+            _log.info("Received auth failure.");
             return result;
         }
 
@@ -1020,10 +1077,13 @@ public class ConsumerManager
                     AuthImmediateFailure.createAuthImmediateFailure(response);
             result.setAuthResponse(fail);
             result.setIdpSetupUrl(fail.getUserSetupUrl());
+            _log.info("Received auth immediate failure.");
             return result;
         }
 
         AuthSuccess authResp = AuthSuccess.createAuthSuccess(response);
+        _log.info("Received positive auth response.");
+
         if (!authResp.isValid())
             throw new MessageException("Invalid Authentication Response: " +
                     authResp.wwwFormEncoding());
@@ -1033,6 +1093,7 @@ public class ConsumerManager
         if (! verifyReturnTo(receivingUrl, authResp))
         {
             result.setStatusMsg("Return_To URL verification failed.");
+            _log.error("Return_To URL verification failed.");
             return result;
         }
 
@@ -1041,6 +1102,7 @@ public class ConsumerManager
         if (discovered == null || ! discovered.hasClaimedIdentifier())
         {
             result.setStatusMsg("Discovered information verification failed.");
+            _log.error("Discovered information verification failed.");
             return result;
         }
 
@@ -1048,14 +1110,22 @@ public class ConsumerManager
         if (! verifyNonce(authResp, discovered))
         {
             result.setStatusMsg("Nonce verificaton failed.");
+            _log.error("Nonce verificaton failed.");
             return result;
         }
 
         // [4/4] : signature verification
-        if (verifySignature(authResp, discovered))  // mark verification success
+        if (verifySignature(authResp, discovered))
+        {
+            // mark verification success
+            _log.info("Verification succeeded.");
             result.setVerifiedId(discovered.getClaimedIdentifier());
+        }
         else
+        {
             result.setStatusMsg("Signature verification failed.");
+            _log.error("Signature verification failed.");
+        }
 
         return result;
     }
@@ -1072,6 +1142,10 @@ public class ConsumerManager
      */
     public boolean verifyReturnTo(String receivingUrl, AuthSuccess response)
     {
+        if (DEBUG)
+            _log.debug("Verifying return URL; receiving: " + receivingUrl +
+                    "\nmessage: " + response.getReturnTo());
+
         URL receiving;
         URL returnTo;
         try
@@ -1081,6 +1155,7 @@ public class ConsumerManager
         }
         catch (MalformedURLException e)
         {
+            _log.error("Invalid return URL.", e);
             return false;
         }
 
@@ -1091,6 +1166,7 @@ public class ConsumerManager
         if ( receivingPath.length() > 0 &&
                 receivingPath.charAt(receivingPath.length() -1) != '/')
             receivingPath.append('/');
+
         StringBuffer returnToPath = new StringBuffer(returnTo.getPath());
         if ( returnToPath.length() > 0 &&
                 returnToPath.charAt(returnToPath.length() -1) != '/')
@@ -1099,7 +1175,12 @@ public class ConsumerManager
         if ( ! receiving.getProtocol().equals(returnTo.getProtocol()) ||
                 ! receiving.getAuthority().equals(returnTo.getAuthority()) ||
                 ! receivingPath.toString().equals(returnToPath.toString()) )
+        {
+            if (DEBUG)
+                _log.debug("Return URL schema, authority or " +
+                           "path verification failed.");
             return false;
+        }
 
         // [2/2] query parameters
         try
@@ -1109,7 +1190,12 @@ public class ConsumerManager
 
             if (returnToParams == null) return true;
 
-            if (receivingParams == null) return false;
+            if (receivingParams == null)
+            {
+                if (DEBUG)
+                    _log.debug("Return URL query parameters verification failed.");
+                return false;
+            }
 
             Iterator iter = returnToParams.keySet().iterator();
             while (iter.hasNext())
@@ -1121,11 +1207,16 @@ public class ConsumerManager
                 if ( receivingValues == null ||
                         receivingValues.size() != returnToValues.size() ||
                         ! receivingValues.containsAll( returnToValues ) )
+                {
+                    if (DEBUG)
+                        _log.debug("Return URL query parameters verification failed.");
                     return false;
+                }
             }
         }
         catch (UnsupportedEncodingException e)
         {
+            _log.error("Error verifying return URL query parameters.", e);
             return false;
         }
 
@@ -1167,7 +1258,8 @@ public class ConsumerManager
                 List newValues = new ArrayList();
                 newValues.add(value);
                 paramsMap.put(key, newValues);
-            } else
+            }
+            else
                 existingValues.add(value);
         }
 
@@ -1220,16 +1312,20 @@ public class ConsumerManager
         {
             returnTo += "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
 
+            // todo: make consumer nonces required
             if (_privateAssociation != null)
+            {
                 returnTo += "&openid.rpsig=" +
                         URLEncoder.encode(_privateAssociation.sign(returnTo), "UTF-8");
+
+                _log.info("Inserted consumer nonce.");
+
+                if (DEBUG) _log.debug("return_to:" + returnTo);
+            }
         }
-        catch (UnsupportedEncodingException e)
+        catch (Exception e)
         {
-            return null;
-        }
-        catch (AssociationException e)
-        {
+            _log.error("Error inserting consumre nonce.", e);
             return null;
         }
 
@@ -1246,7 +1342,8 @@ public class ConsumerManager
      */
     public String extractConsumerNonce(String returnTo)
     {
-        if (returnTo == null) return null;
+        if (DEBUG)
+            _log.debug("Extracting consumer nonce...");
 
         String nonce = null;
         String signature = null;
@@ -1258,6 +1355,7 @@ public class ConsumerManager
         }
         catch (MalformedURLException e)
         {
+            _log.error("Invalid return_to: " + returnTo, e);
             return null;
         }
 
@@ -1272,33 +1370,57 @@ public class ConsumerManager
             try
             {
                 if (keyVal.length == 2 && "openid.rpnonce".equals(keyVal[0]))
+                {
                     nonce = URLDecoder.decode(keyVal[1], "UTF-8");
+                    if (DEBUG) _log.debug("Extracted consumer nonce: " + nonce);
+                }
 
                 if (keyVal.length == 2 && "openid.rpsig".equals(keyVal[0]))
+                {
                     signature = URLDecoder.decode(keyVal[1], "UTF-8");
+                    if (DEBUG) _log.debug("Extracted consumer nonce signature: "
+                                          + signature);
+                }
             }
             catch (UnsupportedEncodingException e)
             {
+                _log.error("Error extracting consumer nonce / signarure.", e);
                 return null;
             }
         }
 
+        // todo: make consumer nonce required
         // don't check the signature if no private association is configured
         if (_privateAssociation == null)
                 return nonce;
 
         // check the signature
-        if (signature == null) return null;
+        if (signature == null)
+        {
+            _log.error("Null consumer nonce signature.");
+            return null;
+        }
 
         String signed = returnTo.substring(0, returnTo.indexOf("&openid.rpsig="));
+        if (DEBUG) _log.debug("Consumer signed text: " + signed);
+
         try
         {
             if (_privateAssociation.verifySignature(signed, signature))
+            {
+                _log.info("Consumer nonce signature verified.");
                 return nonce;
+            }
+
             else
+            {
+                _log.error("Consumer nonce signature failed.");
                 return null;
-        } catch (AssociationException e)
+            }
+        }
+        catch (AssociationException e)
         {
+            _log.error("Error verifying consumer nonce signature.", e);
             return null;
         }
     }
@@ -1323,7 +1445,10 @@ public class ConsumerManager
             throws DiscoveryException
     {
         if (authResp == null || authResp.getIdentity() == null)
-            return null; // assertion is not about an identifier
+        {
+            _log.info("Assertion is not about an identifier");
+            return null;
+        }
 
         if (authResp.isVersion2())
             return verifyDiscovered2(authResp, discovered);
@@ -1353,13 +1478,22 @@ public class ConsumerManager
         if (authResp == null || authResp.isVersion2() ||
                 authResp.getIdentity() == null || discovered == null ||
                 discovered.getClaimedIdentifier() == null || discovered.isVersion2())
+        {
+            if (DEBUG)
+                _log.debug("Discovered information doesn't match " +
+                           "auth response / version");
             return null;
+        }
 
         // asserted identifier in the AuthResponse
         Identifier assertId = Discovery.parseIdentifier(authResp.getIdentity());
 
         // claimed identifier
         Identifier claimedId = discovered.getClaimedIdentifier();
+
+        if (DEBUG)
+            _log.debug("Verifying discovered information for OpenID1 assertion " +
+                       "about ClaimedID: " + claimedId.getIdentifier());
 
         // OP-specific ID
         Identifier opSpecific = discovered.hasDelegateIdentifier() ?
@@ -1370,6 +1504,9 @@ public class ConsumerManager
             return discovered;  // success
 
         // discovered info verification failed
+        if (DEBUG)
+            _log.debug("Identifier in the assertion doesn't match " +
+                       "the one in the discovered information.");
         return null;
     }
 
@@ -1395,7 +1532,12 @@ public class ConsumerManager
     {
         if (authResp == null || ! authResp.isVersion2() ||
                 authResp.getIdentity() == null || authResp.getClaimed() == null)
+        {
+            if (DEBUG)
+                _log.debug("Discovered information doesn't match " +
+                           "auth response / version");
             return null;
+        }
 
         // asserted identifier in the AuthResponse
         Identifier assertId = Discovery.parseIdentifier(authResp.getIdentity());
@@ -1405,6 +1547,11 @@ public class ConsumerManager
 
         // the OP endpoint sent in the response
         String respEndpoint = authResp.getOpEndpoint();
+
+        if (DEBUG)
+            _log.debug("Verifying discovered information for OpenID2 assertion " +
+                       "about ClaimedID: " + respClaimed.getIdentifier());
+
 
         // was the claimed identifier in the assertion previously discovered?
         if (discovered != null && discovered.hasClaimedIdentifier() &&
@@ -1417,18 +1564,29 @@ public class ConsumerManager
 
             if ( assertId.equals(opSpecific) && discovered.isVersion2() &&
                     discovered.getIdpEndpoint().equals(respEndpoint))
+            {
+                if (DEBUG) _log.debug(
+                        "ClaimedID in the assertion was previously discovered: "
+                        + respClaimed);
                 return discovered;
+            }
         }
 
         // stateless, bare response, or the user changed the ID at the OP
         DiscoveryInformation firstServiceMatch = null;
 
         // perform discovery on the claim identifier in the assertion
+        if(DEBUG) _log.debug(
+                "Performing discovery on the ClaimedID in the assertion: "
+                 + respClaimed);
         List discoveries = _discovery.discover(respClaimed);
 
         // find the newly discovered service endpoint that matches the assertion
         // - OP endpoint, OP-specific ID and protocol version must match
         // - prefer (first = highest priority) endpoint with an association
+        if (DEBUG)
+            _log.debug("Looking for a service element to match " +
+                       "the ClaimedID and OP endpoint in the assertion...");
         Iterator iter = discoveries.iterator();
         while (iter.hasNext())
         {
@@ -1446,15 +1604,29 @@ public class ConsumerManager
                 continue;
 
             // keep the first endpoint that matches
-            if (firstServiceMatch == null) firstServiceMatch = service;
+            if (firstServiceMatch == null)
+            {
+                if (DEBUG) _log.debug("Found matching service: " + service);
+                firstServiceMatch = service;
+            }
 
             Association assoc = _associations.load(
                     service.getIdpEndpoint().toString(),
                     authResp.getHandle());
 
             // don't look further if there is an association with this endpoint
-            if (assoc != null) return service;
+            if (assoc != null)
+            {
+                if (DEBUG)
+                    _log.debug("Found existing association, " +
+                               "not looking for another service endpoint.");
+                return service;
+            }
         }
+
+        if (firstServiceMatch == null)
+            _log.error("No service element found to match " +
+                       "the ClaimedID / OP-endpoint in the assertion.");
 
         return firstServiceMatch;
     }
@@ -1472,7 +1644,11 @@ public class ConsumerManager
             throws AssociationException, MessageException
     {
         if (discovered == null || authResp == null)
+        {
+            _log.error("Can't verify signature: " +
+                       "null assertion or discovered information.");
             return false;
+        }
 
         String handle = authResp.getHandle();
         URL idp = discovered.getIdpEndpoint();
@@ -1480,14 +1656,19 @@ public class ConsumerManager
 
         if (assoc != null) // association available, local verification
         {
+            _log.info("Found association: " + assoc.getHandle() +
+                      " verifying signature locally...");
             String text = authResp.getSignedText();
             String signature = authResp.getSignature();
 
             if (assoc.verifySignature(text, signature))
                 return true;
-
-        } else // no association, verify with the IdP
+        }
+        else // no association, verify with the IdP
         {
+            _log.info("No association found, " +
+                      "contacting the OP for direct verification...");
+
             VerifyRequest vrfy = VerifyRequest.createVerifyRequest(authResp);
 
             ParameterList responseParams = new ParameterList();
@@ -1507,6 +1688,13 @@ public class ConsumerManager
 
                     return true;
                 }
+                else
+                    _log.error("OP: " + idp + " says the signature is invalid.");
+            }
+            else
+            {
+                // todo: handle direct verification error responses
+                _log.error("Received verification error response.");
             }
         }
 

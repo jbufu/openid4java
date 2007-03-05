@@ -9,11 +9,15 @@ import net.openid.association.AssociationSessionType;
 import java.util.List;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class AssociationError extends DirectError
 {
+    private static Logger _log = Logger.getLogger(AssociationError.class);
+
     public static final String ASSOC_ERR = "unsupported-type";
 
     protected final static List requiredFields = Arrays.asList( new String[] {
@@ -49,7 +53,8 @@ public class AssociationError extends DirectError
 
         if (! err.isValid())
         {
-            //todo: log
+            _log.error("Invalid association error message created, " +
+                       "type: " + type + " message: " + msg);
         }
 
         return err;
@@ -61,7 +66,8 @@ public class AssociationError extends DirectError
 
         if (! err.isValid())
         {
-            //todo: log
+            _log.error("Invalid association error message created: "
+                       + err.keyValueFormEncoding() );
         }
 
         return err;

@@ -82,4 +82,9 @@ public class Parameter implements Comparable, Serializable
             return keyComp;
         }
     }
+
+    public String toString()
+    {
+        return _key + ":" + _value;
+    }
 }

@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.apache.log4j.Logger;
+
 /**
  * Implements the extension for Attribute Exchange fetch requests.
  *
@@ -23,12 +25,17 @@ import java.util.LinkedHashMap;
  */
 public class FetchRequest extends AxMessage
 {
+    private static Logger _log = Logger.getLogger(FetchRequest.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * Constructs a Fetch Request with an empty parameter list.
      */
     protected FetchRequest()
     {
         _parameters.set(new Parameter("mode", "fetch_request"));
+
+        if (DEBUG) _log.debug("Created empty fetch request.");
     }
 
     /**
@@ -49,7 +56,6 @@ public class FetchRequest extends AxMessage
     protected FetchRequest(ParameterList params)
     {
         _parameters = params;
-
     }
 
     /**
@@ -66,6 +72,9 @@ public class FetchRequest extends AxMessage
 
         if (! req.isValid())
             throw new MessageException("Invalid parameters for a fetch request");
+
+        if (DEBUG)
+            _log.debug("Created fetch request from parameter list: " + params);
 
         return req;
     }
@@ -87,6 +96,7 @@ public class FetchRequest extends AxMessage
 
         String level = required ? "required" : "if_available";
 
+        //todo: rename param -> levelParam
         Parameter param = _parameters.getParameter(level);
         Parameter newParam;
 
@@ -106,6 +116,10 @@ public class FetchRequest extends AxMessage
         if (count > 1)
             _parameters.set(
                     new Parameter("count." + alias, Integer.toString(count)));
+
+        if (DEBUG) _log.debug("Added new attribute to fetch request; type: "
+                              + typeUri + " alias: " + alias + " count: "
+                              + count + " required: " + required);
     }
 
     /**
@@ -163,6 +177,8 @@ public class FetchRequest extends AxMessage
             throw new MessageException("Invalid update_url: " + updateUrl);
         }
 
+        if (DEBUG) _log.debug("Setting fetch request update_url: " + updateUrl);
+
         _parameters.set(new Parameter("update_url", updateUrl));
     }
 
@@ -215,11 +231,18 @@ public class FetchRequest extends AxMessage
     {
         if ( ! _parameters.hasParameter("required") &&
                 ! _parameters.hasParameter("if_available") )
+        {
+            _log.warn("One of 'required' or 'if_available' parameters must be present.");
             return false;
+        }
 
         if ( ! _parameters.hasParameter("mode") ||
                 ! "fetch_request".equals(_parameters.getParameterValue("mode")))
+        {
+            _log.warn("Invalid mode value in fetch_request: "
+                      + _parameters.getParameterValue("mode"));
             return false;
+        }
 
         if (_parameters.hasParameter("required"))
         {
@@ -228,7 +251,10 @@ public class FetchRequest extends AxMessage
             {
                 String value = multivalDecode(values[i]);
                 if ( ! _parameters.hasParameter("type." + value) )
+                {
+                    _log.warn("Type missing for attribute alias: " + value);
                     return false;
+                }
             }
         }
 
@@ -239,7 +265,10 @@ public class FetchRequest extends AxMessage
             {
                 String value = multivalDecode(values[i]);
                 if ( ! _parameters.hasParameter("type." + value) )
+                {
+                    _log.warn("Type missing for attribute alias: " + value);
                     return false;
+                }
             }
         }
 
@@ -252,7 +281,10 @@ public class FetchRequest extends AxMessage
                     ! paramName.equals("required") &&
                     ! paramName.equals("if_available") &&
                     ! paramName.equals("update_url"))
+            {
+                _log.warn("Invalid parameter name in fetch request: " + paramName);
                 return false;
+            }
         }
 
         return true;

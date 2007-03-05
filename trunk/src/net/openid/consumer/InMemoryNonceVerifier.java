@@ -4,6 +4,8 @@
 
 package net.openid.consumer;
 
+import org.apache.log4j.Logger;
+
 import java.util.*;
 import java.text.ParseException;
 
@@ -12,6 +14,9 @@ import java.text.ParseException;
  */
 public class InMemoryNonceVerifier extends AbstractNonceVerifier
 {
+    private static Logger _log = Logger.getLogger(InMemoryNonceVerifier.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     private Map _idpMap = new HashMap();
 
     public InMemoryNonceVerifier(int maxAge)
@@ -33,9 +38,14 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
         }
 
         if (seenSet.contains(nonce))
+        {
+            _log.error("Possible replay attack! Already seen nonce: " + nonce);
             return SEEN;
+        }
 
         seenSet.add(nonce);
+
+        if (DEBUG) _log.debug("Nonce verified: " + nonce);
 
         return OK;
     }
@@ -76,6 +86,9 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
             {
                 String nonce = (String) nonces.next();
 
+                if (DEBUG)
+                    _log.debug("Removing nonce: " + nonce +
+                               " from OP: " + idpUrl);
                 seenSet.remove(nonce);
             }
 
@@ -87,6 +100,8 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
         while (idpUrls.hasNext())
         {
             String idpUrl = (String) idpUrls.next();
+
+            if (DEBUG) _log.debug("Removed all nonces from OP: " + idpUrl);
 
             _idpMap.remove(idpUrl);
         }

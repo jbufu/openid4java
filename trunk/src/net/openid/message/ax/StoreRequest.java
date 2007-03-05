@@ -10,6 +10,8 @@ import net.openid.message.ParameterList;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Implements the extension for Attribute Exchange store requests.
  *
@@ -17,12 +19,17 @@ import java.util.*;
  */
 public class StoreRequest extends AxMessage
 {
+    private static Logger _log = Logger.getLogger(StoreRequest.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * Constructs a Store Request with an empty parameter list.
      */
     protected StoreRequest()
     {
         _parameters.set(new Parameter("mode", "store_request"));
+
+        if (DEBUG) _log.debug("Created empty store request.");
     }
 
     /**
@@ -59,6 +66,9 @@ public class StoreRequest extends AxMessage
 
         if (! req.isValid())
             throw new MessageException("Invalid parameters for a store request");
+
+        if (DEBUG)
+            _log.debug("Created store request from parameter list: " + params);
 
         return req;
     }
@@ -97,6 +107,10 @@ public class StoreRequest extends AxMessage
 
         _parameters.set(new Parameter("value." + alias + index, value));
         setCount(alias, ++count);
+
+        if (DEBUG)
+            _log.debug("Added new attribute to store request; type: " + typeUri
+                       + " alias: " + alias + " count: " + count);
     }
 
     /**
@@ -227,7 +241,10 @@ public class StoreRequest extends AxMessage
                     ! paramName.startsWith("type.") &&
                     ! paramName.startsWith("value.") &&
                     ! paramName.startsWith("count.") )
+            {
+                _log.warn("Invalid parameter name in store request: " + paramName);
                 return false;
+            }
         }
 
         return checkAttributes();
@@ -243,24 +260,38 @@ public class StoreRequest extends AxMessage
             String alias = (String) it.next();
 
             if (! _parameters.hasParameter("type." + alias))
+            {
+                _log.warn("Type missing for attribute alias: " + alias);
                 return false;
+            }
 
             if ( ! _parameters.hasParameter("count." + alias) )
             {
                 if ( ! _parameters.hasParameter("value." + alias) )
+                {
+                    _log.warn("Value missing for attribute alias: " + alias);
                     return false;
+                }
             }
             else // count.alias present
             {
                 if (_parameters.hasParameter("value." + alias))
+                {
+                    _log.warn("Count parameter present for alias: " + alias
+                              + "; should use " + alias + ".[index] format");
                     return false;
+                }
 
                 int count = getCount(alias);
 
                 for (int i = 1; i <= count; i++)
                     if (! _parameters.hasParameter("value." + alias + "." +
                             Integer.toString(i)))
+                    {
+                        _log.warn("Value missing for alias: "
+                                  + alias + "." + Integer.toString(i));
                         return false;
+                    }
             }
         }
 

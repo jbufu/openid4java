@@ -21,9 +21,13 @@ import java.util.List;
  */
 public class SampleConsumer
 {
-    // instantiate a ConsumerManager object
-    public ConsumerManager manager = new ConsumerManager();
+    public ConsumerManager manager;
 
+    public SampleConsumer() throws ConsumerException
+    {
+        // instantiate a ConsumerManager object
+        manager = new ConsumerManager();
+    }
 
     // --- placing the authentication request ---
     public String authRequest(String userSuppliedString, HttpSession session)

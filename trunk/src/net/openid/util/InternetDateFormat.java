@@ -4,6 +4,8 @@
 
 package net.openid.util;
 
+import org.apache.log4j.Logger;
+
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -21,6 +23,9 @@ import java.util.Date;
  */
 public class InternetDateFormat extends SimpleDateFormat
 {
+    private static Logger _log = Logger.getLogger(InternetDateFormat.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final String PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final TimeZone GMT_TIME_ZONE = TimeZone.getTimeZone("GMT");
 
@@ -32,6 +37,10 @@ public class InternetDateFormat extends SimpleDateFormat
 
     public Date parse(String source) throws ParseException
     {
-        return super.parse(source.toUpperCase());
+        Date date = super.parse(source.toUpperCase());
+
+        if (DEBUG) _log.debug("Parsed " + source + " into Data object: " + date);
+
+        return date;
     }
 }

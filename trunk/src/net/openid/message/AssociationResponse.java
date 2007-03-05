@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 
 /**
  * The OpenID Association Response message.
@@ -23,6 +24,9 @@ import org.apache.commons.codec.binary.Base64;
  */
 public class AssociationResponse extends Message
 {
+    private static Logger _log = Logger.getLogger(AssociationResponse.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     protected final static List requiredFields = Arrays.asList( new String[] {
             "assoc_type",
             "assoc_handle",
@@ -46,6 +50,10 @@ public class AssociationResponse extends Message
     protected AssociationResponse(AssociationRequest assocReq, Association assoc)
             throws AssociationException
     {
+        if (DEBUG)
+            _log.debug("Creating association response, type: " + assocReq.getType()
+                       + " association handle: " + assoc.getHandle());
+
         if (assocReq.isVersion2()) set("ns", OPENID2_NS);
 
         AssociationSessionType type = assocReq.getType();
@@ -94,6 +102,9 @@ public class AssociationResponse extends Message
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
+        if (DEBUG) _log.debug("Created association response: "
+                              + resp.keyValueFormEncoding());
+
         return resp;
     }
 
@@ -105,6 +116,9 @@ public class AssociationResponse extends Message
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
+        if (DEBUG)
+            _log.debug("Created association response from message parameters: "
+                       + resp.keyValueFormEncoding() );
         return resp;
     }
 
@@ -229,29 +243,43 @@ public class AssociationResponse extends Message
 
             // make sure compatibility mode is the same for type and message
             if (type.isVersion2() ^ isVersion2())
+            {
+                _log.warn("Protocol verison mismatch between association " +
+                          "session type: " + type +
+                          " and AssociationResponse message type.");
                 return false;
+            }
 
         } catch (AssociationException e) {
+            _log.error("Error verifying association response validity.", e);
             return false;
         }
 
         // additional compatibility checks
         if (! isVersion2() && getAssociationType() == null)
-                return false;   // assoc_type cannot be omitted in v1 responses
-
+        {
+            _log.warn("assoc_type cannot be omitted in OpenID1 responses");
+            return false;
+        }
 
         String macKey;
         if (type.getHAlgorithm() != null) // DH session
         {
             if ( ! hasParameter("dh_server_public") ||
                     ! hasParameter("enc_mac_key") )
+            {
+                _log.warn("DH public key or encrypted MAC key missing.");
                 return false;
+            }
             else
                 macKey = getParameterValue("enc_mac_key");
         } else // no-enc session
         {
             if ( !hasParameter("mac_key") )
+            {
+                _log.warn("Missing MAC key.");
                 return false;
+            }
             else
                 macKey = getParameterValue("mac_key");
         }
@@ -259,7 +287,14 @@ public class AssociationResponse extends Message
         // mac key size
         int macSize = Base64.decodeBase64(macKey.getBytes()).length * 8;
 
-        return (macSize == type.getKeySize());
+        if ( macSize != type.getKeySize())
+        {
+            _log.warn("MAC key size: " + macSize +
+                      " doesn't match the association/session type: " + type);
+            return false;
+        }
+        else
+            return true;
     }
 
     /**
@@ -272,6 +307,8 @@ public class AssociationResponse extends Message
     public Association getAssociation(DiffieHellmanSession dhSess)
             throws AssociationException
     {
+        if (DEBUG) _log.debug("Retrieving MAC key from association response...");
+
         String handle = getParameterValue("assoc_handle");
         int expiresIn = Integer.parseInt(
                 getParameterValue("expires_in") );
@@ -286,19 +323,30 @@ public class AssociationResponse extends Message
             macKey = dhSess.decryptMacKey(
                     getParameterValue("enc_mac_key"),
                     getParameterValue("dh_server_public") );
-        } else {
+            if (DEBUG) _log.debug("Decrypted MAC key (base64): " +
+                                  new String(Base64.encodeBase64(macKey)));
+        }
+        else
+        {
             macKey = Base64.decodeBase64(
                     getParameterValue("mac_key").getBytes() );
+
+            if (DEBUG) _log.debug("Unencrypted MAC key (base64): "
+                                  + getParameterValue("mac_key"));
         }
 
         Association assoc;
 
         if (Association.TYPE_HMAC_SHA1.equals(type.getAssociationType()))
             assoc = Association.createHmacSha1(handle, macKey, expiresIn);
+
         else if (Association.TYPE_HMAC_SHA256.equals(type.getAssociationType()))
             assoc = Association.createHmacSha256(handle, macKey, expiresIn);
+
         else
             throw new AssociationException("Unknown association type: " + type);
+
+        if (DEBUG) _log.debug("Created association for handle: " + handle);
 
         return assoc;
     }

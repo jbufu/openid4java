@@ -14,11 +14,16 @@ import java.text.ParseException;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class AuthSuccess extends Message
 {
+    private static Logger _log = Logger.getLogger(AuthSuccess.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     protected final static List requiredFields = Arrays.asList( new String[] {
             "openid.mode",
             "openid.return_to",
@@ -49,10 +54,10 @@ public class AuthSuccess extends Message
 
 
     protected AuthSuccess(String opEndpoint, String claimedId, String delegate,
-                       boolean compatibility,
-                       String returnTo, String nonce,
-                       String invalidateHandle, Association assoc,
-                       String signList)
+                          boolean compatibility,
+                          String returnTo, String nonce,
+                          String invalidateHandle, Association assoc,
+                          String signList)
             throws AssociationException
     {
         if (! compatibility)
@@ -93,6 +98,9 @@ public class AuthSuccess extends Message
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
+        if (DEBUG) _log.debug("Created positive auth response: "
+                              + resp.keyValueFormEncoding());
+
         return resp;
     }
 
@@ -103,6 +111,9 @@ public class AuthSuccess extends Message
 
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
+
+        if (DEBUG) _log.debug("Created positive auth response: "
+                              + resp.keyValueFormEncoding());
 
         return resp;
     }
@@ -221,6 +232,8 @@ public class AuthSuccess extends Message
             }
         }
 
+        if (DEBUG) _log.debug("Setting fields to be signed: " + toSign);
+
         set("openid.signed", toSign);
     }
 
@@ -251,7 +264,6 @@ public class AuthSuccess extends Message
             signedText.append('\n');
         }
 
-
         return signedText.toString();
     }
 
@@ -262,10 +274,16 @@ public class AuthSuccess extends Message
         boolean compatibility = ! isVersion2();
 
         if ( compatibility && hasParameter("openid.ns") )
+        {
+            _log.warn("openid.ns should not be present in OpenID1 auth responses");
             return false;
+        }
 
         if ( ! compatibility && ! hasParameter("openid.op_endpoint"))
+        {
+            _log.warn("openid.op_endpoint is required in OpenID auth responses");
             return false;
+        }
 
         try
         {
@@ -279,20 +297,25 @@ public class AuthSuccess extends Message
         }
         catch (MalformedURLException e)
         {
+            _log.error("Error verifying auth response validity.", e);
             return false;
         }
 
         if (! MODE_IDRES.equals(getMode()))
+        {
+            _log.warn("Invalid openid.mode value in auth response: " + getMode());
             return false;
-
-        if ( compatibility && ! hasParameter("openid.identity") )
-            return false;
+        }
 
         // figure out if 'identity' is optional
         if ( ! hasParameter("openid.identity") )
         {
             // not optional in v1
-            if (compatibility) return false;
+            if (compatibility)
+            {
+                _log.warn("openid.identity is required in OpenID1 auth responses");
+                return false;
+            }
 
             boolean hasAuthExt = false;
             Iterator iter = getExtensions().iterator();
@@ -316,37 +339,57 @@ public class AuthSuccess extends Message
                 }
             }
             if (! hasAuthExt)
+            {
                 // no extension provides authentication sevices, invalid message
+                _log.warn("no identifier specified in auth request");
                 return false;
+            }
 
             // claimed_id must be present if and only if identity is present
             if ( hasParameter("openid.claimed_id") )
+            {
+                _log.warn("openid.claimed_id must be present if and only if " +
+                          "openid.identity is present.");
                 return false;
+            }
         }
         else if ( ! compatibility && ! hasParameter("openid.claimed_id") )
+        {
+            _log.warn("openid.clamied_id must be present in OpenID2 auth responses");
             return false;
+        }
 
         // nonce optional or not?
         String nonce = getNonce();
         if ( !compatibility )
         {
-            if (nonce == null) return false;
+            if (nonce == null)
+            {
+                _log.warn("openid.response_nonce is required in OpenID2 auth responses");
+                return false;
+            }
 
             // nonce format
             InternetDateFormat _dateFormat = new InternetDateFormat();
             try
             {
                 _dateFormat.parse(nonce.substring(0, 20));
-            } catch (ParseException e)
+            }
+            catch (ParseException e)
             {
+                _log.error("Error verifying nonce in auth response.", e);
                 return false;
             }
 
             if (nonce.length() >255)
+            {
+                _log.warn("nonce length must not exceed 255 characters");
                 return false;
+            }
 
         } else if (nonce != null)
         {
+            _log.warn("openid.response_nonce should not be present in OpenID1 auth responses");
             return false;
         }
 
@@ -355,28 +398,46 @@ public class AuthSuccess extends Message
 
         // return_to must be signed
         if (!signedFields.contains("return_to"))
+        {
+            _log.warn("return_to must be signed");
             return false;
+        }
 
         // either compatibility mode or nonce signed
         if ( compatibility == signedFields.contains("response_nonce") )
+        {
+            _log.warn("response_nonce must be present and signed only OpenID2 auth responses");
             return false;
+        }
 
         // either compatibility mode or op_endpoint signed
         if ( compatibility == signedFields.contains("op_endpoint") )
+        {
+            _log.warn("op_endpoint must be present and signed only in OpenID2 auth responses");
             return false;
+        }
 
         // assoc_handle must be signed in v2
         if ( ! compatibility && ! signedFields.contains("assoc_handle") )
+        {
+            _log.warn("assoc_handle must be signed in OpenID2 auth responses");
             return false;
+        }
 
         // 'identity' and 'claimed_id' must be signed if present
         if (hasParameter("openid.identity") &&
                 ! signedFields.contains("identity"))
+        {
+            _log.warn("openid.identity must be signed if present");
             return false;
+        }
 
         if (hasParameter("openid.claimed_id") &&
                 ! signedFields.contains("claimed_id"))
+        {
+            _log.warn("openid.claimed_id must be signed if present");
             return false;
+        }
 
         return true;
     }

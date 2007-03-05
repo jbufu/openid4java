@@ -8,11 +8,16 @@ import net.openid.association.Association;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryConsumerAssociationStore implements ConsumerAssociationStore
 {
+    private static Logger _log = Logger.getLogger(InMemoryConsumerAssociationStore.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     private Map _idpMap = new HashMap();
 
     public synchronized void save(String idpUrl, Association association)
@@ -25,8 +30,15 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
         {
             handleMap = new HashMap();
 
+
             _idpMap.put(idpUrl, handleMap);
         }
+
+        String handle = association.getHandle();
+
+        if(DEBUG)
+            _log.debug("Adding association to the in-memory store: " + handle +
+                       " with OP: " + idpUrl);
 
         handleMap.put(association.getHandle(), association);
     }
@@ -83,6 +95,8 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
         {
             Map handleMap = (Map) _idpMap.get(idpUrl);
 
+            _log.info("Removing association: " + handle + " widh OP: " + idpUrl);
+
             handleMap.remove(handle);
 
             if (handleMap.size() == 0)
@@ -119,6 +133,9 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
             while (handles.hasNext())
             {
                 String handle = (String) handles.next();
+
+                _log.info("Removing expired association: " + handle +
+                          " with OP: " + idpUrl);
 
                 handleMap.remove(handle);
             }

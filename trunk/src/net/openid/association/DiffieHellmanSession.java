@@ -12,12 +12,16 @@ import javax.crypto.interfaces.DHPrivateKey;
 import java.math.BigInteger;
 import java.security.*;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class DiffieHellmanSession
 {
+    private static Logger _log = Logger.getLogger(DiffieHellmanSession.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final String DEFAULT_MODULUS_HEX =
         "DCF93A0B883972EC0E19989AC5A2CE310E1D37717E8D9571BB7623731866E61E" +
         "F75A2E27898B057F9891C2E27A639C3F29B60814581CD3B2CA3986D268370557" +
@@ -43,12 +47,19 @@ public class DiffieHellmanSession
 
         try
         {
-            _hDigest         = MessageDigest.getInstance(_type.getHAlgorithm());
-        } catch (NoSuchAlgorithmException e)
+            _hDigest = MessageDigest.getInstance(_type.getHAlgorithm());
+        }
+        catch (NoSuchAlgorithmException e)
         {
             throw new AssociationException("Unsupported H algorithm: " +
                     _type.getHAlgorithm(), e);
         }
+    }
+
+    public String toString()
+    {
+        return _type + " base: " + _dhParameterSpec.getG()
+                + " modulus: " + _dhParameterSpec.getP();
     }
 
     public static DiffieHellmanSession create(AssociationSessionType type,
@@ -72,7 +83,11 @@ public class DiffieHellmanSession
             throws AssociationException
     {
 
-        return new DiffieHellmanSession(type, dhParameterSpec);
+        DiffieHellmanSession dh = new DiffieHellmanSession(type, dhParameterSpec);
+
+        if (DEBUG) _log.debug("Created DH session: " + dh);
+
+        return dh;
     }
 
     public static DHParameterSpec getDefaultParameter()
@@ -87,19 +102,28 @@ public class DiffieHellmanSession
     {
         try
         {
-            AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance(ALGORITHM);
+            AlgorithmParameterGenerator paramGen =
+                    AlgorithmParameterGenerator.getInstance(ALGORITHM);
 
-            DHGenParameterSpec genParameterSpec = new DHGenParameterSpec(primeSize, keySize);
+            DHGenParameterSpec genParameterSpec =
+                    new DHGenParameterSpec(primeSize, keySize);
 
             paramGen.init(genParameterSpec);
 
             AlgorithmParameters params = paramGen.generateParameters();
 
-            return (DHParameterSpec) params.getParameterSpec(DHParameterSpec.class);
+            DHParameterSpec result = (DHParameterSpec)
+                    params.getParameterSpec(DHParameterSpec.class);
+
+            if (DEBUG) _log.debug("Generated random DHParameterSpec, base: "
+                    + result.getG() + ", modulus: " + result.getP());
+
+            return result;
         }
         catch (GeneralSecurityException e)
         {
-            // TODO: log
+            _log.error("Cannot generate DH params for primeSize: "
+                    + primeSize + " keySize: " + keySize, e);
             return null;
         }
     }
@@ -116,7 +140,9 @@ public class DiffieHellmanSession
         }
         catch (GeneralSecurityException e)
         {
-            // TODO: log
+            _log.error("Cannot generate key pair for DHParameterSpec, base: "
+                    + dhSpec.getG() + ", modulus: "  + dhSpec.getP() );
+
             return null;
         }
     }
@@ -127,10 +153,12 @@ public class DiffieHellmanSession
     }
 
     /**
-     * Get the modulus for the Diffie-Hellman key echange.
-     * This is the value passed in the <b>openid.dh_modulus</b> association request parameter.
+     * Gets the modulus for the Diffie-Hellman key echange.
+     * This is the value passed in the <b>openid.dh_modulus</b> association
+     * request parameter.
      *
-     * @return The base 64 encoded two's-complement representation of the modulus: <code>base64(btwoc(p))</code>
+     * @return  The base 64 encoded two's-complement representation of the
+     *          modulus: <code>base64(btwoc(p))</code>
      */
     public String getModulus()
     {
@@ -140,10 +168,12 @@ public class DiffieHellmanSession
     }
 
     /**
-     * Get the generator for the Diffie-Hellman key echange.
-     * This is the value passed in the <b>openid.dh_gen</b> association request parameter.
+     * Gets the generator for the Diffie-Hellman key echange.
+     * This is the value passed in the <b>openid.dh_gen</b> association
+     * request parameter.
      *
-     * @return The base 64 encoded two's-complement representation of the generator: <code>base64(btwoc(g))</code>
+     * @return  The base 64 encoded two's-complement representation of the
+     *          generator: <code>base64(btwoc(g))</code>
      */
     public String getGenerator()
     {
@@ -154,10 +184,12 @@ public class DiffieHellmanSession
 
     /**
      * Get the Diffie-Hellman public key.
-     * This is the value passed in the <b>openid.dh_consumer_public</b> association request parameter and the
-     * value passed in the <b>openid.dh_server_public</b> association response parameter.
+     * This is the value passed in the <b>openid.dh_consumer_public</b>
+     * association request parameter and the value passed in the
+     * <b>openid.dh_server_public</b> association response parameter.
      *
-     * @return The base 64 encoded two's-complement representation of the public key: <code>base64(btwoc(g ^ x mod p))</code>
+     * @return  The base 64 encoded two's-complement representation of the
+     *          public key: <code>base64(btwoc(g ^ x mod p))</code>
      */
     public String getPublicKey()
     {
@@ -172,22 +204,31 @@ public class DiffieHellmanSession
     }
 
     /**
-     * Encrypt the association MAC key. The encryption takes palce on the server side (aka IdP).
-     * This is the value passed in the <b>openid.enc_mac_key</b> association response parameter.
+     * Encrypts the association MAC key. The encryption takes palce on the
+     * server side (aka OP). This is the value passed in the
+     * <b>openid.enc_mac_key</b> association response parameter.
      *
-     * @param macKey The MAC key in binary format.
-     * @param consumerPublicKeyBase64 The base 64 encoding of the consumer Diffie-Hellman public key.
-     * This is the value passed in the <b>openid.dh_consumer_public</b> association request parameter.
-     * @return The base 64 encoded two's-complement representation of the encrypted mac key:
-     * <code>base64(H(btwoc(g ^ (xa * xb) mod p)) XOR MAC)</code>
-     * @throws AssociationException if the lengths of the mac key and digest of Diffie-Hellman shared secred do not match.
+     * @param macKey                    The MAC key in binary format.
+     * @param consumerPublicKeyBase64   The base 64 encoding of the consumer
+     *                                  Diffie-Hellman public key. This is the
+     *                                  value passed in the
+     *                                  <b>openid.dh_consumer_public</b>
+     *                                  association request parameter.
+     * @return                          The base 64 encoded two's-complement
+     *                                  representation of the encrypted mac key:
+     *                <code>base64(H(btwoc(g ^ (xa * xb) mod p)) XOR MAC)</code>
+     * @throws AssociationException     if the lengths of the mac key and digest
+     *                                  of Diffie-Hellman shared secred do not
+     *                                  match.
      */
-    public String encryptMacKey(byte[] macKey, String consumerPublicKeyBase64) throws AssociationException
+    public String encryptMacKey(byte[] macKey, String consumerPublicKeyBase64)
+            throws AssociationException
     {
         byte[] hzz = getDigestedZZ(consumerPublicKeyBase64);
 
         if (hzz.length != macKey.length)
-            throw new AssociationException("MAC key legth different from shared secret digest length!");
+            throw new AssociationException(
+                    "MAC key legth different from shared secret digest length!");
 
         byte[] encMacKey = new byte[hzz.length];
 
@@ -199,27 +240,42 @@ public class DiffieHellmanSession
             encMacKey[i] = (byte) (b1 ^ b2);
         }
 
-        return new String(Base64.encodeBase64(encMacKey));
+        String encMacKeyBase64 = new String(Base64.encodeBase64(encMacKey));
+
+        if (DEBUG) _log.debug("Encrypted MAC key Base64: " + encMacKeyBase64);
+
+        return encMacKeyBase64;
     }
 
     /**
-     * Decrypt the association AMC key. The decryption takes palce on the consumer side (aka RP).
+     * Decrypts the association AMC key. The decryption takes palce on the
+     * consumer side (aka RP).
      *
-     * @param encMacKeyBase64 The base 64 encoded two's-complement representation of the encrypted mac key:
-     * <code>base64(H(btwoc(g ^ (xa * xb) mod p)) XOR MAC)</code>.
-     * This is the value passed in the <b>openid.enc_mac_key</b> association response parameter.
-     * @param serverPublicKeyBase64 The base 64 encoding of the server Diffie-Hellman public key.
-     * This is the value passed in the <b>openid.dh_server_public</b> association response parameter.
-     * @return The MAC key in binary format.
-     * @throws AssociationException if the lengths of the encrypted mac key and digest of Diffie-Hellman shared secred do not match.
+     * @param encMacKeyBase64           The base 64 encoded two's-complement
+     *                                  representation of the encrypted mac key:
+     *               <code>base64(H(btwoc(g ^ (xa * xb) mod p)) XOR MAC)</code>.
+     *                                  This is the value passed in the
+     *                                  <b>openid.enc_mac_key</b> association
+     *                                  response parameter.
+     * @param serverPublicKeyBase64     The base 64 encoding of the server
+     *                                  Diffie-Hellman public key. This is the
+     *                                  value passed in the
+     *                                  <b>openid.dh_server_public</b>
+     *                                  association response parameter.
+     * @return                          The MAC key in binary format.
+     * @throws AssociationException     if the lengths of the encrypted mac key
+     *                                  and digest of Diffie-Hellman shared
+     *                                  secret do not match.
      */
-    public byte[] decryptMacKey(String encMacKeyBase64, String serverPublicKeyBase64) throws AssociationException
+    public byte[] decryptMacKey(String encMacKeyBase64, String serverPublicKeyBase64)
+            throws AssociationException
     {
         byte[] hzz = getDigestedZZ(serverPublicKeyBase64);
         byte[] encMacKey = Base64.decodeBase64(encMacKeyBase64.getBytes());
 
         if (hzz.length != encMacKey.length)
-            throw new AssociationException("Encrypted MAC key legth different from shared secret digest length!");
+            throw new AssociationException(
+                    "Encrypted MAC key legth different from shared secret digest length!");
 
         byte[] macKey = new byte[hzz.length];
 
@@ -230,6 +286,9 @@ public class DiffieHellmanSession
 
             macKey[i] = (byte) (b1 ^ b2);
         }
+
+        if (DEBUG) _log.debug("Decrypted MAC key Base64: "
+                + new String(Base64.encodeBase64(macKey)));
 
         return macKey;
     }
@@ -246,7 +305,8 @@ public class DiffieHellmanSession
             byte[] yBinary = Base64.decodeBase64(publicKeyBase64.getBytes());
             BigInteger y = new BigInteger(yBinary);
 
-            DHPublicKeySpec dhPublicKeySpec = new DHPublicKeySpec(y, _dhParameterSpec.getP(), _dhParameterSpec.getG());
+            DHPublicKeySpec dhPublicKeySpec = new DHPublicKeySpec(
+                    y, _dhParameterSpec.getP(), _dhParameterSpec.getG() );
 
             KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
 
@@ -254,7 +314,8 @@ public class DiffieHellmanSession
         }
         catch (GeneralSecurityException e)
         {
-            // TODO: log
+            _log.error("Cannot create PublicKey object from: " + publicKeyBase64, e);
+
             return null;
         }
     }

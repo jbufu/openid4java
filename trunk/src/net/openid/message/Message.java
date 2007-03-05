@@ -10,11 +10,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.net.URLEncoder;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class Message
 {
+    private static Logger _log = Logger.getLogger(Message.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     // message constants
     public static final String MODE_IDRES = "id_res";
     public static final String MODE_CANCEL = "cancel";
@@ -73,6 +78,9 @@ public class Message
         if (! message.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
+        if (DEBUG) _log.debug("Created message: "
+                              + message.keyValueFormEncoding());
+
         return message;
     }
 
@@ -83,6 +91,9 @@ public class Message
 
         if (! message.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
+
+        if (DEBUG) _log.debug("Created message from parameter list: "
+                              + message.keyValueFormEncoding());
 
         return message;
     }
@@ -139,7 +150,10 @@ public class Message
         {
             Parameter param = (Parameter) paramIter.next();
             if (!param.isValid())
+            {
+                _log.warn("Invalid parameter: " + param);
                 return false;
+            }
         }
 
         if (requiredFields == null)
@@ -150,7 +164,10 @@ public class Message
         {
             String required = (String) reqIter.next();
             if (! hasParameter(required))
+            {
+                _log.warn("Required parameter missing: " + required);
                 return false;
+            }
         }
 
         return true;
@@ -228,6 +245,9 @@ public class Message
             MessageExtensionFactory extensionFactory =
                     (MessageExtensionFactory) clazz.newInstance();
 
+            if (DEBUG) _log.debug("Adding extension factory for " +
+                                  extensionFactory.getTypeUri());
+
             _extensionFactories.put(extensionFactory.getTypeUri(), clazz);
         }
         catch (Exception e)
@@ -270,6 +290,7 @@ public class Message
         }
         catch (Exception e)
         {
+            _log.error("Error getting extension factory for " + typeUri);
             return null;
         }
 
@@ -349,6 +370,9 @@ public class Message
         String alias = "ext" + Integer.toString(++ _extCounter);
 
         _extAliases.put(typeUri, alias);
+
+        if (DEBUG) _log.debug("Adding extension; type URI: "
+                              + typeUri + " alias: " +alias);
 
         set("openid.ns." + alias, typeUri);
 
@@ -444,6 +468,8 @@ public class Message
             else
                 throw new MessageException("Cannot instantiate extension: " + typeUri);
         }
+
+        if (DEBUG) _log.debug("Extracting " + typeUri +" extension from message...");
 
         return (MessageExtension) _extesion.get(typeUri);
     }

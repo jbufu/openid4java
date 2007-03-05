@@ -10,6 +10,8 @@ import net.openid.message.Parameter;
 
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 /**
  * Implements the extension for Attribute Exchange store responses.
  *
@@ -17,12 +19,17 @@ import java.util.Iterator;
  */
 public class StoreResponse extends AxMessage
 {
+    private static Logger _log = Logger.getLogger(StoreResponse.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * Constructs a Store Response with an empty parameter list.
      */
     protected StoreResponse()
     {
         _parameters.set(new Parameter("mode", "store_response"));
+
+        if (DEBUG) _log.debug("Created empty store request.");
     }
 
     /**
@@ -59,6 +66,9 @@ public class StoreResponse extends AxMessage
 
         if (! resp.isValid())
             throw new MessageException("Invalid parameters for a store response");
+
+        if (DEBUG)
+            _log.debug("Created store response from parameter list: " + params);
 
         return resp;
     }
@@ -129,11 +139,17 @@ public class StoreResponse extends AxMessage
             if (! paramName.equals("mode") &&
                     ! paramName.equals("status") &&
                     ! paramName.equals("status.description"))
+            {
+                _log.warn("Invalid parameter name in store response: " + paramName);
                 return false;
+            }
 
             if ( paramName.equals("status") &&
                     ! "failure".equals(param.getValue()) )
+            {
+                _log.warn("Invalid status value: " + param.getValue());
                 return false;
+            }
         }
 
         return true;

@@ -9,11 +9,16 @@ import net.sf.ehcache.Element;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class EhcacheNonceVerifier extends AbstractNonceVerifier
 {
+    private static Logger _log = Logger.getLogger(EhcacheNonceVerifier.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     private Cache _cache;
 
     public EhcacheNonceVerifier(int maxAge)
@@ -42,9 +47,14 @@ public class EhcacheNonceVerifier extends AbstractNonceVerifier
         Element element = new Element(pair, pair);
 
         if (_cache.get(pair) != null)
+        {
+            _log.error("Possible replay attack! Already seen nonce: " + nonce);
             return SEEN;
+        }
 
         _cache.put(element);
+
+        if (DEBUG) _log.debug("Nonce verified: " + nonce);
 
         return OK;
     }
