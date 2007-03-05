@@ -4,6 +4,8 @@
 
 package net.openid.message;
    
+import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.Arrays;
 
@@ -12,6 +14,9 @@ import java.util.Arrays;
  */
 public class AuthFailure extends Message
 {
+    private static Logger _log = Logger.getLogger(AuthFailure.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     protected final static List requiredFields = Arrays.asList( new String[] {
             "openid.mode"
     });
@@ -42,6 +47,10 @@ public class AuthFailure extends Message
 
         if (! fail.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
+
+        if (DEBUG)
+            _log.debug("Retrieved auth failure from message parameters: "
+                       + fail.keyValueFormEncoding());
 
         return fail;
     }

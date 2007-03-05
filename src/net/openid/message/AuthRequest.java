@@ -13,11 +13,16 @@ import java.util.Iterator;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class AuthRequest extends Message
 {
+    private static Logger _log = Logger.getLogger(AuthRequest.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final String MODE_SETUP = "checkid_setup";
     public static final String MODE_IMMEDIATE = "checkid_immediate";
 
@@ -38,13 +43,10 @@ public class AuthRequest extends Message
             "openid.return_to"
     });
 
-    // the OP endpoint to which the AuthReq will be sent
-    private String _opEndpoint;
-
     private RealmVerifier _realmVerifier;
 
     protected AuthRequest(String claimedId, String delegate, boolean compatibility,
-                       String returnToUrl, String handle, RealmVerifier verifier)
+                          String returnToUrl, String handle, RealmVerifier verifier)
     {
         this(claimedId, delegate, compatibility,
                 returnToUrl, handle, returnToUrl, verifier);
@@ -52,8 +54,8 @@ public class AuthRequest extends Message
     }
 
     protected AuthRequest(String claimedId, String delegate, boolean compatibility,
-                       String returnToUrl, String handle, String realm,
-                       RealmVerifier verifier)
+                          String returnToUrl, String handle, String realm,
+                          RealmVerifier verifier)
     {
         if (! compatibility)
         {
@@ -78,8 +80,8 @@ public class AuthRequest extends Message
     }
 
     public static AuthRequest createAuthRequest(String claimedId, String delegate,
-                       boolean compatibility, String returnToUrl,
-                       String handle, RealmVerifier verifier)
+                                                boolean compatibility, String returnToUrl,
+                                                String handle, RealmVerifier verifier)
             throws MessageException
     {
         return createAuthRequest(claimedId, delegate, compatibility,
@@ -87,8 +89,8 @@ public class AuthRequest extends Message
     }
 
     public static AuthRequest createAuthRequest(String claimedId, String delegate,
-                       boolean compatibility, String returnToUrl,
-                       String handle, String realm, RealmVerifier verifier)
+                                                boolean compatibility, String returnToUrl,
+                                                String handle, String realm, RealmVerifier verifier)
             throws MessageException
     {
         AuthRequest req = new AuthRequest(claimedId, delegate, compatibility,
@@ -96,6 +98,8 @@ public class AuthRequest extends Message
 
         if (! req.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
+
+        if (DEBUG) _log.debug("Created auth request: " + req.keyValueFormEncoding());
 
         return req;
     }
@@ -110,6 +114,8 @@ public class AuthRequest extends Message
 
         if (! req.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
+
+        if (DEBUG) _log.debug("Created auth request: " + req.keyValueFormEncoding());
 
         return req;
     }
@@ -133,6 +139,9 @@ public class AuthRequest extends Message
     public void setImmediate(boolean immediate)
     {
         set("openid.mode", immediate ? MODE_IMMEDIATE : MODE_SETUP);
+
+        if (DEBUG && immediate)
+            _log.debug("Setting checkid_immediate auth request.");
     }
 
     public boolean isImmediate()
@@ -222,16 +231,27 @@ public class AuthRequest extends Message
         boolean compatibility = ! isVersion2();
 
         if ( compatibility && hasParameter("openid.ns") )
+        {
+            _log.warn("Invalid value for openid.ns field: "
+                      + getParameterValue("openid.ns"));
             return false;
+        }
 
         if ( compatibility && hasParameter("openid.identity")  &&
                 SELECT_ID.equals(getParameterValue("openid.identity")))
+        {
+            _log.warn(SELECT_ID + " not supported in OpenID1");
             return false;
+        }
 
         if ( hasParameter("openid.mode") &&
                 ! MODE_SETUP.equals(getParameterValue("openid.mode")) &&
                 ! MODE_IMMEDIATE.equals(getParameterValue("openid.mode")))
+        {
+            _log.warn("Invalid openid.mode value in auth request: "
+                      + getParameterValue("openid.mode"));
             return false;
+        }
 
         // return_to must be a valid URL, if present
         try
@@ -240,29 +260,46 @@ public class AuthRequest extends Message
                 new URL(getReturnTo());
         } catch (MalformedURLException e)
         {
+            _log.error("Error verifying return URL in auth request.", e);
             return false;
         }
 
         if ( ! hasParameter("openid.return_to") )
         {
             if (compatibility)
+            {
+                _log.warn("openid.return_to is mandatory in OpenID1 auth requests");
                 return false;
+            }
 
             else if ( ! hasParameter("openid.realm") )
+            {
+                _log.warn("openid.realm is mandatory in Openid2 auth requests");
                 return false;
+            }
         }
 
         if ( compatibility && hasParameter("openid.realm") )
-                return false;
+        {
+            _log.warn("openid.realm should not be present in OpenID1 auth requests");
+            return false;
+        }
 
         if ( !compatibility && hasParameter("openid.trust_root") )
-                return false;
+        {
+            _log.warn("openid.trust_root should not be present in OpenID2 auth requests.");
+            return false;
+        }
 
         // figure out if 'claimed_id' and 'identity' are optional
         if ( ! hasParameter("openid.identity") )
         {
             // not optional in v1
-            if (compatibility) return false;
+            if (compatibility)
+            {
+                _log.warn("openid.identity is required in OpenID1 auth requests");
+                return false;
+            }
 
             boolean hasAuthProvider = false;
 
@@ -288,17 +325,33 @@ public class AuthRequest extends Message
             }
 
             // no extension provides authentication sevices - invalid message
-            if ( !hasAuthProvider ) return false;
+            if ( !hasAuthProvider )
+            {
+                _log.warn("no identifier specified in auth request");
+                return false;
+            }
 
             // claimed_id must be present if and only if identity is present
             if ( hasParameter("openid.claimed_id") )
+            {
+                _log.warn("openid.claimed_id must be present if and only if " +
+                          "openid.identity is present.");
                 return false;
+            }
         }
-        else if ( ! compatibility &&
-                ( ! hasParameter("openid.claimed_id") ) )
+        else if ( ! compatibility && ! hasParameter("openid.claimed_id") )
+        {
+            _log.warn("openid.clamied_id must be present in OpenID2 auth requests");
             return false;
+        }
 
-        return (getRealm() == null || RealmVerifier.OK ==
-                        _realmVerifier.match(getRealm(), getReturnTo()) );
+        if (getRealm() != null &&  RealmVerifier.OK !=
+                        _realmVerifier.match(getRealm(), getReturnTo()) )
+        {
+            _log.warn("Realm verification failed for: " + getRealm());
+            return false;
+        }
+
+        return true;
     }
 }

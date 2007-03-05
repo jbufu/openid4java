@@ -4,6 +4,8 @@
 
 package net.openid.message;
 
+import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.Arrays;
 
@@ -12,6 +14,9 @@ import java.util.Arrays;
  */
 public class VerifyResponse extends Message
 {
+    private static Logger _log = Logger.getLogger(VerifyResponse.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     protected final static List requiredFields = Arrays.asList(new String[] {
             "is_valid"
     });
@@ -42,6 +47,9 @@ public class VerifyResponse extends Message
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
+        if (DEBUG) _log.debug("Created verification response "
+                              + resp.keyValueFormEncoding());
+
         return resp;
     }
 
@@ -52,6 +60,9 @@ public class VerifyResponse extends Message
 
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
+
+        if (DEBUG) _log.debug("Created verification response "
+                              + resp.keyValueFormEncoding());
 
         return resp;
     }
@@ -90,7 +101,14 @@ public class VerifyResponse extends Message
     {
         if (! super.isValid()) return false;
 
-        return "true".equals(getParameterValue("is_valid")) ||
-                "false".equals(getParameterValue("is_valid"));
+        if (! "true".equals(getParameterValue("is_valid")) &&
+                ! "false".equals(getParameterValue("is_valid")) )
+        {
+            _log.warn("Invalid is_valid value in verification response: "
+                      + getParameterValue("is_valid"));
+            return false;
+        }
+
+        return true;
     }
 }

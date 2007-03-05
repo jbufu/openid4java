@@ -8,11 +8,16 @@ import net.openid.util.InternetDateFormat;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class IncrementalNonceGenerator implements NonceGenerator
 {
+    private static Logger _log = Logger.getLogger(IncrementalNonceGenerator.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     private static InternetDateFormat _dateFormat = new InternetDateFormat();
 
     private String _timestamp = "";
@@ -32,7 +37,12 @@ public class IncrementalNonceGenerator implements NonceGenerator
             _counter = 0;
         }
 
-        return _timestamp + Integer.toString(_counter);
+        String nonce = _timestamp + Integer.toString(_counter);
+
+        if (DEBUG) _log.debug("Generated nonce: " + nonce);
+
+        return nonce;
+
     }
 
     private String getCurrentTimpestamp()

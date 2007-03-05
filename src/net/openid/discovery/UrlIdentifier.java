@@ -4,6 +4,8 @@
 
 package net.openid.discovery;
 
+import org.apache.log4j.Logger;
+
 import java.net.*;
 import java.util.Set;
 import java.util.HashSet;
@@ -14,6 +16,9 @@ import java.io.UnsupportedEncodingException;
  */
 public class UrlIdentifier implements Identifier
 {
+    private static Logger _log = Logger.getLogger(UrlIdentifier.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     private static final Set UNRESERVED_CHARACTERS = new HashSet();
 
     static
@@ -87,11 +92,17 @@ public class UrlIdentifier implements Identifier
             if (fragment != null)
                 file = file + "#" + fragment;
 
-            return new URL(protocol, host, port, file);
-        } catch (MalformedURLException e)
+            URL normalized = new URL(protocol, host, port, file);
+
+            if (DEBUG) _log.debug("Normalized: " + text + " to: " + normalized);
+
+            return normalized;
+        }
+        catch (MalformedURLException e)
         {
             throw new DiscoveryException("Invalid URL identifier", e);
-        } catch (URISyntaxException e)
+        }
+        catch (URISyntaxException e)
         {
             throw new DiscoveryException("Invalid URL identifier", e);
         }

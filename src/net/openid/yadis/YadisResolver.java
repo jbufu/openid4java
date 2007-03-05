@@ -33,12 +33,12 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 /**
- * Basic implementation of the Yadis discovery protocol.
+ * Yadis discovery protocol implementation.
  * <p>
  * Yadis discovery protocol returns a Yadis Resource Descriptor (XRDS) document
  * associated with a Yadis Identifier (YadisID)
  * <p>
- * YadisIDs can be any type of identifier that is resolvable to a URL form,
+ * YadisIDs can be any type of identifiers that are resolvable to a URL form,
  * and in addition the URL form uses a HTTP or a HTTPS schema. Such an URL
  * is defined by the Yadis speficification as a YadisURL. This functionality
  * is implemented by the YadisURL helper class.
@@ -63,7 +63,8 @@ import java.text.ParseException;
  */
 public class YadisResolver
 {
-    private static Logger _logger = Logger.getLogger(YadisResolver.class);
+    private static Logger _log = Logger.getLogger(YadisResolver.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
 
     // Yadis constants
     private static final String YADIS_XRDS_LOCATION = "X-XRDS-Location";
@@ -228,20 +229,21 @@ public class YadisResolver
             // try to retrieve the Yadis Descriptor URL with a HEAD call first
             headXrdsUrl(client, yadisUrl, result);
 
-            // fallback to the Yadis URL
-            //if (result.getXrdsLocation() == null)
-            //    result.setXrdsLocation(yadisUrl.getUrl().toString(),
-            //            YadisResult.HEAD_INVALID_RESPONSE);
-
             getXrds(client, result, false);
+
             result.setStatus(YadisResult.OK);
 
-
-        } catch (YadisException e)
+            _log.info("Yadis discovery succeeded on " + url);
+        }
+        catch (YadisException e)
         {
             result.setStatus(e.getStatusCode());
             result.setStatusMessage(e.getMessage());
             if (e.getCause() != null) result.setFailureCause(e.getCause());
+
+            _log.info( "Yadis discovery failed on " + url +
+                    ", status: " + e.getStatusCode() +
+                    ", error message: " + e.getMessage() );
         }
 
         return result;
@@ -276,6 +278,10 @@ public class YadisResolver
 
         try
         {
+            if (DEBUG)
+                _log.debug("Performing HTTP GET #" + (secondCall ? "2" : "1") +
+                    " on: " + getUrl + " ...");
+
             int statusCode = client.executeMethod(get);
             if (statusCode != HttpStatus.SC_OK)
                 throw new YadisException("GET failed on " + getUrl,
@@ -292,12 +298,18 @@ public class YadisResolver
                     .split(";")[0].equalsIgnoreCase(YADIS_CONTENT_TYPE) )
             {
                 XRDS xrds = parseXrds(get.getResponseBodyAsStream());
+
                 // todo: only if not set? could be different if redirects were followed
                 // if (result.getXrdsLocation == null)
                 result.setXrdsLocation(get.getURI().toString(),
                         YadisResult.GET_INVALID_RESPONSE);
+
                 result.setContentType(YADIS_ACCEPT_HEADER);
+
                 result.setXrds(xrds);
+
+                if (DEBUG)
+                    _log.debug("Retrieved Yadis discovery result:\n" + result.dump());
             }
             // try further only if this is not the second GET call already
             else if ( !secondCall )
@@ -309,9 +321,13 @@ public class YadisResolver
                             get.getResponseHeaders(YADIS_XRDS_LOCATION),
                             YadisResult.GET_INVALID_RESPONSE);
 
-                String xrdsLocation =
-                        get.getResponseHeader(YADIS_XRDS_LOCATION) != null ?
-                        get.getResponseHeader(YADIS_XRDS_LOCATION).getValue() : null;
+                String xrdsLocation = null;
+                if (get.getResponseHeader(YADIS_XRDS_LOCATION) != null)
+                {
+                    xrdsLocation = get.getResponseHeader(YADIS_XRDS_LOCATION).getValue();
+                    if (DEBUG)
+                        _log.debug("Found " + YADIS_XRDS_LOCATION + " header.");
+                }
 
                 // XRDS location fallback to <HTML><HEAD><META...
                 if (xrdsLocation == null)
@@ -391,11 +407,12 @@ public class YadisResolver
                         if ( xrdsLocation != null )
                             throw new YadisException(
                                 "More than one " + YADIS_XRDS_LOCATION +
-                                        "META tags found in HEAD: " +
-                                        head.toHtml(),
-                                    YadisResult.HTMLMETA_INVALID_RESPONSE);
+                                "META tags found in HEAD: " + head.toHtml(),
+                                YadisResult.HTMLMETA_INVALID_RESPONSE);
 
                         xrdsLocation = meta.getMetaContent();
+                        if (DEBUG)
+                            _log.debug("Found " + YADIS_XRDS_LOCATION + "META tags.");
                     }
                 }
             }
@@ -448,6 +465,9 @@ public class YadisResolver
                     new ByteArrayInputStream(data, 0, bytesRead));
 
             xrds = new XRDS(document.getDocumentElement(), false);
+
+            if (DEBUG)
+                _log.debug("Retrieved Yadis / XRDS:\n" + xrds.dump());
 
         // DOM exceptions :
         } catch (ParserConfigurationException e)
@@ -511,10 +531,13 @@ public class YadisResolver
 
         try
         {
+            if (DEBUG) _log.debug("Performing HTTP HEAD on: " + url + " ...");
+
             int statusCode = client.executeMethod(head);
             if (statusCode != HttpStatus.SC_OK)
             {
-                _logger.info("Cannot retrieve " + YADIS_XRDS_LOCATION +
+                if (DEBUG)
+                    _log.debug("Cannot retrieve " + YADIS_XRDS_LOCATION +
                         " using HEAD from " + url.getUrl().toString() +
                         "; status=" + head.getStatusLine());
                 return;
@@ -536,12 +559,14 @@ public class YadisResolver
                 result.setNormalizedUrl(head.getURI().toString());
             }
 
-        } catch (HttpException e)
+        }
+        catch (HttpException e)
         {
-            _logger.error("Fatal protocol violation during HEAD request: ", e);
-        } catch (IOException e)
+            _log.error("HTTP error during HEAD request on: " + url, e);
+        }
+        catch (IOException e)
         {
-            throw new YadisException("Fatal transport error: ",
+            throw new YadisException("I/O transport error: ",
                     YadisResult.HEAD_TRANSPORT_ERROR, e);
         }
         finally
@@ -549,5 +574,4 @@ public class YadisResolver
             head.releaseConnection();
         }
     }
-
 }

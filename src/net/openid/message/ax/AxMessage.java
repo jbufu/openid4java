@@ -5,6 +5,7 @@
 package net.openid.message.ax;
 
 import net.openid.message.*;
+import org.apache.log4j.Logger;
 
 /**
  * Base class for the Attribute Exchange implementation.
@@ -23,6 +24,9 @@ import net.openid.message.*;
  */
 public class AxMessage implements MessageExtension, MessageExtensionFactory
 {
+    private static Logger _log = Logger.getLogger(AxMessage.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * The Attribute Exchange Type URI.
      */
@@ -41,6 +45,8 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     public AxMessage()
     {
         _parameters = new ParameterList();
+
+        if (DEBUG) _log.debug("Created empty AXMessage.");
     }
 
     /**
@@ -53,6 +59,9 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     public AxMessage(ParameterList params)
     {
         _parameters = params;
+
+        if (DEBUG)
+            _log.debug("Created AXMessage from parameter list: " + params);
     }
 
     /**

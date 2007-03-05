@@ -104,4 +104,12 @@ public class DiscoveryInformation implements Serializable
     {
         return OPENID2.equals(_version) || OPENID2_OP.equals(_version);
     }
+
+    public String toString()
+    {
+        return (isVersion2() ? "OpenID2" : "OpenID1") 
+                + "\nOP-endpoint:" + _idpEndpoint
+                + "\nClaimedID:" + _claimedIdentifier
+                + "\nDelegate:" + _delegateIdentifier;
+    }
 }

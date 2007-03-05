@@ -37,7 +37,8 @@ public class YadisUrl
         try
         {
             url = new URL(urlString);
-        } catch (MalformedURLException e)
+        }
+        catch (MalformedURLException e)
         {
             throw new YadisException("Invalid URL: " + urlString,
                     YadisResult.INVALID_URL, e);

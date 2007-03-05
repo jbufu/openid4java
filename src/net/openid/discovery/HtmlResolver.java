@@ -8,6 +8,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.log4j.Logger;
 import org.htmlparser.Parser;
 import org.htmlparser.Node;
 import org.htmlparser.nodes.TagNode;
@@ -28,6 +29,9 @@ import java.util.List;
  */
 public class HtmlResolver
 {
+    private static Logger _log = Logger.getLogger(HtmlResolver.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * Maximum number of redirects to be followed for the HTTP calls.
      */
@@ -130,6 +134,8 @@ public class HtmlResolver
 
         parseHtml(htmlData, result);
 
+        _log.info("HTML discovery succeeded on: " + identifier);
+
         return result;
     }
 
@@ -161,26 +167,29 @@ public class HtmlResolver
 
         try
         {
+            if (DEBUG) _log.debug("Fetching " + url + "...");
+
             int statusCode = client.executeMethod(get);
             if (statusCode != HttpStatus.SC_OK)
-                throw new DiscoveryException(
-                        "GET failed on " + url.toString());
+                throw new DiscoveryException( "GET failed on " + url +
+                                " Received status code: " + statusCode);
 
             result.setClaimed( new UrlIdentifier(get.getURI().toString()) );
 
             InputStream htmlInput = get.getResponseBodyAsStream();
             if (htmlInput == null)
-                throw new DiscoveryException("Cannot download HTML mesage from "
-                        + url.toString());
+                throw new DiscoveryException(
+                        "Cannot open inputstream for GET response from " + url);
 
             byte data[] = new byte[_maxHtmlSize];
 
             int bytesRead = htmlInput.read(data);
             htmlInput.close();
 
-            // parse and extract the needed info
             if (bytesRead <= 0)
-                throw new DiscoveryException("No data read from the HTML message");
+                throw new DiscoveryException("No HTML data read from " + url);
+
+            if (DEBUG) _log.debug("Read " + bytesRead + " bytes.");
 
             return new String(data, 0, bytesRead);
 
@@ -208,6 +217,8 @@ public class HtmlResolver
         URL idp2Endpoint = null;
         UrlIdentifier delegate1 = null;
         UrlIdentifier delegate2 = null;
+
+        if (DEBUG) _log.debug("Parsing HTML data: " + htmlData);
 
         try
         {
@@ -238,12 +249,17 @@ public class HtmlResolver
                         if (idp1Endpoint != null)
                             throw new DiscoveryException(
                                     "More than one openid.server entries found");
+
+                        // todo: refactor : move to HtmlResult
                         try
                         {
                             idp1Endpoint = new URL(href);
+                            if (DEBUG)
+                                _log.debug("Found OpenID1 endpoint: " + idp1Endpoint);
                             result.setEndpoint1(idp1Endpoint);
 
-                        } catch (MalformedURLException e)
+                        }
+                        catch (MalformedURLException e)
                         {
                             throw new DiscoveryException(
                                     "Invalid openid.server URL: " + href);
@@ -257,6 +273,8 @@ public class HtmlResolver
                                     "More than one openid.delegate entries found");
 
                         delegate1 = new UrlIdentifier(href);
+                        if (DEBUG)
+                            _log.debug("Found OpenID1 delegate: " + delegate1);
                         result.setDelegate1(delegate1);
                     }
                     if (relations.contains("openid2.provider"))
@@ -267,6 +285,8 @@ public class HtmlResolver
                         try
                         {
                             idp2Endpoint = new URL(href);
+                            if (DEBUG)
+                                _log.debug("Found OpenID2 endpoint: " + idp2Endpoint);
                             result.setEndpoint2(idp2Endpoint);
 
                         } catch (MalformedURLException e)
@@ -283,10 +303,14 @@ public class HtmlResolver
                                     "More than one openid2.local_id entries found");
 
                         delegate2 = new UrlIdentifier(href);
+                        if (DEBUG)
+                            _log.debug("Found OpenID2 localID: " + delegate2);
                         result.setDelegate2(delegate2);
                     }
                 }
             }
+
+            if (DEBUG) _log.debug("HTML discovery result: " + result);
         }
         catch (ParserException e)
         {

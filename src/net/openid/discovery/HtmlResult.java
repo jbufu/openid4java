@@ -11,6 +11,7 @@ import java.net.URL;
  */
 public class HtmlResult
 {
+    // todo: delegates don't have to be identifiers
     private UrlIdentifier _claimedId;
     private URL _idp1Endpoint;
     private UrlIdentifier _delegate1;
@@ -79,5 +80,18 @@ public class HtmlResult
     public UrlIdentifier getDelegate2()
     {
         return _delegate2;
+    }
+
+    public String toString()
+    {
+        return "ClaimedID:" + _claimedId +
+                (_idp2Endpoint != null ?
+                        "\nOpenID2-endpoint:" + _idp2Endpoint.toString() : "") +
+                (_delegate2 != null ?
+                        "\nOpenID2-localID:" + _delegate2.getIdentifier() : "") +
+                (_idp1Endpoint != null ?
+                        "\nOpenID1-endpoint:" + _idp1Endpoint.toString() : "") +
+                (_delegate1 != null ?
+                        "\nOpenID1-delegate:" + _delegate1.getIdentifier() : "");
     }
 }

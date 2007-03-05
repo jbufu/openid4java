@@ -4,6 +4,8 @@
 
 package net.openid.message;
 
+import org.apache.log4j.Logger;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -18,15 +20,22 @@ import java.net.URLDecoder;
  */
 public class ParameterList implements Serializable
 {
+    private static Logger _log = Logger.getLogger(ParameterList.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     Map _parameterMap;
 
     public ParameterList()
     {
         _parameterMap  = new LinkedHashMap();
+
+        if (DEBUG) _log.debug("Created empty parameter list.");
     }
 
     public ParameterList(ParameterList that)
     {
+        if (DEBUG) _log.debug("Cloning parameter list: " + that);
+
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
 
@@ -57,10 +66,14 @@ public class ParameterList implements Serializable
 
             set(new Parameter(name, value));
         }
+
+        if (DEBUG) _log.debug("Creating parameter list: " + this);
     }
 
     public void copyOf(ParameterList that)
     {
+        if (DEBUG) _log.debug("Copying parameter list: " + that);
+
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
 
@@ -127,6 +140,8 @@ public class ParameterList implements Serializable
      */
     public static ParameterList createFromQueryString(String queryString) throws MessageException
     {
+        if (DEBUG) _log.debug("Creating parameter list from query string: " + queryString);
+
         ParameterList parameterList = new ParameterList();
 
         StringTokenizer tokenizer = new StringTokenizer(queryString, "&");
@@ -156,6 +171,8 @@ public class ParameterList implements Serializable
 
     public static ParameterList createFromKeyValueForm(String keyValueForm) throws MessageException
     {
+        if (DEBUG) _log.debug("Creating parameter list from key-value form: " + keyValueForm);
+
         ParameterList parameterList = new ParameterList();
 
         StringTokenizer tokenizer = new StringTokenizer(keyValueForm, "\n");
@@ -176,4 +193,22 @@ public class ParameterList implements Serializable
         return parameterList;
     }
 
+    // same as Message.toString()
+    public String toString()
+    {
+        StringBuffer allParams = new StringBuffer("");
+
+        List parameters = getParameters();
+        Iterator iterator = parameters.iterator();
+        while (iterator.hasNext())
+        {
+            Parameter parameter = (Parameter) iterator.next();
+            allParams.append(parameter.getKey());
+            allParams.append(':');
+            allParams.append(parameter.getValue());
+            allParams.append('\n');
+        }
+
+        return allParams.toString();
+    }
 }

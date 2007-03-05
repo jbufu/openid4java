@@ -14,6 +14,8 @@ import net.openid.OpenIDException;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import org.apache.log4j.Logger;
+
 /**
  * Manages OpenID communications with an OpenID Relying Party (Consumer).
  *
@@ -21,6 +23,9 @@ import java.net.MalformedURLException;
  */
 public class ServerManager
 {
+    private static Logger _log = Logger.getLogger(ServerManager.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * Keeps track of the associations established with consumer sites.
      */
@@ -337,6 +342,8 @@ public class ServerManager
     {
         boolean isVersion2 = true;
 
+        _log.info("Processing association request...");
+
         try
         {
             // build request message from response params (+ integrity check)
@@ -361,6 +368,8 @@ public class ServerManager
                 Association assoc = _sharedAssociations.generate(
                         type.getAssociationType(), _expireIn);
 
+                _log.info("Returning shared association; handle: " + assoc.getHandle());
+
                 return AssociationResponse.createAssociationResponse(assocReq, assoc);
             }
         }
@@ -369,27 +378,34 @@ public class ServerManager
             // association failed, respond accordingly
             if (isVersion2)
             {
+                _log.warn("Cannot establish association, " +
+                           "responding with an OpenID2 association error.", e);
+
                 return AssociationError.createAssociationError(
                         e.getMessage(), _prefAssocSessEnc);
             }
             else
             {
+                _log.warn("Error processing an OpenID1 association request; " +
+                          "responding with a dummy association", e);
                 try
                 {
-                // generate dummy association & no-encryption response
-                // for compatibility mode
-                Association dummyAssoc = _sharedAssociations.generate(
-                        Association.TYPE_HMAC_SHA1, 0);
+                    // generate dummy association & no-encryption response
+                    // for compatibility mode
+                    Association dummyAssoc = _sharedAssociations.generate(
+                            Association.TYPE_HMAC_SHA1, 0);
 
-                AssociationRequest dummyRequest =
-                        AssociationRequest.createAssociationRequest(
-                        AssociationSessionType.NO_ENCRYPTION_COMPAT_SHA1MAC);
+                    AssociationRequest dummyRequest =
+                            AssociationRequest.createAssociationRequest(
+                            AssociationSessionType.NO_ENCRYPTION_COMPAT_SHA1MAC);
 
-                return AssociationResponse.createAssociationResponse(dummyRequest, dummyAssoc);
+
+                    return AssociationResponse.createAssociationResponse(
+                            dummyRequest, dummyAssoc);
                 }
                 catch (OpenIDException ee)
                 {
-                    // todo: log error: canot send any association response
+                    _log.error("Error creating negative OpenID1 association response.", e);
                     return null;
                 }
 
@@ -447,6 +463,8 @@ public class ServerManager
                                 boolean authenticatedAndApproved,
                                 String opEndpoint)
     {
+        _log.info("Processing authentication request...");
+
         boolean isVersion2 = true;
 
         try
@@ -455,9 +473,12 @@ public class ServerManager
         }
         catch (MalformedURLException e)
         {
+            _log.error("Invalid OP-endpoint configured; " +
+                  "cannot issue OpenID authentication responses." + opEndpoint);
+
             return DirectError.createDirectError(
                     "Invalid OpenID Provider endpoint URL; " +
-                            "cannot issue authentication response", isVersion2);
+                    "cannot issue authentication response", isVersion2);
         }
 
         try
@@ -467,6 +488,13 @@ public class ServerManager
                     requestParams, _realmVerifier);
             isVersion2 = authReq.isVersion2();
 
+            if (authReq.getReturnTo() == null)
+            {
+                _log.error("Received valid auth request, but no return_to " +
+                           "specified; authResponse() should not be called.");
+                return null;
+            }
+
             String id;
             String claimed;
 
@@ -474,7 +502,8 @@ public class ServerManager
             {
                 id = userSelId;
                 claimed = userSelClaimed;
-            } else
+            }
+            else
             {
                 id = userSelId != null ? userSelId : authReq.getIdentity();
                 claimed = userSelClaimed != null ? userSelClaimed :
@@ -484,7 +513,10 @@ public class ServerManager
             if (id == null)
                 throw new ServerException(
                         "No identifier provided by the authntication request" +
-                                "or by the OpenID Provider");
+                        "or by the OpenID Provider");
+
+            if (DEBUG) _log.debug("Using ClaimedID: " + claimed +
+                                  " OP-specific ID: " + id);
 
             if (authenticatedAndApproved) // positive response
             {
@@ -495,40 +527,72 @@ public class ServerManager
                 if (handle != null)
                 {
                     assoc = _sharedAssociations.load(handle);
-                    if (assoc == null) invalidateHandle = handle;
+                    if (assoc == null)
+                    {
+                        _log.info("Invalidating handle: " + handle);
+                        invalidateHandle = handle;
+                    }
+                    else
+                        _log.info("Loaded shared association; hadle: " + handle);
                 }
 
                 if (assoc == null)
+                {
                     assoc = _privateAssociations.generate(
                             _prefAssocSessEnc.getAssociationType(),
                             _expireIn);
 
-                if (authReq.getReturnTo() != null)
-                    return AuthSuccess.createAuthSuccess(
+                    _log.info("Generated private association; handle: " + handle);
+                }
+
+                AuthSuccess response = AuthSuccess.createAuthSuccess(
                             opEndpoint, claimed, id, !isVersion2,
                             authReq.getReturnTo(),
                             isVersion2 ? _nonceGenerator.next() : null,
                             invalidateHandle, assoc, _signList);
-                else
-                    return null;
 
-            } else // negative response
+                _log.info("Returning positive assertion to " +
+                          response.getReturnTo());
+
+                return response;
+            }
+            else // negative response
             {
                 if (authReq.isImmediate())
+                {
+                    _log.error("Responding with immediate authentication " +
+                               "failure to " + authReq.getReturnTo());
+
                     return AuthImmediateFailure.createAuthImmediateFailure(
                             _userSetupUrl, authReq.getReturnTo(), ! isVersion2);
+                }
                 else
+                {
+                    _log.error("Responding with authentication failure to " +
+                               authReq.getReturnTo());
+
                     return new AuthFailure(! isVersion2, authReq.getReturnTo());
+                }
             }
         }
         catch (OpenIDException e)
         {
             if (requestParams.hasParameter("openid.return_to"))
+            {
+                _log.error("Error processing an authentication request; " +
+                           "responding with an indirect error message.", e);
+
                 return IndirectError.createIndirectError(e.getMessage(),
                         requestParams.getParameterValue("openid.return_to"),
                         ! isVersion2 );
+            }
             else
+            {
+                _log.error("Error processing an authentication request; " +
+                           "responding with an direct error message.", e);
+
                 return DirectError.createDirectError( e.getMessage(), isVersion2 );
+            }
         }
     }
 
@@ -542,6 +606,8 @@ public class ServerManager
      */
     public Message verify(ParameterList requestParams)
     {
+        _log.info("Processing verificatoin request...");
+
         boolean isVersion2 = true;
 
         try
@@ -556,6 +622,8 @@ public class ServerManager
             Association assoc = _privateAssociations.load(handle);
             if (assoc != null) // verify the signature
             {
+                _log.info("Loaded private association; handle: " + handle);
+
                 verified = assoc.verifySignature(
                         vrfyReq.getSignedText(),
                         vrfyReq.getSignature());
@@ -570,14 +638,25 @@ public class ServerManager
 
             vrfyResp.setSignatureVerified(verified);
 
-            // confirm shared association handle invalidation
-            if (_sharedAssociations.load(vrfyReq.getInvalidateHandle()) == null)
-                vrfyResp.setInvalidateHandle(vrfyReq.getInvalidateHandle());
+            String invalidateHandle = vrfyReq.getInvalidateHandle();
+            if (_sharedAssociations.load(invalidateHandle) == null)
+            {
+                _log.info("Confirming shared association invalidate handle: "
+                          + invalidateHandle);
+
+                vrfyResp.setInvalidateHandle(invalidateHandle);
+            }
+
+            _log.info("Responding with " + (verified? "positive" : "negative")
+                      + " verification response");
 
             return vrfyResp;
         }
         catch (OpenIDException e)
         {
+            _log.error("Error processing verification request; " +
+                       "responding with verificatioin error.", e);
+
             return DirectError.createDirectError(e.getMessage(), ! isVersion2);
         }
     }

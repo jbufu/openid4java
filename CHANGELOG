@@ -8,6 +8,9 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20070304:
+    - Added logging.
+
 20070212:
     - Message.getDestinationUrl() replaces the following:
         AuthRequest.getRedirectUrl()

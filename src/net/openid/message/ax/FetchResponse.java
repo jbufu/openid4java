@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Implements the extension for Attribute Exchange fetch responses.
  *
@@ -19,12 +21,17 @@ import java.util.*;
  */
 public class FetchResponse extends AxMessage
 {
+    private static Logger _log = Logger.getLogger(FetchResponse.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * Constructs a Fetch Response with an empty parameter list.
      */
     protected FetchResponse()
     {
         _parameters.set(new Parameter("mode", "fetch_response"));
+
+        if (DEBUG) _log.debug("Created empty fetch response.");
     }
 
     /**
@@ -54,6 +61,9 @@ public class FetchResponse extends AxMessage
 
         if (! resp.isValid())
             throw new MessageException("Invalid parameters for a fetch response");
+
+        if (DEBUG)
+            _log.debug("Created fetch response from parameter list: " + params);
 
         return resp;
     }
@@ -92,6 +102,10 @@ public class FetchResponse extends AxMessage
 
         _parameters.set(new Parameter("value." + alias + index, value));
         setCount(alias, ++count);
+
+        if (DEBUG)
+            _log.debug("Added new attribute to fetch response; type: " + typeUri
+                       + " alias: " + alias + " count: " + count);
     }
 
     /**
@@ -221,6 +235,8 @@ public class FetchResponse extends AxMessage
             throw new MessageException("Invalid update_url: " + updateUrl);
         }
 
+        if (DEBUG) _log.debug("Setting fetch response update_url: " + updateUrl);
+
         _parameters.set(new Parameter("update_url", updateUrl));
     }
 
@@ -252,7 +268,10 @@ public class FetchResponse extends AxMessage
                     ! paramName.startsWith("count.") &&
                     ! paramName.startsWith("value.") &&
                     ! paramName.equals("update_url"))
+            {
+                _log.warn("Invalid parameter name in fetch response: " + paramName);
                 return false;
+            }
         }
 
         return checkAttributes();
@@ -268,24 +287,38 @@ public class FetchResponse extends AxMessage
             String alias = (String) it.next();
 
             if (! _parameters.hasParameter("type." + alias))
+            {
+                _log.warn("Type missing for attribute alias: " + alias);
                 return false;
+            }
 
             if ( ! _parameters.hasParameter("count." + alias) )
             {
                 if ( ! _parameters.hasParameter("value." + alias) )
+                {
+                    _log.warn("Value missing for attribute alias: " + alias);
                     return false;
+                }
             }
             else // count.alias present
             {
                 if (_parameters.hasParameter("value." + alias))
+                {
+                    _log.warn("Count parameter present for alias: " + alias
+                              + "; should use " + alias + ".[index] format");
                     return false;
+                }
 
                 int count = getCount(alias);
 
                 for (int i = 1; i <= count; i++)
                     if (! _parameters.hasParameter("value." + alias + "." +
                             Integer.toString(i)))
+                    {
+                        _log.warn("Value missing for alias: "
+                                  + alias + "." + Integer.toString(i));
                         return false;
+                    }
             }
         }
 

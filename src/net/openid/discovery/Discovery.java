@@ -9,6 +9,7 @@ import org.openxri.resolve.Resolver;
 import org.openxri.resolve.TrustType;
 import org.openxri.resolve.ResolverState;
 import org.w3c.dom.Element;
+import org.apache.log4j.Logger;
 
 import java.util.regex.Pattern;
 import java.util.Vector;
@@ -26,6 +27,9 @@ import net.openid.yadis.YadisResult;
  */
 public class Discovery
 {
+    private static Logger _log = Logger.getLogger(Discovery.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     private static final Pattern URL_PATTERN =
             Pattern.compile("^https?://", Pattern.CASE_INSENSITIVE);
     private static final Pattern XRI_PATTERN =
@@ -41,6 +45,8 @@ public class Discovery
 
     public Discovery()
     {
+        if (DEBUG) _log.debug("Initializing Discovery object...");
+
         // populate the root with whatever trustType the user requested
         String trustParam = ";trust=none";
 
@@ -92,18 +98,26 @@ public class Discovery
         {
             // strip the xri:// prefix if it exists
             if (identifier.toLowerCase().startsWith("xri://"))
+            {
+                if (DEBUG) _log.debug("Dropping xri:// prefix from identifier: "
+                        + identifier);
                 identifier = identifier.substring(6);
+            }
 
             if (URL_PATTERN.matcher(identifier).find())
             {
+                if (DEBUG) _log.debug("Creating URL identifier for: " + identifier);
                 return new UrlIdentifier(identifier);
             }
             else if (XRI_PATTERN.matcher(identifier).find())
             {
+                if (DEBUG) _log.debug("Creating XRI identifier for: " + identifier);
                 return new XriIdentifier(identifier);
             }
             else
             {
+                if (DEBUG) _log.debug("Creating URL identifier (http:// prepended) for: "
+                        + identifier);
                 return new UrlIdentifier("http://" + identifier);
             }
         }
@@ -123,9 +137,12 @@ public class Discovery
     public List discover(Identifier identifier)
             throws DiscoveryException
     {
+        List result = new ArrayList();
 
         if (identifier instanceof XriIdentifier)
         {
+            _log.info("Starting discovery on XRI identifier: " + identifier);
+
             XRDS xrds;
             XriIdentifier xriIdentifier = (XriIdentifier) identifier;
 
@@ -135,11 +152,19 @@ public class Discovery
                 xrds = _xriResolver.resolveAuthToXRDS(
                         xriIdentifier.getXriIdentifier(), trustAll, true, new ResolverState());
 
+                if (DEBUG) _log.debug("Retrieved XRDS:\n" + xrds.dump());
+
                 XRD xrd = xrds.getFinalXRD();
                 CanonicalID canonical = xrd.getCanonicalidAt(0);
 
-                if (! isProviderAuthoritative(xrd.getProviderID(), canonical))
-                    return new ArrayList();
+                if (isProviderAuthoritative(xrd.getProviderID(), canonical))
+                {
+                    _log.info("XRI resolution succeeded on " + identifier);
+                    result = extractDiscoveryInformation(xrds, identifier);
+                }
+                else
+                    _log.warn("ProviderID is not authoritative for the CanonicalID. " +
+                            "Returning empty discovery result set.");
             }
             catch (Exception e)
             {
@@ -147,28 +172,29 @@ public class Discovery
                         "Cannot resolve XRI: " + identifier.toString(), e);
             }
 
-            return extractDiscoveryInformation(xrds, identifier);
         }
         else if (identifier instanceof UrlIdentifier)
         {
+            _log.info("Starting discovery on URL identifier: " + identifier);
+
             UrlIdentifier urlId = (UrlIdentifier) identifier;
 
             YadisResult yadis = _yadisResolver.discover(urlId.getUrl().toString());
 
             if (YadisResult.OK == yadis.getStatus())
             {
-                return extractDiscoveryInformation(yadis);
+                _log.info("Using Yadis normalized URL as claimedID: "
+                        + yadis.getNormalizedUrl());
+
+                result = extractDiscoveryInformation(yadis.getXrds(),
+                        new UrlIdentifier(yadis.getNormalizedUrl()) );
             }
+            // todo: proper fall-back to html discovery
             else
             {
-                //todo: log yadis discovery failure
-                //throw new DiscoveryException(
-                //        "Error while performing Yadis discovery on: "
-                //                + identifier.getIdentifier() + " : "
-                //                + yadis.getStatusMessage());
+                _log.info("No Yadis result discovered; attempting HTML discovery...");
 
-                // attempt HTML-based discovery
-                return extractDiscoveryInformation(_htmlResolver.discover(urlId));
+                result = extractDiscoveryInformation(_htmlResolver.discover(urlId));
             }
         }
         else
@@ -176,6 +202,10 @@ public class Discovery
             throw new DiscoveryException(
                     "Unknown identifier type: " + identifier.toString());
         }
+
+        _log.info("Discovered " + result.size() + " OpenID endpoints.");
+
+        return result;
     }
 
     private List extractDiscoveryInformation(HtmlResult htmlResult)
@@ -184,29 +214,34 @@ public class Discovery
         ArrayList htmlList = new ArrayList();
 
         if (htmlResult.getIdp2Endpoint() != null)
-                htmlList.add(new DiscoveryInformation(
+        {
+            DiscoveryInformation extracted = new DiscoveryInformation(
                         htmlResult.getIdp2Endpoint(),
                         htmlResult.getClaimedId(),
                         htmlResult.getDelegate2(),
-                        DiscoveryInformation.OPENID2));
+                        DiscoveryInformation.OPENID2);
+
+            if (DEBUG)
+                _log.debug("OpenID2-signon HTML discovery endpoint: " + extracted);
+
+            htmlList.add(extracted);
+        }
 
         if (htmlResult.getIdp1Endpoint() != null)
-                htmlList.add(new DiscoveryInformation(
+        {
+            DiscoveryInformation extracted = new DiscoveryInformation(
                         htmlResult.getIdp1Endpoint(),
                         htmlResult.getClaimedId(),
                         htmlResult.getDelegate1(),
-                        DiscoveryInformation.OPENID11));
+                        DiscoveryInformation.OPENID11);
+
+            if (DEBUG)
+                _log.debug("OpenID1-signon HTML discovery endpoint: " + extracted);
+
+            htmlList.add(extracted);
+        }
 
         return htmlList;
-    }
-
-    protected static List extractDiscoveryInformation(YadisResult yadisResult)
-            throws DiscoveryException
-    {
-        // the Yadis normalized URL becomes the claimed ID
-        return extractDiscoveryInformation(
-                yadisResult.getXrds(),
-                new UrlIdentifier(yadisResult.getNormalizedUrl()) );
     }
 
     protected static List extractDiscoveryInformation(XRDS xrds,
@@ -245,7 +280,13 @@ public class Discovery
 
                 if (matchType(service, DiscoveryInformation.OPENID2_OP))
                 {
-                    opSelectList.add(new DiscoveryInformation(opEndpointUrl));
+                    DiscoveryInformation extracted =
+                            new DiscoveryInformation(opEndpointUrl);
+
+                    if (DEBUG) _log.debug("OpenID2-server XRDS discovery result: "
+                            + extracted);
+
+                    opSelectList.add(extracted);
                 }
 
                 if (matchType(service, DiscoveryInformation.OPENID2))
@@ -269,22 +310,39 @@ public class Discovery
                         claimedIdentifier = parseIdentifier(canonicalId.getValue());
                     }
 
-                    signonList.add(new DiscoveryInformation(opEndpointUrl,
-                            claimedIdentifier, getDelegate(service, false)));
+                    DiscoveryInformation extracted =
+                            new DiscoveryInformation(opEndpointUrl,
+                                    claimedIdentifier,
+                                    getDelegate(service, false));
+
+                    if (DEBUG) _log.debug("OpenID2-signon XRDS discovery result: "
+                            + extracted);
+
+                    signonList.add(extracted);
                 }
 
                 if (matchType(service, DiscoveryInformation.OPENID10) ||
                         matchType(service, DiscoveryInformation.OPENID11))
                 {
-                    openid1.add(new DiscoveryInformation(opEndpointUrl,
-                            identifier, getDelegate(service, true),
-                            DiscoveryInformation.OPENID11));
+                    DiscoveryInformation extracted =
+                            new DiscoveryInformation(opEndpointUrl,
+                                    identifier, getDelegate(service, true),
+                                    DiscoveryInformation.OPENID11);
+
+                    if (DEBUG) _log.debug("OpenID1-signon XRDS discovery result: "
+                            + extracted);
+
+                    openid1.add(extracted);
                 }
             }
         }
 
         opSelectList.addAll(signonList);
         opSelectList.addAll(openid1);
+
+        if (opSelectList.size() == 0)
+            _log.info("No OpenID service types found in the XRDS.");
+
         return opSelectList;
     }
 
@@ -294,6 +352,7 @@ public class Discovery
             CanonicalID canonicalId, String providerId)
             throws DiscoveryException
     {
+        // todo: not used? / complete refactoring
         ArrayList opSelectList = new ArrayList();
         ArrayList signonList = new ArrayList();
         ArrayList openid1 = new ArrayList();
@@ -384,6 +443,9 @@ public class Discovery
             {
                 String delegateStr = element.getFirstChild().getNodeValue();
                 delegate = parseIdentifier(delegateStr);
+
+                // todo: multiple delegate tags?
+                if (DEBUG) _log.debug("Found delegate: " + delegate);
             }
         }
 

@@ -4,6 +4,8 @@
 
 package net.openid.association;
 
+import org.apache.log4j.Logger;
+
 /**
  * Modells the session and association types allowed in OpenID associations.
  * <p>
@@ -18,6 +20,9 @@ package net.openid.association;
  */
 public class AssociationSessionType implements Comparable
 {
+    private static Logger _log = Logger.getLogger(AssociationSessionType.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final AssociationSessionType NO_ENCRYPTION_SHA1MAC
             = new AssociationSessionType("no-encryption", null,
                         Association.TYPE_HMAC_SHA1, false, 0);
@@ -141,13 +146,15 @@ public class AssociationSessionType implements Comparable
                                                 boolean compatibility)
             throws AssociationException
     {
+        AssociationSessionType result;
+
         if(! compatibility && "no-encryption".equals(sessType) &&
                 Association.TYPE_HMAC_SHA1.equals(assocType))
-                return NO_ENCRYPTION_SHA1MAC;
+                result = NO_ENCRYPTION_SHA1MAC;
 
         else if (! compatibility && "no-encryption".equals(sessType) &&
                 Association.TYPE_HMAC_SHA256.equals(assocType))
-                return NO_ENCRYPTION_SHA1MAC;
+                result =  NO_ENCRYPTION_SHA1MAC;
 
         else if ( compatibility &&
                 ("".equals(sessType) || sessType == null) &&
@@ -156,25 +163,29 @@ public class AssociationSessionType implements Comparable
             // sess_type:  DH-SHA1, blank, may be omitted in v1 response
             // assoc_type: HMAC_SHA1, may be omitted in v1 requests
 
-            return NO_ENCRYPTION_COMPAT_SHA1MAC;
+            result = NO_ENCRYPTION_COMPAT_SHA1MAC;
         }
 
         else if (! compatibility && "DH-SHA1".equals(sessType) &&
                 Association.TYPE_HMAC_SHA1.equals(assocType))
-            return DH_SHA1;
+            result = DH_SHA1;
 
         else if (compatibility &&
                 ("DH-SHA1".equals(sessType) || sessType == null))
-            return DH_COMPAT_SHA1;
+            result = DH_COMPAT_SHA1;
 
         else if (! compatibility && "DH-SHA256".equals(sessType) &&
                 Association.TYPE_HMAC_SHA256.equals(assocType) )
-            return DH_SHA256;
+            result = DH_SHA256;
         else
             throw new AssociationException(
                     "Unsupported session / association type: "
                     + sessType + " : " + assocType +
                     ", compatibility: " + compatibility);
+
+        if (DEBUG) _log.debug("Returning Session:Association Type: " + result);
+
+        return result;
     }
 
     /**
@@ -244,5 +255,11 @@ public class AssociationSessionType implements Comparable
     public boolean isVersion2()
     {
         return ! _compat;
+    }
+
+    public String toString()
+    {
+        return _sessType + ":" + _assocType + ":" +
+                (_compat ? "OpenID1" : "OpenID2");
     }
 }

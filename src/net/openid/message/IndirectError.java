@@ -4,11 +4,16 @@
 
 package net.openid.message;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class IndirectError extends Message
 {
+    private static Logger _log = Logger.getLogger(IndirectError.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     protected IndirectError(String msg, String returnTo)
     {
         this(msg, returnTo, false);
@@ -40,8 +45,11 @@ public class IndirectError extends Message
 
         if (! err.isValid())
         {
-            //todo: log
+            _log.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
+                       " indirect error message created for message: " + msg);
         }
+
+        _log.debug("Created indirect error message: " + err.keyValueFormEncoding());
 
         return err;
     }
@@ -52,8 +60,11 @@ public class IndirectError extends Message
 
         if (! err.isValid())
         {
-            //todo: log
+            _log.error("Invalid direct error message created: "
+                       + err.keyValueFormEncoding() );
         }
+
+        _log.debug("Created indirect error message: " + err.keyValueFormEncoding());
 
         return err;
     }

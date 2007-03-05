@@ -9,11 +9,16 @@ import net.openid.association.AssociationException;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryServerAssociationStore implements ServerAssociationStore
 {
+    private static Logger _log = Logger.getLogger(InMemoryServerAssociationStore.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     private String _timestamp;
     private int _counter;
     private Map _handleMap;
@@ -25,7 +30,8 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
         _handleMap = new HashMap();
     }
 
-    public synchronized Association generate(String type, int expiryIn) throws AssociationException
+    public synchronized Association generate(String type, int expiryIn)
+            throws AssociationException
     {
         removeExpired();
 
@@ -34,6 +40,10 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
         Association association = Association.generate(type, handle, expiryIn);
 
         _handleMap.put(handle, association);
+
+        if (DEBUG) _log.debug("Generated association, handle: " + handle +
+                              " type: " + type +
+                              " expires in: " + expiryIn + " seconds.");
 
         return association;
     }
@@ -47,6 +57,8 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
 
     public synchronized void remove(String handle)
     {
+        if (DEBUG) _log.debug("Removing association, handle: " + handle);
+
         _handleMap.remove(handle);
 
         removeExpired();
@@ -70,6 +82,8 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
         while (handles.hasNext())
         {
             String handle = (String) handles.next();
+
+            if (DEBUG) _log.debug("Removing expired association, handle: " + handle);
 
             _handleMap.remove(handle);
         }

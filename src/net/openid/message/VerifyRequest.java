@@ -4,6 +4,8 @@
 
 package net.openid.message;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * VerifyRequest is a AuthSuccess with the openid.mode
@@ -13,6 +15,9 @@ package net.openid.message;
  */
 public class VerifyRequest extends AuthSuccess
 {
+    private static Logger _log = Logger.getLogger(VerifyRequest.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final String MODE_CHKAUTH = "check_authentication";
 
     protected VerifyRequest(AuthSuccess authResp)
@@ -40,7 +45,10 @@ public class VerifyRequest extends AuthSuccess
         VerifyRequest req = new VerifyRequest(authResp);
 
         if (! req.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+                "Invalid set of parameters for a verification request");
+
+        if (DEBUG) _log.debug("Created verification request " +
+                "from a positive auth response: " + req.keyValueFormEncoding());
 
         return req;
     }
@@ -51,7 +59,10 @@ public class VerifyRequest extends AuthSuccess
         VerifyRequest req = new VerifyRequest(params);
 
         if (! req.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+                "Invalid set of parameters for a verification request");
+
+        if (DEBUG) _log.debug("Created verification request: "
+                              + req.keyValueFormEncoding());
 
         return req;
     }
@@ -69,11 +80,23 @@ public class VerifyRequest extends AuthSuccess
     public boolean isValid()
     {
         if (! MODE_CHKAUTH.equals(getParameterValue("openid.mode")))
-                return false;
+        {
+            _log.warn("Invalid openid.mode in verification request: "
+                      + getParameterValue("openid.mode"));
+            return false;
+        }
 
         set("openid.mode", MODE_IDRES);
 
-        if (! super.isValid() ) return false;
+        if (DEBUG) _log.debug("Delegating verification request validity check " +
+                              "to auth response...");
+
+        if (! super.isValid() )
+        {
+            _log.warn("Invalid verification request: " +
+                      "related auth response verification failed.");
+            return false;
+        }
 
         set("openid.mode", MODE_CHKAUTH);
 

@@ -4,6 +4,8 @@
 
 package net.openid.server;
 
+import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -15,6 +17,9 @@ import java.net.MalformedURLException;
  */
 public class RealmVerifier
 {
+    private static Logger _log = Logger.getLogger(RealmVerifier.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final int OK = 0;
     public static final int DENIED_REALM = 1;
     public static final int MALFORMED_REALM = 2;
@@ -71,6 +76,9 @@ public class RealmVerifier
 
     public int match(String realm, String returnTo)
     {
+        if (DEBUG) _log.debug("Verifying realm: " + realm +
+                              " on return URL: " + returnTo);
+
         URL realmUrl;
         try
         {
@@ -78,13 +86,17 @@ public class RealmVerifier
         }
         catch (MalformedURLException e)
         {
+            _log.error("Invalid realm URL: " + realm, e);
             return MALFORMED_REALM;
         }
 
         String realmDomain = realmUrl.getHost();
 
         if (isDeniedRealmDomain(realmDomain))
+        {
+            _log.warn("Blacklisted realm domain: " + realmDomain);
             return DENIED_REALM;
+        }
 
         URL returnToUrl;
         try
@@ -93,23 +105,46 @@ public class RealmVerifier
         }
         catch (MalformedURLException e)
         {
+            _log.error("Invalid return URL: " + returnTo);
             return MALFORMED_RETURN_TO_URL;
         }
 
         if (realmUrl.getRef() != null)
+        {
+            if (DEBUG) _log.debug("Realm verification failed: " +
+                                  "URL fragments are not allowed.");
             return FRAGMENT_NOT_ALLOWED;
+        }
 
         if (!realmUrl.getProtocol().equalsIgnoreCase(returnToUrl.getProtocol()))
+        {
+            if (DEBUG) _log.debug("Realm verification failed: " +
+                                  "protocol mismatch.");
             return PROTOCOL_MISMATCH;
+        }
 
         if (!domainMatch(realmDomain, returnToUrl.getHost()))
+        {
+            if (DEBUG) _log.debug("Realm verification failed: " +
+                                  "domain mismatch.");
             return DOMAIN_MISMATCH;
+        }
 
         if (!portMatch(realmUrl, returnToUrl))
+        {
+            if (DEBUG) _log.debug("Realm verification failed: " +
+                                  "port mismatch.");
             return PORT_MISMATCH;
+        }
 
         if (!pathMatch(realmUrl, returnToUrl))
+        {
+            if (DEBUG) _log.debug("Realm verification failed: " +
+                                  "path mismatch.");
             return PATH_MISMATCH;
+        }
+
+        _log.info("Realm verified: " + realm);
 
         return OK;
     }

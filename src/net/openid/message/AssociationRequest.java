@@ -11,6 +11,8 @@ import net.openid.association.AssociationException;
 import java.util.List;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
+
 /**
  * The OpenID Association Request message.
  * <p>
@@ -21,6 +23,9 @@ import java.util.Arrays;
  */
 public class AssociationRequest extends Message
 {
+    private static Logger _log = Logger.getLogger(AssociationRequest.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final String MODE_ASSOC = "associate";
 
     protected final static List requiredFields = Arrays.asList( new String[] {
@@ -67,8 +72,12 @@ public class AssociationRequest extends Message
      *                  if null, a "no-encryption" session is created.
      */
     protected AssociationRequest(AssociationSessionType type,
-                              DiffieHellmanSession dhSess)
+                                 DiffieHellmanSession dhSess)
     {
+        if (DEBUG)
+            _log.debug("Creating association request, type: " + type +
+                       "DH session: " + dhSess);
+
         if (type.isVersion2())
             set("openid.ns", OPENID2_NS);
 
@@ -119,6 +128,9 @@ public class AssociationRequest extends Message
         if ( !req.isValid() ) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
+        if (DEBUG) _log.debug("Created association request: "
+                              + req.keyValueFormEncoding());
+
         return req;
     }
     public static AssociationRequest createAssociationRequest(
@@ -128,6 +140,10 @@ public class AssociationRequest extends Message
 
         if ( !req.isValid() ) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
+
+        if (DEBUG)
+            _log.debug("Created association request from message parameters: "
+                       + req.keyValueFormEncoding());
 
         return req;
     }
@@ -230,28 +246,43 @@ public class AssociationRequest extends Message
 
             // make sure compatibility mode is the same for type and message
             if (type.isVersion2() != isVersion2())
+            {
+                _log.warn("Protocol verison mismatch between association " +
+                          "session type: " + type +
+                          " and AssociationRequest message type.");
                 return false;
+            }
 
         } catch (AssociationException e) {
+            _log.error("Error verifying association request validity.", e);
             return false;
         }
 
         // additional compatibility checks
         if (! isVersion2() && getSessionType() == null)
-                return false;   // sess_type cannot be omitted in v1 requests
+        {
+            _log.warn("sess_type cannot be omitted in OpenID1 association requests");
+            return false;
+        }
 
         // DH seesion parameters
         if ( type.getHAlgorithm() != null) // DH session
         {
             if (getDhGen() == null || getDhModulus() == null ||
                     getPublicKey() == null)
+            {
+                _log.warn("DH session modulus, base or public key not specified.");
                 return false;
+            }
         }
         else // no-enc session
         {
             if (getDhGen() != null || getDhModulus() != null ||
                     getPublicKey() != null)
+            {
+                _log.warn("No-encryption session, but DH parameters specified.");
                 return false;
+            }
         }
 
         return true;

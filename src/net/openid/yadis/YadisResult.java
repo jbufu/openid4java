@@ -5,6 +5,7 @@
 package net.openid.yadis;
 
 import org.openxri.xml.XRDS;
+import org.apache.log4j.Logger;
 
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -20,6 +21,9 @@ import java.net.MalformedURLException;
  */
 public class YadisResult
 {
+    private static Logger _log = Logger.getLogger(YadisResult.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     /**
      * The XRDS document obtained by performing Yadis discovery on the YadisURL.
      */
@@ -122,7 +126,8 @@ public class YadisResult
         try
         {
             xrdsUrl = new URL(xrdsLocation);
-        } catch (MalformedURLException e)
+        }
+        catch (MalformedURLException e)
         {
             validXrdsUrl = false;
         }
@@ -135,6 +140,9 @@ public class YadisResult
                     " MUST be an absolute URL and " +
                     "it must be HTTP or HTTPS; found: " + xrdsLocation,
                     onFailError);
+
+        if (DEBUG)
+            _log.debug("Setting X-XRDS-Location for yadis result: " + xrdsLocation);
 
         _xrdsLocation = xrdsUrl;
     }
@@ -259,5 +267,18 @@ public class YadisResult
     public Throwable getFailureCause()
     {
         return _failureCause;
+    }
+
+    public String dump()
+    {
+        StringBuffer dump = new StringBuffer();
+
+        dump.append("YadisURL:").append(_yadisUrl);
+        dump.append("\nNormalizedURL:").append(_normalizedUrl);
+        dump.append("\nX-XRDS-Location:").append(_xrdsLocation);
+        dump.append("\nContent-type:").append(_contentType);
+        dump.append("\nXRDS:\n").append(_xrds.dump());
+
+        return dump.toString();
     }
 }

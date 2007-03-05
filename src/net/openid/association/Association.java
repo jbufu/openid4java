@@ -5,6 +5,7 @@
 package net.openid.association;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 
 import javax.crypto.SecretKey;
 import javax.crypto.KeyGenerator;
@@ -20,6 +21,9 @@ import java.io.Serializable;
  */
 public class Association implements Serializable
 {
+    private static Logger _log = Logger.getLogger(Association.class);
+    private static final boolean DEBUG = _log.isDebugEnabled();
+
     public static final String FAILED_ASSOC_HANDLE      = " ";
     public static final String TYPE_HMAC_SHA1           = "HMAC-SHA1";
     public static final String TYPE_HMAC_SHA256         = "HMAC-SHA256";
@@ -36,6 +40,8 @@ public class Association implements Serializable
 
     private Association(String type, String handle, SecretKey macKey, Date expiry)
     {
+        if (DEBUG) _log.debug("Creating association, type: " + type +
+                              " handle: " + handle + " expires: " + expiry);
         _type = type;
         _handle = handle;
         _macKey = macKey;
@@ -73,6 +79,8 @@ public class Association implements Serializable
     {
         SecretKey macKey = generateMacSha1Key();
 
+        if (DEBUG) _log.debug("Generated SHA1 MAC key: " + macKey);
+
         return new Association(TYPE_HMAC_SHA1, handle, macKey, expiryIn);
     }
 
@@ -93,6 +101,8 @@ public class Association implements Serializable
     public static Association generateHmacSha256(String handle, int expiryIn)
     {
         SecretKey macKey = generateMacSha256Key();
+
+        if (DEBUG) _log.debug("Generated SHA256 MAC key: " + macKey);
 
         return new Association(TYPE_HMAC_SHA256, handle, macKey, expiryIn);
     }
@@ -123,7 +133,7 @@ public class Association implements Serializable
         }
         catch (NoSuchAlgorithmException e)
         {
-            // TODO: log
+            _log.error("Unsupported algorithm: " + algorithm + ", size: " + keySize, e);
             return null;
         }
     }
@@ -144,15 +154,18 @@ public class Association implements Serializable
 
         if (TYPE_HMAC_SHA1.equals(hMacType))
             hMacAlgorithm = HMAC_SHA1_ALGORITHM;
+
         else if (TYPE_HMAC_SHA256.equals(hMacType))
             hMacAlgorithm = HMAC_SHA256_ALGORITHM;
+
         else
             return false;
 
         try
         {
             KeyGenerator.getInstance(hMacAlgorithm);
-        } catch (NoSuchAlgorithmException e)
+        }
+        catch (NoSuchAlgorithmException e)
         {
             return false;
         }
@@ -239,11 +252,15 @@ public class Association implements Serializable
 
     public String sign(String text) throws AssociationException
     {
+        if (DEBUG) _log.debug("Computing signature for input data: " + text)
+                ;
         return new String(Base64.encodeBase64(sign(text.getBytes())));
     }
 
     public boolean verifySignature(String text, String signature) throws AssociationException
     {
+        if (DEBUG) _log.debug("Verifying signature: " + signature);
+
         return signature.equals(sign(text));
     }
 }
