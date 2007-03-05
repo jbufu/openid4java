@@ -97,6 +97,11 @@ public class DirectError extends Message
         set("error", msg);
     }
 
+    public String getErrorMsg()
+    {
+        return getParameterValue("error");
+    }
+
     public void setContact(String contact)
     {
         set("contact", contact);
