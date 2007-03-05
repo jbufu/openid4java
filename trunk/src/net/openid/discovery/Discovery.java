@@ -313,7 +313,8 @@ public class Discovery
                     DiscoveryInformation extracted =
                             new DiscoveryInformation(opEndpointUrl,
                                     claimedIdentifier,
-                                    getDelegate(service, false));
+                                    getDelegate(service, false),
+                                    DiscoveryInformation.OPENID2);
 
                     if (DEBUG) _log.debug("OpenID2-signon XRDS discovery result: "
                             + extracted);
@@ -359,7 +360,7 @@ public class Discovery
 
         URL opEndpointUrl;
         Identifier claimedIdentifier;
-        Identifier delegateIdentifier;
+        String delegate;
 
         Iterator iter = service.getPrioritizedURIs().iterator();
         while (iter.hasNext())
@@ -396,10 +397,10 @@ public class Discovery
                     claimedIdentifier = parseIdentifier(canonicalId.getValue());
                 }
 
-                delegateIdentifier = getDelegate(service, false);
+                delegate = getDelegate(service, false);
 
                 signonList.add(new DiscoveryInformation(opEndpointUrl,
-                        claimedIdentifier, delegateIdentifier));
+                        claimedIdentifier, delegate, DiscoveryInformation.OPENID2));
             }
 
             if (matchType(service, DiscoveryInformation.OPENID10) ||
@@ -416,10 +417,9 @@ public class Discovery
         return opSelectList;
     }
 
-    public static Identifier getDelegate(Service service, boolean compatibility)
-            throws DiscoveryException
+    public static String getDelegate(Service service, boolean compatibility)
     {
-        Identifier delegate = null;
+        String delegate = null;
         String delegateTag;
         String nsPattern;
 
@@ -441,8 +441,7 @@ public class Discovery
 
             if (Pattern.matches(nsPattern, element.getNamespaceURI()))
             {
-                String delegateStr = element.getFirstChild().getNodeValue();
-                delegate = parseIdentifier(delegateStr);
+                delegate = element.getFirstChild().getNodeValue();
 
                 // todo: multiple delegate tags?
                 if (DEBUG) _log.debug("Found delegate: " + delegate);

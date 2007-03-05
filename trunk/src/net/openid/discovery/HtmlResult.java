@@ -11,12 +11,11 @@ import java.net.URL;
  */
 public class HtmlResult
 {
-    // todo: delegates don't have to be identifiers
     private UrlIdentifier _claimedId;
     private URL _idp1Endpoint;
-    private UrlIdentifier _delegate1;
+    private String _delegate1;
     private URL _idp2Endpoint;
-    private UrlIdentifier _delegate2;
+    private String _delegate2;
 
     /**
      * Constructs an empty HtmlResult object.
@@ -52,12 +51,12 @@ public class HtmlResult
         return _idp1Endpoint;
     }
 
-    public void setDelegate1(UrlIdentifier delegate1)
+    public void setDelegate1(String delegate1)
     {
         _delegate1 = delegate1;
     }
 
-    public UrlIdentifier getDelegate1()
+    public String getDelegate1()
     {
         return _delegate1;
     }
@@ -72,12 +71,12 @@ public class HtmlResult
         return _idp2Endpoint;
     }
 
-    public void setDelegate2(UrlIdentifier delegate2)
+    public void setDelegate2(String delegate2)
     {
         _delegate2 = delegate2;
     }
 
-    public UrlIdentifier getDelegate2()
+    public String getDelegate2()
     {
         return _delegate2;
     }
@@ -88,10 +87,10 @@ public class HtmlResult
                 (_idp2Endpoint != null ?
                         "\nOpenID2-endpoint:" + _idp2Endpoint.toString() : "") +
                 (_delegate2 != null ?
-                        "\nOpenID2-localID:" + _delegate2.getIdentifier() : "") +
+                        "\nOpenID2-localID:" + _delegate2 : "") +
                 (_idp1Endpoint != null ?
                         "\nOpenID1-endpoint:" + _idp1Endpoint.toString() : "") +
                 (_delegate1 != null ?
-                        "\nOpenID1-delegate:" + _delegate1.getIdentifier() : "");
+                        "\nOpenID1-delegate:" + _delegate1 : "");
     }
 }

@@ -989,7 +989,7 @@ public class ConsumerManager
         // set the Delegate ID (aka OP-specific identifier)
         String delegate = claimedId;
         if (discovered.hasDelegateIdentifier())
-            delegate = discovered.getDelegateIdentifier().getIdentifier();
+            delegate = discovered.getDelegateIdentifier();
 
         // stateless mode disabled ?
         if ( !_allowStateless && Association.FAILED_ASSOC_HANDLE.equals(handle))
@@ -1486,7 +1486,7 @@ public class ConsumerManager
         }
 
         // asserted identifier in the AuthResponse
-        Identifier assertId = Discovery.parseIdentifier(authResp.getIdentity());
+        String assertId = authResp.getIdentity();
 
         // claimed identifier
         Identifier claimedId = discovered.getClaimedIdentifier();
@@ -1496,11 +1496,11 @@ public class ConsumerManager
                        "about ClaimedID: " + claimedId.getIdentifier());
 
         // OP-specific ID
-        Identifier opSpecific = discovered.hasDelegateIdentifier() ?
-                discovered.getDelegateIdentifier() : claimedId;
+        String opSpecific = discovered.hasDelegateIdentifier() ?
+                discovered.getDelegateIdentifier() : claimedId.getIdentifier();
 
         // does the asserted ID match the OP-specific ID from the discovery?
-        if ( assertId.equals(opSpecific) )
+        if ( opSpecific.equals(assertId) )
             return discovered;  // success
 
         // discovered info verification failed
@@ -1540,7 +1540,7 @@ public class ConsumerManager
         }
 
         // asserted identifier in the AuthResponse
-        Identifier assertId = Discovery.parseIdentifier(authResp.getIdentity());
+        String assertId = authResp.getIdentity();
 
         // claimed identifier in the AuthResponse
         Identifier respClaimed = Discovery.parseIdentifier(authResp.getClaimed());
@@ -1558,11 +1558,12 @@ public class ConsumerManager
                 discovered.getClaimedIdentifier().equals(respClaimed) )
         {
             // OP-endpoint, OP-specific ID and protocol version must match
-            Identifier opSpecific = discovered.hasDelegateIdentifier() ?
+            String opSpecific = discovered.hasDelegateIdentifier() ?
                     discovered.getDelegateIdentifier() :
-                    discovered.getClaimedIdentifier();
+                    discovered.getClaimedIdentifier().getIdentifier();
 
-            if ( assertId.equals(opSpecific) && discovered.isVersion2() &&
+            if ( opSpecific.equals(assertId) &&
+                    discovered.isVersion2() &&
                     discovered.getIdpEndpoint().equals(respEndpoint))
             {
                 if (DEBUG) _log.debug(
@@ -1595,11 +1596,12 @@ public class ConsumerManager
             if (DiscoveryInformation.OPENID2_OP.equals(service.getVersion()))
                 continue;
 
-            Identifier opSpecific = service.hasDelegateIdentifier() ?
+            String opSpecific = service.hasDelegateIdentifier() ?
                     service.getDelegateIdentifier() :
-                    service.getClaimedIdentifier();
+                    service.getClaimedIdentifier().getIdentifier();
 
-            if ( ! assertId.equals(opSpecific) || ! service.isVersion2() ||
+            if ( ! opSpecific.equals(assertId) ||
+                    ! service.isVersion2() ||
                     ! service.getIdpEndpoint().equals(respEndpoint) )
                 continue;
 

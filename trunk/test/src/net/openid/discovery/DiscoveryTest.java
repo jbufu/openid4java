@@ -110,7 +110,7 @@ public class DiscoveryTest extends TestCase
 
         assertEquals("http://idp.example.com", discoveryInformation.getIdpEndpoint().toExternalForm());
         assertEquals("http://user.example.com", discoveryInformation.getClaimedIdentifier().getIdentifier());
-        assertEquals("http://idp.example.com/user", discoveryInformation.getDelegateIdentifier().getIdentifier());
+        assertEquals("http://idp.example.com/user", discoveryInformation.getDelegateIdentifier());
     }
 
     public void testExtractDiscoveryInformationDelegate1() throws Exception
@@ -127,7 +127,7 @@ public class DiscoveryTest extends TestCase
 
         assertEquals("http://idp.example.com", discoveryInformation.getIdpEndpoint().toExternalForm());
         assertEquals("http://user.example.com", discoveryInformation.getClaimedIdentifier().getIdentifier());
-        assertEquals("http://idp.example.com/user", discoveryInformation.getDelegateIdentifier().getIdentifier());
+        assertEquals("http://idp.example.com/user", discoveryInformation.getDelegateIdentifier());
     }
 
     public void testExtractDiscoveryInformationClaimed() throws Exception
