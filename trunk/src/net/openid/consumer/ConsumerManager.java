@@ -1121,19 +1121,7 @@ public class ConsumerManager
         }
 
         // [4/4] : signature verification
-        if (verifySignature(authResp, discovered))
-        {
-            // mark verification success
-            _log.info("Verification succeeded.");
-            result.setVerifiedId(discovered.getClaimedIdentifier());
-        }
-        else
-        {
-            result.setStatusMsg("Signature verification failed.");
-            _log.error("Signature verification failed.");
-        }
-
-        return result;
+        return (verifySignature(authResp, discovered, result));
     }
 
     /**
@@ -1639,15 +1627,20 @@ public class ConsumerManager
      *                      the discovery stage.
      * @return              True if the verification succeeded, false otherwise.
      */
-    private boolean verifySignature(AuthSuccess authResp,
-                                    DiscoveryInformation discovered)
+    private VerificationResult verifySignature(AuthSuccess authResp,
+                                               DiscoveryInformation discovered,
+                                               VerificationResult result)
             throws AssociationException, MessageException
     {
         if (discovered == null || authResp == null)
         {
             _log.error("Can't verify signature: " +
                        "null assertion or discovered information.");
-            return false;
+
+            result.setStatusMsg("Can't verify signature: " +
+                       "null assertion or discovered information.");
+
+            return result;
         }
 
         String handle = authResp.getHandle();
@@ -1662,7 +1655,12 @@ public class ConsumerManager
             String signature = authResp.getSignature();
 
             if (assoc.verifySignature(text, signature))
-                return true;
+            {
+                result.setVerifiedId(discovered.getClaimedIdentifier());
+                if (DEBUG) _log.debug("Local signature verification succeeded.");
+            }
+            else if (DEBUG) _log.debug("Local signature verification failed.");
+
         }
         else // no association, verify with the IdP
         {
@@ -1686,18 +1684,39 @@ public class ConsumerManager
                     if (invalidateHandle != null)
                         _associations.remove(idp.toString(), invalidateHandle);
 
-                    return true;
+                    result.setVerifiedId(discovered.getClaimedIdentifier());
+                    if (DEBUG)
+                        _log.debug("Direct signature verification succeeded " +
+                                   "with OP: " + idp);
                 }
                 else
-                    _log.error("OP: " + idp + " says the signature is invalid.");
+                {
+                    if (DEBUG)
+                        _log.debug("Direct signature verification failed " +
+                                "with OP: " + idp);
+                    result.setStatusMsg("Direct signature verification failed.");
+                }
             }
             else
             {
-                // todo: handle direct verification error responses
-                _log.error("Received verification error response.");
+                DirectError err = DirectError.createDirectError(responseParams);
+
+                if (DEBUG) _log.debug("Error verifying signature with the OP: "
+                       + idp + " error message: " + err.keyValueFormEncoding());
+
+                result.setStatusMsg("Error verifying signature with the OP: "
+                                    + err.getErrorMsg());
             }
         }
 
-        return false;
+        Identifier verifiedID = result.getVerifiedId();
+        if (verifiedID != null)
+            _log.info("Verification succeeded for: " + verifiedID);
+
+        else
+            _log.error("Verification failed for: " + verifiedID
+                       + " reason: " + result.getStatusMsg());
+
+        return result;
     }
 }
