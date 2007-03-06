@@ -61,7 +61,7 @@ public class DirectError extends Message
                        " direct error message created for message: " + msg);
         }
 
-        _log.debug("Created direct error message: " + err.keyValueFormEncoding());
+        _log.debug("Created direct error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }
@@ -76,7 +76,7 @@ public class DirectError extends Message
                        + err.keyValueFormEncoding() );
         }
 
-        _log.debug("Created direct error message: " + err.keyValueFormEncoding());
+        _log.debug("Created direct error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }

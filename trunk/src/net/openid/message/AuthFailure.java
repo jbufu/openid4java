@@ -49,7 +49,7 @@ public class AuthFailure extends Message
                 "Invalid set of parameters for the requested message type");
 
         if (DEBUG)
-            _log.debug("Retrieved auth failure from message parameters: "
+            _log.debug("Retrieved auth failure from message parameters:\n"
                        + fail.keyValueFormEncoding());
 
         return fail;

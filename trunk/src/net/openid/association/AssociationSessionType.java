@@ -183,7 +183,7 @@ public class AssociationSessionType implements Comparable
                     + sessType + " : " + assocType +
                     ", compatibility: " + compatibility);
 
-        if (DEBUG) _log.debug("Returning Session:Association Type: " + result);
+        if (DEBUG) _log.debug("Session:Association Type: " + result);
 
         return result;
     }

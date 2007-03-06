@@ -48,7 +48,7 @@ public class VerifyRequest extends AuthSuccess
                 "Invalid set of parameters for a verification request");
 
         if (DEBUG) _log.debug("Created verification request " +
-                "from a positive auth response: " + req.keyValueFormEncoding());
+                "from a positive auth response:\n" + req.keyValueFormEncoding());
 
         return req;
     }
@@ -61,7 +61,7 @@ public class VerifyRequest extends AuthSuccess
         if (! req.isValid()) throw new MessageException(
                 "Invalid set of parameters for a verification request");
 
-        if (DEBUG) _log.debug("Created verification request: "
+        if (DEBUG) _log.debug("Created verification request:\n"
                               + req.keyValueFormEncoding());
 
         return req;

@@ -68,6 +68,11 @@ public class UrlIdentifier implements Identifier
         return _urlIdentifier.toExternalForm();
     }
 
+    public String toString()
+    {
+        return _urlIdentifier.toExternalForm();
+    }
+
     public URL getUrl()
     {
         return _urlIdentifier;

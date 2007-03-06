@@ -63,7 +63,7 @@ public class FetchResponse extends AxMessage
             throw new MessageException("Invalid parameters for a fetch response");
 
         if (DEBUG)
-            _log.debug("Created fetch response from parameter list: " + params);
+            _log.debug("Created fetch response from parameter list:\n" + params);
 
         return resp;
     }
