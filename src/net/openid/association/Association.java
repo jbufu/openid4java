@@ -252,7 +252,7 @@ public class Association implements Serializable
 
     public String sign(String text) throws AssociationException
     {
-        if (DEBUG) _log.debug("Computing signature for input data: " + text)
+        if (DEBUG) _log.debug("Computing signature for input data:\n" + text)
                 ;
         return new String(Base64.encodeBase64(sign(text.getBytes())));
     }

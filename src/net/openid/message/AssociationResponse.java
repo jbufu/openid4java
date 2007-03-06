@@ -102,7 +102,7 @@ public class AssociationResponse extends Message
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created association response: "
+        if (DEBUG) _log.debug("Created association response:\n"
                               + resp.keyValueFormEncoding());
 
         return resp;
@@ -117,7 +117,7 @@ public class AssociationResponse extends Message
                 "Invalid set of parameters for the requested message type");
 
         if (DEBUG)
-            _log.debug("Created association response from message parameters: "
+            _log.debug("Created association response from message parameters:\n"
                        + resp.keyValueFormEncoding() );
         return resp;
     }

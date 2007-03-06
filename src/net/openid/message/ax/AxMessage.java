@@ -61,7 +61,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
         _parameters = params;
 
         if (DEBUG)
-            _log.debug("Created AXMessage from parameter list: " + params);
+            _log.debug("Created AXMessage from parameter list:\n" + params);
     }
 
     /**

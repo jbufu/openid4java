@@ -128,7 +128,7 @@ public class AssociationRequest extends Message
         if ( !req.isValid() ) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created association request: "
+        if (DEBUG) _log.debug("Created association request:\n"
                               + req.keyValueFormEncoding());
 
         return req;
@@ -142,7 +142,7 @@ public class AssociationRequest extends Message
                 "Invalid set of parameters for the requested message type");
 
         if (DEBUG)
-            _log.debug("Created association request from message parameters: "
+            _log.debug("Created association request from message parameters:\n"
                        + req.keyValueFormEncoding());
 
         return req;

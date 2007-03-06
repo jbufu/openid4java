@@ -99,7 +99,7 @@ public class AuthRequest extends Message
         if (! req.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created auth request: " + req.keyValueFormEncoding());
+        if (DEBUG) _log.debug("Created auth request:\n" + req.keyValueFormEncoding());
 
         return req;
     }
@@ -115,7 +115,7 @@ public class AuthRequest extends Message
         if (! req.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created auth request: " + req.keyValueFormEncoding());
+        if (DEBUG) _log.debug("Created auth request:\n" + req.keyValueFormEncoding());
 
         return req;
     }

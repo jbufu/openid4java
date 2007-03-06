@@ -215,7 +215,7 @@ public class HtmlResolver
         URL idp1Endpoint = null;
         URL idp2Endpoint = null;
 
-        if (DEBUG) _log.debug("Parsing HTML data: " + htmlData);
+        if (DEBUG) _log.debug("Parsing HTML data:\n" + htmlData);
 
         try
         {
@@ -290,7 +290,7 @@ public class HtmlResolver
                 }
             }
 
-            if (DEBUG) _log.debug("HTML discovery result: " + result);
+            if (DEBUG) _log.debug("HTML discovery result:\n" + result);
         }
         catch (ParserException e)
         {

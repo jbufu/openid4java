@@ -34,7 +34,7 @@ public class ParameterList implements Serializable
 
     public ParameterList(ParameterList that)
     {
-        if (DEBUG) _log.debug("Cloning parameter list: " + that);
+        if (DEBUG) _log.debug("Cloning parameter list:\n" + that);
 
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
@@ -67,12 +67,12 @@ public class ParameterList implements Serializable
             set(new Parameter(name, value));
         }
 
-        if (DEBUG) _log.debug("Creating parameter list: " + this);
+        if (DEBUG) _log.debug("Creating parameter list:\n" + this);
     }
 
     public void copyOf(ParameterList that)
     {
-        if (DEBUG) _log.debug("Copying parameter list: " + that);
+        if (DEBUG) _log.debug("Copying parameter list:\n" + that);
 
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
@@ -171,7 +171,7 @@ public class ParameterList implements Serializable
 
     public static ParameterList createFromKeyValueForm(String keyValueForm) throws MessageException
     {
-        if (DEBUG) _log.debug("Creating parameter list from key-value form: " + keyValueForm);
+        if (DEBUG) _log.debug("Creating parameter list from key-value form:\n" + keyValueForm);
 
         ParameterList parameterList = new ParameterList();
 

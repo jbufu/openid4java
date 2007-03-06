@@ -284,7 +284,7 @@ public class Discovery
                     DiscoveryInformation extracted =
                             new DiscoveryInformation(opEndpointUrl);
 
-                    if (DEBUG) _log.debug("OpenID2-server XRDS discovery result: "
+                    if (DEBUG) _log.debug("OpenID2-server XRDS discovery result:\n"
                             + extracted);
 
                     opSelectList.add(extracted);
@@ -317,7 +317,7 @@ public class Discovery
                                     getDelegate(service, false),
                                     DiscoveryInformation.OPENID2);
 
-                    if (DEBUG) _log.debug("OpenID2-signon XRDS discovery result: "
+                    if (DEBUG) _log.debug("OpenID2-signon XRDS discovery result:\n"
                             + extracted);
 
                     signonList.add(extracted);
@@ -331,7 +331,7 @@ public class Discovery
                                     identifier, getDelegate(service, true),
                                     DiscoveryInformation.OPENID11);
 
-                    if (DEBUG) _log.debug("OpenID1-signon XRDS discovery result: "
+                    if (DEBUG) _log.debug("OpenID1-signon XRDS discovery result:\n"
                             + extracted);
 
                     openid1.add(extracted);

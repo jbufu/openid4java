@@ -67,7 +67,7 @@ public class AuthImmediateFailure extends Message
                 "Invalid set of parameters for the requested message type");
 
         if (DEBUG)
-            _log.debug("Retrieved auth immediate failure from message parameters: "
+            _log.debug("Retrieved auth immediate failure from message parameters:\n"
                        + fail.keyValueFormEncoding());
 
         return fail;

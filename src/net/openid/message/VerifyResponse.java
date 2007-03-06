@@ -47,7 +47,7 @@ public class VerifyResponse extends Message
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created verification response "
+        if (DEBUG) _log.debug("Created verification response:\n"
                               + resp.keyValueFormEncoding());
 
         return resp;
@@ -61,7 +61,7 @@ public class VerifyResponse extends Message
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created verification response "
+        if (DEBUG) _log.debug("Created verification response:\n"
                               + resp.keyValueFormEncoding());
 
         return resp;

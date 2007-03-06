@@ -573,7 +573,7 @@ public class ConsumerManager
             String postResponse = post.getResponseBodyAsString();
             response.copyOf(ParameterList.createFromKeyValueForm(postResponse));
 
-            if (DEBUG) _log.debug("Retrived response:" + postResponse);
+            if (DEBUG) _log.debug("Retrived response:\n" + postResponse);
         }
         catch (IOException e)
         {
@@ -1388,7 +1388,7 @@ public class ConsumerManager
         }
 
         String signed = returnTo.substring(0, returnTo.indexOf("&openid.rpsig="));
-        if (DEBUG) _log.debug("Consumer signed text: " + signed);
+        if (DEBUG) _log.debug("Consumer signed text:\n" + signed);
 
         try
         {

@@ -68,7 +68,7 @@ public class StoreResponse extends AxMessage
             throw new MessageException("Invalid parameters for a store response");
 
         if (DEBUG)
-            _log.debug("Created store response from parameter list: " + params);
+            _log.debug("Created store response from parameter list:\n" + params);
 
         return resp;
     }

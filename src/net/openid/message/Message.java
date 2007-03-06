@@ -78,7 +78,7 @@ public class Message
         if (! message.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created message: "
+        if (DEBUG) _log.debug("Created message:\n"
                               + message.keyValueFormEncoding());
 
         return message;
@@ -92,7 +92,7 @@ public class Message
         if (! message.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
 
-        if (DEBUG) _log.debug("Created message from parameter list: "
+        if (DEBUG) _log.debug("Created message from parameter list:\n"
                               + message.keyValueFormEncoding());
 
         return message;

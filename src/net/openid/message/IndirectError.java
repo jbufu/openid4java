@@ -49,7 +49,7 @@ public class IndirectError extends Message
                        " indirect error message created for message: " + msg);
         }
 
-        _log.debug("Created indirect error message: " + err.keyValueFormEncoding());
+        _log.debug("Created indirect error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }
@@ -64,7 +64,7 @@ public class IndirectError extends Message
                        + err.keyValueFormEncoding() );
         }
 
-        _log.debug("Created indirect error message: " + err.keyValueFormEncoding());
+        _log.debug("Created indirect error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }
