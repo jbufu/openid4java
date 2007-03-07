@@ -419,7 +419,10 @@ public class ServerManager
      * <p>
      * Uses ServerManager's global OpenID Provider endpoint URL.
      *
-     * @see #authResponse(net.openid.message.ParameterList, String, String, boolean, String)
+     * @return      An signed positive Authentication Response if successfull,
+     *              or an IndirectError / DirectError message.
+     * @see #authResponse(net.openid.message.ParameterList, String, String,
+     *                    boolean, String, boolean)
      */
     public Message authResponse(ParameterList requestParams,
                                 String userSelId,
@@ -427,9 +430,50 @@ public class ServerManager
                                 boolean authenticatedAndApproved)
     {
         return authResponse(requestParams, userSelId, userSelClaimed,
-                authenticatedAndApproved, _opEndpointUrl);
+                authenticatedAndApproved, _opEndpointUrl, true);
 
     }
+
+    /**
+     * Processes a Authentication Request received from a consumer site.
+     * <p>
+     * Uses ServerManager's global OpenID Provider endpoint URL.
+     *
+     * @return      A positive Authentication Response if successfull,
+     *              or an IndirectError / DirectError message.
+     * @see #authResponse(net.openid.message.ParameterList, String, String,
+     *                    boolean, String, boolean)
+     */
+    public Message authResponse(ParameterList requestParams,
+                                String userSelId,
+                                String userSelClaimed,
+                                boolean authenticatedAndApproved,
+                                boolean signNow)
+    {
+        return authResponse(requestParams, userSelId, userSelClaimed,
+                authenticatedAndApproved, _opEndpointUrl, signNow);
+
+    }
+
+    /**
+     * Processes a Authentication Request received from a consumer site.
+     * <p>
+     *
+     * @return      An signed positive Authentication Response if successfull,
+     *              or an IndirectError / DirectError message.
+     * @see #authResponse(net.openid.message.ParameterList, String, String,
+     *                    boolean, String, boolean)
+     */
+    public Message authResponse(ParameterList requestParams,
+                                String userSelId,
+                                String userSelClaimed,
+                                boolean authenticatedAndApproved,
+                                String opEndpoint)
+    {
+        return authResponse(requestParams, userSelId, userSelClaimed,
+                authenticatedAndApproved, _opEndpointUrl, true);
+    }
+
     /**
      * Processes a Authentication Request received from a consumer site.
      *
@@ -448,6 +492,10 @@ public class ServerManager
      *                                  authenticated the user and the user
      *                                  has approved the authentication
      *                                  transaction
+     * @param signNow           If true, the returned AuthSuccess will be signed.
+     *                          If false, the signature will not be computed and
+     *                          set - this will have to be performed later,
+     *                          using #sign(net.openid.message.Message).
      *
      * @return                  <ul><li> AuthSuccess, if authenticatedAndApproved
      *                          <li> AuthFailure (negative response) if either
@@ -461,7 +509,8 @@ public class ServerManager
                                 String userSelId,
                                 String userSelClaimed,
                                 boolean authenticatedAndApproved,
-                                String opEndpoint)
+                                String opEndpoint,
+                                boolean signNow)
     {
         _log.info("Processing authentication request...");
 
@@ -549,7 +598,7 @@ public class ServerManager
                             opEndpoint, claimed, id, !isVersion2,
                             authReq.getReturnTo(),
                             isVersion2 ? _nonceGenerator.next() : null,
-                            invalidateHandle, assoc, _signList);
+                            invalidateHandle, assoc, _signList, signNow);
 
                 _log.info("Returning positive assertion to " +
                           response.getReturnTo());
@@ -594,6 +643,31 @@ public class ServerManager
                 return DirectError.createDirectError( e.getMessage(), isVersion2 );
             }
         }
+    }
+
+    /**
+     * Signs an AuthSuccess message, using the association identified by the
+     * handle specified within the message.
+     */
+    public void sign(Message msg) throws ServerException, AssociationException
+    {
+        if (! (msg instanceof AuthSuccess) ) throw new ServerException(
+                    "Cannot sign message of type: " + msg.getClass());
+
+        AuthSuccess authResp = (AuthSuccess) msg;
+
+        String handle = authResp.getHandle();
+
+        // try shared associations first, then private
+        Association assoc = _sharedAssociations.load(handle);
+
+        if (assoc == null)
+        assoc = _privateAssociations.load(handle);
+
+        if (assoc == null) throw new ServerException(
+                "No association found for handle: " + handle);
+
+        authResp.setSignature(assoc.sign(authResp.getSignedText()));
     }
 
     /**

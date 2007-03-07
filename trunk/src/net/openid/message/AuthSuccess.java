@@ -57,7 +57,8 @@ public class AuthSuccess extends Message
                           boolean compatibility,
                           String returnTo, String nonce,
                           String invalidateHandle, Association assoc,
-                          String signList)
+                          String signList,
+                          boolean signNow)
             throws AssociationException
     {
         if (! compatibility)
@@ -76,7 +77,7 @@ public class AuthSuccess extends Message
         setHandle(assoc.getHandle());
         setSigned(signList);
 
-        setSignature(assoc.sign(getSignedText()));
+        setSignature(signNow ? assoc.sign(getSignedText()) : "");
     }
 
     protected AuthSuccess(ParameterList params)
@@ -89,11 +90,13 @@ public class AuthSuccess extends Message
                        boolean compatibility,
                        String returnTo, String nonce,
                        String invalidateHandle, Association assoc,
-                       String signList)
+                       String signList,
+                       boolean signNow)
             throws MessageException, AssociationException
     {
         AuthSuccess resp = new AuthSuccess(opEndpoint, claimedId, delegate,
-                compatibility, returnTo, nonce, invalidateHandle, assoc, signList);
+                                compatibility, returnTo, nonce,
+                                invalidateHandle, assoc, signList, signNow);
 
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");

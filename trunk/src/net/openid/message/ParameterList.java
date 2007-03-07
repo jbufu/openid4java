@@ -193,7 +193,7 @@ public class ParameterList implements Serializable
         return parameterList;
     }
 
-    // same as Message.toString()
+    // todo: same as Message.keyValueFormEncoding()
     public String toString()
     {
         StringBuffer allParams = new StringBuffer("");
