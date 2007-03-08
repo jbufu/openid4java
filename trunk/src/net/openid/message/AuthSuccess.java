@@ -52,12 +52,14 @@ public class AuthSuccess extends Message
     protected final static String signRequired3 =
             "op_endpoint,return_to,response_nonce,assoc_handle";
 
+    protected List _signFields = new ArrayList();
+
+    protected List _signExtensions = new ArrayList();
 
     protected AuthSuccess(String opEndpoint, String claimedId, String delegate,
                           boolean compatibility,
                           String returnTo, String nonce,
                           String invalidateHandle, Association assoc,
-                          String signList,
                           boolean signNow)
             throws AssociationException
     {
@@ -75,8 +77,8 @@ public class AuthSuccess extends Message
         setReturnTo(returnTo);
         if (invalidateHandle != null) setInvalidateHandle(invalidateHandle);
         setHandle(assoc.getHandle());
-        setSigned(signList);
 
+        buildSignedList();
         setSignature(signNow ? assoc.sign(getSignedText()) : "");
     }
 
@@ -90,13 +92,12 @@ public class AuthSuccess extends Message
                        boolean compatibility,
                        String returnTo, String nonce,
                        String invalidateHandle, Association assoc,
-                       String signList,
                        boolean signNow)
             throws MessageException, AssociationException
     {
         AuthSuccess resp = new AuthSuccess(opEndpoint, claimedId, delegate,
                                 compatibility, returnTo, nonce,
-                                invalidateHandle, assoc, signList, signNow);
+                                invalidateHandle, assoc, signNow);
 
         if (! resp.isValid()) throw new MessageException(
                 "Invalid set of parameters for the requested message type");
@@ -216,33 +217,125 @@ public class AuthSuccess extends Message
         return getParameterValue("openid.assoc_handle");
     }
 
-    public void setSigned(String userSuppliedList)
+
+    /**
+     * Builds the list of fields that will be signed. Three input sources are
+     * considered for this:
+     * <ul>
+     * <li>fields required to be signed by the OpenID protocol</li>
+     * <li>the user defined list of fields to be signed
+     *     {@link #setSignFields(String)}</li>
+     * <li>fields belonging to extensions to be signed
+     *     {@link #setSignExtensions(String[])}</li>
+     * </ul>
+     * <p>
+     * This method should be called after any field additions/deletions to/from
+     * the message.
+     */
+    public void buildSignedList()
     {
-        String toSign = ! isVersion2() ? signRequired1 :
-                hasParameter("openid.identity") ? signRequired2 : signRequired3;
+        StringBuffer toSign = ! isVersion2() ? new StringBuffer(signRequired1) :
+               hasParameter("openid.identity") ? new StringBuffer(signRequired2)
+               : new StringBuffer(signRequired3);
 
-        if (userSuppliedList != null)
+        List signList = new ArrayList(Arrays.asList(toSign.toString().split(",")));
+
+        Iterator iter = _signFields.iterator();
+        while (iter.hasNext())
         {
-            List req = Arrays.asList(toSign.split(","));
-            List user = Arrays.asList(toSign.split(","));
-
-            Iterator iter = user.iterator();
-            while (iter.hasNext())
+            String field = (String) iter.next();
+            if ( ! signList.contains(field) )
             {
-                String field = (String) iter.next();
-                if (! req.contains(field))
-                    toSign += "," + field;
+                toSign.append(",").append(field);
+                signList.add(field);
+            }
+        }
+
+        // build list of field prefixes belonging to extensions
+        List extensionPrefixes = new ArrayList();
+        iter = _signExtensions.iterator();
+        while(iter.hasNext())
+        {
+            String alias = getExtensionAlias((String) iter.next());
+
+            // openid.ns.<ext_alias> needs to be signed
+            String nsSign = "ns." + alias;
+            toSign.append(",").append(nsSign);
+            signList.add(nsSign);
+
+            extensionPrefixes.add(alias);
+        }
+
+        // add exension fields to the signed list
+        iter = getParameters().iterator();
+        while(iter.hasNext())
+        {
+            String paramName = ((Parameter) iter.next()).getKey();
+
+            if (! paramName.startsWith("openid.")) continue;
+
+            String signName = paramName.substring(7);
+
+            int dotIndex = signName.indexOf(".");
+            if (dotIndex > 0 &&
+                extensionPrefixes.contains(signName.substring(0,dotIndex)) &&
+                ! signList.contains(signName) )
+            {
+                toSign.append(",").append(signName);
+                signList.add(signName);
             }
         }
 
         if (DEBUG) _log.debug("Setting fields to be signed: " + toSign);
 
-        set("openid.signed", toSign);
+        set("openid.signed", toSign.toString());
+    }
+
+    /**
+     * Sets the messages fields that will be signed, in addition to the ones
+     * required by the protocol to be signed. The OpenID signature will
+     * only be applied to OpenID fields, starting with the "openid." prefix.
+     *
+     * @param userSuppliedList  Comma-separated list of fields to be signed,
+     *                          without the "openid." prefix
+     * @see #setSignExtensions(String[])
+     */
+    public void setSignFields(String userSuppliedList)
+    {
+        if (userSuppliedList != null)
+        {
+            _signFields = Arrays.asList(userSuppliedList.split(","));
+
+            buildSignedList();
+        }
+    }
+
+    /**
+     * Sets the list of messages fields that will be signed, in addition to
+     * the ones required by the protocol to be signed and any additional
+     * fields already configured to be signed. The OpenID signature will
+     * only be applied to OpenID fields, starting with the "openid." prefix.
+     * Should be called <b>after</b> all relevant extension fields have been
+     * added to the message.
+     *
+     * @param extensions  Array of extension namespace URIs to be signed.
+     * @see #setSignFields(String)
+     */
+    public void setSignExtensions(String[] extensions)
+    {
+        if (extensions != null)
+        {
+            _signExtensions = Arrays.asList(extensions);
+
+            buildSignedList();
+        }
     }
 
     public void setSignature(String sig)
     {
         set("openid.sig", sig);
+
+        if(DEBUG) _log.debug("Added signature: " + sig);
     }
 
     public String getSignature()

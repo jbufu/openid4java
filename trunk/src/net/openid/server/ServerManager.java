@@ -77,7 +77,13 @@ public class ServerManager
     /**
      * List of coma-separated fields to be signed in authentication responses.
      */
-    private String _signList;
+    private String _signFields;
+
+    /**
+     * Array of extension namespace URIs that the consumer manager will sign,
+     * if present in auth responses.
+     */
+    private String[] _signExtensions;
 
     /**
      * Used to perform verify realms against return_to URLs.
@@ -258,9 +264,9 @@ public class ServerManager
      * added by the underlying logic, so that a valid message is generated,
      * regardles if they are included in the user-supplied list or not.
      */
-    public void setSignList(String _signList)
+    public void setSignFields(String signFields)
     {
-        this._signList = _signList;
+        this._signFields = signFields;
     }
 
     /**
@@ -269,9 +275,19 @@ public class ServerManager
      * <p>
      * Coma-separated list.
      */
-    public String getSignList()
+    public String getSignFields()
     {
-        return _signList;
+        return _signFields;
+    }
+
+    public void setSignExtensions(String[] extensins)
+    {
+        _signExtensions = extensins;
+    }
+
+    public String[] getSignExtensions()
+    {
+        return _signExtensions;
     }
 
     /**
@@ -598,9 +614,18 @@ public class ServerManager
                             opEndpoint, claimed, id, !isVersion2,
                             authReq.getReturnTo(),
                             isVersion2 ? _nonceGenerator.next() : null,
-                            invalidateHandle, assoc, _signList, signNow);
+                            invalidateHandle, assoc, false);
 
-                _log.info("Returning positive assertion to " +
+                if (_signFields != null)
+                    response.setSignFields(_signFields);
+
+                if (_signExtensions != null)
+                    response.setSignExtensions(_signExtensions);
+
+                if (signNow)
+                    response.setSignature(assoc.sign(response.getSignedText()));
+
+                _log.info("Returning positive assertion for " +
                           response.getReturnTo());
 
                 return response;
