@@ -165,7 +165,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
             throws MessageException
     {
         String axMode = null;
-        if (parameterList.hasParameter("ax.mode"))
+        if (parameterList.hasParameter("mode"))
         {
             axMode = parameterList.getParameterValue("mode");
 
@@ -182,6 +182,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
                 return StoreResponse.createStoreResponse(parameterList);
         }
 
-        throw new MessageException("Invalid value for ax.mode: " + axMode);
+        throw new MessageException("Invalid value for attribute exchange mode: "
+                                   + axMode);
     }
 }
