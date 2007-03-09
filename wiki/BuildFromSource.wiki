@@ -1,3 +1,4 @@
+#summary How to build the package from source
 =Building the OpenID4Java package from source =
 
 == Requirements ==
@@ -11,9 +12,9 @@ To build the package from source Ant is also needed. The following build targets
 
   * Packages compiled class files into a JAR archive
 {{{
-        ant jar
+ant jar
 }}}
   * Builds distribution ZIP package
 {{{
-        ant dist
+ant dist
 }}}
