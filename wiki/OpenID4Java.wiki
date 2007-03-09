@@ -1,4 +1,4 @@
-#summary OpenID Java Library - Front Page
+#summary OpenID Java Library
 
 = What is this package? =
 
@@ -30,3 +30,11 @@ specification at: http://openid.net/specs.bml
 If you want a ready-built package, the latest version can be found on the OpenID4Java library distribution project page at: http://code.sxip.com
 
 You can also [BuildFromSource build the package from source].
+
+= See also ==
+
+Requirements
+
+Installation
+
+Documentation
