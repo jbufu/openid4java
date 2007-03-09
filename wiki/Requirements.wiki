@@ -1,0 +1,8 @@
+#summary OpenID4Java Requirements
+
+= Requirements =
+
+  * Java 1.4 JVM (or higher)
+
+  * Ant (optional: needed for building the package and running the tests)
+  * JUnit (optional: needed for running the tests)
