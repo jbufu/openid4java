@@ -23,10 +23,15 @@ ant apidoc
 
 Please consider contributing to this wiki
 
+== Sample Code ==
+
+See the SampleConsumer and SampleServer classes to get started.
+
 == OpenID4Java Google Group ==
 
 If you encounter issues not covered in the above, you can ask for help on the openid4java mailing list:
 http://groups.google.com/group/openid4java
+
 
 
 
