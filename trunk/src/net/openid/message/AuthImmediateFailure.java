@@ -31,12 +31,16 @@ public class AuthImmediateFailure extends Message
     protected AuthImmediateFailure(String url, String returnTo,
                                    boolean compatibility)
     {
-        set("openid.mode", MODE_IDRES);
-
         if (compatibility)
+        {
+            set("openid.mode", MODE_IDRES);
             set("openid.user_setup_url", url);
+        }
         else
+        {
+            set("openid.mode", MODE_SETUP_NEEDED);
             set("openid.ns", OPENID2_NS);
+        }
 
         _destinationUrl = returnTo;
     }
@@ -106,9 +110,10 @@ public class AuthImmediateFailure extends Message
                 _log.error("Error verifying auth immediate response validity.", e);
                 return false;
             }
+
+            return MODE_IDRES.equals(getParameterValue("openid.mode"));
         }
-
-        return MODE_IDRES.equals(getParameterValue("openid.mode"));
+        else
+            return MODE_SETUP_NEEDED.equals(getParameterValue("openid.mode"));
     }
-
 }
