@@ -1,4 +1,4 @@
-#summary OpenID Java Library
+#summary OpenID Java Library - Front Page
 
 = What is this package? =
 
