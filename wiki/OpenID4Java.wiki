@@ -1,4 +1,5 @@
 #summary OpenID Java Library
+#labels Featured
 
 = What is this package? =
 
