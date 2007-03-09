@@ -1,0 +1,21 @@
+#summary How to install the package
+
+= Installing the package =
+
+The JAR files under the endorsed/ folder need to be copied under your environment's endorsed libraries folder. If you are running a web application under Apache Tomcat, this directory can be found at:
+{{{
+JAVA_HOME/lib/endorsed
+}}}
+or
+{{{
+CATALINA_HOME/common/endorsed
+}}}
+
+For other application servers or environments, please consult their documentation for configuring endorsed libraries.
+
+To make the library available to the web application the following
+need to be done:
+
+  * Copy lib/*.jar and java-openid-sxip-*.jar to your application's Java classpath
+
+
