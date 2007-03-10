@@ -1,5 +1,4 @@
 #summary OpenID Java Library
-#labels Featured
 
 = What is this package? =
 
@@ -55,7 +54,6 @@ You can also [http://code.google.com/p/openid4java/source check out the code] an
 [Documentation]
 
 Sample useage / code: SampleConsumer SampleServer
-
 
 
 
