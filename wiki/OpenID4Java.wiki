@@ -42,7 +42,7 @@ To OpenID-enable a website - a Relying Party (RP) in OpenID terms, or Consumer a
 
 If you want a ready-built package, the latest version can be found on the OpenID4Java library distribution project page at: http://code.sxip.com
 
-You can also [BuildFromSource build the package from source].
+You can also [http://code.google.com/p/openid4java/source check out the code] and [BuildFromSource build the package from source].
 
 = See also ==
 
