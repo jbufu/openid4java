@@ -38,6 +38,8 @@ To OpenID-enable a website - a Relying Party (RP) in OpenID terms, or Consumer a
 
   * Receive the OpenID Provider's authentication response at your webapp's ReturnURL, and verify it
 
+Have a look at the QuickStart page for a code-level overview of the above, and at the SampleConsumer class for the full code.
+
 = Download =
 
 If you want a ready-built package, the latest version can be found on the OpenID4Java library distribution project page at: http://code.sxip.com
