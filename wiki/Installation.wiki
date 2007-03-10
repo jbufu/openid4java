@@ -17,6 +17,5 @@ For other application servers or environments, please consult their documentatio
 To make the library available to the web application the following
 need to be done:
 
-  * Copy lib/`*`.jar and java-openid-sxip-```*```.jar to your application's Java classpath
-
+  * Copy lib/`*`.jar and java-openid-sxip-`*`.jar to your application's Java classpath
 
