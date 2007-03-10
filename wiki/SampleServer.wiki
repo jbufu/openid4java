@@ -3,6 +3,8 @@
 = SampleServer =
 
 {{{
+public class SampleServer
+{
     // instantiate a ServerManager object
     public ServerManager manager = new ServerManager();
 
@@ -95,4 +97,5 @@
 
         return null;
     }
+}
 }}}
