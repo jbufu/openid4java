@@ -1,4 +1,5 @@
 #summary Brief introduction to OpenID-enabling your webapp
+#labels Featured
 
 = Quick Start =
 
@@ -78,6 +79,5 @@ Receive the response at your webapp's ReturnURL and process it like this:
 == Where to go next? ==
 
 You can see all the above put together in the SampleConsumer class.
-
 
 
