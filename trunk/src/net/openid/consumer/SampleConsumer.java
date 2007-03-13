@@ -14,7 +14,9 @@ import net.openid.OpenIDException;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.io.IOException;
 
 /**
  * Sample Consumer (Relying Party) implementation.
@@ -30,7 +32,10 @@ public class SampleConsumer
     }
 
     // --- placing the authentication request ---
-    public String authRequest(String userSuppliedString, HttpSession session)
+    public String authRequest(String userSuppliedString,
+                              HttpServletRequest httpReq,
+                              HttpServletResponse httpResp)
+            throws IOException
     {
         try
         {
@@ -46,7 +51,7 @@ public class SampleConsumer
             DiscoveryInformation discovered = manager.associate(discoveries);
 
             // store the discovery information in the user's session
-            session.setAttribute("openid-disc", discovered);
+            httpReq.getSession().setAttribute("openid-disc", discovered);
 
             // obtain a AuthRequest message to be sent to the OpenID provider
             AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
@@ -61,12 +66,14 @@ public class SampleConsumer
             // attach the extension to the authentication request
             authReq.addExtension(fetch);
 
+
             if (! discovered.isVersion2() )
             {
                 // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
                 // The only method supported in OpenID 1.x
                 // redirect-URL usually limited ~2048 bytes
-                return authReq.getDestinationUrl(true);
+                httpResp.sendRedirect(authReq.getDestinationUrl(true));
+                return null;
             }
             else
             {
@@ -88,19 +95,18 @@ public class SampleConsumer
     }
 
     // --- processing the authentication response ---
-    public Identifier verifyResponse(HttpServletRequest httpReq, HttpSession session)
+    public Identifier verifyResponse(HttpServletRequest httpReq)
     {
         try
         {
-
             // extract the parameters from the authentication response
             // (which comes in as a HTTP request from the OpenID provider)
             ParameterList response =
                     new ParameterList(httpReq.getParameterMap());
 
             // retrieve the previously stored discovery information
-            DiscoveryInformation discovered =
-                    (DiscoveryInformation) session.getAttribute("openid-disc");
+            DiscoveryInformation discovered = (DiscoveryInformation)
+                    httpReq.getSession().getAttribute("openid-disc");
 
             // extract the receiving URL from the HTTP request
             StringBuffer receivingURL = httpReq.getRequestURL();
