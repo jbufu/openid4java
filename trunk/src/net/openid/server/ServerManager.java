@@ -705,7 +705,7 @@ public class ServerManager
      */
     public Message verify(ParameterList requestParams)
     {
-        _log.info("Processing verificatoin request...");
+        _log.info("Processing verification request...");
 
         boolean isVersion2 = true;
 
