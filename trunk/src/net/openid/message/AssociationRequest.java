@@ -284,14 +284,13 @@ public class AssociationRequest extends Message
             _log.warn("DH consumer public key not specified.");
             return false;
         }
-        else // no-enc session
+
+        // no-enc session
+        if (type.getHAlgorithm() == null && getDhGen() != null ||
+                getDhModulus() != null || getDhPublicKey() != null)
         {
-            if (getDhGen() != null || getDhModulus() != null ||
-                    getDhPublicKey() != null)
-            {
-                _log.warn("No-encryption session, but DH parameters specified.");
-                return false;
-            }
+            _log.warn("No-encryption session, but DH parameters specified.");
+            return false;
         }
 
         return true;
