@@ -27,7 +27,14 @@ public class DiffieHellmanSession
         "F75A2E27898B057F9891C2E27A639C3F29B60814581CD3B2CA3986D268370557" +
         "7D45C2E7E52DC81C7A171876E5CEA74B1448BFDFAF18828EFD2519F14E45E382" +
         "6634AF1949E5B535CC829A483B8A76223E5D490A257F05BDFF16F2FB22C583AB";
-    public static final long DEFAULT_GENERATOR = 2;
+    public static final String DEFAULT_MODULUS_BASE64 =
+        "ANz5OguIOXLsDhmYmsWizjEOHTdxfo2Vcbt2I3MYZuYe91ouJ4mLBX+YkcLiemOc" +
+        "Pym2CBRYHNOyyjmG0mg3BVd9RcLn5S3IHHoXGHblzqdLFEi/368Ygo79JRnxTkXj" +
+        "gmY0rxlJ5bU1zIKaSDuKdiI+XUkKJX8Fvf8W8vsixYOr";
+
+    public static final long   DEFAULT_GENERATOR = 2;
+    public static final String DEFAULT_GENERATOR_BASE64 = "Ag==";
+
     public static final String ALGORITHM = "DH";
     public static final String H_ALGORITHM_SHA1 = "SHA1";
     public static final String H_ALGORITHM_SHA256 = "SHA256";
