@@ -74,7 +74,7 @@ public class AssociationResponse extends Message
 
             setMacKeyEnc(dhSess.encryptMacKey(
                     assoc.getMacKey().getEncoded(),
-                    assocReq.getPublicKey() ));
+                    assocReq.getDhPublicKey() ));
         }
         else // no-encryption session, unecrypted MAC key
         {
