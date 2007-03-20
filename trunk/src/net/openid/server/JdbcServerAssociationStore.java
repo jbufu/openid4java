@@ -171,7 +171,8 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
 
             if (cnt == 1 && DEBUG)
                 _log.debug("Removed association, handle: " + handle);
-            else
+
+            if (cnt != 1)
                 _log.warn("Trying to remove handle: " + handle +
                           " from database; affected entries: " + cnt);
         }
