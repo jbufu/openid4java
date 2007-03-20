@@ -89,9 +89,15 @@ public class AssociationRequest extends Message
 
         if (dhSess != null )
         {
-            set("openid.dh_modulus", _dhSess.getModulus());
-            set("openid.dh_gen", _dhSess.getGenerator());
             set("openid.dh_consumer_public", _dhSess.getPublicKey());
+
+            if (! Long.toString(DiffieHellmanSession.DEFAULT_GENERATOR)
+                    .equals(_dhSess.getGenerator()))
+                set("openid.dh_gen", _dhSess.getGenerator());
+
+            if (! DiffieHellmanSession.DEFAULT_MODULUS_HEX
+                    .equals(_dhSess.getModulus()))
+                set("openid.dh_modulus", _dhSess.getModulus());
         }
     }
 
@@ -204,7 +210,11 @@ public class AssociationRequest extends Message
      */
     public String getDhModulus()
     {
-        return getParameterValue("openid.dh_modulus");
+        String modulus = getParameterValue("openid.dh_modulus");
+
+        return modulus != null ?
+                    modulus : hasParameter("openid.dh_consumer_public") ?
+                    DiffieHellmanSession.DEFAULT_MODULUS_HEX : null;
     }
 
     /**
@@ -213,15 +223,18 @@ public class AssociationRequest extends Message
      */
     public String getDhGen()
     {
-        return getParameterValue("openid.dh_gen");
+        String gen = getParameterValue("openid.dh_gen");
 
+        return gen != null ?
+                gen : hasParameter("openid.dh_consumer_public") ?
+                Long.toString(DiffieHellmanSession.DEFAULT_GENERATOR) : null;
     }
 
     /**
      * Gets the Relying Party's (consumer) Diffie-Hellman public key, or null
      * for messages with no-encryption sessions.
      */
-    public String getPublicKey()
+    public String getDhPublicKey()
     {
         return getParameterValue("openid.dh_consumer_public");
     }
@@ -266,19 +279,15 @@ public class AssociationRequest extends Message
         }
 
         // DH seesion parameters
-        if ( type.getHAlgorithm() != null) // DH session
+        if ( type.getHAlgorithm() != null && getDhPublicKey() == null)
         {
-            if (getDhGen() == null || getDhModulus() == null ||
-                    getPublicKey() == null)
-            {
-                _log.warn("DH session modulus, base or public key not specified.");
-                return false;
-            }
+            _log.warn("DH consumer public key not specified.");
+            return false;
         }
         else // no-enc session
         {
             if (getDhGen() != null || getDhModulus() != null ||
-                    getPublicKey() != null)
+                    getDhPublicKey() != null)
             {
                 _log.warn("No-encryption session, but DH parameters specified.");
                 return false;

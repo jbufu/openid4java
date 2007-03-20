@@ -104,7 +104,7 @@ public class AssociationError extends DirectError
         if (!super.isValid()) return false;
 
         return ASSOC_ERR.equals(getErrorCode()) &&
-                OPENID2_NS.equals(getParameter("ns"));
+                OPENID2_NS.equals(getParameterValue("ns"));
 
     }
 
