@@ -91,11 +91,11 @@ public class AssociationRequest extends Message
         {
             set("openid.dh_consumer_public", _dhSess.getPublicKey());
 
-            if (! Long.toString(DiffieHellmanSession.DEFAULT_GENERATOR)
+            if (DiffieHellmanSession.DEFAULT_GENERATOR_BASE64
                     .equals(_dhSess.getGenerator()))
                 set("openid.dh_gen", _dhSess.getGenerator());
 
-            if (! DiffieHellmanSession.DEFAULT_MODULUS_HEX
+            if (! DiffieHellmanSession.DEFAULT_MODULUS_BASE64
                     .equals(_dhSess.getModulus()))
                 set("openid.dh_modulus", _dhSess.getModulus());
         }
@@ -214,7 +214,7 @@ public class AssociationRequest extends Message
 
         return modulus != null ?
                     modulus : hasParameter("openid.dh_consumer_public") ?
-                    DiffieHellmanSession.DEFAULT_MODULUS_HEX : null;
+                    DiffieHellmanSession.DEFAULT_MODULUS_BASE64 : null;
     }
 
     /**
@@ -227,7 +227,7 @@ public class AssociationRequest extends Message
 
         return gen != null ?
                 gen : hasParameter("openid.dh_consumer_public") ?
-                Long.toString(DiffieHellmanSession.DEFAULT_GENERATOR) : null;
+                DiffieHellmanSession.DEFAULT_GENERATOR_BASE64 : null;
     }
 
     /**
