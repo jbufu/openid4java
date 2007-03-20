@@ -356,7 +356,7 @@ public class ServerManager
      */
     public Message associationResponse(ParameterList requestParams)
     {
-        boolean isVersion2 = true;
+        boolean isVersion2 = requestParams.hasParameter("openid.ns");
 
         _log.info("Processing association request...");
 
@@ -607,7 +607,8 @@ public class ServerManager
                             _prefAssocSessEnc.getAssociationType(),
                             _expireIn);
 
-                    _log.info("Generated private association; handle: " + handle);
+                    _log.info("Generated private association; handle: "
+                              + assoc.getHandle());
                 }
 
                 AuthSuccess response = AuthSuccess.createAuthSuccess(
@@ -738,7 +739,8 @@ public class ServerManager
             vrfyResp.setSignatureVerified(verified);
 
             String invalidateHandle = vrfyReq.getInvalidateHandle();
-            if (_sharedAssociations.load(invalidateHandle) == null)
+            if (invalidateHandle != null &&
+                    _sharedAssociations.load(invalidateHandle) == null)
             {
                 _log.info("Confirming shared association invalidate handle: "
                           + invalidateHandle);
