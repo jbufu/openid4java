@@ -68,6 +68,8 @@ public class FetchResponse extends AxMessage
         return resp;
     }
 
+    //todo: createFetchResponse(FetchRequest req, Map providedValues)
+    
     /**
      * Adds an attribute to the fetch response.
      *
