@@ -8,6 +8,9 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20070321:
+    - Added forward-proxy support for consumers.
+
 20070304:
     - Added logging.
 

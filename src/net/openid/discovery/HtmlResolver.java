@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import net.openid.util.HttpClientFactory;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
@@ -149,17 +151,9 @@ public class HtmlResolver
      */
     private String call(URL url, HtmlResult result) throws DiscoveryException
     {
-        HttpClient client = new HttpClient();
-        client.getParams().setParameter("http.protocol.max-redirects",
-                new Integer(_maxRedirects));
-        client.getParams().setParameter("http.protocol.allow-circular-redirects",
-                Boolean.TRUE);
-        client.getParams().setParameter("http.protocol.cookie-policy", 
+        HttpClient client = HttpClientFactory.getInstance(
+                _maxRedirects, Boolean.TRUE, _socketTimeout, _connTimeout,
                 CookiePolicy.IGNORE_COOKIES);
-
-        client.getParams().setSoTimeout(_socketTimeout);
-        client.getHttpConnectionManager()
-                .getParams().setConnectionTimeout(_connTimeout);
 
         GetMethod get = new GetMethod(url.toString());
         get.setFollowRedirects(true);

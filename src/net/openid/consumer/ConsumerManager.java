@@ -23,6 +23,7 @@ import net.openid.server.NonceGenerator;
 import net.openid.server.IncrementalNonceGenerator;
 import net.openid.server.RealmVerifier;
 import net.openid.OpenIDException;
+import net.openid.util.HttpClientFactory;
 
 import javax.crypto.spec.DHParameterSpec;
 import java.net.*;
@@ -153,14 +154,11 @@ public class ConsumerManager
      */
     public ConsumerManager() throws ConsumerException
     {
-        _httpClient = new HttpClient();
-
         // global httpclient configuration parameters
-        _httpClient.getParams().setParameter(
-                "http.protocol.allow-circular-redirects", Boolean.FALSE);
-        _httpClient.getParams().setParameter(
-                "http.protocol.cookie-policy", CookiePolicy.IGNORE_COOKIES);
-
+        _httpClient = HttpClientFactory.getInstance(
+                _maxRedirects, Boolean.FALSE, _socketTimeout, _connectTimeout,
+                CookiePolicy.IGNORE_COOKIES);
+        
         _realmVerifier = new RealmVerifier();
 
         if (Association.isHmacSha256Supported())
