@@ -286,8 +286,8 @@ public class AssociationRequest extends Message
         }
 
         // no-enc session
-        if (type.getHAlgorithm() == null && getDhGen() != null ||
-                getDhModulus() != null || getDhPublicKey() != null)
+        if (type.getHAlgorithm() == null && (getDhGen() != null ||
+                getDhModulus() != null || getDhPublicKey() != null) )
         {
             _log.warn("No-encryption session, but DH parameters specified.");
             return false;
