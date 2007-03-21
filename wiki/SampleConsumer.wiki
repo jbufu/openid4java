@@ -54,12 +54,6 @@ public class SampleConsumer
             // proxyProps.setProxyPort(8080);
             // HttpClientFactory.setProxyProperties(proxyProps);
 
-            // --- Forward proxy setup (only if needed) ---
-            // ProxyProperties proxyProps = new ProxyProperties();
-            // proxyProps.setProxyName("proxy.example.com");
-            // proxyProps.setProxyPort(8080);
-            // HttpClientFactory.setProxyProperties(proxyProps);
-
             // perform discovery on the user-supplied identifier
             List discoveries = manager.discover(userSuppliedString);
 
