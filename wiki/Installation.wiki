@@ -1,15 +1,21 @@
-#summary One-sentence summary of this page.
+#summary How to install the package
+#labels Phase-Deploy
 
-= Introduction =
+= Installing the package =
 
-Add your content here.
+The JAR files under the endorsed/ folder need to be copied under your environment's endorsed libraries folder. If you are running a web application under Apache Tomcat, this directory can be found at:
+{{{
+JAVA_HOME/lib/endorsed
+}}}
+or
+{{{
+CATALINA_HOME/common/endorsed
+}}}
 
+For other application servers or environments, please consult their documentation for configuring endorsed libraries.
 
-= Details =
+To make the library available to the web application the following
+need to be done:
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
-
+  * Copy lib/`*`.jar and java-openid-sxip-`*`.jar to your application's Java classpath
 
