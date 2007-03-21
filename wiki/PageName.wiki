@@ -1,0 +1,13 @@
+#summary Forward-proxy configuration for consumer sites / Relying Parties
+
+= Consumer Forward Proxy =
+
+If your Relying Party / consumer site needs to access the internet through a proxy, this is how the proxy access info is configured:
+
+{{{
+// --- Forward proxy setup (only if needed) ---
+ProxyProperties proxyProps = new ProxyProperties();
+proxyProps.setProxyName("proxy.example.com");
+proxyProps.setProxyPort(8080);
+HttpClientFactory.setProxyProperties(proxyProps);
+}}}
