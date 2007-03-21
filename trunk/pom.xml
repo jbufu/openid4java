@@ -26,6 +26,9 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<!-- NOTE: We don't need a groupId specification because the group is
+					org.apache.maven.plugins ...which is assumed by default.
+				-->
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<systemProperties>
@@ -47,21 +50,15 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- NOTE: We don't need a groupId specification because the group is
-					org.apache.maven.plugins ...which is assumed by default.
-				-->
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<descriptors>
-						<descriptor>bin.xml</descriptor>
-					</descriptors>
-					<!--
-						<descriptorRefs>
-						<descriptorRef>bin</descriptorRef>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
+					<descriptorRefs>
 						<descriptorRef>src</descriptorRef>
-						</descriptorRefs>
-					-->
+						<descriptorRef>bin</descriptorRef>
+						<descriptorRef>
+							jar-with-dependencies
+						</descriptorRef>
+					</descriptorRefs>
 				</configuration>
 			</plugin>
 		</plugins>
