@@ -12,6 +12,7 @@ import java.util.*;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
@@ -131,8 +132,9 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
             Date expDate = (Date) res.get("expdate");
 
             if (type == null || macKey == null || expDate == null)
-                throw new AssociationException("Unable to retrieve " +
-                        "association from data store for handle: " + handle);
+                throw new AssociationException("Invalid association data " +
+                        "retrived from database; cannot create Association " +
+                        "object for handle: " + handle);
 
             Association assoc;
 
@@ -145,16 +147,28 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
                         Base64.decodeBase64(macKey.getBytes() ), expDate);
 
             else
-                throw new AssociationException("Unknown association type: " + type);
+                throw new AssociationException("Invalid association type " +
+                        "retrieved from database: " + type);
 
             if (DEBUG)
                 _log.debug("Retrieved association from database, handle: " + handle);
 
             return assoc;
         }
-        catch (Exception e)
+        catch (AssociationException ase )
         {
-            _log.error("Error retrieving association from database.", e);
+            _log.error("Error rerieving association from database.", ase);
+            return null;
+        }
+        catch (IncorrectResultSizeDataAccessException rse)
+        {
+            _log.warn("Association not found in the database for handle: " + handle);
+            return null;
+        }
+        catch (DataAccessException dae)
+        {
+            _log.error("Error retrieving association from database, handle: "
+                       + handle, dae);
             return null;
         }
     }
