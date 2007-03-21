@@ -15,7 +15,6 @@ public class ProxyProperties
     protected String password;
     protected String proxyHostName;
     protected String userName;
-    protected String cookiePolicy;
 
     public ProxyProperties()
     {
@@ -90,16 +89,6 @@ public class ProxyProperties
     public void setUserName(String userName)
     {
         this.userName = userName;
-    }
-
-    public String getCookiePolicy()
-    {
-        return cookiePolicy;
-    }
-
-    public void setCookiePolicy(String cookiePolicy)
-    {
-        this.cookiePolicy = cookiePolicy;
     }
 }
 
