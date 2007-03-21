@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
+import net.openid.util.HttpClientFactory;
+
 /**
  * Yadis discovery protocol implementation.
  * <p>
@@ -205,18 +207,9 @@ public class YadisResolver
      */
     public YadisResult discover(String url)
     {
-        HttpClient client = new HttpClient();
-        client.getParams().setParameter("http.protocol.max-redirects",
-                new Integer(_maxRedirects));
-        client.getParams().setParameter("http.protocol.allow-circular-redirects",
-                Boolean.TRUE);
-        client.getParams().setParameter("http.protocol.cookie-policy",
+        HttpClient client = HttpClientFactory.getInstance(
+                _maxRedirects, Boolean.TRUE, _socketTimeout, _connTimeout,
                 CookiePolicy.IGNORE_COOKIES);
-        
-
-        client.getParams().setSoTimeout(_socketTimeout);
-        client.getHttpConnectionManager()
-                .getParams().setConnectionTimeout(_connTimeout);
 
         // initialize the result
         YadisResult result = new YadisResult();

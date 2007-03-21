@@ -43,6 +43,12 @@ public class SampleConsumer
             // the authentication responses from the OpenID provider
             String returnToUrl = "http://example.com/openid";
 
+            // --- Forward proxy setup (only if needed) ---
+            // ProxyProperties proxyProps = new ProxyProperties();
+            // proxyProps.setProxyName("proxy.example.com");
+            // proxyProps.setProxyPort(8080);
+            // HttpClientFactory.setProxyProperties(proxyProps);
+
             // perform discovery on the user-supplied identifier
             List discoveries = manager.discover(userSuppliedString);
 
