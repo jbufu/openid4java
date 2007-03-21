@@ -738,15 +738,20 @@ public class ServerManager
 
             vrfyResp.setSignatureVerified(verified);
 
-            String invalidateHandle = vrfyReq.getInvalidateHandle();
-            if (invalidateHandle != null &&
-                    _sharedAssociations.load(invalidateHandle) == null)
+            if (verified)
             {
-                _log.info("Confirming shared association invalidate handle: "
-                          + invalidateHandle);
+                String invalidateHandle = vrfyReq.getInvalidateHandle();
+                if (invalidateHandle != null &&
+                        _sharedAssociations.load(invalidateHandle) == null) {
+                    _log.info("Confirming shared association invalidate handle: "
+                            + invalidateHandle);
 
-                vrfyResp.setInvalidateHandle(invalidateHandle);
+                    vrfyResp.setInvalidateHandle(invalidateHandle);
+                }
             }
+            else
+                _log.error("Signature verification failed, handle: " + handle);
+
 
             _log.info("Responding with " + (verified? "positive" : "negative")
                       + " verification response");
