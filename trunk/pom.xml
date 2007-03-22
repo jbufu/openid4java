@@ -242,16 +242,16 @@
 			<version>1.2.14</version>
 		</dependency>
 		<dependency>
-			<groupId>openxri</groupId>
+			<groupId>org.openxri</groupId>
 			<artifactId>openxri-client</artifactId>
-			<version>1.0</version>
+			<version>1.0.1</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/openxri-client.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>openxri</groupId>
+			<groupId>org.openxri</groupId>
 			<artifactId>openxri-syntax</artifactId>
-			<version>1.0</version>
+			<version>1.0.1</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/openxri-syntax.jar</systemPath>
 		</dependency>
