@@ -88,11 +88,21 @@ public class UrlIdentifier implements Identifier
             String protocol = url.getProtocol().toLowerCase();
             String host = url.getHost().toLowerCase();
             int port = url.getPort();
-            String file = normalizeUrlEncoding(url.getFile());
+            String path = normalizeUrlEncoding(url.getPath());
+            String query = normalizeUrlEncoding(url.getQuery());
             String fragment = normalizeUrlEncoding(url.getRef());
 
             if (port == url.getDefaultPort())
                 port = -1;
+
+            // start building the 'file' part for the URL constructor...
+            String file = path;
+
+            if ("".equals(file))
+                file = "/";
+
+            if (query != null)
+                file = file + "?" + query;
 
             if (fragment != null)
                 file = file + "#" + fragment;

@@ -18,8 +18,8 @@ public class NormalizationTest extends TestCase
 
     public void testCaseNormalization() throws DiscoveryException
     {
-        Identifier identifier = Discovery.parseIdentifier("HTTP://EXAMPLE.COM");
-        assertEquals("http://example.com", identifier.getIdentifier());
+        Identifier identifier = Discovery.parseIdentifier("HTTP://EXAMPLE.COM/");
+        assertEquals("http://example.com/", identifier.getIdentifier());
 
         identifier = Discovery.parseIdentifier("HTTP://EXAMPLE.COM/A/B?Q=Z#END");
         assertEquals("http://example.com/A/B?Q=Z#END", identifier.getIdentifier());
@@ -49,12 +49,21 @@ public class NormalizationTest extends TestCase
         assertEquals("http://example.com/A/B?Q=Z#", identifier.getIdentifier());
 
         identifier = Discovery.parseIdentifier("https://example.com:443");
-        assertEquals("https://example.com", identifier.getIdentifier());
+        assertEquals("https://example.com/", identifier.getIdentifier());
     }
 
     public void testPathNormalization() throws DiscoveryException
     {
         Identifier identifier = Discovery.parseIdentifier("http://example.com//a/./b/../b/c/");
         assertEquals("http://example.com/a/b/c/", identifier.getIdentifier());
+
+        identifier = Discovery.parseIdentifier("http://example.com");
+        assertEquals("http://example.com/", identifier.getIdentifier());
+
+        identifier = Discovery.parseIdentifier("http://example.com?bla");
+        assertEquals("http://example.com/?bla", identifier.getIdentifier());
+
+        identifier = Discovery.parseIdentifier("http://example.com#bla");
+        assertEquals("http://example.com/#bla", identifier.getIdentifier());
     }
 }
