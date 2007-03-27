@@ -200,7 +200,7 @@ public class FetchRequest extends AxMessage
      */
     public Map getAttributes(boolean required)
     {
-        HashMap reqAttrs = new LinkedHashMap();
+        HashMap attributes = new LinkedHashMap();
 
         String level = required ? "required" : "if_available";
 
@@ -211,12 +211,25 @@ public class FetchRequest extends AxMessage
             for (int i = 0; i < values.length; i++)
             {
                 String alias = multivalDecode(values[i]);
-                reqAttrs.put(alias,
+                attributes.put(alias,
                         _parameters.getParameterValue("type." + alias));
             }
         }
 
-        return reqAttrs;
+        return attributes;
+    }
+
+    /**
+     * Gets all requested attributes (required and optional).
+     *
+     * @return      Map of attribute aliases -> attribute type URIs.
+     */
+    public Map getAttributes()
+    {
+        Map attributes = getAttributes(true);
+        attributes.putAll(getAttributes(false));
+
+        return attributes;
     }
 
     /**
