@@ -289,6 +289,8 @@ public class AuthSuccess extends Message
         if (DEBUG) _log.debug("Setting fields to be signed: " + toSign);
 
         set("openid.signed", toSign.toString());
+
+        //todo: if signature is alread set, recompute it
     }
 
     /**
@@ -331,6 +333,11 @@ public class AuthSuccess extends Message
         }
     }
 
+    public List getSignExtensions()
+    {
+        return _signExtensions;
+    }
+
     public void setSignature(String sig)
     {
         set("openid.sig", sig);
@@ -341,6 +348,11 @@ public class AuthSuccess extends Message
     public String getSignature()
     {
         return getParameterValue("openid.sig");
+    }
+
+    public String getSignList()
+    {
+        return getParameterValue("openid.signed");
     }
 
     /**

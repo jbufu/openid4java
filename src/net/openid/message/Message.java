@@ -388,6 +388,10 @@ public class Message
 
             set(paramName, param.getValue());
         }
+
+        if (this instanceof AuthSuccess &&
+                ((AuthSuccess)this).getSignExtensions().contains(extension) )
+            ((AuthSuccess)this).buildSignedList();
     }
 
     /**
