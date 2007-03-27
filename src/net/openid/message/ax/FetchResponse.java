@@ -68,8 +68,32 @@ public class FetchResponse extends AxMessage
         return resp;
     }
 
-    //todo: createFetchResponse(FetchRequest req, Map providedValues)
-    
+    /**
+     * Creates a FetchResponse from a FetchRequest message and the data released
+     * by the user.
+     *
+     * @param req               FetchRequest message.
+     * @param userData    Map<attribute_alias, attribute_values> with the
+     *                          data released by the user.
+     * @return                  Properly formed FetchcResponse.
+     */
+    public FetchResponse createFetchResponse(FetchRequest req, Map userData)
+    {
+        FetchResponse resp = new FetchResponse();
+
+        Map attributes = req.getAttributes();
+        Iterator iter = attributes.keySet().iterator();
+        while (iter.hasNext())
+        {
+            String alias = (String) iter.next();
+            String value = userData.get(alias) != null ?
+                            (String) userData.get(alias) : "";
+            resp.addAttribute(alias, (String) attributes.get(alias), value);
+        }
+
+        return null;
+    }
+
     /**
      * Adds an attribute to the fetch response.
      *
