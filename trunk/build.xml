@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="OpenID4Java Library" default="dist" basedir=".">
+<project name="OpenID4Java Library" default="jar" basedir=".">
 
     <property environment="env"/>
     <property file="local.properties"/>
@@ -24,18 +24,6 @@
 
     <target name="prepare" depends="create_paths">
         <mkdir dir="${build}"/>
-        <taskdef resource="svntask.properties" classpathref="classpath"/>
-        <svn>
-            <status path="." lastchangedrevisionproperty="svn.rev" />
-        </svn>
-        <property file="VERSION"/>
-        <condition value="${Version}" else="${component.ver}.${svn.rev}"
-                   property="version">
-            <equals arg1="" arg2="${svn.rev}" />
-        </condition>
-        <propertyfile file="VERSION">
-            <entry key="Version" value="${version}"/>
-        </propertyfile>
     </target>
 
     <target name="clean" depends="prepare"
@@ -76,7 +64,22 @@
         </jar>
     </target>
 
-    <target name="dist" depends="jar, apidoc"
+  <target name="version-update">
+    <taskdef resource="svntask.properties" classpathref="classpath"/>
+    <svn>
+        <status path="." lastchangedrevisionproperty="svn.rev" />
+    </svn>
+    <property file="VERSION"/>
+    <condition value="${Version}" else="${component.ver}.${svn.rev}"
+               property="version">
+        <equals arg1="" arg2="${svn.rev}" />
+    </condition>
+    <propertyfile file="VERSION">
+        <entry key="Version" value="${version}"/>
+    </propertyfile>
+  </target>
+
+  <target name="dist" depends="jar, apidoc, version-update"
             description="Builds distribution zip package">
         <move file="${build}/${component.name}.jar"
               tofile="${basedir}/${component.name}-${component.ver}.jar"/>
