@@ -55,6 +55,7 @@ public class Discovery
         eqAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
         eqAuthService.addType(Tags.SERVICE_AUTH_RES);
         eqAuthService.addURI(ROOT_DEF_EQ_URI);
+        eqRoot.setProviderID("xri://=");
         eqRoot.addService(eqAuthService);
 
         XRD atRoot = new XRD();
@@ -62,6 +63,7 @@ public class Discovery
         atAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
         atAuthService.addType(Tags.SERVICE_AUTH_RES);
         atAuthService.addURI(ROOT_DEF_AT_URI);
+        atRoot.setProviderID("xri://@");
         atRoot.addService(atAuthService);
 
         XRD bangRoot = new XRD();
@@ -69,6 +71,7 @@ public class Discovery
         bangAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
         bangAuthService.addType(Tags.SERVICE_AUTH_RES);
         bangAuthService.addURI(ROOT_DEF_BANG_URI);
+        bangRoot.setProviderID("xri://!");
         bangRoot.addService(bangAuthService);
 
         _xriResolver.setAuthority("=", eqRoot);
@@ -414,6 +417,10 @@ public class Discovery
         String parentNoPrefix = parent.startsWith("xri://") ?
                 parent.substring(6) : parent;
 
-        return parentNoPrefix.equals(providerId);
+        String providerIDNoPrefix = providerId.startsWith("xri://") ?
+
+        providerId.substring(6) : providerId;
+
+        return parentNoPrefix.equals(providerIDNoPrefix);
     }
 }
