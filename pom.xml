@@ -31,6 +31,7 @@
 				-->
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<skip>true</skip>
 					<systemProperties>
 						<property>
 							<name>YADIS_TEST_DATA</name>
