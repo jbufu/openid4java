@@ -1586,7 +1586,7 @@ public class ConsumerManager
 
             if ( ! opSpecific.equals(assertId) ||
                     ! service.isVersion2() ||
-                    ! service.getIdpEndpoint().equals(respEndpoint) )
+                    ! service.getIdpEndpoint().toString().equals(respEndpoint) )
                 continue;
 
             // keep the first endpoint that matches
