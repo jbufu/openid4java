@@ -390,7 +390,7 @@ public class Discovery
     {
         for (int i = 0; i < service.getNumTypes(); i++) {
             SEPType type = service.getTypeAt(i);
-            if(type.match(sVal)) return true;
+            if(type.match(sVal)) return true;                                                                               
         }
         return false;
 
@@ -418,8 +418,7 @@ public class Discovery
                 parent.substring(6) : parent;
 
         String providerIDNoPrefix = providerId.startsWith("xri://") ?
-
-        providerId.substring(6) : providerId;
+                providerId.substring(6) : providerId;
 
         return parentNoPrefix.equals(providerIDNoPrefix);
     }
