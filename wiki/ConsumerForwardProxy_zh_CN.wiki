@@ -1,0 +1,13 @@
+#summary OpenID 客户端的代理配置 / 一方依赖
+
+= 客户端代理配置 =
+
+如果你所依赖的一方 / OpenID 客户端站点需要通过代理访问互联网，这里是针对这方面的配置：
+
+{{{
+// --- Forward proxy setup (only if needed) ---
+ProxyProperties proxyProps = new ProxyProperties();
+proxyProps.setProxyName("proxy.example.com");
+proxyProps.setProxyPort(8080);
+HttpClientFactory.setProxyProperties(proxyProps);
+}}}

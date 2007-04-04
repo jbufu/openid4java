@@ -1,0 +1,43 @@
+#summary OpenID4Java 文档
+#labels Phase-Implementation
+
+= 文档 =
+
+目前有如下文档：
+
+== 应用程序接口（API） JavaDocs ==
+
+  * 请访问程序包分发网站：
+  http://code.sxip.com/openid4java/apidoc/
+ 
+
+  * 在程序包的目录 /apidoc 下
+
+
+  * 最新的应用程序接口（API） JavaDocs 可以从源码中通过如下方式生成：
+{{{
+ant apidoc
+}}}
+
+
+== Wiki ==
+
+Please consider contributing to this wiki
+
+== 代码示例 ==
+
+参见类 SampleConsumer 和 SampleServer。
+
+== OpenID4Java Google Group ==
+
+如果这里没有解决你的疑问，你可以到邮件列表寻求帮助：
+http://groups.google.com/group/openid4java
+
+
+
+
+
+
+
+
+

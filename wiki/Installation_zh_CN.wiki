@@ -1,0 +1,20 @@
+#summary 如何安装本开发包
+#labels Phase-Deploy
+
+= 安装 OpenID4Java 开发包 =
+
+复制目录 endorsed/ 下的 jar 到你的环境的信任类库目录。如果你是在一个 web 应用程序容器如 Apache Tomcat 下使用本开发包，这个目录在：
+{{{
+JAVA_HOME/lib/endorsed
+}}}
+或
+{{{
+CATALINA_HOME/common/endorsed
+}}}
+
+对于其他的应用程序服务器或者运行环境，请查看他们的文档来配置信任类库。
+
+如果你想在你的 web 应用程序中使用本开发包，你必须做如下操作：
+
+  * 复制 lib/`*`.jar 和 java-openid-sxip-`*`.jar 到你的应用程序的 Java classpath 下。
+

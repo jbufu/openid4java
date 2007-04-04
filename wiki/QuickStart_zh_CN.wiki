@@ -1,0 +1,83 @@
+#summary 在你的 web 应用程序中启用 OpenID 的简单介绍
+#labels Featured
+
+= Quick Start =
+
+一旦你[Installation_zh_CN 安装]本开发包并且获得了一个 OpenID 身份标识，你就可以开始了。将下面的代码加入到你的应用程序的认证部分：
+
+== 初始化一个 ConsumerManager 对象 ==
+{{{
+    public ConsumerManager _manager;
+
+    public SampleConsumer() throws ConsumerException
+    {
+        _manager = new ConsumerManager();
+    }
+}}}
+
+ConsumerManager 将替你完成所有的 OpenID 该做的事情。
+
+== 定义一个 ReturnURL（返回 URL） ==
+
+ReturnURL（返回 URL）是你的应用程序接受 OpenID 服务器的认证返回的页面路径。
+
+{{{
+    String _returnURL = "http://example.com/openid";
+}}}
+
+== 创建一个认证请求 ==
+
+{{{
+    // perform discovery on the user-supplied identifier
+    List discoveries = manager.discover(userSuppliedString);
+
+    // attempt to associate with the OpenID provider
+    // and retrieve one service endpoint for authentication
+    DiscoveryInformation discovered = manager.associate(discoveries);
+
+    // store the discovery information in the user's session for later use
+    session.setAttribute("discovered", discovered);
+
+    // obtain a AuthRequest message to be sent to the OpenID provider
+    AuthRequest authReq = manager.authenticate(discovered, _returnURL);
+}}}
+
+== 重定向用户到他们的 OpenID 服务器（提供商） ==
+{{{
+    httpResp.sendRedirect(authReq.getDestinationUrl(true));
+}}}
+
+== 核实 OpenID 服务器的认证返回 ==
+
+Receive the response at your webapp's ReturnURL and process it like this: 
+{{{
+    // extract the parameters from the authentication response
+    // (which comes in as a HTTP request from the OpenID provider)
+    ParameterList openidResp = new ParameterList(request.getParameterMap());
+
+    // retrieve the previously stored discovery information
+    DiscoveryInformation discovered = (DiscoveryInformation) session.getAttribute("discovered");
+
+    // extract the receiving URL from the HTTP request
+    StringBuffer receivingURL = request.getRequestURL();
+    String queryString = request.getQueryString();
+    if (queryString != null && queryString.length() > 0)
+        receivingURL.append("?").append(request.getQueryString());
+
+    // verify the response
+    VerificationResult verification = _consumerManager.verify(receivingURL.toString(), openidResp, discovered);
+
+    // examine the verification result and extract the verified identifier
+    Identifier verified = verification.getVerifiedId();
+
+    if (verified != null)
+        // success, use the verified identifier to identify the user
+    else
+        // OpenID authentication failed
+}}}
+
+== 接着该做什么？ ==
+
+你可以参考类 SampleConsumer。
+
+
