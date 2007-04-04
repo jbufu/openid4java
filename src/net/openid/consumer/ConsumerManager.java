@@ -1548,7 +1548,7 @@ public class ConsumerManager
 
             if ( opSpecific.equals(assertId) &&
                     discovered.isVersion2() &&
-                    discovered.getIdpEndpoint().equals(respEndpoint))
+                    discovered.getIdpEndpoint().toString().equals(respEndpoint))
             {
                 if (DEBUG) _log.debug(
                         "ClaimedID in the assertion was previously discovered: "
