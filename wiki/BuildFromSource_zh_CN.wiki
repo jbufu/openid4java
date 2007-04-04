@@ -1,20 +1,21 @@
-#summary How to build the package from source
-=Building the OpenID4Java package from source =
+#summary 如何从源码构建程序包
+=从源码构建 OpenID4Java 程序包 =
 
-== Requirements ==
+== 必要条件 ==
 
-  * Java 1.4 JVM (or higher)
-  * Ant (build script developed using v1.6.5)
+  * Java 1.4 JVM (或更高)
+  * Ant (版本 1.6.5)
 
-== Building the package ==
+== 构建类库程序包 ==
 
-To build the package from source Ant is also needed. The following build targets are provided:
+从源码构建本程序包需要使用 Ant。OpenID4Java 提供了如下的构建目标：
 
-  * Packages compiled class files into a JAR archive
+  * 打包成一个 jar 存档
 {{{
 ant jar
 }}}
-  * Builds distribution ZIP package
+  * 打包成发布形式的 zip 包
 {{{
 ant dist
 }}}
+
