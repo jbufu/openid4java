@@ -28,7 +28,7 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 
     * 接受 OpenID 服务器的认证返回（参照 ReturnURL），并验证返回信息。 
 
-去 [QuickStart] 看看，这里有一些完整的代码示例。
+去[QuickStart_zh_CN 快速上手]看看，这里有一些完整的代码示例。
 
 =下载=
 
@@ -44,3 +44,4 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 [Documentation_zh_CN 文档]
 
 使用示例和代码： [SampleConsumer] [SampleServer]
+
