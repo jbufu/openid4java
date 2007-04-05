@@ -5,8 +5,8 @@
 
 目前本开发包支持下面的规范：
 
-    * [!OpenID Authentication 2.0, draft 11 http://openid.net/specs/openid-authentication-2_0-11.html]
-    * [!OpenID Attribute Exchange 1.0, draft 4 http://openid.net/specs/openid-attribute-exchange-1_0-04.html]
+    * [http://openid.net/specs/openid-authentication-2_0-11.html !OpenID Authentication 2.0, draft 11 ]
+    * [http://openid.net/specs/openid-attribute-exchange-1_0-04.html !OpenID Attribute Exchange 1.0, draft 4]
 
 =OpenID 是什么？=
 
