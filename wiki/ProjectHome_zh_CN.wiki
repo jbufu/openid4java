@@ -1,50 +1,47 @@
 #summary OpenID 2.0 Java 开发包
+#labels Featured
 =这个开发包是什么？=
 
 这个开发包可以让你在你的 Java web 应用程序中启用 OpenID 支持。
 
 目前本开发包支持下面的规范：
 
-    * [http://openid.net/specs/openid-authentication-2_0-11.html !OpenID Authentication 2.0, draft 11 ]
-    * [http://openid.net/specs/openid-attribute-exchange-1_0-04.html !OpenID Attribute Exchange 1.0, draft 4]
+    * [http://openid.net/specs/openid-authentication-2_0-11.html OpenID Authentication 2.0, draft 11 ]
+    * [http://openid.net/specs/openid-attribute-exchange-1_0-04.html OpenID Attribute Exchange 1.0, draft 4]
 
 =OpenID 是什么？=
 
-OpenID starts with the concept that anyone can identify themselves on the Internet the same way websites do - with a URI. Since URIs are at the very core of Web architecture, they provide a solid foundation for user-centric identity.
+OpenID 基于如下一个思想：任何人都可以在互联网上用一个 URI 来认证他们自己。基于 URI 是 Web 体系结构的核心，提供了一个可靠的以用户为中心的认证基础。
 
-The first piece of the OpenID framework is authentication -- how you prove ownership of a URI. Today, websites require usernames and passwords to login, which means that many people use the same password everywhere. With OpenID Authentication, your username is your URI, and your password (or other credentials) stays safely stored on your OpenID Provider (which you can run yourself, or use a third-party identity provider).
+OpenID 框架的第一个部分就是认证——如何证实你对一个 URI 的拥有所有权。现在，一些网站使用用户名和密码来登录，也就是说很多人在很多地方使用相同的密码。如果使用 OpenID 认证，你的用户名就是你的 URI，而你的密码（或者是认证资料）则安全地存放在你的 OpenID 服务器（提供商）那里（你可以假设自己的 OpenID 服务器，或者使用第三方的认证提供商提供的服务）。
 
-For more information about the OpenID protocol please refer to the specification at: http://openid.net/specs.bml
-=Quick Start=
+想了解更多关于 OpenID 协议，请参考技术规范： http://openid.net/specs.bml
+=快速上手=
 
-To OpenID-enable a website - a Relying Party (RP) in OpenID terms, or Consumer at code-level, you need to do the following:
+要在你的站点启用 OpenID 支持 —— a Relying Party (RP) in OpenID terms, 或 Consumer at code-level, 你需要按照如下所示来做：
 
-    * Install the libraries 
+    * 安装被开发包
 
     * Instead (or as an alternative to) prompting the user for their username/password, obtain their OpenID (URL) identifier 
 
-    * Create an authentication request for this identifier, and redirect the user to their OpenID Provider (with this request) 
+    * 创建一个认证请求Create an authentication request for this identifier, and redirect the user to their OpenID Provider (with this request) 
 
-    * Receive the OpenID Provider's authentication response at your webapp's ReturnURL, and verify it 
+    * 接受 OpenID 服务器的认证返回（参照 ReturnURL），并验证返回信息。 
 
-Have a look at the QuickStart page for a code-level walk-through the above, and at the SampleConsumer class for the full code.
+去 [QuickStart] 看看，这里有一些完整的代码示例。
 
-The bulk of the action amounts to about a dozen lines of code.
-=Download=
+=下载=
 
-If you want a ready-built package, the latest version can be found on the OpenID4Java library distribution project page at: http://code.sxip.com
+如果你需要一个已经编译好了的二进制包，可以到下列网址下载 OpenID4Java 开发包： http://code.sxip.com
 
-You can also check out the code and build the package from source.
-=See also=
+你也可以从源码库中取出代码然后自己编译。
+=参见=
 
-[Requirements]
+[Requirements_zh_CN 必需环境]
 
-[Installation]
+[Installation_zh_CN 安装]
 
-[Documentation]
+[Documentation_zh_CN 文档]
 
-Sample useage / code: [SampleConsumer] [SampleServer]
-
-
-
+使用示例和代码： [SampleConsumer_zh_CN] [SampleServer_zh_CN]
 
