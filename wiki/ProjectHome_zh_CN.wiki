@@ -34,7 +34,7 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 
 如果你需要一个已经编译好了的二进制包，可以到下列网址下载 OpenID4Java 开发包： http://code.sxip.com
 
-你也可以从源码库中取出代码然后自己编译。
+你也可以从源码库中[http://code.google.com/p/openid4java/source 取出代码]然后自己[BuildFromSource_zh_CN 编译]。
 =参见=
 
 [Requirements_zh_CN 必需环境]
