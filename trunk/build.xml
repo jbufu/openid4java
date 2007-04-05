@@ -11,6 +11,9 @@
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
             </fileset>
+            <fileset dir="${endorsed.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
             <fileset dir="${libext.dir}">
                 <include name="**/*.jar"/>
             </fileset>
