@@ -1,4 +1,4 @@
-#summary OpenID 客户端的代理配置 / 一方依赖
+#summary OpenID 客户端的代理配置
 
 = 客户端代理配置 =
 
