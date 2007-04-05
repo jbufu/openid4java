@@ -43,5 +43,4 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 
 [Documentation_zh_CN 文档]
 
-使用示例和代码： [SampleConsumer_zh_CN] [SampleServer_zh_CN]
-
+使用示例和代码： [SampleConsumer] [SampleServer]
