@@ -20,7 +20,7 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 
 要在你的站点启用 OpenID 支持 —— a Relying Party (RP) in OpenID terms, 或 Consumer at code-level, 你需要按照如下所示来做：
 
-    * [Install_zh_CN 安装] OpenID4Java 开发包
+    * [Installation_zh_CN_zh_CN 安装] OpenID4Java 开发包
 
     * Instead (or as an alternative to) prompting the user for their username/password, obtain their OpenID (URL) identifier 
 
@@ -44,4 +44,3 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 [Documentation_zh_CN 文档]
 
 使用示例和代码： [SampleConsumer] [SampleServer]
-
