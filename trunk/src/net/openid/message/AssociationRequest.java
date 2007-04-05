@@ -91,13 +91,15 @@ public class AssociationRequest extends Message
         {
             set("openid.dh_consumer_public", _dhSess.getPublicKey());
 
-            if (DiffieHellmanSession.DEFAULT_GENERATOR_BASE64
-                    .equals(_dhSess.getGenerator()))
-                set("openid.dh_gen", _dhSess.getGenerator());
+            // send both diffie-hellman generator and modulus if either are not the default values
+            // (this meets v1.1 spec and is compatible with v2.0 spec)
 
-            if (! DiffieHellmanSession.DEFAULT_MODULUS_BASE64
-                    .equals(_dhSess.getModulus()))
+            if (!DiffieHellmanSession.DEFAULT_GENERATOR_BASE64.equals(_dhSess.getGenerator())
+                    || !DiffieHellmanSession.DEFAULT_MODULUS_BASE64.equals(_dhSess.getModulus()))
+            {
+                set("openid.dh_gen", _dhSess.getGenerator());
                 set("openid.dh_modulus", _dhSess.getModulus());
+            }
         }
     }
 
