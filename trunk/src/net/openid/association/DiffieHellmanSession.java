@@ -36,8 +36,8 @@ public class DiffieHellmanSession
     public static final String DEFAULT_GENERATOR_BASE64 = "Ag==";
 
     public static final String ALGORITHM = "DH";
-    public static final String H_ALGORITHM_SHA1 = "SHA1";
-    public static final String H_ALGORITHM_SHA256 = "SHA256";
+    public static final String H_ALGORITHM_SHA1 = "SHA-1";
+    public static final String H_ALGORITHM_SHA256 = "SHA-256";
 
     private AssociationSessionType _type;
     private DHParameterSpec _dhParameterSpec;
