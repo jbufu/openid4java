@@ -22,9 +22,9 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 
     * [Installation_zh_CN 安装] OpenID4Java 开发包
 
-    * Instead (or as an alternative to) prompting the user for their username/password, obtain their OpenID (URL) identifier 
+    * 获取用户的 OpenID（URL）标识而不是询问他们用户名／密码对 
 
-    * 创建一个认证请求Create an authentication request for this identifier, and redirect the user to their OpenID Provider (with this request) 
+    * 为指定的身份标识创建一个认证请求，并重定向到用户的 OpenID 服务器（提供商）
 
     * 接受 OpenID 服务器的认证返回（参照 ReturnURL），并验证返回信息。 
 
