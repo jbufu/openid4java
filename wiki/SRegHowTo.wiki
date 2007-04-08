@@ -53,7 +53,7 @@ if (authReq.hasExtension(SRegMessage.OPENID_NS_SREG))
 {{{
 if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
 {
-    MessageExtension ext = authSuccess.getExtension(AxMessage.OPENID_NS_SREG);
+    MessageExtension ext = authSuccess.getExtension(SRegMessage.OPENID_NS_SREG);
 
     if (ext instance of SRegResponse)
     {
@@ -65,7 +65,6 @@ if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
     }
 }
 }}}
-
 
 
 
