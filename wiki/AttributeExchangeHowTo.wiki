@@ -1,0 +1,53 @@
+#summary How to transfer attributes using the Attribute Exchange extension.
+
+= Attribute Exchange HowTo =
+
+
+== Relying Party sends a FetchRequest ==
+
+{{{
+FetchRequest fetch = FetchRequest.createFetchRequest();
+fetch.addAttribute("FirstName", "http://schema.openid.net/namePerson/first", true);
+fetch.addAttribute("LastName", "http://schema.openid.net/namePerson/last", true);
+fetch.addAttribute("Email", "http://schema.openid.net/contact/email", true);
+// wants up to three email addresses
+fetch.setCount("Email", 3);
+AuthRequest req = _consumerManager.authenticate(discovered, return_to);
+req.addExtension(fetch);
+}}}
+
+== OpenID Provider receives a FetchRequest ==
+{{{
+...
+}}}
+
+
+== OpenID Provider sends a FetchResponse ==
+{{{
+...
+}}}
+
+
+
+== Relying Party receives a FetchResponse ==
+{{{
+if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
+{
+    MessageExtension ext = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+
+    if (ext instance of FetchResponse)
+    {
+        FetchResponse fetchResp = (FetchResponse) ext;
+        
+        String firstName = fetcResp.getAttributeValue("FirstName");
+        String lastName = fetchResp.getAttributeValue("LastName");
+        
+        // can have multiple values
+        List emails = fetchResp.getAttributeValues("Email");
+    }
+    else if (ext instance of StoreResponse)
+    {
+        ...
+    }
+}
+}}}
