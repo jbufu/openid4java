@@ -2,78 +2,97 @@
  * Copyright 2006-2007 Sxip Identity Corporation
  */
 
-package net.openid.message.ax;
+package net.openid.message.sreg;
 
 import net.openid.message.*;
 import org.apache.log4j.Logger;
 
 /**
- * Base class for the Attribute Exchange implementation.
+ * Base class for the Simple Registration implementation.
  * <p>
  * Encapsulates:
  * <ul>
- * <li> the Type URI that identifies the Attribute Exchange extension
+ * <li> the Type URI that identifies the Simple Registration extension
  * <li> a list of extension-specific parameters, with the
  * openid.<extension_alias> prefix removed
  * <li> methods for handling the extension-specific support of parameters with
  * multpile values
  * </ul>
  *
+ * Considering that:
+ * <ul>
+ * <li>SREG 1.0 and SREG 1.1 use the same type URI
+ * ("http://openid.net/sreg/1.0") in XRDS documents</li>
+ * <li>The only differences between the two are the hardcoded "sreg" extension
+ * alias in SREG1.0 and the openid.ns.<ext_alias> namespace declaration
+ * in SREG1.1</li>
+ * </ul>
+ *
+ * Support for Simple Registration is implemented as follows:
+ * <ul>
+ * <li>Both SREG1.0 and SREG1.1 are implemented using the same extension
+ * framework</li>
+ * <li>In OpenID2 messages only SREG1.1 is accepted, i.e. the namespace
+ * declaration (openid.ns.<ext_alias>) MUST be present</li>
+ * <li>For seamless inteoperation, the extension alias is forced to "sreg" for
+ * OpenID 2 messages / SREG1.1</li>
+ * </ul>
+ *
  * @see Message MessageExtension
  * @author Marius Scurtescu, Johnny Bufu
  */
-public class AxMessage implements MessageExtension, MessageExtensionFactory
+public class SRegMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Logger _log = Logger.getLogger(AxMessage.class);
+    private static Logger _log = Logger.getLogger(SRegMessage.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**
-     * The Attribute Exchange Type URI.
+     * The Simple Registration Type URI.
      */
-    public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0-draft4";
+    public static final String OPENID_NS_SREG = "http://openid.net/sreg/1.0";
 
     /**
-     * The Attribute Exchange extension-specific parameters.
+     * The Simple Registration extension-specific parameters.
      * <p>
      * The openid.<extension_alias> prefix is not part of the parameter names
      */
     protected ParameterList _parameters;
 
     /**
-     * Constructs an empty (no parameters) Attribute Exchange extension.
+     * Constructs an empty (no parameters) Simple Registration extension.
      */
-    public AxMessage()
+    public SRegMessage()
     {
         _parameters = new ParameterList();
 
-        if (DEBUG) _log.debug("Created empty AXMessage.");
+        if (DEBUG) _log.debug("Created empty SRegMessage.");
     }
 
     /**
-     * Constructs an Attribute Exchange extension with a specified list of
+     * Constructs an Simple Registration extension with a specified list of
      * parameters.
      * <p>
      * The parameter names in the list should not contain the
      * openid.<extension_alias>.
      */
-    public AxMessage(ParameterList params)
+    public SRegMessage(ParameterList params)
     {
         _parameters = params;
 
         if (DEBUG)
-            _log.debug("Created AXMessage from parameter list:\n" + params);
+            _log.debug("Created SRegMessage from parameter list:\n" + params);
     }
 
     /**
-     * Gets the Type URI that identifies the Attribute Exchange extension.
+     * Gets the Type URI that identifies the Simple Registration extension.
      */
     public String getTypeUri()
     {
-        return OPENID_NS_AX;
+        return OPENID_NS_SREG;
     }
 
     /**
-     * Gets ParameterList containing the Attribute Exchange extension-specific
+     * Gets ParameterList containing the Simple Registration extension-specific
      * parameters.
      * <p>
      * The openid.<extension_alias> prefix is not part of the parameter names,
@@ -137,7 +156,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
-     * Attribute exchange doesn't implement authentication services.
+     * Simple Registration doesn't implement authentication services.
      *
      * @return false
      */
@@ -147,10 +166,10 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
-     * Instantiates the apropriate Attribute Exchange object (fetch / store -
-     * request / response) for the supplied parameter list.
+     * Instantiates the apropriate Simple Registration object
+     * (request / response) for the supplied parameter list.
      *
-     * @param parameterList         The Attribute Exchange specific parameters
+     * @param parameterList         The Simple Registration specific parameters
      *                              (without the openid.<ext_alias> prefix)
      *                              extracted from the openid message.
      * @param isRequest             Indicates whether the parameters were
@@ -158,32 +177,20 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
      *                              or from an OpenID response.
      * @return                      MessageExtension implementation for
      *                              the supplied extension parameters.
-     * @throws MessageException     If a Attribute Exchange object could not be
+     * @throws MessageException     If a Simple Registration object could not be
      *                              instantiated from the supplied parameter list.
      */
     public MessageExtension getExtension(
             ParameterList parameterList, boolean isRequest)
             throws MessageException
     {
-        String axMode = null;
-        if (parameterList.hasParameter("mode"))
-        {
-            axMode = parameterList.getParameterValue("mode");
+        if ( parameterList.hasParameter("required") ||
+             parameterList.hasParameter("optional"))
 
-            if ("fetch_request".equals(axMode))
-                return FetchRequest.createFetchRequest(parameterList);
+            return SRegRequest.createSRegRequest(parameterList);
 
-            else if ("fetch_response".equals(axMode))
-                return FetchResponse.createFetchResponse(parameterList);
+        else
+            return SRegResponse.createSRegResponse(parameterList);
 
-            else if ("store_request".equals(axMode))
-                return StoreRequest.createStoreRequest(parameterList);
-
-            else if ("store_response".equals(axMode))
-                return StoreResponse.createStoreResponse(parameterList);
-        }
-
-        throw new MessageException("Invalid value for attribute exchange mode: "
-                                   + axMode);
     }
 }
