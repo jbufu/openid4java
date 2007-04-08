@@ -1,5 +1,4 @@
 #summary 在你的 web 应用程序中启用 OpenID 的简单介绍
-#labels Featured
 
 = Quick Start =
 
@@ -79,5 +78,4 @@ Receive the response at your webapp's ReturnURL and process it like this:
 == 接着该做什么？ ==
 
 你可以参考类 SampleConsumer。
-
 
