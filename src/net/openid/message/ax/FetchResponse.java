@@ -75,7 +75,7 @@ public class FetchResponse extends AxMessage
      * @param req               FetchRequest message.
      * @param userData    Map<attribute_alias, attribute_values> with the
      *                          data released by the user.
-     * @return                  Properly formed FetchcResponse.
+     * @return                  Properly formed FetchResponse.
      */
     public FetchResponse createFetchResponse(FetchRequest req, Map userData)
     {

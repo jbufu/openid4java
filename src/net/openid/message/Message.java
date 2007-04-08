@@ -5,6 +5,7 @@
 package net.openid.message;
 
 import net.openid.message.ax.AxMessage;
+import net.openid.message.sreg.SRegMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -45,6 +46,7 @@ public class Message
     static
     {
         _extensionFactories.put(AxMessage.OPENID_NS_AX, AxMessage.class);
+        _extensionFactories.put(SRegMessage.OPENID_NS_SREG, SRegMessage.class);
     }
 
     protected Message()
@@ -62,13 +64,27 @@ public class Message
 
         //build the extension list when creating a message from a param list
         Iterator iter = _params.getParameters().iterator();
+
+        // simple registration is a special case; we support only:
+        // SREG1.0 (no namespace, "sreg" alias hardcoded) in OpenID1 messages
+        // SREG1.1 (namespace, any possible alias) in OpenID2 messages
+        boolean hasSReg10 = false;
+
         while (iter.hasNext())
         {
             String key = ((Parameter) iter.next()).getKey();
             if (key.startsWith("openid.ns.") && key.length() > 10)
                 _extAliases.put(_params.getParameter(key).getValue(),
                         key.substring(10));
+
+            if (key.startsWith("openid.sreg."))
+                hasSReg10 = true;
         }
+
+        // only do the workaround for OpenID1 messages
+        if ( hasSReg10 && ! hasParameter("openid.ns") )
+            _extAliases.put(SRegMessage.OPENID_NS_SREG, "sreg");
+
         _extCounter = _extAliases.size();
     }
 
@@ -231,8 +247,38 @@ public class Message
         return allParams.toString();
     }
 
+    /**
+     * Gets the URL where the message should be sent, where applicable.
+     * Null for received messages.
+     *
+     * @param   httpGet     If true, the wwwFormEncoding() is appended to the
+     *                      destination URL; the return value should be used
+     *                      with a GET-redirect.
+     *                      If false, the verbatim destination URL is returned,
+     *                      which should be used with a FORM POST redirect.
+     *
+     * @see #wwwFormEncoding()
+     */
+    public String getDestinationUrl(boolean httpGet)
+    {
+        if (_destinationUrl == null)
+            throw new IllegalStateException("Destination URL not set; " +
+                    "is this a received message?");
+
+        if (httpGet)  // append wwwFormEncoding to the destination URL
+        {
+            boolean hasQuery = _destinationUrl.indexOf("?") > 0;
+            String initialChar = hasQuery ? "&" : "?";
+
+            return _destinationUrl + initialChar + wwwFormEncoding();
+        }
+        else  // should send the keyValueFormEncoding in POST data
+            return _destinationUrl;
+    }
+
 
     // ------------ extensions implementation ------------
+
     /**
      * Adds a new extension factory.
      *
@@ -299,6 +345,25 @@ public class Message
     }
 
     /**
+     * Returns true if the message has parameters for the specified
+     * extension type URI.
+     *
+     * @param typeUri       The URI that identifies the extension.
+     */
+    public boolean hasExtension(String typeUri)
+    {
+        return _extAliases.containsKey(typeUri);
+    }
+
+    /**
+     * Gets a set of extension Type URIs that are present in the message.
+     */
+    public Set getExtensions()
+    {
+        return _extAliases.keySet();
+    }
+
+    /**
      * Retrieves the extension alias that will be used for the extension
      * identified by the supplied extension type URI.
      * <p>
@@ -312,43 +377,6 @@ public class Message
     public String getExtensionAlias(String extensionTypeUri)
     {
         return (String) _extAliases.get(extensionTypeUri);
-    }
-
-    /**
-     * Gets a set of extension Type URIs that are present in the message.
-     */
-    public Set getExtensions()
-    {
-        return _extAliases.keySet();
-    }
-
-    /**
-     * Gets the URL where the message should be sent, where applicable.
-     * Null for received messages.
-     *
-     * @param   httpGet     If true, the wwwFormEncoding() is appended to the
-     *                      destination URL; the return value should be used
-     *                      with a GET-redirect.
-     *                      If false, the verbatim destination URL is returned,
-     *                      which should be used with a FORM POST redirect.
-     *
-     * @see #wwwFormEncoding()
-     */
-    public String getDestinationUrl(boolean httpGet)
-    {
-        if (_destinationUrl == null)
-            throw new IllegalStateException("Destination URL not set; " +
-                    "is this a received message?");
-
-        if (httpGet)  // append wwwFormEncoding to the destination URL
-        {
-            boolean hasQuery = _destinationUrl.indexOf("?") > 0;
-            String initialChar = hasQuery ? "&" : "?";
-
-            return _destinationUrl + initialChar + wwwFormEncoding();
-        }
-        else  // should send the keyValueFormEncoding in POST data
-            return _destinationUrl;
     }
 
     /**
@@ -369,6 +397,11 @@ public class Message
             throw new MessageException("Extension already present: " + typeUri);
 
         String alias = "ext" + Integer.toString(++ _extCounter);
+
+        // use the hardcoded "sreg" alias for SREG, for seamless interoperation
+        // between SREG10/OpenID1 and SREG11/OpenID2
+        if (SRegMessage.OPENID_NS_SREG.equals(typeUri))
+            alias = "sreg";
 
         _extAliases.put(typeUri, alias);
 
@@ -433,17 +466,6 @@ public class Message
         }
 
         return extension;
-    }
-
-    /**
-     * Returns true if the message has parameters for the specified
-     * extension type URI.
-     *
-     * @param typeUri       The URI that identifies the extension.
-     */
-    public boolean hasExtension(String typeUri)
-    {
-        return _extAliases.containsKey(typeUri);
     }
 
     /**

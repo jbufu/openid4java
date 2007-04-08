@@ -24,7 +24,6 @@
     - OpenID Signed Assertions 1.0
     - OpenID Authentication Age 1.0
     - OpenID Relying Party Identity 1.0
-    - Simple Registration
 
   - Normalization : review XRI parsing to mach the latest spec / XRI syntax 2.1
     (when when syntax 2.1 goes out)
@@ -34,8 +33,6 @@
     - review affected message validation logic
 
   - Compatibility mode - check/enforce limits defined in v1
-
-  - Allow extensions in openid 1 messages?
 
   --> Nice to have, but not essential:
 
