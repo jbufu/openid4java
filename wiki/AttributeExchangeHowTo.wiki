@@ -7,11 +7,14 @@
 
 {{{
 FetchRequest fetch = FetchRequest.createFetchRequest();
+
 fetch.addAttribute("FirstName", "http://schema.openid.net/namePerson/first", true);
 fetch.addAttribute("LastName", "http://schema.openid.net/namePerson/last", true);
 fetch.addAttribute("Email", "http://schema.openid.net/contact/email", true);
+
 // wants up to three email addresses
 fetch.setCount("Email", 3);
+
 AuthRequest req = _consumerManager.authenticate(discovered, return_to);
 req.addExtension(fetch);
 }}}
