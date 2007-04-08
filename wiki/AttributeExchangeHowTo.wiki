@@ -21,16 +21,37 @@ req.addExtension(fetch);
 
 == OpenID Provider receives a FetchRequest ==
 {{{
-...
-}}}
+if (authReq.hasExtension(AxMessage.OPENID_NS_AX))
+{
+    Extension ext = authReq.getExtension(AxMessage.OPENID_NS_AX)
 
+    if (ext instance of FetchRequest)
+    {
+        FetchRequest fetchReq = (FetchRequest) ext;
+        Map required = fetchReq.getAttributes(true);
+        Map optional = fetchReq.getAttributes(false);
+        // prompt the user
+    }
+    else if (ext instance of StoreRequest)
+    {
+        ...
+    }
+}
+}}}
 
 == OpenID Provider sends a FetchResponse ==
 {{{
-...
+    // data released by the user
+    Map userData = new HashMap();
+    //userData.put("Email", "user@example.com");
+
+    FetchResponse fetchResp = FetchResponse.createFetchResponse(fetchReq, userData);
+
+    // (alternatively) manually add attribute values
+    fetchResp.addAttribute("email", "http://schema.openid.net/contact/email", "user@example.com");
+
+    authSuccess.addExtension(fetchResp);
 }}}
-
-
 
 == Relying Party receives a FetchResponse ==
 {{{
@@ -54,3 +75,4 @@ if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
     }
 }
 }}}
+
