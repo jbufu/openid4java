@@ -154,6 +154,8 @@ public class FetchResponse extends AxMessage
         return values;
     }
 
+    //todo: public String getAttributeValue(String alias)
+
     /**
      * Gets a list of attribute aliases.
      */
