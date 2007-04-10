@@ -7,10 +7,11 @@
 
     * [http://openid.net/specs/openid-authentication-2_0-11.html OpenID Authentication 2.0, draft 11 ]
     * [http://openid.net/specs/openid-attribute-exchange-1_0-04.html OpenID Attribute Exchange 1.0, draft 4]
+    * [http://openid.net/specs/openid-simple-registration-extension-1_0.html OpenID Simple Registration 1.0] and [http://openid.net/specs/openid-simple-registration-extension-1_1-01.html 1.1]
 
 =OpenID 是什么？=
 
-OpenID 基于如下一个思想：任何人都可以在互联网上用一个 URI 来认证他们自己。基于 URI 是 Web 体系结构的核心，提供了一个可靠的以用户为中心的认证基础。
+OpenID 基于如下思想：任何人都可以在互联网上用一个 URI 来认证他们自己。基于 URI 是 Web 体系结构的核心，提供了一个可靠的以用户为中心的认证基础。
 
 OpenID 框架的第一个部分就是认证——如何证实你对一个 URI 的拥有所有权。现在，一些网站使用用户名和密码来登录，也就是说很多人在很多地方使用相同的密码。如果使用 OpenID 认证，你的用户名就是你的 URI，而你的密码（或者是认证资料）则安全地存放在你的 OpenID 服务器（提供商）那里（你可以假设自己的 OpenID 服务器，或者使用第三方的认证提供商提供的服务）。
 
@@ -29,6 +30,14 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 
 去[QuickStart_zh_CN 快速上手]看看，这里有一些完整的代码示例。
 
+=一个简单的例子=
+在源码的 samples/simple-openid/ 下有一个非常简单的 OpenID 服务端和客户端的例子。使用下面的 maven 命令来快速运行它：
+{{{
+mvn jetty:run
+}}}
+然后访问 http://localhost:8080/simple-openid/
+要了解更多详细信息可以参考这个目录下的README.txt。
+
 =下载=
 
 如果你需要一个已经编译好了的二进制包，可以到下列网址下载 OpenID4Java 开发包： http://code.sxip.com
@@ -43,3 +52,5 @@ OpenID 框架的第一个部分就是认证——如何证实你对一个 URI �
 [Documentation_zh_CN 文档]
 
 使用示例和代码： [SampleConsumer] [SampleServer]
+
+
