@@ -1,14 +1,14 @@
 <%@ page session="true" %>
-<%@ page import="java.util.Map,java.util.Iterator,net.openid.discovery.Identifier, net.openid.discovery.DiscoveryInformation, net.openid.message.ax.FetchRequest, net.openid.message.ax.FetchResponse, net.openid.message.ax.AxMessage,  net.openid.message.*, net.openid.OpenIDException, java.util.List, java.io.IOException, javax.servlet.http.HttpSession, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, net.openid.consumer.ConsumerManager, net.openid.consumer.InMemoryConsumerAssociationStore,net.openid.consumer.InMemoryNonceVerifier" %>
+<%@ page import="java.util.Map,java.util.Iterator,org.openid4java.discovery.Identiforg.openid4java.discoveryovery.DiscoveryInformation, org.openid4java.message.ax.FetchRequorg.openid4java.messagessage.ax.Fetchorg.openid4java.messageid.message.ax.AxMessage,  org.openid4java.message.*, org.openid4java.OpenIDException, java.util.List, java.io.IOException, javax.servlet.http.HttpSession, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.openid4java.consumer.ConsumerManaorg.openid4java.consumersumer.InMemoryConsumerAssociaorg.openid4java.consumerd.consumer.InMemoryNonceVerifier" %>
 
 <%
     // README:
     // Set the returnToUrl string to the appropriate value for this JSP
-    // Since you may be deployed behind apache, etc, the jsp has no real idea what the 
-    // absolute URI is to get back here. 
-    
+    // Since you may be deployed behind apache, etc, the jsp has no real idea what the
+    // absolute URI is to get back here.
+
     Object o = pageContext.getAttribute("consumermanager", PageContext.APPLICATION_SCOPE);
-    if (o == null) 
+    if (o == null)
     {
         ConsumerManager newmgr=new ConsumerManager();
         newmgr.setAssociations(new InMemoryConsumerAssociationStore());
@@ -17,14 +17,14 @@
     }
     ConsumerManager manager=(ConsumerManager) pageContext.getAttribute("consumermanager", PageContext.APPLICATION_SCOPE);
     String openid=request.getParameter("openid");
-    
+
         try
         {
             // determine a return_to URL where your application will receive
             // the authentication responses from the OpenID provider
-            // YOU SHOULD CHANGE THIS TO GO TO THE 
+            // YOU SHOULD CHANGE THIS TO GO TO THE
             String returnToUrl = "http://localhost:8080/simple-openid/consumer_returnurl.jsp";
-            
+
 
             // perform discovery on the user-supplied identifier
             List discoveries = manager.discover(openid);
@@ -67,7 +67,7 @@
 
                 // build a HTML FORM with the message parameters
                 //authReq.getParameterMap();
-                
+
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -79,10 +79,10 @@
 <%
                 Map pm=authReq.getParameterMap();
                 Iterator keyit=pm.keySet().iterator();
-        
+
                 Object key;
                 Object value;
-        
+
                 while (keyit.hasNext())
                 {
                     key=keyit.next();
