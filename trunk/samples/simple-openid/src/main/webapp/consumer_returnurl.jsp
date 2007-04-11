@@ -1,8 +1,8 @@
-<%@ page session="true" %> 
-<%@ page import="net.openid.discovery.Identifier, net.openid.discovery.DiscoveryInformation, net.openid.message.ax.FetchRequest, net.openid.message.ax.FetchResponse, net.openid.message.ax.AxMessage,  net.openid.message.*, net.openid.OpenIDException, java.util.List, java.io.IOException, javax.servlet.http.HttpSession, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, net.openid.consumer.ConsumerManager, net.openid.consumer.InMemoryConsumerAssociationStore, net.openid.consumer.VerificationResult" %>
+<%@ page session="true" %>
+<%@ page import="org.openid4java.discovery.Identifier, org.openid4java.discovery.DiscoveryInformation, org.openid4java.message.ax.FetchRequest, org.openid4java.message.ax.FetchRespoorg.openid4java.messagessage.ax.Axorg.openid4java.messageid.message.*, org.openid4java.OpenIDException, java.util.List, java.io.IOException, javax.servlet.http.HttpSession, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.openid4java.consumer.ConsumerManager, org.openid4java.consumer.InMemoryConsumerAssociationStore, org.openid4java.consumer.VerificationResult" %>
 
 <%
- 
+
     ConsumerManager manager=(ConsumerManager) pageContext.getAttribute("consumermanager", PageContext.APPLICATION_SCOPE);
 try
         {
@@ -28,7 +28,7 @@ try
             VerificationResult verification = manager.verify(
                     receivingURL.toString(),
                     responselist, discovered);
-            
+
             // examine the verification result and extract the verified identifier
             Identifier verified = verification.getVerifiedId();
             if (verified != null)
@@ -54,5 +54,5 @@ try
 <%
             // present error to the user
         }
-        
+
 %>
