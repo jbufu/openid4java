@@ -44,7 +44,7 @@
 						<property>
 							<name>TEST_DATA</name>
 							<value>
-								${basedir}/test/src/net/openid/
+								${basedir}/test/src/org/openid4java/
 							</value>
 						</property>
 					</systemProperties>
