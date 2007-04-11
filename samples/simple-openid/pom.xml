@@ -20,7 +20,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.openid</groupId>
+      <groupId>org.openid4java</groupId>
       <artifactId>java-openid-sxip</artifactId>
       <version>0.9.1</version>
       <scope>system</scope>
