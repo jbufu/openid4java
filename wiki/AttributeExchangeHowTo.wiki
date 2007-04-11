@@ -24,16 +24,16 @@ req.addExtension(fetch);
 {{{
 if (authReq.hasExtension(AxMessage.OPENID_NS_AX))
 {
-    Extension ext = authReq.getExtension(AxMessage.OPENID_NS_AX)
+    MessageExtension ext = authReq.getExtension(AxMessage.OPENID_NS_AX)
 
-    if (ext instance of FetchRequest)
+    if (ext instanceof FetchRequest)
     {
         FetchRequest fetchReq = (FetchRequest) ext;
         Map required = fetchReq.getAttributes(true);
         Map optional = fetchReq.getAttributes(false);
         // prompt the user
     }
-    else if (ext instance of StoreRequest)
+    else if (ext instanceof StoreRequest)
     {
         ...
     }
@@ -60,7 +60,7 @@ if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
 {
     MessageExtension ext = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
 
-    if (ext instance of FetchResponse)
+    if (ext instanceof FetchResponse)
     {
         FetchResponse fetchResp = (FetchResponse) ext;
         
@@ -70,7 +70,7 @@ if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
         // can have multiple values
         List emails = fetchResp.getAttributeValues("Email");
     }
-    else if (ext instance of StoreResponse)
+    else if (ext instanceof StoreResponse)
     {
         ...
     }
