@@ -24,9 +24,9 @@ req.addExtension(sregReq);
 {{{
 if (authReq.hasExtension(SRegMessage.OPENID_NS_SREG))
 {
-    Extension ext = authReq.getExtension(SRegMessage.OPENID_NS_SREG)
+    MessageExtension ext = authReq.getExtension(SRegMessage.OPENID_NS_SREG)
 
-    if (ext instance of SRegRequest)
+    if (ext instanceof SRegRequest)
     {
         SRegRequest sregReq = (SRegRequest) ext;
         List required = sregReq.getAttributes(true);
@@ -56,7 +56,7 @@ if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
 {
     MessageExtension ext = authSuccess.getExtension(SRegMessage.OPENID_NS_SREG);
 
-    if (ext instance of SRegResponse)
+    if (ext instanceof SRegResponse)
     {
         SRegResponse sregResp = (SRegResponse) ext;
         
@@ -66,7 +66,3 @@ if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
     }
 }
 }}}
-
-
-
-
