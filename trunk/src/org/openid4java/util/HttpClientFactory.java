@@ -13,7 +13,8 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 
 /**
- * This class handles all HTTPClient connections for the net.openid packages....
+ * This class handles all HTTPClient connections for the
+ * org.openid4java packages.
  * <p/>
  *
  * @author Kevin
