@@ -18,3 +18,14 @@ CATALINA_HOME/common/endorsed
 
   * 复制 lib/`*`.jar 和 java-openid-sxip-`*`.jar 到你的应用程序的 Java classpath 下。
 
+= Maven 2=
+在你的项目的 pom.xml 的 dependencies 节点下增加如下依赖关系：
+{{{
+<dependency>
+  <groupId>org.openid4java</groupId>
+  <artifactId>openid4java</artifactId>
+  <version>0.9.2</version>
+</dependency>
+}}}
+其中的 0.9.2 请替换成你需要的版本。
+
