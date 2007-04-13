@@ -19,3 +19,12 @@ need to be done:
 
   * Copy lib/`*`.jar and java-openid-sxip-`*`.jar to your application's Java classpath
 
+= Maven 2=
+Add following to your project's pom.xml in section dependencies:
+{{{
+<dependency>
+  <groupId>org.openid4java</groupId>
+  <artifactId>openid4java</artifactId>
+  <version>0.9.2</version>
+</dependency>
+}}}
