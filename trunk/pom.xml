@@ -62,6 +62,16 @@
           </descriptorRefs>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-idea-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <downloadSources>true</downloadSources>
+          <downloadJavadocs>true</downloadJavadocs>
+          <dependenciesAsLibraries>true</dependenciesAsLibraries>
+          <useFullNames>false</useFullNames>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
