@@ -487,7 +487,7 @@ public class ServerManager
                                 String opEndpoint)
     {
         return authResponse(requestParams, userSelId, userSelClaimed,
-                authenticatedAndApproved, _opEndpointUrl, true);
+                authenticatedAndApproved, opEndpoint, true);
     }
 
     /**
