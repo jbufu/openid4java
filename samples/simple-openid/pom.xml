@@ -24,6 +24,20 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+                        <groupId>org.openxri</groupId>
+                        <artifactId>openxri-client</artifactId>
+                        <version>1.0.1</version>
+                        <scope>system</scope>
+                        <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/openxri-client.jar</systemPath>
+                </dependency>
+                <dependency>
+                        <groupId>org.openxri</groupId>
+                        <artifactId>openxri-syntax</artifactId>
+                        <version>1.0.1</version>
+                        <scope>system</scope>
+                        <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/openxri-syntax.jar</systemPath>
+                </dependency>
   </dependencies>
   <build>
     <finalName>simple-openid</finalName>
