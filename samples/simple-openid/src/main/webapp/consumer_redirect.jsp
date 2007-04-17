@@ -1,5 +1,5 @@
 <%@ page session="true" %>
-<%@ page import="java.util.Map,java.util.Iterator,org.openid4java.discovery.Identiforg.openid4java.discoveryovery.DiscoveryInformation, org.openid4java.message.ax.FetchRequorg.openid4java.messagessage.ax.Fetchorg.openid4java.messageid.message.ax.AxMessage,  org.openid4java.message.*, org.openid4java.OpenIDException, java.util.List, java.io.IOException, javax.servlet.http.HttpSession, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.openid4java.consumer.ConsumerManaorg.openid4java.consumersumer.InMemoryConsumerAssociaorg.openid4java.consumerd.consumer.InMemoryNonceVerifier" %>
+<%@ page import="java.util.Map,java.util.Iterator,org.openid4java.discovery.Identifier, org.openid4java.discovery.DiscoveryInformation, org.openid4java.message.ax.FetchRequest, org.openid4java.message.ax.FetchResponse, org.openid4java.message.ax.AxMessage,  org.openid4java.message.*, org.openid4java.OpenIDException, java.util.List, java.io.IOException, javax.servlet.http.HttpSession, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.openid4java.consumer.ConsumerManager, org.openid4java.consumer.InMemoryConsumerAssociationStore, org.openid4java.consumer.InMemoryNonceVerifier" %>
 
 <%
     // README:
