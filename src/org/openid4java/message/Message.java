@@ -376,7 +376,8 @@ public class Message
      */
     public String getExtensionAlias(String extensionTypeUri)
     {
-        return (String) _extAliases.get(extensionTypeUri);
+        return (_extAliases.get(extensionTypeUri) != null) ?
+                (String) _extAliases.get(extensionTypeUri) : null;
     }
 
     /**
