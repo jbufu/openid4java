@@ -77,7 +77,7 @@ public class FetchResponse extends AxMessage
      *                          data released by the user.
      * @return                  Properly formed FetchResponse.
      */
-    public FetchResponse createFetchResponse(FetchRequest req, Map userData)
+    public static FetchResponse createFetchResponse(FetchRequest req, Map userData)
     {
         FetchResponse resp = new FetchResponse();
 
