@@ -91,7 +91,7 @@ public class FetchResponse extends AxMessage
             resp.addAttribute(alias, (String) attributes.get(alias), value);
         }
 
-        return null;
+        return resp;
     }
 
     /**
