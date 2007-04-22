@@ -1,4 +1,5 @@
 #summary OpenID 2.0 Java 开发包
+http://openid4java.googlecode.com/svn/trunk/openid4java.png
 =这个开发包是什么？=
 
 这个开发包可以让你在你的 Java web 应用程序中启用 OpenID 支持。
