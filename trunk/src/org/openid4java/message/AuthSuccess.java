@@ -487,7 +487,7 @@ public class AuthSuccess extends Message
             }
             catch (ParseException e)
             {
-                _log.error("Error verifying nonce in auth response.", e);
+                _log.error("Error parsing nonce in auth response.", e);
                 return false;
             }
 
@@ -499,8 +499,8 @@ public class AuthSuccess extends Message
 
         } else if (nonce != null)
         {
-            _log.warn("openid.response_nonce should not be present in OpenID1 auth responses");
-            return false;
+            _log.warn("openid.response_nonce present in OpenID1 auth responses");
+//            return false;
         }
 
         List signedFields = Arrays.asList(
