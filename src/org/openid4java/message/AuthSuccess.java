@@ -499,7 +499,7 @@ public class AuthSuccess extends Message
 
         } else if (nonce != null)
         {
-            _log.warn("openid.response_nonce present in OpenID1 auth responses");
+            _log.warn("openid.response_nonce present in OpenID1 auth response");
 //            return false;
         }
 
@@ -516,15 +516,15 @@ public class AuthSuccess extends Message
         // either compatibility mode or nonce signed
         if ( compatibility == signedFields.contains("response_nonce") )
         {
-            _log.warn("response_nonce must be present and signed only OpenID2 auth responses");
-            return false;
+            _log.warn("response_nonce must be present and signed only in OpenID2 auth responses");
+//            return false;
         }
 
         // either compatibility mode or op_endpoint signed
         if ( compatibility == signedFields.contains("op_endpoint") )
         {
             _log.warn("op_endpoint must be present and signed only in OpenID2 auth responses");
-            return false;
+//            return false;
         }
 
         // assoc_handle must be signed in v2
