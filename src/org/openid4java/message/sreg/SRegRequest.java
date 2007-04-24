@@ -202,7 +202,7 @@ public class SRegRequest extends SRegMessage
                     ! paramName.equals("policy_url"))
             {
                 _log.warn("Invalid parameter name in SReg request: " + paramName);
-                return false;
+//                return false;
             }
         }
 

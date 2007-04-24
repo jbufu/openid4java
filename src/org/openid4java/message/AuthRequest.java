@@ -282,13 +282,13 @@ public class AuthRequest extends Message
         if ( compatibility && hasParameter("openid.realm") )
         {
             _log.warn("openid.realm should not be present in OpenID1 auth requests");
-            return false;
+//            return false;
         }
 
         if ( !compatibility && hasParameter("openid.trust_root") )
         {
             _log.warn("openid.trust_root should not be present in OpenID2 auth requests.");
-            return false;
+//            return false;
         }
 
         // figure out if 'claimed_id' and 'identity' are optional

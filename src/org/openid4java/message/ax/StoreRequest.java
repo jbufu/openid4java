@@ -243,7 +243,7 @@ public class StoreRequest extends AxMessage
                     ! paramName.startsWith("count.") )
             {
                 _log.warn("Invalid parameter name in store request: " + paramName);
-                return false;
+//                return false;
             }
         }
 

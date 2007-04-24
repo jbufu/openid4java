@@ -294,7 +294,7 @@ public class FetchRequest extends AxMessage
                     ! paramName.equals("update_url"))
             {
                 _log.warn("Invalid parameter name in fetch request: " + paramName);
-                return false;
+//                return false;
             }
         }
 
