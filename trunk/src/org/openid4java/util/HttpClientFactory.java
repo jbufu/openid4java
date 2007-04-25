@@ -63,10 +63,10 @@ public class HttpClientFactory
             //now set headers for auth
             AuthScope authScope = new AuthScope(AuthScope.ANY_HOST,
                     AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME);
-            client.getState().setCredentials(authScope,
+            client.getState().setProxyCredentials(authScope,
                     new UsernamePasswordCredentials(
                             proxyProperties.getUserName(),
-                            proxyProperties.getUserName()));
+                            proxyProperties.getPassword()));
         }
 
         return client;
