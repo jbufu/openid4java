@@ -10,6 +10,7 @@ package org.openid4java.util;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.auth.AuthScope;
 
 /**
@@ -41,8 +42,8 @@ public class HttpClientFactory
                                          int connTimeout, int socketTimeout,
                                          String cookiePolicy)
     {
+        HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
 
-        HttpClient client = new HttpClient();
         client.getParams().setParameter(
                 "http.protocol.max-redirects", new Integer(maxRedirects));
         client.getParams().setParameter(

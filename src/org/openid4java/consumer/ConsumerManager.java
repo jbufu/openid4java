@@ -109,7 +109,7 @@ public class ConsumerManager
     /**
      * Parameters (modulus and generator) for the Diffie-Hellman sessions.
      */
-    DHParameterSpec _dhParams = DiffieHellmanSession.getDefaultParameter();
+    private DHParameterSpec _dhParams = DiffieHellmanSession.getDefaultParameter();
 
     /**
      * Timeout (in seconds) for keeping track of failed association attempts.
@@ -533,6 +533,29 @@ public class ConsumerManager
         return _privateAssociation;
     }
 
+    public void setConnectTimeout(int connectTimeout)
+    {
+        _connectTimeout = connectTimeout;
+
+        _httpClient.getHttpConnectionManager()
+                .getParams().setConnectionTimeout(_connectTimeout);
+    }
+
+    public void setSocketTimeout(int socketTimeout)
+    {
+        _socketTimeout = socketTimeout;
+
+        _httpClient.getParams().setSoTimeout(_socketTimeout);
+    }
+
+    public void setMaxRedirects(int maxRedirects)
+    {
+        _maxRedirects = maxRedirects;
+
+        _httpClient.getParams().setParameter(
+                "http.protocol.max-redirects", new Integer(_maxRedirects));
+    }
+
     /**
      * Makes a HTTP call to the specified URL with the parameters specified
      * in the Message.
@@ -546,18 +569,13 @@ public class ConsumerManager
     private int call(String url, Message request, ParameterList response)
             throws MessageException
     {
-        // custom httpclient configuration
-        _httpClient.getParams().setParameter(
-                "http.protocol.max-redirects", new Integer(_maxRedirects));
-        _httpClient.getParams().setSoTimeout(_socketTimeout);
-        _httpClient.getHttpConnectionManager()
-                .getParams().setConnectionTimeout(_connectTimeout);
-
         int responseCode = -1;
+
+        // build the post message with the parameters from the request
+        PostMethod post = new PostMethod(url);
+
         try
         {
-            // build the post message with the parameters from the request
-            PostMethod post = new PostMethod(url);
             // can't follow redirects on a POST (w/o user intervention)
             //post.setFollowRedirects(true);
             post.setRequestEntity(new StringRequestEntity(
@@ -577,6 +595,10 @@ public class ConsumerManager
         {
             _log.error("Error talking to " + url +
                     " response code: " + responseCode, e);
+        }
+        finally
+        {
+            post.releaseConnection();
         }
 
         return responseCode;
