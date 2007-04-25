@@ -129,4 +129,7 @@
     <test result="PATH_MISMATCH" realm="http://example.com/Sub/Folder/" returnTo="http://example.com/sub/folder/"
         message="Paths are case sensitive."/>
 
+    <test result="PATH_MISMATCH" realm="http://example.com/sub/*" returnTo="http://example.com/sub/folder"
+        message="Wildcard (*) should be treated as literal in realm paths."/>
+
 </testSuite>
