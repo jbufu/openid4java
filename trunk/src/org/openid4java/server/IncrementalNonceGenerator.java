@@ -23,7 +23,7 @@ public class IncrementalNonceGenerator implements NonceGenerator
     private String _timestamp = "";
     private int _counter = 0;
 
-    public String next()
+    public synchronized String next()
     {
         String currentTimestamp = getCurrentTimpestamp();
 

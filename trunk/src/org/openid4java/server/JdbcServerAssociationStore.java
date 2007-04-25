@@ -6,7 +6,6 @@ package org.openid4java.server;
 
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
-import org.openid4java.server.ServerAssociationStore;
 
 import java.util.*;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
