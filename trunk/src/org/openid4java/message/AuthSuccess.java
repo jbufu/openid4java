@@ -260,9 +260,9 @@ public class AuthSuccess extends Message
             if (alias != null)
             {
                 // openid.ns.<ext_alias> needs to be signed
-                String nsSign = "ns." + alias;
-                toSign.append(",").append(nsSign);
-                signList.add(nsSign);
+                //String nsSign = "ns." + alias;
+                //toSign.append(",").append(nsSign);
+                //signList.add(nsSign);
 
                 extensionPrefixes.add(alias);
             }
