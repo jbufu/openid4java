@@ -241,6 +241,15 @@
       <systemPath>${basedir}/lib/openxri-syntax.jar</systemPath>
       -->
     </dependency>
+    <!-- 
+      Overwrite the dependency of openxri-syntax-1.0.1 
+      as icu4j-3.4.1 not found in maven's central repository.
+    -->
+    <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>3.4.4</version>
+    </dependency>
     <dependency>
       <groupId>org.openxri</groupId>
       <artifactId>openxri-client</artifactId>
