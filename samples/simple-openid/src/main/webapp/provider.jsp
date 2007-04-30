@@ -51,9 +51,10 @@
             //List userData = userInteraction(requestp);
             String userSelectedId = null;
             String userSelectedClaimedId = null;
-            Boolean authenticatedAndApproved = false;
+            Boolean authenticatedAndApproved = Boolean.FALSE;
 
-            if ((session.getAttribute("authenticatedAndApproved") == null) || (! ((Boolean)session.getAttribute("authenticatedAndApproved"))))
+            if ((session.getAttribute("authenticatedAndApproved") == null) ||
+                    (((Boolean)session.getAttribute("authenticatedAndApproved")) == Boolean.FALSE) )
             {
                 session.setAttribute("parameterlist", requestp);
                 response.sendRedirect("provider_authorization.jsp");
@@ -65,7 +66,7 @@
                 authenticatedAndApproved = (Boolean) session.getAttribute("authenticatedAndApproved");
                 // Remove the parameterlist so this provider can accept requests from elsewhere
                 session.removeAttribute("parameterlist");
-                session.setAttribute("authenticatedAndApproved", false); // Makes you authorize each and every time
+                session.setAttribute("authenticatedAndApproved", Boolean.FALSE); // Makes you authorize each and every time
             }
 
             // --- process an authentication request ---
