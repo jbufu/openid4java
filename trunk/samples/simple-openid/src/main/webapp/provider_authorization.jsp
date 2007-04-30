@@ -33,7 +33,7 @@ This JSP just asks you to click a link without authentication.</em><p>
     }
     else // Logged in
     {
-        session.setAttribute("authenticatedAndApproved", true); // No need to change openid.* session vars
+        session.setAttribute("authenticatedAndApproved", Boolean.TRUE); // No need to change openid.* session vars
         response.sendRedirect("provider.jsp?_action=complete");
     }
 %>
