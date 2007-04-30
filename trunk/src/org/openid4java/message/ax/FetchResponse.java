@@ -73,26 +73,63 @@ public class FetchResponse extends AxMessage
      * by the user.
      *
      * @param req               FetchRequest message.
-     * @param userData    Map<attribute_alias, attribute_values> with the
-     *                          data released by the user.
+     * @param userData          The userData may be a Map<String alias, String value>
+     *                          or a Map<String alias, List<String> values>. The attribute values
+     *                          are provided by the calling application. If a list of values is
+     *                          specified per attribute, at most n will be sent, where n is the
+     *                          number of attribute values requested in the FetchRequest.
      * @return                  Properly formed FetchResponse.
      */
     public static FetchResponse createFetchResponse(FetchRequest req, Map userData)
     {
         FetchResponse resp = new FetchResponse();
 
+        // go through each requested attribute
         Map attributes = req.getAttributes();
-        Iterator iter = attributes.keySet().iterator();
-        while (iter.hasNext())
+
+        for (Iterator i = attributes.keySet().iterator(); i.hasNext(); )
         {
-            String alias = (String) iter.next();
-            String value = userData.get(alias) != null ?
-                            (String) userData.get(alias) : "";
-            resp.addAttribute(alias, (String) attributes.get(alias), value);
+            String alias = (String) i.next();
+
+            // find attribute in userData
+            Object value = userData.get(alias);
+
+            // if the value isn't there, skip over it
+            if (value == null)
+            {
+                continue;
+            }
+
+            // if the value is a string, add the single attribute to the response
+            if (value instanceof String)
+            {
+                resp.addAttribute(alias, (String) attributes.get(alias), (String)value);
+            }
+
+            // if the value is a list (of string) iteratively add each attribute to the response
+            else if (value instanceof List)
+            {
+                Iterator values = ((List)value).iterator();
+
+                // only send up the the maximum requested number
+                int max = req.getCount(alias);
+                for (int count = 0; count < max && values.hasNext(); count++)
+                {
+                    // if the value isn't there, skip over it
+                    String val = (String)values.next();
+                    if (val == null)
+                    {
+                        count--; // disregard this as a value as we are skipping over it
+                        continue;
+                    }
+                    resp.addAttribute(alias, (String) attributes.get(alias), val);
+                }
+            }
         }
 
         return resp;
     }
+
 
     /**
      * Adds an attribute to the fetch response.
