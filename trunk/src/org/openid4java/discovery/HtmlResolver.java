@@ -176,15 +176,25 @@ public class HtmlResolver
 
             byte data[] = new byte[_maxHtmlSize];
 
-            int bytesRead = htmlInput.read(data);
+            int totalRead = 0;
+            int currentRead = 0;
+            while (totalRead < _maxHtmlSize)
+            {
+                currentRead = htmlInput.read(data, totalRead, _maxHtmlSize - totalRead);
+
+                if (currentRead == -1) break;
+
+                totalRead += currentRead;
+            }
+
             htmlInput.close();
 
-            if (bytesRead <= 0)
+            if (totalRead <= 0)
                 throw new DiscoveryException("No HTML data read from " + url);
 
-            if (DEBUG) _log.debug("Read " + bytesRead + " bytes.");
+            if (DEBUG) _log.debug("Read " + totalRead + " bytes.");
 
-            return new String(data, 0, bytesRead);
+            return new String(data, 0, totalRead);
 
         } catch (IOException e)
         {
