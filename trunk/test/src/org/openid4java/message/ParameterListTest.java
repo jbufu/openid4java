@@ -211,6 +211,12 @@ public class ParameterListTest extends TestCase
         createdParameterList = ParameterList.createFromKeyValueForm("key1:value1\nkey2:value:2");
 
         assertEquals("value:2", createdParameterList.getParameterValue("key2"));
+
+        createdParameterList = ParameterList.createFromKeyValueForm("key1:value1\nkey2:value2\n");
+
+        assertEquals("value2", createdParameterList.getParameterValue("key2"));
+
+
     }
 
     public static Test suite()
