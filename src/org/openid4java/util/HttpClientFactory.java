@@ -53,13 +53,12 @@ public class HttpClientFactory
         client.getParams().setParameter("http.protocol.cookie-policy",
                 cookiePolicy);
 
-        if (proxyProperties != null) {
-            HostConfiguration hostConf = new HostConfiguration();
+        if (proxyProperties != null)
+        {
+            HostConfiguration hostConf = client.getHostConfiguration();
 
-            hostConf.setProxy(proxyProperties.getProxyHostName(),
-                    proxyProperties.getProxyPort());
+            hostConf.setProxy(proxyProperties.getProxyHostName(), proxyProperties.getProxyPort());
 
-            client.setHostConfiguration(hostConf);
             //now set headers for auth
             AuthScope authScope = new AuthScope(AuthScope.ANY_HOST,
                     AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME);
