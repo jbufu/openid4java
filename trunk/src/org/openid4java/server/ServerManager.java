@@ -598,7 +598,7 @@ public class ServerManager
                         invalidateHandle = handle;
                     }
                     else
-                        _log.info("Loaded shared association; hadle: " + handle);
+                        _log.info("Loaded shared association; handle: " + handle);
                 }
 
                 if (assoc == null)
