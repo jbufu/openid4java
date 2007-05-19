@@ -5,6 +5,7 @@
 package org.openid4java.discovery;
 
 import org.openxri.xml.*;
+import org.openxri.resolve.exception.*;
 import org.openxri.resolve.Resolver;
 import org.openxri.resolve.TrustType;
 import org.openxri.resolve.ResolverState;
@@ -160,10 +161,12 @@ public class Discovery
                 XRD xrd = xrds.getFinalXRD();
                 CanonicalID canonical = xrd.getCanonicalidAt(0);
 
+                // todo: this is not the right place to put isProviderAuthoritative
                 if (isProviderAuthoritative(xrd.getProviderID(), canonical))
                 {
                     _log.info("XRI resolution succeeded on " + identifier);
-                    result = extractDiscoveryInformation(xrds, identifier);
+                    result = extractDiscoveryInformation(xrds,
+                            (XriIdentifier)identifier, _xriResolver);
                 }
                 else
                     _log.warn("ProviderID is not authoritative for the CanonicalID. " +
@@ -212,6 +215,13 @@ public class Discovery
         return result;
     }
 
+    /**
+     * Extracts OpenID discovery endpoints from a HTML discovery result.
+     *
+     * @param htmlResult    HTML discovery result.
+     * @return              List of DiscoveryInformation endpoints.
+     * @throws DiscoveryException when invalid information is discovered.
+     */
     private List extractDiscoveryInformation(HtmlResult htmlResult)
             throws DiscoveryException
     {
@@ -248,6 +258,17 @@ public class Discovery
         return htmlList;
     }
 
+    /**
+     * Extracts OpenID discovery endpoints from a XRDS discovery result.
+     * Can be used for both URLs and XRIs, however the
+     * {@link #extractDiscoveryInformation(XRDS, XriIdentifier, Resolver)}
+     * offers additional functionality for XRIs.
+     *
+     * @param xrds          The discovered XRDS document.
+     * @param identifier    The identifier on which discovery was performed.
+     * @return              A list of DiscoveryInformation endpoints.
+     * @throws DiscoveryException when invalid information is discovered.
+     */
     protected static List extractDiscoveryInformation(XRDS xrds,
                                                       Identifier identifier)
             throws DiscoveryException
@@ -351,6 +372,166 @@ public class Discovery
         return opSelectList;
     }
 
+    // --- XRI discovery patch from William Tan ---
+
+    /**
+     * Extracts OpenID discovery endpoints from a XRDS discovery result
+     * for XRI identifiers.
+     *
+     * @param xrds          The discovered XRDS document.
+     * @param identifier    The identifier on which discovery was performed.
+     * @param xriResolver   The XRI resolver to use for extraction of OpenID
+     *                      service endpoints.
+     * @return              A list of DiscoveryInformation endpoints.
+     * @throws DiscoveryException when invalid information is discovered.
+     */
+    protected static List extractDiscoveryInformation(XRDS xrds,
+                                                      XriIdentifier identifier,
+                                                      Resolver xriResolver)
+            throws DiscoveryException
+    {
+        ArrayList endpoints = new ArrayList();
+
+        XRD xrd = xrds.getFinalXRD();
+
+        // try OP Identifier
+        extractDiscoveryInformationOpenID(
+            xriResolver,
+            endpoints,
+            xrd,
+            identifier,
+            DiscoveryInformation.OPENID2_OP,
+            false // no CID
+        );
+
+        // OpenID 2 signon
+        extractDiscoveryInformationOpenID(
+            xriResolver,
+            endpoints,
+            xrd,
+            identifier,
+            DiscoveryInformation.OPENID2, // sepType
+            true // want CID
+        );
+
+        // OpenID 1.x
+        extractDiscoveryInformationOpenID(
+            xriResolver,
+            endpoints,
+            xrd,
+            identifier,
+            DiscoveryInformation.OPENID11,
+            true // wantCID
+        );
+
+        extractDiscoveryInformationOpenID(
+            xriResolver,
+            endpoints,
+            xrd,
+            identifier,
+            DiscoveryInformation.OPENID10,
+            true // wantCID
+        );
+
+        if (endpoints.size() == 0)
+            _log.info("No OpenID service types found in the XRDS.");
+
+        return endpoints;
+    }
+
+    public static boolean extractDiscoveryInformationOpenID(
+            Resolver xriResolver, ArrayList out, XRD baseXRD,
+            XriIdentifier identifier, String srvType, boolean wantCID)
+    {
+        try
+        {
+            XRDS tmpXRDS = xriResolver.selectServiceFromXRD(
+                baseXRD,
+                identifier.getXriIdentifier(),
+                new TrustType(), 
+                srvType,
+                null, // sepMediaType
+                true, // followRefs
+                new ResolverState()
+            );
+
+            Identifier claimedIdentifier = null;
+            URL opEndpointUrl;
+            CanonicalID canonID;
+
+            XRD tmpXRD = tmpXRDS.getFinalXRD();
+
+            if (wantCID)
+            {
+                canonID = tmpXRD.getCanonicalidAt(0);
+
+                if (canonID == null) {
+                    _log.error("No CanonicalID found for " + srvType +
+                            " after XRI resolution of: "
+                            + identifier.getIdentifier());
+                    return false;
+                }
+
+                // todo: canonicalID verification?
+                claimedIdentifier = parseIdentifier(canonID.getValue());
+                _log.info("Using canonicalID as claimedID: " +
+                          claimedIdentifier.getIdentifier() +
+                          " for " + srvType);
+            }
+
+            Iterator it = tmpXRD.getSelectedServices().getList().iterator();
+            while (it.hasNext())
+            {
+                Service srv = (Service)it.next();
+                Iterator itURI = srv.getPrioritizedURIs().iterator();
+                while (itURI.hasNext())
+                {
+                    try
+                    {
+                        SEPUri sepURI = (SEPUri) itURI.next();
+                        String urlString = xriResolver.constructURI(
+                                sepURI.getURI(),
+                                sepURI.getAppend(),
+                                identifier.getXriIdentifier());
+
+                        opEndpointUrl = new URL(urlString);
+
+                        DiscoveryInformation extracted =
+                                new DiscoveryInformation(
+                                        opEndpointUrl,
+                                        wantCID ? claimedIdentifier : null,
+                                        null,
+                                        srvType);
+
+                        _log.info("Added " + srvType +
+                                  " endpoint: " + opEndpointUrl);
+
+                        out.add(extracted);
+                    }
+                    catch (MalformedURLException mue)
+                    {
+                        _log.error("Error parsing URI in XRDS result for "
+                                   + srvType, mue);
+                    }
+                }
+            }
+
+            return true;
+        }
+        catch (PartialResolutionException e)
+        {
+            _log.error("XRI resolution failed for " + srvType, e);
+        }
+        catch (DiscoveryException de)
+        {
+            _log.error("XRDS discovery failed for " + srvType, de);
+        }
+
+        return false;
+    }
+
+    // --- end XRI discovery patch from William Tan ---
+
     public static String getDelegate(Service service, boolean compatibility)
     {
         String delegate = null;
@@ -400,6 +581,7 @@ public class Discovery
                                                    CanonicalID canonicalId)
     {
         // todo: also handle xri delegation / community names
+        // todo: isProviderAuthoritative does not work on multi-level i-names
         if (canonicalId == null || canonicalId.getValue() == null)
             return false;
 
