@@ -8,6 +8,10 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20070530:
+    - API change in SRegResponse: method public SRegResponse createFetchResponse(SRegRequest req, Map userData) throws MessageException
+      replaced with factory method public static SRegResponse createSRegResponse(SRegRequest req, Map userData) throws MessageException
+
 20070407:
     - Implemented OpenID Simple Registration 1.0 and 1.1
 

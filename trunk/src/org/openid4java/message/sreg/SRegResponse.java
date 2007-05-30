@@ -74,11 +74,13 @@ public class SRegResponse extends SRegMessage
      * by the user.
      *
      * @param req               SRegRequest message.
-     * @param userData          Map<attribute_name, attribute_values> with the
+     * @param userData          Map<String attributeName, String attributeValue> with the
      *                          data released by the user.
      * @return                  Properly formed SRegResponse.
+     * @throws MessageException if any attribute-name in the userData map does not
+     *                          correspond to an SREG field-name.
      */
-    public SRegResponse createFetchResponse(SRegRequest req, Map userData)
+    public static SRegResponse createSRegResponse(SRegRequest req, Map userData)
             throws MessageException
     {
         SRegResponse resp = new SRegResponse();
@@ -93,8 +95,9 @@ public class SRegResponse extends SRegMessage
                 resp.addAttribute(attr, value);
         }
 
-        return null;
+        return resp;
     }
+
 
     /**
      * Adds an attribute to the SReg response. The allowed attribute names are
