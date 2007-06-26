@@ -152,11 +152,17 @@ public class PapeRequest extends PapeMessage
      * Gets the max_auth_age parameter.
      *
      * @return          The number of seconds within which the OP is
-     *                  requested to have actively authenticated the user.
+     *                  requested to have actively authenticated the user,
+     *                  or -1 if max_auth_age is not present in the request.
      */
     public int getMaxAuthAge()
     {
-        return Integer.parseInt(getParameterValue("max_auth_age"));
+        String maxAuthAge = getParameterValue("max_auth_age");
+
+        if (maxAuthAge != null)
+            return Integer.parseInt(maxAuthAge);
+        else
+            return -1;
     }
 
     /**

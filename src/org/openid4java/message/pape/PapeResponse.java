@@ -22,6 +22,8 @@ public class PapeResponse extends PapeMessage
     private static Logger _log = Logger.getLogger(PapeResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
+    public static final String AUTH_AGE_UNKNOWN = "unknown";
+
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
             "auth_policies", "auth_age", "nist_auth_level"
     });
@@ -33,7 +35,7 @@ public class PapeResponse extends PapeMessage
      */
     protected PapeResponse()
     {
-        set("preferred_auth_policies", "");
+        set("auth_policies", "");
 
         if (DEBUG) _log.debug("Created empty PAPE response.");
     }
@@ -117,12 +119,12 @@ public class PapeResponse extends PapeMessage
     }
 
     /**
-     * Gets a list with the preferred_auth_policies. An empty list is
+     * Gets a list with the auth_policies. An empty list is
      * returned if no authentication policies exist.
      */
-    public List getPreferredAuthPoliciesList()
+    public List getAuthPoliciesList()
     {
-        String policies = getParameterValue("preferred_auth_policies");
+        String policies = getParameterValue("auth_policies");
 
         if (policies != null)
             return Arrays.asList(policies.split(" "));
@@ -134,24 +136,34 @@ public class PapeResponse extends PapeMessage
      * Sets the auth_age parameter.
      *
      * @param seconds   The number of seconds since the user was actively
-     *                  authenticated by the OP.
+     *                  authenticated by the OP, or -1 if the auth_age
+     *                  is unknown.
      */
-    public void setMaxAuthAge(int seconds)
+    public void setAuthAge(int seconds)
     {
         // todo: have a timestamp field; convert it to auth_age when sending?
 
-        set("auth_age", Integer.toString(seconds));
+        if (-1 == seconds)
+            set("auth_age", AUTH_AGE_UNKNOWN);
+        else
+            set("auth_age", Integer.toString(seconds));
     }
 
     /**
      * Gets the value of the auth_age parameter.
      *
      * @return          The number of seconds since the user was actively
-     *                  authenticated by the OP.
+     *                  authenticated by the OP. For the special value
+     *                  "unknown" -1 is returned.
      */
     public int getAuthAge()
     {
-        return Integer.parseInt(getParameterValue("auth_age"));
+        String authAge = getParameterValue("auth_age");
+
+        if (AUTH_AGE_UNKNOWN.equals(authAge))
+            return -1;
+
+        return Integer.parseInt(authAge);
     }
 
     /**

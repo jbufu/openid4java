@@ -323,13 +323,35 @@ public class AuthSuccess extends Message
      * added to the message.
      *
      * @param extensions  Array of extension namespace URIs to be signed.
-     * @see #setSignFields(String)
+     * @see #setSignFields(String) #setSignExtension
      */
     public void setSignExtensions(String[] extensions)
     {
         if (extensions != null)
         {
             _signExtensions = Arrays.asList(extensions);
+
+            buildSignedList();
+        }
+    }
+
+
+    /**
+     * Sets the list of messages fields that will be signed, in addition to
+     * the ones required by the protocol to be signed and any additional
+     * fields already configured to be signed. The OpenID signature will
+     * only be applied to OpenID fields, starting with the "openid." prefix.
+     * Should be called <b>after</b> all relevant extension fields have been
+     * added to the message.
+     *
+     * @param extensionNamespace  Extension namespace URI to be signed.
+     * @see #setSignFields(String) #setSignExtensions
+     */
+    public void setSignExtension(String extensionNamespace)
+    {
+        if (! _signExtensions.contains(extensionNamespace))
+        {
+            _signExtensions.add(extensionNamespace);
 
             buildSignedList();
         }
