@@ -24,7 +24,7 @@ public class PapeRequest extends PapeMessage
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
-            "preferred_auth_policies", "auth_age"
+            "preferred_auth_policies", "max_auth_age"
     });
 
     /**
