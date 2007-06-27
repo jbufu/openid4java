@@ -154,16 +154,21 @@ public class PapeResponse extends PapeMessage
      *
      * @return          The number of seconds since the user was actively
      *                  authenticated by the OP. For the special value
-     *                  "unknown" -1 is returned.
+     *                  "unknown" 0 is returned; if the parameter is not
+     *                  present, -1 is returned.
      */
     public int getAuthAge()
     {
         String authAge = getParameterValue("auth_age");
 
-        if (AUTH_AGE_UNKNOWN.equals(authAge))
+        if (authAge == null)
             return -1;
 
-        return Integer.parseInt(authAge);
+        else if (AUTH_AGE_UNKNOWN.equals(authAge))
+            return 0;
+        
+        else
+            return Integer.parseInt(authAge);
     }
 
     /**

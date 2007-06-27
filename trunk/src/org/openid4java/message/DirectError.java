@@ -23,7 +23,7 @@ public class DirectError extends Message
     });
 
     protected final static List optionalFields = Arrays.asList( new String[] {
-            "contat",
+            "contact",
             "reference"
     });
 
