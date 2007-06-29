@@ -185,6 +185,38 @@
         <role>member</role>
       </roles>
     </developer>
+    <developer>
+      <id>gwachob</id>
+      <name>gwachob</name>
+      <url>http://code.google.com/u/gwachob/</url>
+      <roles>
+        <role>member</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>ibussed</id>
+      <name>ibussed</name>
+      <url>http://code.google.com/u/ibussed/</url>
+      <roles>
+        <role>member</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>justen.stepka</id>
+      <name>justen.stepka</name>
+      <url>http://code.google.com/u/justen.stepka/</url>
+      <roles>
+        <role>member</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>shihab</id>
+      <name>shihab</name>
+      <url>http://code.google.com/u/shihab/</url>
+      <roles>
+        <role>member</role>
+      </roles>
+    </developer>
   </developers>
 
   <mailingLists>
