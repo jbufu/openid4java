@@ -268,10 +268,6 @@
       <groupId>org.openxri</groupId>
       <artifactId>openxri-syntax</artifactId>
       <version>1.0.1</version>
-      <!--
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/openxri-syntax.jar</systemPath>
-      -->
     </dependency>
     <!-- 
       Overwrite the dependency of openxri-syntax-1.0.1 
@@ -286,10 +282,6 @@
       <groupId>org.openxri</groupId>
       <artifactId>openxri-client</artifactId>
       <version>1.0.1</version>
-      <!--
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/openxri-client.jar</systemPath>
-      -->
     </dependency>
     <!--
       Overwrite the dependency of openxri-client-1.0.1
@@ -322,7 +314,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>2.0.3</version>
+      <version>2.0.6</version>
     </dependency>
 
     <!-- Sample Consumer -->
