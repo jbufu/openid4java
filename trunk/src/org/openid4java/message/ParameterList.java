@@ -53,7 +53,7 @@ public class ParameterList implements Serializable
             if (v instanceof Object[])
             {
                 Object[] values = (Object[]) v;
-                if (values.length > 1)
+                if (values.length > 1 && name.startsWith("openid."))
                     throw new IllegalArgumentException(
                             "Multiple parameters with the same name: " + values);
 
