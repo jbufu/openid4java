@@ -22,7 +22,7 @@ public class PapeResponse extends PapeMessage
     private static Logger _log = Logger.getLogger(PapeResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
-    public static final String AUTH_AGE_UNKNOWN = "unknown";
+    public static final String AUTH_AGE_UNKNOWN = "none";
 
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
             "auth_policies", "auth_age", "nist_auth_level"
