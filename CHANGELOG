@@ -8,7 +8,11 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
-20070626
+20070821:
+    - Added support for OpenID Information Cards 1.0, draft 1
+    - Added (OpenID-Infocard) DemoRP and InfocardOP sample/demo projects 
+
+20070626:
     - Implemented OpenID Provider Authentication Policy Extension 1.0, draft 1
       http://openid.net/specs/openid-provider-authentication-policy-extension-1_0-01.html
 
