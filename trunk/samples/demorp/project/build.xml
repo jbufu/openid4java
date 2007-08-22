@@ -1,4 +1,4 @@
-<project name="ICDemo" default="dist">
+<project name="DemoRP" default="dist">
 
   <property file="local.properties"/>
   <property file="project.properties"/>
@@ -100,7 +100,7 @@
 
   <target name="jar" depends="compile"
           description="Package the binary code into a jar file.">
-    <jar basedir="build/classes" destfile="build/icdemo.jar"/>
+    <jar basedir="build/classes" destfile="build/demorp.jar"/>
   </target>
 
   <target name="war_folder" depends="jar">
@@ -113,7 +113,7 @@
     </copy>
     <copy todir="build/war/WEB-INF/lib">
       <fileset dir="lib" includes="*.jar"/>
-      <fileset dir="build" includes="icdemo.jar"/>
+      <fileset dir="build" includes="demorp.jar"/>
     </copy>
 
     <taskdef resource="svntask.properties" classpathref="classpath"/>
@@ -151,7 +151,7 @@
 
   <target name="war" depends="war_folder, copy_local_config"
           description="Package the whole application as a war file.">
-    <war destfile="build/icdemo.war" webxml="www/WEB-INF/web.xml"
+    <war destfile="build/demorp.war" webxml="www/WEB-INF/web.xml"
          duplicate="fail">
       <fileset dir="build/war"/>
     </war>
@@ -160,7 +160,7 @@
   <target name="dist" depends="war"
           description="Create distributable artifacts.">
     <mkdir dir="dist"/>
-    <copy file="build/icdemo.war" todir="dist"/>
+    <copy file="build/demorp.war" todir="dist"/>
     <copy todir="dist">
       <fileset dir="libext">
         <include name="endorsed/*"/>
@@ -176,7 +176,7 @@
           message="Local changes exist; can't build release target."/>
     <fail if="head.changes"
           message="Changes exist between BASE and HEAD; try 'svn up' or 'ant old_release'."/>
-    <copy tofile="../../webapps/demorp.war" file="dist/icdemo.war"/>
+    <copy tofile="../../webapps/demorp.war" file="dist/demorp.war"/>
   </target>
 
   <target name="old_release" depends="dist"
@@ -185,7 +185,7 @@
           message="Local configuration enabled; can't build release target."/>
     <fail if="local.changes"
           message="Local changes exist; can't build release target."/>
-    <copy tofile="../../webapps/demorp.war" file="dist/icdemo.war"/>
+    <copy tofile="../../webapps/demorp.war" file="dist/demorp.war"/>
   </target>
   
   <target name="javadoc" depends="compile"
@@ -200,8 +200,8 @@
       version="yes"
       use="yes"
       author="yes"
-      windowtitle="ICDemo"
-      doctitle="ICDemo"
+      windowtitle="DemoRP"
+      doctitle="DemoRP"
       source="${compile.source}">
       <bottom>
         <![CDATA[<i>Copyright &#169; 2007 Sxip Identity Corp. All Rights Reserved.</i>]]></bottom>
@@ -266,21 +266,21 @@
           description="Deploy to local Tomcat">
     <deploy url="${tomcat.manager.url}" username="${tomcat.manager.username}"
             password="${tomcat.manager.password}"
-            path="/icdemo" war="dist/${component.name}.war"/>
+            path="/demorp" war="dist/${component.name}.war"/>
   </target>
 
   <target name="reload" depends="define_tomcat"
           description="Reload on local Tomcat">
     <reload url="${tomcat.manager.url}" username="${tomcat.manager.username}"
             password="${tomcat.manager.password}"
-            path="/icdemo"/>
+            path="/demorp"/>
   </target>
 
   <target name="undeploy" depends="define_tomcat"
           description="Undeploy from local Tomcat">
     <undeploy url="${tomcat.manager.url}" username="${tomcat.manager.username}"
               password="${tomcat.manager.password}"
-              path="/icdemo"/>
+              path="/demorp"/>
   </target>
 
   <target name="redeploy" depends="undeploy, deploy"
