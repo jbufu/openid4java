@@ -13,6 +13,7 @@ The library currently supports the following OpenID specifications:
 	- OpenID Attribute Exchange 1.0, draft 4
 	- OpenID Simple Registration 1.0 and 1.1
 	- OpenID Provider Authentication Policy Extension 1.0, draft 1
+	- OpenID Information Cards 1.0, draft 1
 
 OpenID starts with the concept that anyone can identify themselves on the 
 Internet the same way websites do - with a URI. Since URIs are at the very 
