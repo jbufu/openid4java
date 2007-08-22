@@ -24,6 +24,8 @@ public class FetchResponse extends AxMessage
     private static Logger _log = Logger.getLogger(FetchResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
+    private int _attrAliasGen = 0;
+
     /**
      * Constructs a Fetch Response with an empty parameter list.
      */
@@ -172,6 +174,49 @@ public class FetchResponse extends AxMessage
     }
 
     /**
+     * Adds an attribute to the FetchResponse, without the caller having to
+     * specify an alias. An alias in the form "attrNN" will be automatically 
+     * generated.
+     *
+     * @param typeUri   The attribute type URI.
+     * @param value     The attribute value.
+     * @return          The generated attribute alias.
+     */
+    public String addAttribute(String typeUri, String value)
+    {
+        _attrAliasGen += 1;
+
+        String alias = "attr" + _attrAliasGen;
+
+        // not calling the other addAttribute - extra overhead in checks there
+        _parameters.set(new Parameter("type." + alias, typeUri));
+        _parameters.set(new Parameter("value." + alias, value));
+
+        if (DEBUG)
+            _log.debug("Added new attribute to fetch response; type: " + typeUri
+                       + " alias: " + alias);
+
+        return alias;
+    }
+
+    /**
+     * Adds the attributes in the supplied Map to the FetchResponse.
+     * A requested count of 1 is assumed for each attribute in the map.
+     *
+     * @param attributes    Map<String typeURI, String value>.
+     */
+    public void addAttributes(Map attributes)
+    {
+        String typeUri;
+        Iterator iter = attributes.keySet().iterator();
+        while (iter.hasNext())
+        {
+            typeUri = (String) iter.next();
+            addAttribute(typeUri, (String) attributes.get(typeUri));
+        }
+    }
+
+    /**
      * Returns a list with the attribute value(s) associated for the specified
      * attribute alias.
      *
@@ -247,6 +292,32 @@ public class FetchResponse extends AxMessage
         }
 
         return attributes;
+    }
+
+    /**
+     * Gets a map with attribute aliases -> attribute type URI.
+     */
+    public Map getAttributeTypes()
+    {
+        Map typeUris = new HashMap();
+
+        Iterator it = _parameters.getParameters().iterator();
+        while (it.hasNext())
+        {
+            Parameter param = (Parameter) it.next();
+            String paramName = param.getKey();
+            String paramType = param.getValue();
+
+            if (paramName.startsWith("type."))
+            {
+                String alias = paramName.substring(5);
+
+                if ( ! typeUris.containsKey(alias) )
+                    typeUris.put(alias, paramType);
+            }
+        }
+
+        return typeUris;
     }
 
     /**
