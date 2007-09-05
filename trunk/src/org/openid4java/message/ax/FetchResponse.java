@@ -83,6 +83,7 @@ public class FetchResponse extends AxMessage
      * @return                  Properly formed FetchResponse.
      */
     public static FetchResponse createFetchResponse(FetchRequest req, Map userData)
+        throws MessageException
     {
         FetchResponse resp = new FetchResponse();
 
@@ -115,9 +116,10 @@ public class FetchResponse extends AxMessage
 
                 // only send up the the maximum requested number
                 int max = req.getCount(alias);
-                for (int count = 0; count < max && values.hasNext(); count++)
+                int count;
+                for (count = 0; count < max && values.hasNext(); count++)
                 {
-                    // if the value isn't there, skip over it
+                    // don't add null values to the response
                     String val = (String)values.next();
                     if (val == null)
                     {
@@ -142,7 +144,13 @@ public class FetchResponse extends AxMessage
      * @param       value       The value of the attribute.
      */
     public void addAttribute(String alias, String typeUri, String value)
+        throws MessageException
     {
+        if ( alias.indexOf(',') > -1 || alias.indexOf('.') > -1 ||
+             alias.indexOf(':') > -1 || alias.indexOf('\n') > -1 )
+            throw new MessageException(
+                "Characters [.,:\\n] are not allowed in attribute aliases: " + alias);
+
         int count = getCount(alias);
 
         String index = "";
@@ -236,7 +244,15 @@ public class FetchResponse extends AxMessage
         return values;
     }
 
-    //todo: public String getAttributeValue(String alias)
+    /**
+     * Gets the (first) for the specified attribute alias.
+     */
+    public String getAttributeValue(String alias)
+    {
+        return getCount(alias) > 1 ?
+            getParameterValue("value." + alias + ".1") :
+            getParameterValue("value." + alias);
+    }
 
     /**
      * Gets a list of attribute aliases.
@@ -250,13 +266,9 @@ public class FetchResponse extends AxMessage
         {
             String paramName = ((Parameter) it.next()).getKey();
 
-            if (paramName.startsWith("value."))
+            if (paramName.startsWith("type."))
             {
-                String alias;
-                if (paramName.endsWith("."))
-                    alias = paramName.substring(6, paramName.length() - 1);
-                else
-                    alias = paramName.substring(6);
+                String alias = paramName.substring(5);
 
                 if ( ! aliases.contains(alias) )
                     aliases.add(alias);
@@ -278,13 +290,9 @@ public class FetchResponse extends AxMessage
         {
             String paramName = ((Parameter) it.next()).getKey();
 
-            if (paramName.startsWith("value."))
+            if (paramName.startsWith("type."))
             {
-                String alias;
-                if (paramName.endsWith("."))
-                    alias = paramName.substring(6, paramName.length() - 1);
-                else
-                    alias = paramName.substring(6);
+                String alias = paramName.substring(5);
 
                 if ( ! attributes.containsKey(alias) )
                     attributes.put(alias, getAttributeValues(alias));
@@ -340,18 +348,16 @@ public class FetchResponse extends AxMessage
 
     /**
      * Sets the number of values provided in the fetch response for the
-     * specified attribute alias.
+     * specified attribute alias. The value must be greater than 1.
      *
      * @param alias     The attribute alias.
      * @param count     The number of values.
      */
     private void setCount(String alias, int count)
     {
-        // make sure that count.< alias >.1 is removed
-        _parameters.removeParameters("count." + alias);
-
         if (count > 1)
-            _parameters.set(new Parameter("count." + alias, Integer.toString(count)));
+            _parameters.set(
+                new Parameter("count." + alias, Integer.toString(count)));
     }
 
     /**
@@ -366,7 +372,8 @@ public class FetchResponse extends AxMessage
         try
         {
             new URL(updateUrl);
-        } catch (MalformedURLException e)
+        }
+        catch (MalformedURLException e)
         {
             throw new MessageException("Invalid update_url: " + updateUrl);
         }
@@ -394,6 +401,14 @@ public class FetchResponse extends AxMessage
      */
     private boolean isValid()
     {
+        if ( ! _parameters.hasParameter("mode") ||
+                ! "fetch_response".equals(_parameters.getParameterValue("mode")))
+        {
+            _log.warn("Invalid mode value in fetch_reponse: "
+                      + _parameters.getParameterValue("mode"));
+            return false;
+        }
+
         Iterator it = _parameters.getParameters().iterator();
         while (it.hasNext())
         {
@@ -406,7 +421,7 @@ public class FetchResponse extends AxMessage
                     ! paramName.equals("update_url"))
             {
                 _log.warn("Invalid parameter name in fetch response: " + paramName);
-                return false;
+                //return false;
             }
         }
 
@@ -447,7 +462,14 @@ public class FetchResponse extends AxMessage
 
                 int count = getCount(alias);
 
+                if (count < 0)
+                {
+                    _log.warn("Invalid value for count." + alias + ": " + count);
+                    return false;
+                }
+
                 for (int i = 1; i <= count; i++)
+                {
                     if (! _parameters.hasParameter("value." + alias + "." +
                             Integer.toString(i)))
                     {
@@ -455,6 +477,7 @@ public class FetchResponse extends AxMessage
                                   + alias + "." + Integer.toString(i));
                         return false;
                     }
+                }
             }
         }
 
