@@ -82,7 +82,13 @@ public class StoreRequest extends AxMessage
      * @param       value       The value of the attribute
      */
     public void addAttribute(String alias, String typeUri, String value)
+        throws MessageException
     {
+        if ( alias.indexOf(',') > -1 || alias.indexOf('.') > -1 ||
+             alias.indexOf(':') > -1 || alias.indexOf('\n') > -1 )
+            throw new MessageException(
+                "Characters [.,:\\n] are not allowed in attribute aliases: " + alias);
+
         int count = getCount(alias);
 
         String index = "";
@@ -134,6 +140,16 @@ public class StoreRequest extends AxMessage
     }
 
     /**
+     * Gets the (first) for the specified attribute alias.
+     */
+    public String getAttributeValue(String alias)
+    {
+        return getCount(alias) > 1 ?
+            getParameterValue("value." + alias + ".1") :
+            getParameterValue("value." + alias);
+    }
+
+    /**
      * Gets a list of attribute aliases.
      */
     public List getAttributeAliases()
@@ -145,13 +161,9 @@ public class StoreRequest extends AxMessage
         {
             String paramName = ((Parameter) it.next()).getKey();
 
-            if (paramName.startsWith("value."))
+            if (paramName.startsWith("type."))
             {
-                String alias;
-                if (paramName.endsWith("."))
-                    alias = paramName.substring(6, paramName.length() - 1);
-                else
-                    alias = paramName.substring(6);
+                String alias = paramName.substring(5);
 
                 if ( ! aliases.contains(alias) )
                     aliases.add(alias);
@@ -173,13 +185,9 @@ public class StoreRequest extends AxMessage
         {
             String paramName = ((Parameter) it.next()).getKey();
 
-            if (paramName.startsWith("value."))
+            if (paramName.startsWith("type."))
             {
-                String alias;
-                if (paramName.endsWith("."))
-                    alias = paramName.substring(6, paramName.length() - 1);
-                else
-                    alias = paramName.substring(6);
+                String alias = paramName.substring(5);
 
                 if ( ! attributes.containsKey(alias) )
                     attributes.put(alias, getAttributeValues(alias));
@@ -209,16 +217,13 @@ public class StoreRequest extends AxMessage
 
     /**
      * Sets the number of values provided in the fetch response for the
-     * specified attribute alias.
+     * specified attribute alias. The value must be greater than 1.
      *
      * @param alias     The attribute alias.
      * @param count     The number of values.
      */
     private void setCount(String alias, int count)
     {
-        // make sure that count.< alias >.1 is removed
-        _parameters.removeParameters("count." + alias);
-
         if (count > 1)
             _parameters.set(new Parameter("count." + alias, Integer.toString(count)));
     }
@@ -232,6 +237,14 @@ public class StoreRequest extends AxMessage
      */
     public boolean isValid()
     {
+        if ( ! _parameters.hasParameter("mode") ||
+                ! "store_request".equals(_parameters.getParameterValue("mode")))
+        {
+            _log.warn("Invalid mode value in store_request: "
+                      + _parameters.getParameterValue("mode"));
+            return false;
+        }
+
         Iterator it = _parameters.getParameters().iterator();
         while (it.hasNext())
         {
@@ -243,7 +256,7 @@ public class StoreRequest extends AxMessage
                     ! paramName.startsWith("count.") )
             {
                 _log.warn("Invalid parameter name in store request: " + paramName);
-//                return false;
+                //return false;
             }
         }
 
@@ -284,7 +297,14 @@ public class StoreRequest extends AxMessage
 
                 int count = getCount(alias);
 
+                if (count <= 0)
+                {
+                    _log.warn("Invalid value for count." + alias + ": " + count);
+                    return false;
+                }
+
                 for (int i = 1; i <= count; i++)
+                {
                     if (! _parameters.hasParameter("value." + alias + "." +
                             Integer.toString(i)))
                     {
@@ -292,6 +312,7 @@ public class StoreRequest extends AxMessage
                                   + alias + "." + Integer.toString(i));
                         return false;
                     }
+                }
             }
         }
 

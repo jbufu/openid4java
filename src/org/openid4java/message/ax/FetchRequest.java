@@ -88,10 +88,17 @@ public class FetchRequest extends AxMessage
      * @param       required    If true, marks the attribute as 'required';
      *                          'if_available' otherwise.
      * @param       count       The number of attribute values requested.
+     *                          0 for the special value "unlimited".
      */
     public void addAttribute(String alias, String typeUri,
                              boolean required, int count)
+        throws MessageException
     {
+        if ( alias.indexOf(',') > -1 || alias.indexOf('.') > -1 ||
+             alias.indexOf(':') > -1 || alias.indexOf('\n') > -1 )
+            throw new MessageException(
+                "Characters [.,:\\n] are not allowed in attribute aliases: " + alias);
+
         _parameters.set(new Parameter("type." + alias, typeUri));
 
         String level = required ? "required" : "if_available";
@@ -101,20 +108,18 @@ public class FetchRequest extends AxMessage
 
         if (levelParam == null)
         {
-            newParam = new Parameter(level, multivalEncode(alias));
+            newParam = new Parameter(level, alias);
         }
         else
         {
             newParam = new Parameter(level,
-                    levelParam.getValue() + "," + multivalEncode(alias));
+                    levelParam.getValue() + "," + alias);
             _parameters.removeParameters(level);
         }
 
         _parameters.set(newParam);
 
-        if (count > 1)
-            _parameters.set(
-                    new Parameter("count." + alias, Integer.toString(count)));
+        setCount(alias, count);
 
         if (DEBUG) _log.debug("Added new attribute to fetch request; type: "
                               + typeUri + " alias: " + alias + " count: "
@@ -127,33 +132,42 @@ public class FetchRequest extends AxMessage
      * @see #addAttribute(String, String, boolean, int)
      */
     public void addAttribute(String alias, String typeUri, boolean required)
+        throws MessageException
     {
         addAttribute(alias, typeUri, required, 1);
     }
 
     /**
      * Sets the desired number of attribute vaules requested for the specified
-     * attribute alias.
+     * attribute alias. Special value 0 means "unlimited".
      *
      * @param alias     The attribute alias.
      */
     public void setCount(String alias, int count)
     {
-        if (count > 1)
+        if (count == 0)
+            _parameters.set(new Parameter("count." + alias, "unlimited"));
+
+        else if (count > 1)
             _parameters.set(
                     new Parameter("count." + alias, Integer.toString(count)));
     }
 
     /**
-     * Returns the number of values requested for the specified attribute alias,
-     * or 1 (the default number) if the count parameter is absent.
+     * Returns the number of values requested for the specified attribute alias.
+     * 1 (the default number) is returned if the count parameter is absent.
+     * 0 is returned if the special value "unlimited" was requested.
      *
      * @param alias     The attribute alias.
      */
     public int getCount(String alias)
     {
-        if (_parameters.hasParameter("count." + alias))
+        if ("unlimited".equals(_parameters.getParameterValue("count" + alias)))
+            return 0;
+
+        else if (_parameters.hasParameter("count." + alias))
             return Integer.parseInt(_parameters.getParameterValue("count." + alias));
+
         else
             return 1;
     }
@@ -257,29 +271,33 @@ public class FetchRequest extends AxMessage
 
         if (_parameters.hasParameter("required"))
         {
-            String[] values = _parameters.getParameterValue("required").split(",");
-            for (int i = 0; i < values.length; i++)
+            String[] aliases = _parameters.getParameterValue("required").split(",");
+            for (int i = 0; i < aliases.length; i++)
             {
-                String value = multivalDecode(values[i]);
-                if ( ! _parameters.hasParameter("type." + value) )
+                String alias = aliases[i];
+                if ( ! _parameters.hasParameter("type." + alias) )
                 {
-                    _log.warn("Type missing for attribute alias: " + value);
+                    _log.warn("Type missing for attribute alias: " + alias);
                     return false;
                 }
+
+                if (! checkCount(alias)) return false;
             }
         }
 
         if ( _parameters.hasParameter("if_available"))
         {
-            String[] values = _parameters.getParameterValue("if_available").split(",");
-            for (int i = 0; i < values.length; i++)
+            String[] aliases = _parameters.getParameterValue("if_available").split(",");
+            for (int i = 0; i < aliases.length; i++)
             {
-                String value = multivalDecode(values[i]);
-                if ( ! _parameters.hasParameter("type." + value) )
+                String alias = aliases[i];
+                if ( ! _parameters.hasParameter("type." + alias) )
                 {
-                    _log.warn("Type missing for attribute alias: " + value);
+                    _log.warn("Type missing for attribute alias: " + alias);
                     return false;
                 }
+
+                if (! checkCount(alias)) return false;
             }
         }
 
@@ -289,13 +307,31 @@ public class FetchRequest extends AxMessage
             String paramName = ((Parameter) it.next()).getKey();
             if (! paramName.equals("mode") &&
                     ! paramName.startsWith("type.") &&
+                    ! paramName.startsWith("count.") &&
                     ! paramName.equals("required") &&
                     ! paramName.equals("if_available") &&
                     ! paramName.equals("update_url"))
             {
                 _log.warn("Invalid parameter name in fetch request: " + paramName);
-//                return false;
+                //return false;
             }
+        }
+
+        return true;
+    }
+
+    private boolean checkCount(String alias)
+    {
+        int count = getCount(alias);
+
+        if ( count < 0 ||
+             ( count == 0 &&
+               ! "unlimited".equals(_parameters.getParameterValue("count." + alias))) )
+
+        {
+            _log.warn("Invalid value for count." + alias + ": " +
+                      _parameters.getParameterValue("count." + alias));
+            return false;
         }
 
         return true;

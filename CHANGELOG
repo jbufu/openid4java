@@ -8,6 +8,9 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20070905:
+    - Updated to OpenID Attribute Exchange draft 7
+
 20070821:
     - Added support for OpenID Information Cards 1.0, draft 1
     - Added (OpenID-Infocard) DemoRP and InfocardOP sample/demo projects 

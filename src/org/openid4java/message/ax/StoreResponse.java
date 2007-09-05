@@ -27,7 +27,7 @@ public class StoreResponse extends AxMessage
      */
     protected StoreResponse()
     {
-        _parameters.set(new Parameter("mode", "store_response"));
+        _parameters.set(new Parameter("mode", "store_response_success"));
 
         if (DEBUG) _log.debug("Created empty store request.");
     }
@@ -82,10 +82,10 @@ public class StoreResponse extends AxMessage
      */
     protected void setFailure(String description)
     {
-        _parameters.set(new Parameter("status", "failure"));
+        _parameters.set(new Parameter("mode", "store_response_failure"));
 
         if (description != null)
-            _parameters.set(new Parameter("status.description", description));
+            _parameters.set(new Parameter("error", description));
     }
 
     /**
@@ -94,28 +94,17 @@ public class StoreResponse extends AxMessage
      */
     public boolean hasFailed()
     {
-        return _parameters.hasParameter("status")  &&
-                "failure".equals(_parameters.getParameterValue("status"));
+        return "store_response_failure".equals(
+            _parameters.getParameterValue("mode") );
     }
 
     /**
      * Gets the status of the Store Response if the 'status' parameter is part
      * of the response, or null otherwise.
      */
-    public String getStatus()
+    public String getErrorDescription()
     {
-        return _parameters.hasParameter("status")  ?
-                _parameters.getParameterValue("status") : null;
-    }
-
-    /**
-     * Gets the status of the Store Response if the 'status.description'
-     * parameter is part of the response, or null otherwise.
-     */
-    public String getStatusDescription()
-    {
-        return _parameters.hasParameter("status.description") ?
-                _parameters.getParameterValue("status.description") : null;
+        return _parameters.getParameterValue("error");
     }
 
     /**
@@ -127,8 +116,14 @@ public class StoreResponse extends AxMessage
      */
     private boolean isValid()
     {
-        if ( getStatusDescription() != null && getStatus() == null)
+        if ( ! _parameters.hasParameter("mode") ||
+                ( ! "store_response_success".equals(_parameters.getParameterValue("mode")) &&
+                  ! "store_response_failure".equals(_parameters.getParameterValue("mode")) ) )
+        {
+            _log.warn("Invalid mode value in store response: "
+                      + _parameters.getParameterValue("mode"));
             return false;
+        }
 
         Iterator it = _parameters.getParameters().iterator();
         while (it.hasNext())
@@ -137,17 +132,9 @@ public class StoreResponse extends AxMessage
             String paramName = param.getKey();
 
             if (! paramName.equals("mode") &&
-                    ! paramName.equals("status") &&
-                    ! paramName.equals("status.description"))
+                    ! paramName.equals("error"))
             {
                 _log.warn("Invalid parameter name in store response: " + paramName);
-                return false;
-            }
-
-            if ( paramName.equals("status") &&
-                    ! "failure".equals(param.getValue()) )
-            {
-                _log.warn("Invalid status value: " + param.getValue());
                 return false;
             }
         }

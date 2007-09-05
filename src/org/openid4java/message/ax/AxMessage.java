@@ -30,7 +30,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     /**
      * The Attribute Exchange Type URI.
      */
-    public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0-draft4";
+    public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0-draft7";
 
     /**
      * The Attribute Exchange extension-specific parameters.
@@ -110,30 +110,6 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     public void setParameters(ParameterList params)
     {
         _parameters = params;
-    }
-
-    /**
-     * Encodes a string value according to the conventions for supporting
-     * multiple values for a parameter (commas and backslashes are escaped).
-     *
-     * @param       value   String value to be encoded.
-     * @return              The encoded value.
-     */
-    public String multivalEncode(String value)
-    {
-        return value.replaceAll("\\\\", "\\\\\\\\").replaceAll(",","\\\\,");
-    }
-
-    /**
-    * Decodes a string value according to the conventions for supporting
-    * multiple values for a parameter (commas and backslashes are escaped).
-    *
-    * @param       value   String value to be decoded.
-    * @return              The dencoded value.
-    */
-    public String multivalDecode(String value)
-    {
-        return value.replaceAll("\\\\,", ",").replaceAll("\\\\\\\\","\\\\");
     }
 
     /**
