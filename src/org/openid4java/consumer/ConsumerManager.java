@@ -101,12 +101,6 @@ public class ConsumerManager
     private AssociationSessionType _prefAssocSessEnc;
 
     /**
-     * Flag for allowing / disallowing no-encryption association session
-     * over plain HTTP.
-     */
-    private boolean _allowNoEncHttpSess = false;
-
-    /**
      * Parameters (modulus and generator) for the Diffie-Hellman sessions.
      */
     private DHParameterSpec _dhParams = DiffieHellmanSession.getDefaultParameter();
@@ -376,30 +370,6 @@ public class ConsumerManager
     public AssociationSessionType getPrefAssocSessEnc()
     {
         return _prefAssocSessEnc;
-    }
-
-    /**
-     * Flag that determines whether no-encryption association sessions are
-     * allowed through plain HTTP.
-     * <p>
-     * Default: false (require HTTPS for no-encryption association sessions).
-     * <p>
-     * OpenID specification strongly RECOMMENDEDS AGAINST  the use of
-     * "no-encryption" sessions on a public network; this is vulnerable to
-     * eavesdropping attacks.
-     */
-    public void setAllowNoEncHttp(boolean allowNoEncHttp)
-    {
-        this._allowNoEncHttpSess = allowNoEncHttp;
-    }
-
-    /**
-     * Returns true if no-encryption association sessions will be allowed to be
-     * established over plain HTTP.
-     */
-    public boolean getAllowNoEncHttp()
-    {
-        return _allowNoEncHttpSess;
     }
 
     /**
@@ -851,14 +821,13 @@ public class ConsumerManager
                     && Association.isHmacSupported(type.getAssociationType()))
                     assocReq = AssociationRequest.createAssociationRequest(type, dhSess);
             }
-            else // no-enc session
-            {
-                if ((_allowNoEncHttpSess ||
-                        idpUrl.getProtocol().equals("https"))
-                        &&
-                        Association.isHmacSupported(type.getAssociationType()))
+
+            else if ( idpUrl.getProtocol().equals("https") && // no-enc sess
+                     Association.isHmacSupported(type.getAssociationType()))
                     assocReq = AssociationRequest.createAssociationRequest(type);
-            }
+
+            if (assocReq == null)
+                _log.warn("Could not create association of type: " + type);
 
             return assocReq;
         }
