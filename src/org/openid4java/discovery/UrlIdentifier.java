@@ -42,7 +42,13 @@ public class UrlIdentifier implements Identifier
 
     public UrlIdentifier(String identifier) throws DiscoveryException
     {
-        _urlIdentifier = normalize(identifier);
+        this(identifier, false);
+    }
+
+    public UrlIdentifier(String identifier, boolean removeFragment)
+        throws DiscoveryException
+    {
+        _urlIdentifier = normalize(identifier, removeFragment);
     }
 
     public boolean equals(Object o)
@@ -80,6 +86,12 @@ public class UrlIdentifier implements Identifier
 
     public static URL normalize(String text) throws DiscoveryException
     {
+        return normalize(text, false);
+    }
+
+    public static URL normalize(String text, boolean removeFragment)
+        throws DiscoveryException
+    {
         try
         {
             URI uri = new URI(text);
@@ -104,7 +116,7 @@ public class UrlIdentifier implements Identifier
             if (query != null)
                 file = file + "?" + query;
 
-            if (fragment != null)
+            if (fragment != null && ! removeFragment)
                 file = file + "#" + fragment;
 
             URL normalized = new URL(protocol, host, port, file);

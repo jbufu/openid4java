@@ -98,6 +98,13 @@ public class Discovery
     public static Identifier parseIdentifier(String identifier)
             throws DiscoveryException
     {
+        return parseIdentifier(identifier, false);
+    }
+
+    public static Identifier parseIdentifier(String identifier,
+                                             boolean removeFragment)
+            throws DiscoveryException
+    {
         try
         {
             // strip the xri:// prefix if it exists
@@ -111,7 +118,7 @@ public class Discovery
             if (URL_PATTERN.matcher(identifier).find())
             {
                 if (DEBUG) _log.debug("Creating URL identifier for: " + identifier);
-                return new UrlIdentifier(identifier);
+                return new UrlIdentifier(identifier, removeFragment);
             }
             else if (XRI_PATTERN.matcher(identifier).find())
             {
@@ -122,7 +129,7 @@ public class Discovery
             {
                 if (DEBUG) _log.debug("Creating URL identifier (http:// prepended) for: "
                         + identifier);
-                return new UrlIdentifier("http://" + identifier);
+                return new UrlIdentifier("http://" + identifier, removeFragment);
             }
         }
         catch (Exception e)
@@ -135,7 +142,7 @@ public class Discovery
     public List discover(String identifier)
             throws DiscoveryException
     {
-        return discover(parseIdentifier(identifier));
+        return discover(parseIdentifier(identifier, true)); // remove fragment
     }
 
     public List discover(Identifier identifier)
