@@ -1518,7 +1518,8 @@ public class ConsumerManager
         String assertId = authResp.getIdentity();
 
         // claimed identifier in the AuthResponse
-        Identifier respClaimed = Discovery.parseIdentifier(authResp.getClaimed());
+        Identifier respClaimed =
+            Discovery.parseIdentifier(authResp.getClaimed(), true);
 
         // the OP endpoint sent in the response
         String respEndpoint = authResp.getOpEndpoint();
@@ -1619,7 +1620,7 @@ public class ConsumerManager
     private VerificationResult verifySignature(AuthSuccess authResp,
                                                DiscoveryInformation discovered,
                                                VerificationResult result)
-            throws AssociationException, MessageException
+        throws AssociationException, MessageException, DiscoveryException
     {
         if (discovered == null || authResp == null)
         {
@@ -1631,6 +1632,10 @@ public class ConsumerManager
 
             return result;
         }
+
+        Identifier claimedId = discovered.isVersion2() ?
+            Discovery.parseIdentifier(authResp.getClaimed()) : //may have frag
+            discovered.getClaimedIdentifier(); //assert id may be delegate in v1
 
         String handle = authResp.getHandle();
         URL idp = discovered.getIdpEndpoint();
@@ -1645,7 +1650,7 @@ public class ConsumerManager
 
             if (assoc.verifySignature(text, signature))
             {
-                result.setVerifiedId(discovered.getClaimedIdentifier());
+                result.setVerifiedId(claimedId);
                 if (DEBUG) _log.debug("Local signature verification succeeded.");
             }
             else if (DEBUG) _log.debug("Local signature verification failed.");
@@ -1673,7 +1678,7 @@ public class ConsumerManager
                     if (invalidateHandle != null)
                         _associations.remove(idp.toString(), invalidateHandle);
 
-                    result.setVerifiedId(discovered.getClaimedIdentifier());
+                    result.setVerifiedId(claimedId);
                     if (DEBUG)
                         _log.debug("Direct signature verification succeeded " +
                                    "with OP: " + idp);
