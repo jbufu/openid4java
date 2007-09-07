@@ -223,7 +223,7 @@ public class FetchRequest extends AxMessage
             String[] values = param.getValue().split(",");
             for (int i = 0; i < values.length; i++)
             {
-                String alias = multivalDecode(values[i]);
+                String alias = values[i];
                 attributes.put(alias,
                         _parameters.getParameterValue("type." + alias));
             }
