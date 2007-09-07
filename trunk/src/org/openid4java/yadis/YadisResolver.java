@@ -77,6 +77,7 @@ public class YadisResolver
 
     /**
      * Maximum number of redirects to be followed for the HTTP calls.
+     * Defalut 10.
      */
     private int _maxRedirects = 10;
 
@@ -198,17 +199,41 @@ public class YadisResolver
      * <li> retrieves the XRDS document with a GET on the above if available,
      *      or through a GET on the YadisURL otherwise
      * </ul>
+     * <p>
+     * The maximum number of redirects that are followed is determined by the
+     * #_maxRedirects member field.
      *
      * @param url           YadisURL on which discovery will be performed
      * @return              YadisResult containing discovered information,
      *                      which includes the XRDS document associated with
      *                      the Yadis URL and additional meta-information
-     * @see YadisResult
+     * @see YadisResult, #discover(String, int)
      */
     public YadisResult discover(String url)
     {
+        return discover(url, _maxRedirects);
+    }
+
+    /**
+     * Performs Yadis discovery on the YadisURL.
+     * <p>
+     * <ul>
+     * <li> tries to retrieve the XRDS location via a HEAD call on the Yadis URL
+     * <li> retrieves the XRDS document with a GET on the above if available,
+     *      or through a GET on the YadisURL otherwise
+     * </ul>
+     *
+     * @param url           YadisURL on which discovery will be performed
+     * @param maxRedirects  The maximum number of redirects to be followed.
+     * @return              YadisResult containing discovered information,
+     *                      which includes the XRDS document associated with
+     *                      the Yadis URL and additional meta-information
+     * @see YadisResult
+     */
+    public YadisResult discover(String url, int maxRedirects)
+    {
         HttpClient client = HttpClientFactory.getInstance(
-                _maxRedirects, Boolean.TRUE, _socketTimeout, _connTimeout,
+                maxRedirects, Boolean.TRUE, _socketTimeout, _connTimeout,
                 CookiePolicy.IGNORE_COOKIES);
 
         // initialize the result

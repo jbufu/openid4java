@@ -91,6 +91,13 @@ public class ServerManager
     private RealmVerifier _realmVerifier;
 
     /**
+     * Flag that instructs the realm verifier to enforce validation
+     * of the return URL agains the endpoints discovered from the RP's realm.
+     * Default false (don't enforce).
+     */
+    private boolean _enforceRpId;
+
+    /**
      * The OpenID Provider's endpoint URL, where it accepts OpenID
      * authentication requests.
      * <p>
@@ -306,6 +313,25 @@ public class ServerManager
         this._realmVerifier = realmVerifier;
     }
 
+
+    /**
+     * Gets the flag that instructs the realm verifier to enforce validation
+     * of the return URL agains the endpoints discovered from the RP's realm.
+     */
+    public boolean getEnforceRpId()
+    {
+        return _enforceRpId;
+    }
+
+    /**
+     * Sets the flag that instructs the realm verifier to enforce validation
+     * of the return URL agains the endpoints discovered from the RP's realm.
+     */
+    public void setEnforceRpId(boolean enforceRpId)
+    {
+        this._enforceRpId = enforceRpId;
+    }
+
     /**
      * Gets OpenID Provider's endpoint URL, where it accepts OpenID
      * authentication requests.
@@ -340,7 +366,9 @@ public class ServerManager
     public ServerManager()
     {
         // initialize a default realm verifier
+        _enforceRpId = false;
         _realmVerifier = new RealmVerifier();
+        _realmVerifier.setEnforceRpId(_enforceRpId);
     }
 
 
