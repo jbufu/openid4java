@@ -5,9 +5,14 @@
 package org.openid4java.server;
 
 import org.apache.log4j.Logger;
+import org.openid4java.yadis.YadisResolver;
+import org.openid4java.discovery.Discovery;
+import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.DiscoveryInformation;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -29,9 +34,16 @@ public class RealmVerifier
     public static final int PORT_MISMATCH = 6;
     public static final int PATH_MISMATCH = 7;
     public static final int DOMAIN_MISMATCH = 8;
+    public static final int RP_DISCOVERY_FAILED = 9;
+    public static final int RP_INVALID_ENDPOINT = 10;
 
     private List _deniedRealmDomains;
     private List _deniedRealmRegExps;
+
+    // yadis resolver used for RP discovery
+    private YadisResolver _yadisResolver;
+
+    private boolean _enforceRpId;
 
     public RealmVerifier()
     {
@@ -39,6 +51,10 @@ public class RealmVerifier
 
         addDeniedRealmDomain("\\*\\.[^\\.]+");
         addDeniedRealmDomain("\\*\\.[a-z]{2}\\.[a-z]{2}");
+
+        _yadisResolver = new YadisResolver();
+
+        _enforceRpId = true;
     }
 
     public void addDeniedRealmDomain(String deniedRealmDomain)
@@ -68,9 +84,99 @@ public class RealmVerifier
         {
             String deniedRealm = (String) _deniedRealmDomains.get(i);
 
-            Pattern deniedRealmPattern = Pattern.compile(deniedRealm, Pattern.CASE_INSENSITIVE);
+            Pattern deniedRealmPattern =
+                Pattern.compile(deniedRealm, Pattern.CASE_INSENSITIVE);
 
             _deniedRealmRegExps.add(deniedRealmPattern);
+        }
+    }
+
+
+    public boolean getEnforceRpId()
+    {
+        return _enforceRpId;
+    }
+
+    public void setEnforceRpId(boolean enforceRpId)
+    {
+        this._enforceRpId = enforceRpId;
+    }
+
+    public int validate(String realm, String returnTo)
+    {
+        return validate(realm, returnTo, _enforceRpId);
+    }
+
+    public int validate(String realm, String returnTo, boolean enforceRpId)
+    {
+        int result;
+        // 1. match the return_to against the realm
+        result = match(realm, returnTo);
+
+        if (OK != result)
+        {
+            _log.error("Return URL: " + returnTo +
+                       " does not match realm: " + realm);
+            return result;
+        }
+
+        // 2. match the return_to against RP endpoints discovered from the realm
+        result = RP_INVALID_ENDPOINT; // assume there won't get a match
+        try
+        {
+            // replace '*.' with 'www.' in the authority part
+            URL realmUrl = new URL(realm);
+            if (realmUrl.getAuthority().startsWith("*."))
+                realm = realm.replaceFirst("\\*\\.", "www.");
+
+            List endpoints = Discovery.rpDiscovery(realm, _yadisResolver);
+            DiscoveryInformation endpoint;
+            String endpointUrl;
+            Iterator iter = endpoints.iterator();
+            while (iter.hasNext())
+            {
+                endpoint = (DiscoveryInformation) iter.next();
+                endpointUrl = endpoint.getIdpEndpoint().toString();
+
+                if (endpoint.getIdpEndpoint().getAuthority().startsWith("*."))
+                {
+                    _log.warn("Wildcard not allowed in discovered " +
+                              "RP endpoints; found: " + endpointUrl);
+                    continue;
+                }
+
+                if (OK == match(endpointUrl, returnTo))
+                {
+                    _log.info("Return URL: " + returnTo +
+                             " matched discovered RP endpoint: " + endpointUrl);
+                    result = OK;
+                    break;
+                }
+            }
+        }
+        catch (DiscoveryException e)
+        {
+            _log.error("Discovery failed on realm: " + realm, e);
+            result = RP_DISCOVERY_FAILED;
+        }
+        catch (MalformedURLException e)
+        {
+            _log.error("Invalid realm URL: " + realm, e);
+            result = MALFORMED_REALM;
+        }
+
+        // return the result
+        if (enforceRpId)
+        {
+            return result;
+        }
+        else
+        {
+            if (OK != result)
+                _log.warn("Failed to validate return URL: " + returnTo +
+                    "against endpoints discovered from the RP's realm; " +
+                    "not enforced, returning OK; error code: " + result);
+            return OK;
         }
     }
 
@@ -144,7 +250,7 @@ public class RealmVerifier
             return PATH_MISMATCH;
         }
 
-        _log.info("Realm verified: " + realm);
+        _log.info("Return URL: " + returnTo + "matches realm: " + realm);
 
         return OK;
     }

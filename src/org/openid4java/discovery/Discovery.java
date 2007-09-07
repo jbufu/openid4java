@@ -604,4 +604,46 @@ public class Discovery
 
         return parentNoPrefix.equals(providerIDNoPrefix);
     }
+
+    /**
+     * Performs discovery on the Relying Party's realm and returns a list of
+     * OpenID 2.0 DiscoveryInformation entries.
+     * <p>
+     * Static method / caller must provide a YadisResolver so that
+     * the OP doesn't have to instantiate a Discovery object.
+     *
+     * @param realm         RP's realm.
+     * @param yadisResolver The YadisResolver instance to be used for discovery.
+     * @return              List of OpenID 2.0 DiscoveryInformation endpoints.
+     */
+    public static List rpDiscovery(String realm, YadisResolver yadisResolver)
+        throws DiscoveryException
+    {
+        List result = new ArrayList();
+
+        // don't follow redirects when doing RP discovery
+        YadisResult rpDiscovery = yadisResolver.discover(realm, 0);
+
+        if (YadisResult.OK == rpDiscovery.getStatus())
+        {
+            result = extractDiscoveryInformation(rpDiscovery.getXrds(),
+                    new UrlIdentifier(rpDiscovery.getNormalizedUrl()) );
+
+            // return only OpenID 2.0 endpoints (RP realm validation only in v2)
+            Iterator iter = result.iterator();
+            DiscoveryInformation endpoint;
+            while (iter.hasNext())
+            {
+                endpoint = (DiscoveryInformation)iter.next();
+
+                if (!DiscoveryInformation.OPENID2.equals(endpoint.getVersion()))
+                {
+                    iter.remove();
+                }
+            }
+        }
+
+        return result;
+    }
+
 }

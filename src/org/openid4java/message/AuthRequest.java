@@ -346,7 +346,7 @@ public class AuthRequest extends Message
         }
 
         if (getRealm() != null &&  RealmVerifier.OK !=
-                        _realmVerifier.match(getRealm(), getReturnTo()) )
+                        _realmVerifier.validate(getRealm(), getReturnTo()) )
         {
             _log.warn("Realm verification failed for: " + getRealm());
             return false;
