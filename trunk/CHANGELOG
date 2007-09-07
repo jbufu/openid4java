@@ -8,6 +8,12 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20070907:
+    - Draft 12 compliant
+    - Implemented identifier recycling
+    - Implemented return URL validation against endpoints
+      discovered from the RP's realm
+
 20070905:
     - Updated to OpenID Attribute Exchange draft 7
 
