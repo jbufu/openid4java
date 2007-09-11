@@ -1,0 +1,22 @@
+#summary Enabling 256bit cryptographic support
+
+
+= Enabling 256bit cryptographic support =
+
+== Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy == 
+
+Download and install (under JAVA_HOME/jre/lib/security) the JCE
+unlimited strength policy files, usually distributed along with JVMs
+(but not included in standard packages). SUN's Java JCE policy files
+can be found as separate downloads at the following URLs:
+
+      http://java.sun.com/javase/downloads/index_jdk5.jsp
+      http://java.sun.com/j2se/1.4.2/download.html
+
+== Third party libraries ==
+
+Third party libraries that provide unlimited strength JCE
+implementations can also be used. One such library is provided by
+Bouncy Castle:
+
+      http://www.bouncycastle.org/java.html
