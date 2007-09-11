@@ -23,9 +23,11 @@ Installation:
 
   1. Installing the package
 
-    The JAR files under the endorsed/ folder need to be copied under your
-    environment's endorsed libraries folder. If you are running a web
-    application under Apache Tomcat, this directory can be found at:
+    => Endorsed libraries:
+
+    The JAR files under the lib/endorsed/ folder need to be copied under
+    your environment's endorsed libraries folder. If you are running a
+    webapplication under Apache Tomcat, this directory can be found at:
 
         JAVA_HOME/lib/endorsed
      or
@@ -34,11 +36,24 @@ Installation:
     For other application servers or environments, please consult their
     documentation for configuring endorsed libraries.
 
-    => To make the library available to the web application the following
-    need to be done:
+    => To make the OpenID4Java library available to the web application
+    the following need to be done:
 
-    - Copy lib/*.jar and java-openid-sxip-*.jar to your application's Java
-      classpath
+      Copy lib/*.jar and java-openid-sxip-*.jar to your application's
+      Java classpath, along with any additional requirements as described 
+      in the library dependencies section below.
+
+    => Library dependencies:
+
+      lib/xri/      : OpenXRI dependencies; needed for XRI support.
+      lib/endorsed/ : Endorsed libraries; documented above.   
+      lib/infocard/ : Higgins STS dependency; needed for OpenID-Infocards STS.
+      lib/optional/ : Optional libraries supporting alternative deployments.
+                      - spring.jar        : JdbcServerAssociationStore
+                      - ehcache-1.2.4.jar : EhcacheNonceVerifier
+                      - log4j-1.2.8.jar
+      lib/extra/    : Extra libraries, not needed for deployments
+                      (JUnit tests, Jetty servlet container, SVN Ant utilities)
 
 
   2. OPTIONAL: Building the package
