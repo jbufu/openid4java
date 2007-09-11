@@ -56,7 +56,28 @@ Installation:
                       (JUnit tests, Jetty servlet container, SVN Ant utilities)
 
 
-  2. OPTIONAL: Building the package
+  2. OPTIONAL: Enabling 256bit cryptographic support
+
+    => Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy
+
+      Download and install (under JAVA_HOME/jre/lib/security) the JCE
+      unlimited strength policy files, usually distributed along with JVMs
+      (but not included in standard packages). SUN's Java JCE policy files
+      can be found as separate downloads at the following URLs:
+
+      http://java.sun.com/javase/downloads/index_jdk5.jsp
+      http://java.sun.com/j2se/1.4.2/download.html
+
+    => Third party libraries
+
+      Third party libraries that provide unlimited strength JCE
+      implementations can also be used. One such library is provided by
+      Bouncy Castle:
+
+      http://www.bouncycastle.org/java.html
+
+
+  3. OPTIONAL: Building the package
 
     To build the package from source Ant is also needed. The following
     build targets are provided:
@@ -70,7 +91,7 @@ Installation:
         ant dist
 
 
-  3. OPTIONAL: Testing the package
+  4. OPTIONAL: Testing the package
 
     JUnit test classes and data files are found under the test/ folder.
     JUnit and Ant are needed for running the tests:
