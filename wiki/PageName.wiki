@@ -11,7 +11,9 @@ unlimited strength policy files, usually distributed along with JVMs
 can be found as separate downloads at the following URLs:
 
       http://java.sun.com/javase/downloads/index_jdk5.jsp
+
       http://java.sun.com/j2se/1.4.2/download.html
+
 
 == Third party libraries ==
 
@@ -20,3 +22,6 @@ implementations can also be used. One such library is provided by
 Bouncy Castle:
 
       http://www.bouncycastle.org/java.html
+
+
+
