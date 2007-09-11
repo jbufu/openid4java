@@ -6,6 +6,8 @@
 
  - Complete JavaDocs
  - Do we package 256 bit libs?
+ - Configuring logging
+ - Enabling 256bit cryptographic support
 
 => Tests
 

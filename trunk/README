@@ -39,28 +39,28 @@ distribution project page at: http://code.sxip.com
 
 Package contents:
 
-CHANGELOG     : Version highlight changes
+CHANGELOG     : Version highlight changes.
 
 INSTALL       : Installation and usage instructions.
 
-LICENSE       : OpenID4Java Library license (Apache 2.0)
+LICENSE       : OpenID4Java Library license (Apache 2.0).
 
-MAINTAINERS   : List of code and documentation maintainers
+MAINTAINERS   : List of code and documentation maintainers.
 
 README        : This file!
 
-TODO          : Tasks remaining and/or ongoing
+TODO          : Tasks remaining and/or ongoing.
 
-VERSION       : The released version of this package
+VERSION       : The released version of this package.
 
-src/          : Source code, libraries and endorsed libraries required to
-lib/            use the OpenID4Java Library
-endorsed/
+apidoc/       : JavaDoc API documentation.
 
-apidoc/       : JavaDoc API documentation
+src/          : Source code.
 
-test/         : Junit tests, bundled with the Jetty servlet container for
-libext/         generating custom identifiers and discovery results
+test/         : Test cases source code and test data.
+
+lib/          : Library dependencies.
+                See INSTALL / Installing the package for details.
 
 build.xml     : Ant build file; see INSTALL / Building the package.
 project.properties
