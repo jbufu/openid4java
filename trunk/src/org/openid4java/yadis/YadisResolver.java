@@ -259,7 +259,7 @@ public class YadisResolver
             result.setStatusMessage(e.getMessage());
             if (e.getCause() != null) result.setFailureCause(e.getCause());
 
-            _log.info( "Yadis discovery failed on " + url +
+            _log.warn( "Yadis discovery failed on " + url +
                     ", status: " + e.getStatusCode() +
                     ", error message: " + e.getMessage() );
         }
