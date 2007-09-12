@@ -21,8 +21,10 @@ import java.util.List;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.openid4java.yadis.YadisResolver;
-import org.openid4java.yadis.YadisResult;
+import org.openid4java.discovery.yadis.YadisResolver;
+import org.openid4java.discovery.yadis.YadisResult;
+import org.openid4java.discovery.html.HtmlResolver;
+import org.openid4java.discovery.html.HtmlResult;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu

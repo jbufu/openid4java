@@ -2,7 +2,7 @@
  * Copyright 2006-2007 Sxip Identity Corporation
  */
 
-package org.openid4java.yadis;
+package org.openid4java.discovery.yadis;
 
 import org.htmlparser.Parser;
 import org.htmlparser.Node;
