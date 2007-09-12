@@ -1,27 +1,34 @@
-#summary Enabling 256bit cryptographic support
+#summary Logging Configuration
 
 
-= Enabling 256bit cryptographic support =
+= Logging Configuration =
 
-== Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy == 
+OpenID4Java uses Apache's commons-logging API. This allows the
+application developers to choose (or change) their preferred logging
+implementations, without the need to modify or recompile the library.
 
-Download and install (under JAVA_HOME/jre/lib/security) the JCE
-unlimited strength policy files, usually distributed along with JVMs
-(but not included in standard packages). SUN's Java JCE policy files
-can be found as separate downloads at the following URLs:
+    http://commons.apache.org/logging/guide.html#Configuration
 
-      http://java.sun.com/javase/downloads/index_jdk5.jsp
+== Log4J configuration ==
 
-      http://java.sun.com/j2se/1.4.2/download.html
+Log4J v1.2 is used as the logging implementation for the sample
+projects included with the OpenID4Java library. Commons-logging
+uses Log4J as the primary default and automatically detects if
+Log4J is available when discoverying available logging 
+implementations.
 
+A typical way to configure Log4J is using a log4j.properties file
+in the classpath which should contain the following (adjust log
+levels as desired):
 
-== Third party libraries ==
+{{{
+        log4j.rootLogger=INFO, A1
+        log4j.logger.org.openid4java=DEBUG, A1
+        log4j.appender.A1=org.apache.log4j.ConsoleAppender
+        log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+}}}
 
-Third party libraries that provide unlimited strength JCE
-implementations can also be used. One such library is provided by
-Bouncy Castle:
-
-      http://www.bouncycastle.org/java.html
+http://logging.apache.org/log4j/1.2/
 
 
 
