@@ -2,7 +2,10 @@
  * Copyright 2006-2007 Sxip Identity Corporation
  */
 
-package org.openid4java.discovery;
+package org.openid4java.discovery.html;
+
+import org.openid4java.discovery.UrlIdentifier;
+import org.openid4java.discovery.DiscoveryException;
 
 import java.net.URL;
 import java.net.MalformedURLException;

@@ -2,7 +2,7 @@
  * Copyright 2006-2007 Sxip Identity Corporation
  */
 
-package org.openid4java.discovery;
+package org.openid4java.discovery.html;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openid4java.util.HttpClientFactory;
+import org.openid4java.discovery.UrlIdentifier;
+import org.openid4java.discovery.DiscoveryException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -178,7 +180,7 @@ public class HtmlResolver
             byte data[] = new byte[_maxHtmlSize];
 
             int totalRead = 0;
-            int currentRead = 0;
+            int currentRead;
             while (totalRead < _maxHtmlSize)
             {
                 currentRead = htmlInput.read(data, totalRead, _maxHtmlSize - totalRead);

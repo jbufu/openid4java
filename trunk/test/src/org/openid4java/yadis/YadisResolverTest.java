@@ -11,6 +11,8 @@ import junit.framework.TestCase;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.openid4java.discovery.yadis.YadisResolver;
+import org.openid4java.discovery.yadis.YadisResult;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu

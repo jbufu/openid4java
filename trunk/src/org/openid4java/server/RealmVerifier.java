@@ -6,10 +6,10 @@ package org.openid4java.server;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openid4java.yadis.YadisResolver;
 import org.openid4java.discovery.Discovery;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
+import org.openid4java.discovery.yadis.YadisResolver;
 
 import java.util.List;
 import java.util.ArrayList;
