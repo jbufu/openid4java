@@ -234,10 +234,10 @@ public class Discovery
     {
         ArrayList htmlList = new ArrayList();
 
-        if (htmlResult.getIdp2Endpoint() != null)
+        if (htmlResult.getOP2Endpoint() != null)
         {
             DiscoveryInformation extracted = new DiscoveryInformation(
-                        htmlResult.getIdp2Endpoint(),
+                        htmlResult.getOP2Endpoint(),
                         htmlResult.getClaimedId(),
                         htmlResult.getDelegate2(),
                         DiscoveryInformation.OPENID2);
@@ -248,10 +248,10 @@ public class Discovery
             htmlList.add(extracted);
         }
 
-        if (htmlResult.getIdp1Endpoint() != null)
+        if (htmlResult.getOP1Endpoint() != null)
         {
             DiscoveryInformation extracted = new DiscoveryInformation(
-                        htmlResult.getIdp1Endpoint(),
+                        htmlResult.getOP1Endpoint(),
                         htmlResult.getClaimedId(),
                         htmlResult.getDelegate1(),
                         DiscoveryInformation.OPENID11);

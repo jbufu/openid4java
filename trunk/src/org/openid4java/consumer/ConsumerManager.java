@@ -267,7 +267,7 @@ public class ConsumerManager
 
     /**
      * Maximum number of attempts (HTTP calls) the RP is willing to make
-     * for trying to establish an association with the IdP.
+     * for trying to establish an association with the OP.
      *
      * Default: 4;
      * 0 = don't use associations
@@ -376,8 +376,8 @@ public class ConsumerManager
      * Sets the expiration timeout (in seconds) for keeping track of failed
      * association attempts.
      * <p>
-     * If an association cannot be establish with an IdP, subsequesnt
-     * authentication request to that IdP will not try to establish an
+     * If an association cannot be establish with an OP, subsequesnt
+     * authentication request to that OP will not try to establish an
      * association within the timeout period configured here.
      * <p>
      * Default: 300s
@@ -552,7 +552,7 @@ public class ConsumerManager
                     request.wwwFormEncoding(),
                     "application/x-www-form-urlencoded", "UTF-8"));
 
-            // place the http call to the IdP
+            // place the http call to the OP
             if (DEBUG) _log.debug("Performing HTTP POST on " + url);
             responseCode = _httpClient.executeMethod(post);
 
@@ -604,7 +604,7 @@ public class ConsumerManager
             attemptsLeft -= associate(discovered, attemptsLeft);
 
             // check if an association was established
-            assoc = _associations.load(discovered.getIdpEndpoint().toString());
+            assoc = _associations.load(discovered.getOPEndpoint().toString());
 
             if ( assoc != null &&
                     ! Association.FAILED_ASSOC_HANDLE.equals(assoc.getHandle()))
@@ -616,7 +616,7 @@ public class ConsumerManager
             // no association established, return the first service endpoint
             DiscoveryInformation d0 = (DiscoveryInformation) discoveries.get(0);
             _log.warn("Association failed; using first entry: " +
-                      d0.getIdpEndpoint());
+                      d0.getOPEndpoint());
 
             return d0;
         }
@@ -640,14 +640,14 @@ public class ConsumerManager
     {
         if (_maxAssocAttempts == 0) return 0; // associations disabled
 
-        URL idpUrl = discovered.getIdpEndpoint();
-        String idpEndpoint = idpUrl.toString();
+        URL opUrl = discovered.getOPEndpoint();
+        String opEndpoint = opUrl.toString();
 
-        _log.info("Trying to associate with " + idpEndpoint +
+        _log.info("Trying to associate with " + opEndpoint +
                 " attempts left: " + maxAttempts);
 
         // check if there's an already established association
-        Association a = _associations.load(idpEndpoint);
+        Association a = _associations.load(opEndpoint);
         if (a != null && a.getHandle() != null)
         {
             _log.info("Found an existing association.");
@@ -685,7 +685,7 @@ public class ConsumerManager
             AssociationSessionType type = (AssociationSessionType) iter.next();
 
             // create the appropriate Association Request
-            AssociationRequest newReq = createAssociationRequest(type, idpUrl);
+            AssociationRequest newReq = createAssociationRequest(type, opUrl);
             if (newReq != null) reqStack.push(newReq);
         }
 
@@ -714,7 +714,7 @@ public class ConsumerManager
                 alreadyTried.put(assocReq.getType(), null);
 
                 ParameterList respParams = new ParameterList();
-                int status = call(idpEndpoint, assocReq, respParams);
+                int status = call(opEndpoint, assocReq, respParams);
 
                 // process the response
                 if (status == HttpStatus.SC_OK) // success response
@@ -731,14 +731,14 @@ public class ConsumerManager
 
                     AssociationSessionType respType = assocResp.getType();
                     if ( respType.equals(assocReq.getType()) ||
-                            // v1 IdPs may return a success no-encryption resp
+                            // v1 OPs may return a success no-encryption resp
                             ( ! discovered.isVersion2() &&
                               respType.getHAlgorithm() == null &&
-                              createAssociationRequest(respType,idpUrl) != null))
+                              createAssociationRequest(respType,opUrl) != null))
                     {
                         // store the association and do no try alternatives
-                        _associations.save(idpEndpoint, assoc);
-                        _log.info("Associated with " + discovered.getIdpEndpoint()
+                        _associations.save(opEndpoint, assoc);
+                        _log.info("Associated with " + discovered.getOPEndpoint()
                                 + " handle: " + assoc.getHandle());
                         break;
                     }
@@ -749,22 +749,22 @@ public class ConsumerManager
                 {
                     _log.info("Association attempt failed.");
 
-                    // retrieve fallback sess/assoc/encryption params set by IdP
+                    // retrieve fallback sess/assoc/encryption params set by OP
                     // and queue a new attempt
                     AssociationError assocErr =
                             AssociationError.createAssociationError(respParams);
 
-                    AssociationSessionType idpType =
+                    AssociationSessionType opType =
                             AssociationSessionType.create(
                                     assocErr.getSessionType(),
                                     assocErr.getAssocType());
 
-                    if (alreadyTried.keySet().contains(idpType))
+                    if (alreadyTried.keySet().contains(opType))
                         continue;
 
                     // create the appropriate Association Request
                     AssociationRequest newReq =
-                            createAssociationRequest(idpType, idpUrl);
+                            createAssociationRequest(opType, opUrl);
 
                     if (newReq != null)
                     {
@@ -782,11 +782,11 @@ public class ConsumerManager
             }
         }
 
-        // store IdPs with which an association could not be established
+        // store OPs with which an association could not be established
         // so that association attempts are not performed with each auth request
         if (Association.FAILED_ASSOC_HANDLE.equals(handle)
                 && _failedAssocExpire > 0)
-            _associations.save(idpEndpoint,
+            _associations.save(opEndpoint,
                     Association.getFailedAssociation(_failedAssocExpire));
 
         return maxAttempts - attemptsLeft;
@@ -798,13 +798,13 @@ public class ConsumerManager
      * level, default Diffie-Hellman parameters).
      *
      * @param type      The type of the association (session and association)
-     * @param idpUrl    The IdP for which the association request is created
+     * @param opUrl    The OP for which the association request is created
      * @return          An AssociationRequest message ready to be sent back
      *                  to the OpenID Provider, or null if an association
      *                  of the requested type cannot be built.
      */
     private AssociationRequest createAssociationRequest(
-            AssociationSessionType type, URL idpUrl)
+            AssociationSessionType type, URL opUrl)
     {
         try
         {
@@ -822,7 +822,7 @@ public class ConsumerManager
                     assocReq = AssociationRequest.createAssociationRequest(type, dhSess);
             }
 
-            else if ( idpUrl.getProtocol().equals("https") && // no-enc sess
+            else if ( opUrl.getProtocol().equals("https") && // no-enc sess
                      Association.isHmacSupported(type.getAssociationType()))
                     assocReq = AssociationRequest.createAssociationRequest(type);
 
@@ -970,7 +970,7 @@ public class ConsumerManager
         associate(discovered, _maxAssocAttempts);
 
         Association assoc =
-                _associations.load(discovered.getIdpEndpoint().toString());
+                _associations.load(discovered.getOPEndpoint().toString());
         String handle = assoc != null ?
                 assoc.getHandle() : Association.FAILED_ASSOC_HANDLE;
 
@@ -992,14 +992,14 @@ public class ConsumerManager
                     "no association available and stateless mode is disabled");
 
         _log.info("Creating authentication request for" +
-                " OP-endpoint: " + discovered.getIdpEndpoint() +
+                " OP-endpoint: " + discovered.getOPEndpoint() +
                 " claimedID: " + claimedId +
                 " OP-specific ID: " + delegate);
 
         AuthRequest authReq = AuthRequest.createAuthRequest(claimedId, delegate,
                 ! discovered.isVersion2(), returnToUrl, handle, realm, _realmVerifier);
 
-        authReq.setOPEndpoint(discovered.getIdpEndpoint());
+        authReq.setOPEndpoint(discovered.getOPEndpoint());
 
         if (! discovered.isVersion2())
             authReq.setReturnTo(insertConsumerNonce(authReq.getReturnTo()));
@@ -1071,7 +1071,7 @@ public class ConsumerManager
             AuthImmediateFailure fail =
                     AuthImmediateFailure.createAuthImmediateFailure(response);
             result.setAuthResponse(fail);
-            result.setIdpSetupUrl(fail.getUserSetupUrl());
+            result.setOPSetupUrl(fail.getUserSetupUrl());
             _log.info("Received auth immediate failure.");
             return result;
         }
@@ -1270,7 +1270,7 @@ public class ConsumerManager
 
         // using the same nonce verifier for both server and consumer nonces
         return (NonceVerifier.OK == _nonceVerifier.seen(
-                discovered.getIdpEndpoint().toString(), nonce));
+                discovered.getOPEndpoint().toString(), nonce));
     }
 
     /**
@@ -1540,7 +1540,7 @@ public class ConsumerManager
 
             if ( opSpecific.equals(assertId) &&
                     discovered.isVersion2() &&
-                    discovered.getIdpEndpoint().toString().equals(respEndpoint))
+                    discovered.getOPEndpoint().toString().equals(respEndpoint))
             {
                 if (DEBUG) _log.debug(
                         "ClaimedID in the assertion was previously discovered: "
@@ -1578,7 +1578,7 @@ public class ConsumerManager
 
             if ( ! opSpecific.equals(assertId) ||
                     ! service.isVersion2() ||
-                    ! service.getIdpEndpoint().toString().equals(respEndpoint) )
+                    ! service.getOPEndpoint().toString().equals(respEndpoint) )
                 continue;
 
             // keep the first endpoint that matches
@@ -1589,7 +1589,7 @@ public class ConsumerManager
             }
 
             Association assoc = _associations.load(
-                    service.getIdpEndpoint().toString(),
+                    service.getOPEndpoint().toString(),
                     authResp.getHandle());
 
             // don't look further if there is an association with this endpoint
@@ -1638,8 +1638,8 @@ public class ConsumerManager
             discovered.getClaimedIdentifier(); //assert id may be delegate in v1
 
         String handle = authResp.getHandle();
-        URL idp = discovered.getIdpEndpoint();
-        Association assoc = _associations.load(idp.toString(), handle);
+        URL op = discovered.getOPEndpoint();
+        Association assoc = _associations.load(op.toString(), handle);
 
         if (assoc != null) // association available, local verification
         {
@@ -1656,7 +1656,7 @@ public class ConsumerManager
             else if (DEBUG) _log.debug("Local signature verification failed.");
 
         }
-        else // no association, verify with the IdP
+        else // no association, verify with the OP
         {
             _log.info("No association found, " +
                       "contacting the OP for direct verification...");
@@ -1665,7 +1665,7 @@ public class ConsumerManager
 
             ParameterList responseParams = new ParameterList();
 
-            int respCode = call(idp.toString(), vrfy, responseParams);
+            int respCode = call(op.toString(), vrfy, responseParams);
             if (HttpStatus.SC_OK == respCode)
             {
                 VerifyResponse vrfyResp =
@@ -1676,18 +1676,18 @@ public class ConsumerManager
                     // process the optional invalidate_handle first
                     String invalidateHandle = vrfyResp.getInvalidateHandle();
                     if (invalidateHandle != null)
-                        _associations.remove(idp.toString(), invalidateHandle);
+                        _associations.remove(op.toString(), invalidateHandle);
 
                     result.setVerifiedId(claimedId);
                     if (DEBUG)
                         _log.debug("Direct signature verification succeeded " +
-                                   "with OP: " + idp);
+                                   "with OP: " + op);
                 }
                 else
                 {
                     if (DEBUG)
                         _log.debug("Direct signature verification failed " +
-                                "with OP: " + idp);
+                                "with OP: " + op);
                     result.setStatusMsg("Direct signature verification failed.");
                 }
             }
@@ -1696,7 +1696,7 @@ public class ConsumerManager
                 DirectError err = DirectError.createDirectError(responseParams);
 
                 if (DEBUG) _log.debug("Error verifying signature with the OP: "
-                       + idp + " error message: " + err.keyValueFormEncoding());
+                       + op + " error message: " + err.keyValueFormEncoding());
 
                 result.setStatusMsg("Error verifying signature with the OP: "
                                     + err.getErrorMsg());

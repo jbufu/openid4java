@@ -3,8 +3,8 @@
     <XRD>
         <Service>
             <Type>http://specs.openid.net/auth/2.0/signon</Type>
-            <URI>http://idp.example.com</URI>
-            <LocalID>http://idp.example.com/user</LocalID>
+            <URI>http://op.example.com</URI>
+            <LocalID>http://op.example.com/user</LocalID>
         </Service>
     </XRD>
 </xrds:XRDS>

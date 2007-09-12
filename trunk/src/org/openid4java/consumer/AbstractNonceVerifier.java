@@ -39,7 +39,7 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
     /**
      * Checks if nonce date is valid and if it is in the max age boudary. Other checks are delegated to {@link #seen(java.util.Date, String, String)}
      */
-    public int seen(String idpUrl, String nonce)
+    public int seen(String opUrl, String nonce)
     {
         if (DEBUG) _log.debug("Verifying nonce: " + nonce);
 
@@ -55,7 +55,7 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
                 return TOO_OLD;
             }
 
-            return seen(now, idpUrl, nonce);
+            return seen(now, opUrl, nonce);
         }
         catch (ParseException e)
         {
@@ -70,7 +70,7 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
      *
      * @param now The timestamp used to check the max age boudary.
      */
-    protected abstract int seen(Date now, String idpUrl, String nonce);
+    protected abstract int seen(Date now, String opUrl, String nonce);
 
     protected boolean isTooOld(Date now, Date nonce)
     {

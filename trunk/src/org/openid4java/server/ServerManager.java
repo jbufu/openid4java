@@ -532,7 +532,7 @@ public class ServerManager
      * @param userSelClaimed    Claimed Identifier selected by the user at
      *                          the OpenID Provider; if present it will override
      *                          the one received in the authentication request.
-     * @param authenticatedAndApproved  Flag indicating that the IdP has
+     * @param authenticatedAndApproved  Flag indicating that the OP has
      *                                  authenticated the user and the user
      *                                  has approved the authentication
      *                                  transaction

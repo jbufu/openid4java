@@ -36,7 +36,7 @@ public interface NonceVerifier
      * @return {@link #OK} only if this nonce has a valid time stamp, the time stamp did not age and the nonce was not
      * seen before.
      */
-    public int seen(String idpUrl, String nonce);
+    public int seen(String opUrl, String nonce);
 
     /**
      * Returns the expiration timeout for nonces, in seconds

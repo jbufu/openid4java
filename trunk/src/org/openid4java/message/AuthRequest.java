@@ -274,7 +274,7 @@ public class AuthRequest extends Message
 
             else if ( ! hasParameter("openid.realm") )
             {
-                _log.warn("openid.realm is mandatory in Openid2 auth requests");
+                _log.warn("openid.realm is mandatory if return_to is absent.");
                 return false;
             }
         }

@@ -3,7 +3,7 @@
     <XRD>
         <Service>
             <Type>http://specs.openid.net/auth/2.0/server</Type>
-            <URI>http://idp.example.com</URI>
+            <URI>http://op.example.com</URI>
         </Service>
     </XRD>
 </xrds:XRDS>

@@ -43,15 +43,15 @@ public abstract class AbstractNonceVerifierTest extends TestCase
     {
         String nonce = _dateFormat.format(new Date()) + "abc";
 
-        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("idp1", nonce));
-        assertEquals(NonceVerifier.SEEN, _nonceVerifier.seen("idp1", nonce));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("op1", nonce));
+        assertEquals(NonceVerifier.SEEN, _nonceVerifier.seen("op1", nonce));
 
-        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("idp2", nonce));
+        assertEquals(NonceVerifier.OK, _nonceVerifier.seen("op2", nonce));
     }
 
     public void testMalformed()
     {
-        assertEquals(NonceVerifier.INVALID_TIMESTAMP, _nonceVerifier.seen("idp1", "xyz"));
+        assertEquals(NonceVerifier.INVALID_TIMESTAMP, _nonceVerifier.seen("op1", "xyz"));
     }
 
     public void testExpired()
@@ -61,7 +61,7 @@ public abstract class AbstractNonceVerifierTest extends TestCase
 
         String nonce = _dateFormat.format(past) + "abc";
 
-        assertEquals(NonceVerifier.TOO_OLD, _nonceVerifier.seen("idp1", nonce));
+        assertEquals(NonceVerifier.TOO_OLD, _nonceVerifier.seen("op1", nonce));
     }
 
     public void testNonceCleanup() throws Exception

@@ -3,8 +3,8 @@
     <XRD>
         <Service>
             <Type>http://openid.net/signon/1.0</Type>
-            <URI>http://idp.example.com</URI>
-            <openid:Delegate>http://idp.example.com/user</openid:Delegate>
+            <URI>http://op.example.com</URI>
+            <openid:Delegate>http://op.example.com/user</openid:Delegate>
         </Service>
     </XRD>
 </xrds:XRDS>

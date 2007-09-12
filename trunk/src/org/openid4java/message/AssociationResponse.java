@@ -201,7 +201,7 @@ public class AssociationResponse extends Message
     }
 
     /**
-     * Sets the IdP's (server's) public key for the association.
+     * Sets the OP's (server's) public key for the association.
      *
      * @param key           The server's public key for the association.
      */

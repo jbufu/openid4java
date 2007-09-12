@@ -11,11 +11,11 @@ import org.openid4java.association.Association;
  */
 public interface ConsumerAssociationStore
 {
-    public void save(String idpUrl, Association association);
+    public void save(String opUrl, Association association);
 
-    public Association load(String idpUrl, String handle);
+    public Association load(String opUrl, String handle);
 
-    public Association load(String idpUrl);
+    public Association load(String opUrl);
 
-    public void remove(String idpUrl, String handle);
+    public void remove(String opUrl, String handle);
 }
