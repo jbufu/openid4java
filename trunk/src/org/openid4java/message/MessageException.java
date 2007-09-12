@@ -13,16 +13,31 @@ public class MessageException extends OpenIDException
 {
     public MessageException(String message)
     {
-        super(message);
+        super(message, MESSAGE_ERROR);
+    }
+
+    public MessageException(String message, int code)
+    {
+        super(message, code);
     }
 
     public MessageException(Throwable cause)
     {
-        super(cause);
+        super(MESSAGE_ERROR, cause);
+    }
+
+    public MessageException(int code, Throwable cause)
+    {
+        super(code, cause);
     }
 
     public MessageException(String message, Throwable cause)
     {
-        super(message, cause);
+        super(message, MESSAGE_ERROR, cause);
+    }
+
+    public MessageException(String message, int code, Throwable cause)
+    {
+        super(message, code, cause);
     }
 }

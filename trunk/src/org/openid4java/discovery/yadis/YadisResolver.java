@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 import org.openid4java.util.HttpClientFactory;
+import org.openid4java.OpenIDException;
 
 /**
  * Yadis discovery protocol implementation.
@@ -210,7 +211,7 @@ public class YadisResolver
      *                      the Yadis URL and additional meta-information
      * @see YadisResult, #discover(String, int)
      */
-    public YadisResult discover(String url)
+    public YadisResult discover(String url) throws YadisException
     {
         return discover(url, _maxRedirects);
     }
@@ -232,6 +233,7 @@ public class YadisResolver
      * @see YadisResult
      */
     public YadisResult discover(String url, int maxRedirects)
+        throws YadisException
     {
         HttpClient client = HttpClientFactory.getInstance(
                 maxRedirects, Boolean.TRUE, _socketTimeout, _connTimeout,
@@ -240,30 +242,17 @@ public class YadisResolver
         // initialize the result
         YadisResult result = new YadisResult();
 
-        try
-        {
-            YadisUrl yadisUrl = new YadisUrl(url);
-            result.setYadisUrl(yadisUrl);
+        YadisUrl yadisUrl = new YadisUrl(url);
+        result.setYadisUrl(yadisUrl);
 
-            // try to retrieve the Yadis Descriptor URL with a HEAD call first
-            headXrdsUrl(client, yadisUrl, result);
+        // try to retrieve the Yadis Descriptor URL with a HEAD call first
+        headXrdsUrl(client, yadisUrl, result);
 
-            getXrds(client, result, false);
+        getXrds(client, result, false);
 
-            result.setStatus(YadisResult.OK);
+        result.setSuccess(true);
 
-            _log.info("Yadis discovery succeeded on " + url);
-        }
-        catch (YadisException e)
-        {
-            result.setStatus(e.getStatusCode());
-            result.setStatusMessage(e.getMessage());
-            if (e.getCause() != null) result.setFailureCause(e.getCause());
-
-            _log.warn( "Yadis discovery failed on " + url +
-                    ", status: " + e.getStatusCode() +
-                    ", error message: " + e.getMessage() );
-        }
+        _log.info("Yadis discovery succeeded on " + url);
 
         return result;
     }
@@ -304,7 +293,7 @@ public class YadisResolver
             int statusCode = client.executeMethod(get);
             if (statusCode != HttpStatus.SC_OK)
                 throw new YadisException("GET failed on " + getUrl,
-                        YadisResult.GET_ERROR);
+                        OpenIDException.YADIS_GET_ERROR);
 
             // store the normalized / after redirects URL, if not already set
             if (result.getNormalizedUrl() == null)
@@ -321,7 +310,7 @@ public class YadisResolver
                 // todo: only if not set? could be different if redirects were followed
                 // if (result.getXrdsLocation == null)
                 result.setXrdsLocation(get.getURI().toString(),
-                        YadisResult.GET_INVALID_RESPONSE);
+                        OpenIDException.YADIS_GET_INVALID_RESPONSE);
 
                 result.setContentType(YADIS_ACCEPT_HEADER);
 
@@ -338,7 +327,7 @@ public class YadisResolver
                     throw new YadisException("Found more than one " +
                             YADIS_XRDS_LOCATION + " headers: " +
                             get.getResponseHeaders(YADIS_XRDS_LOCATION),
-                            YadisResult.GET_INVALID_RESPONSE);
+                            OpenIDException.YADIS_GET_INVALID_RESPONSE);
 
                 String xrdsLocation = null;
                 if (get.getResponseHeader(YADIS_XRDS_LOCATION) != null)
@@ -353,20 +342,22 @@ public class YadisResolver
                     xrdsLocation = getHtmlMeta(get.getResponseBodyAsStream());
 
                 result.setXrdsLocation(xrdsLocation,
-                        YadisResult.GET_INVALID_RESPONSE);
+                        OpenIDException.YADIS_GET_INVALID_RESPONSE);
 
                 getXrds(client, result, true);
 
-            } else // secondCall == true
+            }
+            else // secondCall == true
             {
                 throw new YadisException("Cannot retrieve XRDS for " +
                         result.getYadisUrl().getUrl().toString(),
-                        YadisResult.GET_NO_XRDS);
+                        OpenIDException.YADIS_GET_NO_XRDS);
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             throw new YadisException("Fatal transport error: ",
-                    YadisResult.GET_TRANSPORT_ERROR, e);
+                    OpenIDException.YADIS_GET_TRANSPORT_ERROR, e);
         }
         finally
         {
@@ -388,7 +379,7 @@ public class YadisResolver
 
         if (input == null)
             throw new YadisException("Cannot download HTML message",
-                    YadisResult.HTMLMETA_DOWNLOAD_ERROR);
+                    OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
 
         try
         {
@@ -400,7 +391,7 @@ public class YadisResolver
             // parse and extract the needed info
             if (bytesRead <= 0)
                 throw new YadisException("No data read from the HTML message",
-                        YadisResult.HTMLMETA_DOWNLOAD_ERROR);
+                        OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
 
             Parser parser = Parser.createParser(new String(data, 0, bytesRead), null);
             NodeList heads = parser.parse(new TagNameFilter("HEAD"));
@@ -410,7 +401,7 @@ public class YadisResolver
                         "HTML response must have exactly one HEAD element, " +
                                 "found " + heads.size() + " : "
                                 + heads.toHtml(),
-                        YadisResult.HTMLMETA_INVALID_RESPONSE);
+                        OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
 
             Node head = heads.elementAt(0);
             for (NodeIterator i = head.getChildren().elements();
@@ -427,7 +418,7 @@ public class YadisResolver
                             throw new YadisException(
                                 "More than one " + YADIS_XRDS_LOCATION +
                                 "META tags found in HEAD: " + head.toHtml(),
-                                YadisResult.HTMLMETA_INVALID_RESPONSE);
+                                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
 
                         xrdsLocation = meta.getMetaContent();
                         if (DEBUG)
@@ -438,11 +429,11 @@ public class YadisResolver
         } catch (IOException e)
         {
             throw new YadisException("I/O error while reading HTML message",
-                    YadisResult.HTMLMETA_DOWNLOAD_ERROR, e);
+                    OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR, e);
         } catch (ParserException pe)
         {
             throw new YadisException("Error parsing HTML message",
-                    YadisResult.HTMLMETA_INVALID_RESPONSE, pe);
+                    OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, pe);
         }
 
         return xrdsLocation;
@@ -461,7 +452,7 @@ public class YadisResolver
 
         if (input == null)
             throw new YadisException("Cannot read XML message",
-                    YadisResult.XRDS_DOWNLOAD_ERROR);
+                    OpenIDException.YADIS_XRDS_DOWNLOAD_ERROR);
 
         try
         {
@@ -470,7 +461,7 @@ public class YadisResolver
 
             if (input.read() != -1)
                 throw new YadisException("XRDS stream exceeds max allowed size: "
-                         + _maxXmlSize, YadisResult.XRDS_SIZE_EXCEEDED);
+                         + _maxXmlSize, OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
             input.close();
 
             DocumentBuilderFactory documentBuilderFactory =
@@ -492,25 +483,25 @@ public class YadisResolver
         } catch (ParserConfigurationException e)
         {
             throw new YadisException("Parser configuration error",
-                    YadisResult.XRDS_PARSING_ERROR, e);
+                    OpenIDException.YADIS_XRDS_PARSING_ERROR, e);
         } catch (SAXException e)
         {
             throw new YadisException("Error parsing XML document",
-                    YadisResult.XRDS_PARSING_ERROR, e);
+                    OpenIDException.YADIS_XRDS_PARSING_ERROR, e);
         // XRDS exceptions :
         } catch (ParseException e)
         {
             // this one seems to come only XRD.fromDom() trying to parse a date
             throw new YadisException("Error parsing XML DATE field",
-                    YadisResult.XRDS_PARSING_ERROR, e);
+                    OpenIDException.YADIS_XRDS_PARSING_ERROR, e);
         } catch (URISyntaxException e)
         {
             throw new YadisException("Invalid URI specified in XRDS document",
-                    YadisResult.XRDS_PARSING_ERROR, e);
+                    OpenIDException.YADIS_XRDS_PARSING_ERROR, e);
         } catch (IOException e)
         {
             throw new YadisException("Error reading XRDS document",
-                    YadisResult.XRDS_DOWNLOAD_ERROR, e);
+                    OpenIDException.YADIS_XRDS_DOWNLOAD_ERROR, e);
         }
 
         return xrds;
@@ -567,14 +558,14 @@ public class YadisResolver
                 throw new YadisException("Found more than one " +
                         YADIS_XRDS_LOCATION + " headers: " +
                         head.getResponseHeaders(YADIS_XRDS_LOCATION),
-                        YadisResult.HEAD_INVALID_RESPONSE);
+                        OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
 
             Header xrdsLocation = head.getResponseHeader(YADIS_XRDS_LOCATION);
 
             if (xrdsLocation != null)
             {
                 result.setXrdsLocation(xrdsLocation.getValue(),
-                        YadisResult.HEAD_INVALID_RESPONSE);
+                        OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
                 result.setNormalizedUrl(head.getURI().toString());
             }
 
@@ -586,7 +577,7 @@ public class YadisResolver
         catch (IOException e)
         {
             throw new YadisException("I/O transport error: ",
-                    YadisResult.HEAD_TRANSPORT_ERROR, e);
+                    OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
         }
         finally
         {

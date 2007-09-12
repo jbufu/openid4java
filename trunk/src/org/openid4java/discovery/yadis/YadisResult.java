@@ -54,41 +54,12 @@ public class YadisResult
     /**
      * Flag indicating whether the discovery was successfull.
      */
-    private int _status = UNDISCOVERED;
-
-    /**
-     * Status or error message.
-     */
-    private String _statusMessage;
+    private boolean _success = false;
 
     /**
      * The throwable or exception that caused the failure, if available.
      */
     private Throwable _failureCause;
-
-    // status codes:
-    public static final int UNDISCOVERED = -1;
-    public static final int OK = 0;
-    public static final int UNKNOWN_ERROR = 1;
-
-    public static final int INVALID_URL = 2;
-    public static final int INVALID_SCHEME = 3;
-
-    public static final int HEAD_TRANSPORT_ERROR = 4;
-    public static final int HEAD_INVALID_RESPONSE = 5;
-
-    public static final int GET_ERROR = 6;
-    public static final int GET_TRANSPORT_ERROR = 7;
-    public static final int GET_INVALID_RESPONSE = 8;
-    public static final int GET_NO_XRDS = 9;
-
-    public static final int HTMLMETA_DOWNLOAD_ERROR = 10;
-    public static final int HTMLMETA_INVALID_RESPONSE = 11;
-
-    public static final int XRDS_DOWNLOAD_ERROR = 12;
-    public static final int XRDS_PARSING_ERROR = 13;
-    public static final int XRDS_SIZE_EXCEEDED = 14;
-
 
     /**
      * Sets the YadisURL on which discovery will be performed.
@@ -217,39 +188,22 @@ public class YadisResult
     }
 
     /**
-     * Gets the status code which indicates whether the Yadis discovery
-     * succeeded or failed.
+     * Returns true if Yadis discovery succeeded.
+     *
      */
-    public int getStatus()
+    public boolean isSuccess()
     {
-        return _status;
+        return _success;
     }
 
     /**
-     * Sets the status code for the Yadis discovery, indicating whether it
-     * succeeded or failed.
+     * Sets the Yadis discovery success flag.
+     *
+     * @param   status  True if Yadis succeeded, false otherwise.
      */
-    public void setStatus(int status)
+    public void setSuccess(boolean status)
     {
-        this._status = status;
-    }
-
-    /**
-     * Gets a status message giving more details about the status of the
-     * Yadis discovery.
-     */
-    public String getStatusMessage()
-    {
-        return _statusMessage;
-    }
-
-    /**
-     * Sets a status message which gives more details about the status of the
-     * Yadis discovery.
-     */
-    public void setStatusMessage(String statusMessage)
-    {
-        this._statusMessage = statusMessage;
+        this._success = status;
     }
 
     /**

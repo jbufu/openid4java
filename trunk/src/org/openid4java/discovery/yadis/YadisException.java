@@ -4,53 +4,40 @@
 
 package org.openid4java.discovery.yadis;
 
-import org.openid4java.OpenIDException;
+import org.openid4java.discovery.DiscoveryException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
-public class YadisException extends OpenIDException
+public class YadisException extends DiscoveryException
 {
-    private int statusCode;
-
     public YadisException(String message)
     {
-        super(message);
-        statusCode = YadisResult.UNKNOWN_ERROR;
+        super(message, YADIS_ERROR);
     }
 
-    public YadisException(String message, int status)
+    public YadisException(String message, int code)
     {
-        super(message);
-        statusCode = status;
+        super(message, code);
     }
 
     public YadisException(Throwable cause)
     {
-        super(cause);
-        statusCode = YadisResult.UNKNOWN_ERROR;
+        super(YADIS_ERROR, cause);
     }
 
-    public YadisException(Throwable cause, int status)
+    public YadisException(int code, Throwable cause)
     {
-        super(cause);
-        statusCode = status;
+        super(code, cause);
     }
 
     public YadisException(String message, Throwable cause)
     {
-        super(message, cause);
-        statusCode = YadisResult.UNKNOWN_ERROR;
+        super(message, YADIS_ERROR, cause);
     }
 
-    public YadisException(String message, int status, Throwable cause)
+    public YadisException(String message, int code, Throwable cause)
     {
-        super(message, cause);
-        statusCode = status;
-    }
-
-    public int getStatusCode()
-    {
-        return statusCode;
+        super(message, code, cause);
     }
 }

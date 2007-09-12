@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.openid4java.OpenIDException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -47,15 +48,17 @@ public class YadisResolverTest extends TestCase
         _server.stop();
     }
 
+/*
     public void printResult(YadisResult result)
     {
-        System.out.println("Yadis Status: " + result.getStatus() +
+        System.out.println("Yadis Status: " + result.isSuccess() +
                 " (" + result.getStatusMessage() + ")");
         System.out.println("YadisURL: " + result.getYadisUrl().getUrl());
         System.out.println("XRDS-Location: " + result.getXrdsLocation());
         System.out.println("Content-type: " + result.getContentType());
         System.out.println("XRDS:\n" + result.getXrds());
     }
+*/
 
     public static Test suite()
     {
@@ -65,53 +68,48 @@ public class YadisResolverTest extends TestCase
 
     // --------------------- positive tests ------------------------------------
 
-    public void testHeadersUrl()
+    public void testHeadersUrl() throws YadisException
     {
         YadisResult result = _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simpleheaders");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.OK, result.getStatus());
+        assertTrue(result.isSuccess());
     }
 
-    public void testHtmlUrl()
+    public void testHtmlUrl() throws YadisException
     {
         YadisResult result = _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=simplehtml");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.OK, result.getStatus());
+        assertTrue(result.isSuccess());
     }
 
-    public void testRedirectToHeaderResponse()
+    public void testRedirectToHeaderResponse() throws YadisException
     {
         YadisResult result = _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=redir_simpleheaders");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.OK, result.getStatus());
+        assertTrue(result.isSuccess());
     }
 
-    public void testRedirectToHtmlResponse()
+    public void testRedirectToHtmlResponse() throws YadisException
     {
         YadisResult result = _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=redir_simplehtml");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.OK, result.getStatus());
+        assertTrue(result.isSuccess());
     }
 
-    public void testRedirectToXrdsResponse()
+    public void testRedirectToXrdsResponse() throws YadisException
     {
         YadisResult result = _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=redir_simplexrds");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.OK, result.getStatus());
+        assertTrue(result.isSuccess());
     }
 
 
-    public void testIncompleteHtmlParsing()
+    public void testIncompleteHtmlParsing() throws YadisException
     {
         // stop reading from the received HTML body shortly after the Yadis tag
         _resolver.setMaxHtmlSize(146);
@@ -119,29 +117,45 @@ public class YadisResolverTest extends TestCase
         YadisResult result = _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=simplehtml");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.OK, result.getStatus());
+        assertTrue(result.isSuccess());
     }
 
     // -------------------- error handling tests -------------------------------
 
     public void testInvalidUrl()
     {
-        YadisResult result = _resolver.discover("bla.com");
+        try
+        {
+            _resolver.discover("bla.com");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.INVALID_URL, result.getStatus());
+            fail("Should have failed with error code " +
+                 OpenIDException.YADIS_INVALID_URL);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                    OpenIDException.YADIS_INVALID_URL, expected.getErrorCode());
+        }
+
     }
 
     public void testHeadTransportError() throws Exception
     {
         _server.stop();
 
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?servertopped");
+        try
+        {
+            _resolver.discover("http://localhost:" + _servletPort +
+                               "/?servertopped");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.HEAD_TRANSPORT_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                 OpenIDException.YADIS_HEAD_TRANSPORT_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                    OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, expected.getErrorCode());
+        }
     }
 
     //public void testMultipleXrdsLocationInHeaders()
@@ -150,7 +164,7 @@ public class YadisResolverTest extends TestCase
     //            _servletPort + "/?headers=multiplexrdslocation");
     //
     //    assertEquals(result.getStatusMessage(),
-    //            YadisResult.HEAD_INVALID_RESPONSE, result.getStatus());
+    //            OpenIDException.YADIS_HEAD_INVALID_RESPONSE, result.isSuccess());
     //
     //    // todo: jetty's HttpResponse.addHeader() doesn't actually set...
     //    assertEquals("should fail with multiple headers error",
@@ -159,76 +173,146 @@ public class YadisResolverTest extends TestCase
 
     public  void testInvalidXrdsLocationInHeaders()
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=invalidxrdslocation1");
+        try
+        {
+            _resolver.discover("http://localhost:" + _servletPort +
+                               "/?headers=invalidxrdslocation1");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.HEAD_INVALID_RESPONSE, result.getStatus());
+            fail("Should have failed with error code " +
+                 OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                    OpenIDException.YADIS_HEAD_INVALID_RESPONSE, expected.getErrorCode());
+        }
 
-        result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=invalidxrdslocation2");
+        try
+        {
+            _resolver.discover("http://localhost:" + _servletPort +
+                               "/?headers=invalidxrdslocation2");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.HEAD_INVALID_RESPONSE, result.getStatus());
+            fail("Should have failed with error code " +
+                 OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_HEAD_INVALID_RESPONSE, expected.getErrorCode());
+        }
     }
 
     public  void testInvalidXrdsLocationInGetHeaders()
     {
-        YadisResult result;
-
-        result = _resolver.discover("http://localhost:" + _servletPort +
+        try
+        {
+            _resolver.discover("http://localhost:" + _servletPort +
                 "/?headers=simplehtml&getheaders=invalidxrdslocation1");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.GET_INVALID_RESPONSE, result.getStatus());
+            fail("Should have failed with error code " +
+                 OpenIDException.YADIS_GET_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                    OpenIDException.YADIS_GET_INVALID_RESPONSE, expected.getErrorCode());
+        }
 
-        result = _resolver.discover("http://localhost:" + _servletPort +
+        try
+        {
+            _resolver.discover("http://localhost:" + _servletPort +
                 "/?headers=simplehtml&getheaders=invalidxrdslocation2");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.GET_INVALID_RESPONSE, result.getStatus());
+            fail("Should have failed with error code " +
+                 OpenIDException.YADIS_GET_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_GET_INVALID_RESPONSE, expected.getErrorCode());
+        }
     }
 
     public void testMultipleXrdsLocationInHtml()
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=multiplexrdslocation");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.HTMLMETA_INVALID_RESPONSE, result.getStatus());
+            fail("Should have failed with error code " +
+                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
+        }
     }
 
     public void testHtmlHeadElements()
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=nohead");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.HTMLMETA_INVALID_RESPONSE, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
+        }
 
-        result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=twoheads");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.HTMLMETA_INVALID_RESPONSE, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
+        }
     }
 
     public void testEmptyHtml()
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=empty");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.HTMLMETA_DOWNLOAD_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR, expected.getErrorCode());
+        }
     }
 
     public void testGetError() throws Exception
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=nonexistantfile");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.GET_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_GET_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_GET_ERROR, expected.getErrorCode());
+        }
     }
 
 
@@ -241,8 +325,8 @@ public class YadisResolverTest extends TestCase
     //    YadisResult result = _resolver.discover("http://localhost:" +
     //            _servletPort + "/?headers=simplehtml&html=failonget");
     //
-    //    assertEquals(result.getStatusMessage(),
-    //            YadisResult.GET_TRANSPORT_ERROR, result.getStatus());
+    //    assertEquals(expected.getMessage(),
+    //            OpenIDException.YADIS_GET_TRANSPORT_ERROR, expected.getErrorCode());
     //}
 
 
@@ -250,52 +334,95 @@ public class YadisResolverTest extends TestCase
     {
         _resolver.setMaxXmlSize(10);
 
-        YadisResult result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simpleheaders");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.XRDS_SIZE_EXCEEDED, result.getStatus());
-
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_XRDS_SIZE_EXCEEDED, expected.getErrorCode());
+        }
     }
 
     public void testMalformedXML()
     {
-        YadisResult result;
-
-        result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds1");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.XRDS_PARSING_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+        }
 
-        result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds2");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.XRDS_PARSING_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+        }
     }
 
     public void testMalformedXRDSServiceURI()
     {
-        YadisResult result;
-
-        result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds3");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.XRDS_PARSING_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+        }
 
-        result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds4");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.XRDS_PARSING_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+        }
 
-        result = _resolver.discover("http://localhost:" +
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds5");
 
-        assertEquals(result.getStatusMessage(),
-                YadisResult.XRDS_PARSING_ERROR, result.getStatus());
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+        }
 
     }
 }
