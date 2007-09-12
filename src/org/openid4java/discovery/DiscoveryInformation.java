@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class DiscoveryInformation implements Serializable
 {
-    URL _idpEndpoint;
+    URL _opEndpoint;
     Identifier _claimedIdentifier;
     String _delegate;
     String _version;
@@ -23,34 +23,34 @@ public class DiscoveryInformation implements Serializable
     public final static String OPENID2_OP = "http://specs.openid.net/auth/2.0/server";
 
 
-    public DiscoveryInformation(URL idpEndpoint) throws DiscoveryException
+    public DiscoveryInformation(URL opEndpoint) throws DiscoveryException
     {
-        this(idpEndpoint, null, OPENID2_OP);
+        this(opEndpoint, null, OPENID2_OP);
     }
 
-    public DiscoveryInformation(URL idpEndpoint, Identifier claimedIdentifier)
+    public DiscoveryInformation(URL opEndpoint, Identifier claimedIdentifier)
             throws DiscoveryException
     {
-        this(idpEndpoint, claimedIdentifier, OPENID2);
+        this(opEndpoint, claimedIdentifier, OPENID2);
     }
 
-    public DiscoveryInformation(URL idpEndpoint, Identifier claimedIdentifier,
+    public DiscoveryInformation(URL opEndpoint, Identifier claimedIdentifier,
                                 String version)
             throws DiscoveryException
     {
-        this(idpEndpoint, claimedIdentifier, null, version);
+        this(opEndpoint, claimedIdentifier, null, version);
     }
 
-    public DiscoveryInformation(URL idpEndpoint, Identifier claimedIdentifier,
+    public DiscoveryInformation(URL opEndpoint, Identifier claimedIdentifier,
                                 String delegate, String version)
             throws DiscoveryException
     {
-        _idpEndpoint = idpEndpoint;
+        _opEndpoint = opEndpoint;
         _claimedIdentifier = claimedIdentifier;
         _version = version;
         _delegate = delegate;
 
-        if (_idpEndpoint == null)
+        if (_opEndpoint == null)
             throw new DiscoveryException("Null OpenID Provider endpoint.");
 
         if (_delegate != null && _claimedIdentifier == null)
@@ -68,9 +68,9 @@ public class DiscoveryInformation implements Serializable
         return _delegate != null;
     }
 
-    public URL getIdpEndpoint()
+    public URL getOPEndpoint()
     {
-        return _idpEndpoint;
+        return _opEndpoint;
     }
 
     public Identifier getClaimedIdentifier()
@@ -101,8 +101,8 @@ public class DiscoveryInformation implements Serializable
     public String toString()
     {
         return (isVersion2() ? "OpenID2" : "OpenID1")
-                + "\nOP-endpoint:" + _idpEndpoint
-                + "\nClaimedID:" + _claimedIdentifier
+                + "\nOP-endpoint:" + _opEndpoint
+            + "\nClaimedID:" + _claimedIdentifier
                 + "\nDelegate:" + _delegate;
     }
 }

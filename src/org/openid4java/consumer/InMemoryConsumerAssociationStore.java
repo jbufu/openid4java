@@ -18,38 +18,38 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
     private static Logger _log = Logger.getLogger(InMemoryConsumerAssociationStore.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
-    private Map _idpMap = new HashMap();
+    private Map _opMap = new HashMap();
 
-    public synchronized void save(String idpUrl, Association association)
+    public synchronized void save(String opUrl, Association association)
     {
         removeExpired();
 
-        Map handleMap = (Map) _idpMap.get(idpUrl);
+        Map handleMap = (Map) _opMap.get(opUrl);
 
         if (handleMap == null)
         {
             handleMap = new HashMap();
 
 
-            _idpMap.put(idpUrl, handleMap);
+            _opMap.put(opUrl, handleMap);
         }
 
         String handle = association.getHandle();
 
         if(DEBUG)
             _log.debug("Adding association to the in-memory store: " + handle +
-                       " with OP: " + idpUrl);
+                       " with OP: " + opUrl);
 
         handleMap.put(association.getHandle(), association);
     }
 
-    public synchronized Association load(String idpUrl, String handle)
+    public synchronized Association load(String opUrl, String handle)
     {
         removeExpired();
 
-        if (_idpMap.containsKey(idpUrl))
+        if (_opMap.containsKey(opUrl))
         {
-            Map handleMap = (Map) _idpMap.get(idpUrl);
+            Map handleMap = (Map) _opMap.get(opUrl);
 
             if (handleMap.containsKey(handle))
             {
@@ -61,15 +61,15 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
     }
 
 
-    public synchronized Association load(String idpUrl)
+    public synchronized Association load(String opUrl)
     {
         removeExpired();
 
         Association latest = null;
 
-        if (_idpMap.containsKey(idpUrl))
+        if (_opMap.containsKey(opUrl))
         {
-            Map handleMap = (Map) _idpMap.get(idpUrl);
+            Map handleMap = (Map) _opMap.get(opUrl);
 
             Iterator handles = handleMap.keySet().iterator();
             while (handles.hasNext())
@@ -87,33 +87,33 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
         return latest;
     }
 
-    public synchronized void remove(String idpUrl, String handle)
+    public synchronized void remove(String opUrl, String handle)
     {
         removeExpired();
 
-        if (_idpMap.containsKey(idpUrl))
+        if (_opMap.containsKey(opUrl))
         {
-            Map handleMap = (Map) _idpMap.get(idpUrl);
+            Map handleMap = (Map) _opMap.get(opUrl);
 
-            _log.info("Removing association: " + handle + " widh OP: " + idpUrl);
+            _log.info("Removing association: " + handle + " widh OP: " + opUrl);
 
             handleMap.remove(handle);
 
             if (handleMap.size() == 0)
-                _idpMap.remove(idpUrl);
+                _opMap.remove(opUrl);
         }
     }
 
 
     private synchronized void removeExpired()
     {
-        Set idpToRemove = new HashSet();
-        Iterator idpUrls = _idpMap.keySet().iterator();
-        while (idpUrls.hasNext())
+        Set opToRemove = new HashSet();
+        Iterator opUrls = _opMap.keySet().iterator();
+        while (opUrls.hasNext())
         {
-            String idpUrl = (String) idpUrls.next();
+            String opUrl = (String) opUrls.next();
 
-            Map handleMap = (Map) _idpMap.get(idpUrl);
+            Map handleMap = (Map) _opMap.get(opUrl);
 
             Set handleToRemove = new HashSet();
             Iterator handles = handleMap.keySet().iterator();
@@ -135,21 +135,21 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
                 String handle = (String) handles.next();
 
                 _log.info("Removing expired association: " + handle +
-                          " with OP: " + idpUrl);
+                          " with OP: " + opUrl);
 
                 handleMap.remove(handle);
             }
 
             if (handleMap.size() == 0)
-                idpToRemove.add(idpUrl);
+                opToRemove.add(opUrl);
         }
 
-        idpUrls = idpToRemove.iterator();
-        while (idpUrls.hasNext())
+        opUrls = opToRemove.iterator();
+        while (opUrls.hasNext())
         {
-            String idpUrl = (String) idpUrls.next();
+            String opUrl = (String) opUrls.next();
 
-            _idpMap.remove(idpUrl);
+            _opMap.remove(opUrl);
         }
     }
 
@@ -157,12 +157,12 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
     {
         int total = 0;
 
-        Iterator idpUrls = _idpMap.keySet().iterator();
-        while (idpUrls.hasNext())
+        Iterator opUrls = _opMap.keySet().iterator();
+        while (opUrls.hasNext())
         {
-            String idpUrl = (String) idpUrls.next();
+            String opUrl = (String) opUrls.next();
 
-            Map handleMap = (Map) _idpMap.get(idpUrl);
+            Map handleMap = (Map) _opMap.get(opUrl);
 
             total += handleMap.size();
         }

@@ -136,9 +136,9 @@ public class RealmVerifier
             while (iter.hasNext())
             {
                 endpoint = (DiscoveryInformation) iter.next();
-                endpointUrl = endpoint.getIdpEndpoint().toString();
+                endpointUrl = endpoint.getOPEndpoint().toString();
 
-                if (endpoint.getIdpEndpoint().getAuthority().startsWith("*."))
+                if (endpoint.getOPEndpoint().getAuthority().startsWith("*."))
                 {
                     _log.warn("Wildcard not allowed in discovered " +
                               "RP endpoints; found: " + endpointUrl);

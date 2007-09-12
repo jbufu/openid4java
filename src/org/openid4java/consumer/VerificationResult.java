@@ -26,7 +26,7 @@ public class VerificationResult
      * Optional parameter returned in a failure response to a immediate
      * authentication request (AuthImmediateFailure).
      */
-    private String _idpSetupUrl;
+    private String _opSetupUrl;
 
 
     /**
@@ -56,23 +56,23 @@ public class VerificationResult
     }
 
     /**
-     * Gets the optional IdP user_setup_url parameter, if one was returned in a
+     * Gets the optional OP user_setup_url parameter, if one was returned in a
      * failure response to a immediate authentication request.
      * <p>
      * Null if the response did not include the user_setup_url parameter.
      */
-    public String getIdpSetupUrl()
+    public String getOPSetupUrl()
     {
-        return _idpSetupUrl;
+        return _opSetupUrl;
     }
 
     /**
-     * Sets the IdP user_setup_url parameter, if one was returned in a failure
+     * Sets the OP user_setup_url parameter, if one was returned in a failure
      * response to a immediate authentication request.
      */
-    public void setIdpSetupUrl(String idpSetupUrl) throws MessageException
+    public void setOPSetupUrl(String opSetupUrl) throws MessageException
     {
-        this._idpSetupUrl = idpSetupUrl;
+        this._opSetupUrl = opSetupUrl;
     }
 
     /**

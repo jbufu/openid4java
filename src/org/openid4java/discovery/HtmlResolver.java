@@ -216,8 +216,8 @@ public class HtmlResolver
     private void parseHtml(String htmlData, HtmlResult result)
             throws DiscoveryException
     {
-        URL idp1Endpoint = null;
-        URL idp2Endpoint = null;
+        URL op1Endpoint = null;
+        URL op2Endpoint = null;
 
         if (DEBUG) _log.debug("Parsing HTML data:\n" + htmlData);
 
@@ -247,12 +247,12 @@ public class HtmlResolver
 
                     if (relations.contains("openid.server"))
                     {
-                        if (result.getIdp1Endpoint() != null)
+                        if (result.getOP1Endpoint() != null)
                             throw new DiscoveryException(
                                     "More than one openid.server entries found");
 
                         if (DEBUG)
-                            _log.debug("Found OpenID1 endpoint: " + idp1Endpoint);
+                            _log.debug("Found OpenID1 endpoint: " + op1Endpoint);
 
                         result.setEndpoint1(href);
                     }
@@ -270,12 +270,12 @@ public class HtmlResolver
                     }
                     if (relations.contains("openid2.provider"))
                     {
-                        if (result.getIdp2Endpoint() != null)
+                        if (result.getOP2Endpoint() != null)
                             throw new DiscoveryException(
                                     "More than one openid.server entries found");
 
                         if (DEBUG)
-                            _log.debug("Found OpenID2 endpoint: " + idp2Endpoint);
+                            _log.debug("Found OpenID2 endpoint: " + op2Endpoint);
 
                         result.setEndpoint2(href);
                     }

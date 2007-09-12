@@ -41,9 +41,9 @@ public class EhcacheNonceVerifier extends AbstractNonceVerifier
         _cache = cache;
     }
 
-    protected int seen(Date now, String idpUrl, String nonce)
+    protected int seen(Date now, String opUrl, String nonce)
     {
-        String pair = idpUrl + '#' + nonce;
+        String pair = opUrl + '#' + nonce;
         Element element = new Element(pair, pair);
 
         if (_cache.get(pair) != null)

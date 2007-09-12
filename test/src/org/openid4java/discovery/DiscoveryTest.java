@@ -108,9 +108,9 @@ public class DiscoveryTest extends TestCase
         assertTrue(discoveryInformation.hasClaimedIdentifier());
         assertTrue(discoveryInformation.hasDelegateIdentifier());
 
-        assertEquals("http://idp.example.com", discoveryInformation.getIdpEndpoint().toExternalForm());
+        assertEquals("http://op.example.com", discoveryInformation.getOPEndpoint().toExternalForm());
         assertEquals("http://user.example.com/", discoveryInformation.getClaimedIdentifier().getIdentifier());
-        assertEquals("http://idp.example.com/user", discoveryInformation.getDelegateIdentifier());
+        assertEquals("http://op.example.com/user", discoveryInformation.getDelegateIdentifier());
     }
 
     public void testExtractDiscoveryInformationDelegate1() throws Exception
@@ -125,9 +125,9 @@ public class DiscoveryTest extends TestCase
         assertTrue(discoveryInformation.hasClaimedIdentifier());
         assertTrue(discoveryInformation.hasDelegateIdentifier());
 
-        assertEquals("http://idp.example.com", discoveryInformation.getIdpEndpoint().toExternalForm());
+        assertEquals("http://op.example.com", discoveryInformation.getOPEndpoint().toExternalForm());
         assertEquals("http://user.example.com/", discoveryInformation.getClaimedIdentifier().getIdentifier());
-        assertEquals("http://idp.example.com/user", discoveryInformation.getDelegateIdentifier());
+        assertEquals("http://op.example.com/user", discoveryInformation.getDelegateIdentifier());
     }
 
     public void testExtractDiscoveryInformationClaimed() throws Exception
@@ -142,14 +142,14 @@ public class DiscoveryTest extends TestCase
         assertTrue(discoveryInformation.hasClaimedIdentifier());
         assertFalse(discoveryInformation.hasDelegateIdentifier());
 
-        assertEquals("http://idp.example.com", discoveryInformation.getIdpEndpoint().toExternalForm());
+        assertEquals("http://op.example.com", discoveryInformation.getOPEndpoint().toExternalForm());
         assertEquals("http://user.example.com/", discoveryInformation.getClaimedIdentifier().getIdentifier());
     }
 
-    public void testExtractDiscoveryInformationIdP() throws Exception
+    public void testExtractDiscoveryInformationOP() throws Exception
     {
-        XRDS xrds = createXrds("exampleIdP.xml");
-        Identifier identifier = new UrlIdentifier("http://idp.example.com");
+        XRDS xrds = createXrds("exampleOP.xml");
+        Identifier identifier = new UrlIdentifier("http://op.example.com");
 
         List services = Discovery.extractDiscoveryInformation(xrds, identifier);
         DiscoveryInformation discoveryInformation =
@@ -158,7 +158,7 @@ public class DiscoveryTest extends TestCase
         assertFalse(discoveryInformation.hasClaimedIdentifier());
         assertFalse(discoveryInformation.hasDelegateIdentifier());
 
-        assertEquals("http://idp.example.com", discoveryInformation.getIdpEndpoint().toExternalForm());
+        assertEquals("http://op.example.com", discoveryInformation.getOPEndpoint().toExternalForm());
     }
 
     public static Test suite()

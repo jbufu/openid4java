@@ -17,24 +17,24 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
     private static Logger _log = Logger.getLogger(InMemoryNonceVerifier.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
-    private Map _idpMap = new HashMap();
+    private Map _opMap = new HashMap();
 
     public InMemoryNonceVerifier(int maxAge)
     {
         super(maxAge);
     }
 
-    protected synchronized int seen(Date now, String idpUrl, String nonce)
+    protected synchronized int seen(Date now, String opUrl, String nonce)
     {
         removeAged(now);
 
-        Set seenSet = (Set) _idpMap.get(idpUrl);
+        Set seenSet = (Set) _opMap.get(opUrl);
 
         if (seenSet == null)
         {
             seenSet = new HashSet();
 
-            _idpMap.put(idpUrl, seenSet);
+            _opMap.put(opUrl, seenSet);
         }
 
         if (seenSet.contains(nonce))
@@ -52,13 +52,13 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
 
     private synchronized void removeAged(Date now)
     {
-        Set idpToRemove = new HashSet();
-        Iterator idpUrls = _idpMap.keySet().iterator();
-        while (idpUrls.hasNext())
+        Set opToRemove = new HashSet();
+        Iterator opUrls = _opMap.keySet().iterator();
+        while (opUrls.hasNext())
         {
-            String idpUrl = (String) idpUrls.next();
+            String opUrl = (String) opUrls.next();
 
-            Set seenSet = (Set) _idpMap.get(idpUrl);
+            Set seenSet = (Set) _opMap.get(opUrl);
             Set nonceToRemove = new HashSet();
 
             Iterator nonces = seenSet.iterator();
@@ -88,22 +88,22 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
 
                 if (DEBUG)
                     _log.debug("Removing nonce: " + nonce +
-                               " from OP: " + idpUrl);
+                               " from OP: " + opUrl);
                 seenSet.remove(nonce);
             }
 
             if (seenSet.size() == 0)
-                idpToRemove.add(idpUrl);
+                opToRemove.add(opUrl);
         }
 
-        idpUrls = idpToRemove.iterator();
-        while (idpUrls.hasNext())
+        opUrls = opToRemove.iterator();
+        while (opUrls.hasNext())
         {
-            String idpUrl = (String) idpUrls.next();
+            String opUrl = (String) opUrls.next();
 
-            if (DEBUG) _log.debug("Removed all nonces from OP: " + idpUrl);
+            if (DEBUG) _log.debug("Removed all nonces from OP: " + opUrl);
 
-            _idpMap.remove(idpUrl);
+            _opMap.remove(opUrl);
         }
     }
 
@@ -111,12 +111,12 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
     {
         int total = 0;
 
-        Iterator idpUrls = _idpMap.keySet().iterator();
-        while (idpUrls.hasNext())
+        Iterator opUrls = _opMap.keySet().iterator();
+        while (opUrls.hasNext())
         {
-            String idpUrl = (String) idpUrls.next();
+            String opUrl = (String) opUrls.next();
 
-            Set seenSet = (Set) _idpMap.get(idpUrl);
+            Set seenSet = (Set) _opMap.get(opUrl);
 
             total += seenSet.size();
         }

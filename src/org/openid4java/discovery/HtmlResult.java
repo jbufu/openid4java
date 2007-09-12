@@ -13,9 +13,9 @@ import java.net.MalformedURLException;
 public class HtmlResult
 {
     private UrlIdentifier _claimedId;
-    private URL _idp1Endpoint;
+    private URL _op1Endpoint;
     private String _delegate1;
-    private URL _idp2Endpoint;
+    private URL _op2Endpoint;
     private String _delegate2;
 
     /**
@@ -42,26 +42,26 @@ public class HtmlResult
         return _claimedId;
     }
 
-    public void setEndpoint1(String idp1Endpoint) throws DiscoveryException
+    public void setEndpoint1(String op1Endpoint) throws DiscoveryException
     {
         URL url;
         try
         {
-            url = new URL(idp1Endpoint);
+            url = new URL(op1Endpoint);
 
-            _idp1Endpoint = url;
+            _op1Endpoint = url;
         }
         catch (MalformedURLException e)
         {
             throw new DiscoveryException(
-                    "Invalid openid.server URL: " + idp1Endpoint);
+                    "Invalid openid.server URL: " + op1Endpoint);
         }
 
     }
 
-    public URL getIdp1Endpoint()
+    public URL getOP1Endpoint()
     {
-        return _idp1Endpoint;
+        return _op1Endpoint;
     }
 
     public void setDelegate1(String delegate1)
@@ -74,26 +74,26 @@ public class HtmlResult
         return _delegate1;
     }
 
-    public void setEndpoint2(String idp2Endpoint) throws DiscoveryException
+    public void setEndpoint2(String op2Endpoint) throws DiscoveryException
     {
         URL url;
         try
         {
-            url = new URL(idp2Endpoint);
+            url = new URL(op2Endpoint);
 
-            _idp2Endpoint = url;
+            _op2Endpoint = url;
 
         } catch (MalformedURLException e)
         {
             throw new DiscoveryException(
-                    "Invalid openid2.provider URL: " + idp2Endpoint);
+                    "Invalid openid2.provider URL: " + op2Endpoint);
         }
 
     }
 
-    public URL getIdp2Endpoint()
+    public URL getOP2Endpoint()
     {
-        return _idp2Endpoint;
+        return _op2Endpoint;
     }
 
     public void setDelegate2(String delegate2)
@@ -109,12 +109,12 @@ public class HtmlResult
     public String toString()
     {
         return "ClaimedID:" + _claimedId +
-                (_idp2Endpoint != null ?
-                        "\nOpenID2-endpoint:" + _idp2Endpoint.toString() : "") +
+                (_op2Endpoint != null ?
+                        "\nOpenID2-endpoint:" + _op2Endpoint.toString() : "") +
                 (_delegate2 != null ?
                         "\nOpenID2-localID:" + _delegate2 : "") +
-                (_idp1Endpoint != null ?
-                        "\nOpenID1-endpoint:" + _idp1Endpoint.toString() : "") +
+                (_op1Endpoint != null ?
+                        "\nOpenID1-endpoint:" + _op1Endpoint.toString() : "") +
                 (_delegate1 != null ?
                         "\nOpenID1-delegate:" + _delegate1 : "");
     }
