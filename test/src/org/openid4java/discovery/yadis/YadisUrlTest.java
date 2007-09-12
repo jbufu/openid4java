@@ -2,13 +2,11 @@
  * Copyright 2006-2007 Sxip Identity Corporation
  */
 
-package org.openid4java.yadis;
+package org.openid4java.discovery.yadis;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
-import org.openid4java.discovery.yadis.YadisUrl;
-import org.openid4java.discovery.yadis.YadisException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
