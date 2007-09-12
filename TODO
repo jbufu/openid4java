@@ -5,7 +5,6 @@
 => Documentation and Packaging
 
  - Complete JavaDocs
- - Configuring logging
 
 => Tests
 
@@ -46,8 +45,6 @@
     - Review consumer verification flow
 
     - Make isValid() throw exceptions
-
-    - rename IdP to OP (cosmetic)
 
     - Interface for saving discovered information
         - into session, db, url/return_to, etc.
