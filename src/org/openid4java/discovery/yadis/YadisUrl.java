@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 import org.openxri.XRI;
+import org.openid4java.OpenIDException;
 
 /**
  * Wrapper class for various identifiers that are resolvable to URLs
@@ -41,7 +42,7 @@ public class YadisUrl
         catch (MalformedURLException e)
         {
             throw new YadisException("Invalid URL: " + urlString,
-                    YadisResult.INVALID_URL, e);
+                    OpenIDException.YADIS_INVALID_URL, e);
         }
 
         return url;
@@ -59,8 +60,9 @@ public class YadisUrl
         this(urlFromString(urlString));
 
         if (! isValid(this._yadisUrl))
-            throw new YadisException("The scheme name of a Yadis URL " +
-                    "must be 'http' or 'https'", YadisResult.INVALID_SCHEME);
+            throw new YadisException(
+                "The scheme name of a Yadis URL must be 'http' or 'https'",
+                OpenIDException.YADIS_INVALID_SCHEME);
 
     }
 
@@ -76,8 +78,9 @@ public class YadisUrl
         if (isValid(urlId))
             _yadisUrl = urlId;
         else
-            throw new YadisException("The scheme name of a Yadis URL " +
-                    "must be 'http' or 'https'", YadisResult.INVALID_SCHEME);
+            throw new YadisException(
+                "The scheme name of a Yadis URL must be 'http' or 'https'",
+                OpenIDException.YADIS_INVALID_SCHEME);
     }
 
     /**

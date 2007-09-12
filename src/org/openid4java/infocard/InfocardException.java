@@ -11,20 +11,23 @@ import org.openid4java.OpenIDException;
  */
 public class InfocardException extends OpenIDException
 {
-
     public InfocardException(String message)
     {
-        super(message);
+        super(message, INFOCARD_ERROR);
+    }
+
+    public InfocardException(String message, int code)
+    {
+        super(message, code);
     }
 
     public InfocardException(String message, Throwable cause)
     {
-        super(message, cause);
+        super(message, INFOCARD_ERROR, cause);
     }
 
     public InfocardException(Throwable cause)
     {
-        super(cause);
+        super(INFOCARD_ERROR, cause);
     }
-
 }

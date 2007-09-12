@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.openid4java.discovery.yadis.YadisResolver;
 import org.openid4java.discovery.yadis.YadisResult;
+import org.openid4java.discovery.yadis.YadisException;
 import org.openid4java.discovery.html.HtmlResolver;
 import org.openid4java.discovery.html.HtmlResult;
 
@@ -195,17 +196,27 @@ public class Discovery
 
             UrlIdentifier urlId = (UrlIdentifier) identifier;
 
-            YadisResult yadis = _yadisResolver.discover(urlId.getUrl().toString());
-
-            if (YadisResult.OK == yadis.getStatus())
+            try
             {
-                _log.info("Using Yadis normalized URL as claimedID: "
-                        + yadis.getNormalizedUrl());
+                YadisResult yadis = _yadisResolver.discover(urlId.toString());
 
-                result = extractDiscoveryInformation(yadis.getXrds(),
-                        new UrlIdentifier(yadis.getNormalizedUrl()) );
+                if (yadis.isSuccess())
+                {
+                    _log.info("Using Yadis normalized URL as claimedID: "
+                            + yadis.getNormalizedUrl());
+
+                    result = extractDiscoveryInformation(yadis.getXrds(),
+                            new UrlIdentifier(yadis.getNormalizedUrl()) );
+                }
+
+            }
+            catch (YadisException e)
+            {
+                _log.warn("Yadis discovery failed on " + urlId.toString() +
+                          " : " + e.getMessage(), e.getCause());
             }
 
+            // fall-back to HTML discovery
             if (result.size() == 0)
             {
                 _log.info("No OpenID service endpoints discovered through Yadis;" +
@@ -634,7 +645,7 @@ public class Discovery
         // don't follow redirects when doing RP discovery
         YadisResult rpDiscovery = yadisResolver.discover(realm, 0);
 
-        if (YadisResult.OK == rpDiscovery.getStatus())
+        if ( rpDiscovery.isSuccess() )
         {
             result = extractDiscoveryInformation(rpDiscovery.getXrds(),
                     new UrlIdentifier(rpDiscovery.getNormalizedUrl()) );
