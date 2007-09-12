@@ -4,7 +4,8 @@
 
 package org.openid4java.consumer;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 import java.text.ParseException;
@@ -14,7 +15,7 @@ import java.text.ParseException;
  */
 public class InMemoryNonceVerifier extends AbstractNonceVerifier
 {
-    private static Logger _log = Logger.getLogger(InMemoryNonceVerifier.class);
+    private static Log _log = LogFactory.getLog(InMemoryNonceVerifier.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private Map _opMap = new HashMap();

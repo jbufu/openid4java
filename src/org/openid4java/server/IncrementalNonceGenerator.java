@@ -8,14 +8,15 @@ import org.openid4java.util.InternetDateFormat;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class IncrementalNonceGenerator implements NonceGenerator
 {
-    private static Logger _log = Logger.getLogger(IncrementalNonceGenerator.class);
+    private static Log _log = LogFactory.getLog(IncrementalNonceGenerator.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static InternetDateFormat _dateFormat = new InternetDateFormat();

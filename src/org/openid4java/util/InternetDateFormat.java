@@ -4,7 +4,8 @@
 
 package org.openid4java.util;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -23,7 +24,7 @@ import java.util.Date;
  */
 public class InternetDateFormat extends SimpleDateFormat
 {
-    private static Logger _log = Logger.getLogger(InternetDateFormat.class);
+    private static Log _log = LogFactory.getLog(InternetDateFormat.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";

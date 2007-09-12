@@ -4,7 +4,8 @@
 
 package org.openid4java.message;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -20,7 +21,7 @@ import java.net.URLDecoder;
  */
 public class ParameterList implements Serializable
 {
-    private static Logger _log = Logger.getLogger(ParameterList.class);
+    private static Log _log = LogFactory.getLog(ParameterList.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     Map _parameterMap;

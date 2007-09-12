@@ -15,7 +15,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for Attribute Exchange fetch requests.
@@ -25,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 public class FetchRequest extends AxMessage
 {
-    private static Logger _log = Logger.getLogger(FetchRequest.class);
+    private static Log _log = LogFactory.getLog(FetchRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

@@ -4,7 +4,8 @@
 
 package org.openid4java.message;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -15,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class VerifyRequest extends AuthSuccess
 {
-    private static Logger _log = Logger.getLogger(VerifyRequest.class);
+    private static Log _log = LogFactory.getLog(VerifyRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String MODE_CHKAUTH = "check_authentication";

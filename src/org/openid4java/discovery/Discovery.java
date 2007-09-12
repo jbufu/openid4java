@@ -10,7 +10,8 @@ import org.openxri.resolve.Resolver;
 import org.openxri.resolve.TrustType;
 import org.openxri.resolve.ResolverState;
 import org.w3c.dom.Element;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.regex.Pattern;
 import java.util.Vector;
@@ -28,7 +29,7 @@ import org.openid4java.yadis.YadisResult;
  */
 public class Discovery
 {
-    private static Logger _log = Logger.getLogger(Discovery.class);
+    private static Log _log = LogFactory.getLog(Discovery.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static final Pattern URL_PATTERN =

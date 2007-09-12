@@ -5,7 +5,8 @@
 package org.openid4java.message.ax;
 
 import org.openid4java.message.*;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for the Attribute Exchange implementation.
@@ -24,7 +25,7 @@ import org.apache.log4j.Logger;
  */
 public class AxMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Logger _log = Logger.getLogger(AxMessage.class);
+    private static Log _log = LogFactory.getLog(AxMessage.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The OpenID Association Response message.
@@ -24,7 +25,7 @@ import org.apache.log4j.Logger;
  */
 public class AssociationResponse extends Message
 {
-    private static Logger _log = Logger.getLogger(AssociationResponse.class);
+    private static Log _log = LogFactory.getLog(AssociationResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List requiredFields = Arrays.asList( new String[] {

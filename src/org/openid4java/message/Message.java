@@ -12,14 +12,15 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.net.URLEncoder;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class Message
 {
-    private static Logger _log = Logger.getLogger(Message.class);
+    private static Log _log = LogFactory.getLog(Message.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     // message constants

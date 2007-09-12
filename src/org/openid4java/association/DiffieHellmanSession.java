@@ -12,14 +12,15 @@ import javax.crypto.interfaces.DHPrivateKey;
 import java.math.BigInteger;
 import java.security.*;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class DiffieHellmanSession
 {
-    private static Logger _log = Logger.getLogger(DiffieHellmanSession.class);
+    private static Log _log = LogFactory.getLog(DiffieHellmanSession.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String DEFAULT_MODULUS_HEX =

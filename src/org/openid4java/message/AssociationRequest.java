@@ -11,7 +11,8 @@ import org.openid4java.association.AssociationException;
 import java.util.List;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The OpenID Association Request message.
@@ -23,7 +24,7 @@ import org.apache.log4j.Logger;
  */
 public class AssociationRequest extends Message
 {
-    private static Logger _log = Logger.getLogger(AssociationRequest.class);
+    private static Log _log = LogFactory.getLog(AssociationRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String MODE_ASSOC = "associate";
