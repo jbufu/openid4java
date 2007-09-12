@@ -9,14 +9,15 @@ import org.openid4java.association.AssociationException;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryServerAssociationStore implements ServerAssociationStore
 {
-    private static Logger _log = Logger.getLogger(InMemoryServerAssociationStore.class);
+    private static Log _log = LogFactory.getLog(InMemoryServerAssociationStore.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private String _timestamp;

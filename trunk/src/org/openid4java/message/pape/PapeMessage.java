@@ -5,7 +5,8 @@
 package org.openid4java.message.pape;
 
 import org.openid4java.message.*;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for the OpenID Provider Authentication Policy extension
@@ -24,7 +25,7 @@ import org.apache.log4j.Logger;
  */
 public class PapeMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Logger _log = Logger.getLogger(PapeMessage.class);
+    private static Log _log = LogFactory.getLog(PapeMessage.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String PAPE_POLICY_PHISHING_RESISTANT =

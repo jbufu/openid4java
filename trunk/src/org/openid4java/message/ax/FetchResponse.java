@@ -12,7 +12,8 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for Attribute Exchange fetch responses.
@@ -21,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class FetchResponse extends AxMessage
 {
-    private static Logger _log = Logger.getLogger(FetchResponse.class);
+    private static Log _log = LogFactory.getLog(FetchResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private int _attrAliasGen = 0;

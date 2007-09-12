@@ -9,7 +9,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.*;
 import org.openid4java.association.Association;
 import org.openid4java.association.DiffieHellmanSession;
@@ -41,7 +42,7 @@ import java.util.*;
  */
 public class ConsumerManager
 {
-    private static Logger _log = Logger.getLogger(ConsumerManager.class);
+    private static Log _log = LogFactory.getLog(ConsumerManager.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

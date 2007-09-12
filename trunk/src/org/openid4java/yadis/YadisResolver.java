@@ -19,7 +19,8 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -65,7 +66,7 @@ import org.openid4java.util.HttpClientFactory;
  */
 public class YadisResolver
 {
-    private static Logger _log = Logger.getLogger(YadisResolver.class);
+    private static Log _log = LogFactory.getLog(YadisResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     // Yadis constants

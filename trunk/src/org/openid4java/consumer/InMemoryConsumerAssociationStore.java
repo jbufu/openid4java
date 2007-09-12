@@ -8,14 +8,15 @@ import org.openid4java.association.Association;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryConsumerAssociationStore implements ConsumerAssociationStore
 {
-    private static Logger _log = Logger.getLogger(InMemoryConsumerAssociationStore.class);
+    private static Log _log = LogFactory.getLog(InMemoryConsumerAssociationStore.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private Map _opMap = new HashMap();

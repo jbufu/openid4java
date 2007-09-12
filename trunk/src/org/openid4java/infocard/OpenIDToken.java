@@ -7,7 +7,8 @@ package org.openid4java.infocard;
 import org.openid4java.message.Message;
 import org.openid4java.message.ParameterList;
 import org.openid4java.OpenIDException;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -28,7 +29,7 @@ import java.io.IOException;
  */
 public class OpenIDToken
 {
-    private static Logger _log = Logger.getLogger(OpenIDToken.class);
+    private static Log _log = LogFactory.getLog(OpenIDToken.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
              
     /**

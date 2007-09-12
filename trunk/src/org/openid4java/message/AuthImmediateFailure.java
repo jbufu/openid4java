@@ -4,7 +4,8 @@
 
 package org.openid4java.message;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ import java.net.MalformedURLException;
  */
 public class AuthImmediateFailure extends Message
 {
-    private static Logger _log = Logger.getLogger(AuthImmediateFailure.class);
+    private static Log _log = LogFactory.getLog(AuthImmediateFailure.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List requiredFields = Arrays.asList( new String[] {

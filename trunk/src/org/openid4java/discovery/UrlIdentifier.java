@@ -4,7 +4,8 @@
 
 package org.openid4java.discovery;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.net.*;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class UrlIdentifier implements Identifier
 {
-    private static Logger _log = Logger.getLogger(UrlIdentifier.class);
+    private static Log _log = LogFactory.getLog(UrlIdentifier.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static final Set UNRESERVED_CHARACTERS = new HashSet();

@@ -10,7 +10,8 @@ import org.openid4java.message.Parameter;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for OpenID Provider Authentication Policy responses.
@@ -19,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 public class PapeResponse extends PapeMessage
 {
-    private static Logger _log = Logger.getLogger(PapeResponse.class);
+    private static Log _log = LogFactory.getLog(PapeResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String AUTH_AGE_UNKNOWN = "none";

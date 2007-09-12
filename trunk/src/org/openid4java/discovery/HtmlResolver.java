@@ -8,7 +8,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.htmlparser.Parser;
 import org.htmlparser.Node;
 import org.htmlparser.nodes.TagNode;
@@ -30,7 +31,7 @@ import org.openid4java.util.HttpClientFactory;
  */
 public class HtmlResolver
 {
-    private static Logger _log = Logger.getLogger(HtmlResolver.class);
+    private static Log _log = LogFactory.getLog(HtmlResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**
