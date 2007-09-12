@@ -66,6 +66,9 @@
       </plugin>
     </plugins>
   </build>
+  <reporting>
+    <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
+  </reporting>
   <dependencies>
     <dependency>
       <groupId>org.apache.ws.commons.axiom</groupId>

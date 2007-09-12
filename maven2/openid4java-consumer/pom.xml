@@ -49,6 +49,9 @@
       </plugin>
     </plugins>
   </build>
+  <reporting>
+    <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
+  </reporting>
   <dependencies>
     <dependency>
       <groupId>commons-httpclient</groupId>

@@ -62,7 +62,6 @@
   </build>
 
   <reporting>
-    <outputDirectory>../build/site</outputDirectory>
     <plugins>
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
