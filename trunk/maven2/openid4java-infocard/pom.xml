@@ -96,35 +96,35 @@
       <artifactId>higgins-configuration-api</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../../lib/higgins-configuration-api.jar</systemPath>
+      <systemPath>${basedir}/../../lib/infocard/higgins-configuration-api.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>higgins</groupId>
       <artifactId>higgins-sts-api</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../../lib/higgins-sts-api.jar</systemPath>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-api.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>higgins</groupId>
       <artifactId>higgins-sts-common</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../../lib/higgins-sts-common.jar</systemPath>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-common.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>higgins</groupId>
       <artifactId>higgins-sts-server-token-handler</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../../lib/higgins-sts-server-token-handler.jar</systemPath>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-server-token-handler.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>higgins</groupId>
       <artifactId>higgins-sts-spi</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../../lib/higgins-sts-spi.jar</systemPath>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-spi.jar</systemPath>
     </dependency>
   </dependencies>
 </project>
