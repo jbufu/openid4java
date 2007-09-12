@@ -35,6 +35,9 @@
       </plugin>
     </plugins>
   </build>
+  <reporting>
+    <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
+  </reporting>
   <dependencies>
     <dependency>
       <groupId>org.openid4java</groupId>
