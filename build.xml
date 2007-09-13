@@ -60,12 +60,22 @@
         </javac>
     </target>
 
-    <target name="jar" depends="compile"
-            description="Packages compiled class files into a jar archive">
-        <jar jarfile="${build}/${component.name}.jar">
-            <fileset dir="${classes}"/>
-        </jar>
-    </target>
+  <target name="jar" depends="compile"
+          description="Packages compiled class files into a jar archive">
+      <property file="VERSION"/>
+      <jar jarfile="${build}/${component.name}.jar">
+          <fileset dir="${classes}"/>
+        <manifest>
+          <section name="openid4java">
+            <attribute name="Specification-Title" value="OpenID Authentication"/>
+            <attribute name="Specification-Version" value="2.0,1.1"/>
+            <attribute name="Specification-Vendor" value="openid.net"/>
+            <attribute name="Implementation-Title" value="openid4java"/>
+            <attribute name="Implementation-Version" value="${Version}"/>
+          </section>
+        </manifest>
+      </jar>
+  </target>
 
   <target name="version-update">
     <taskdef resource="svntask.properties" classpathref="classpath"/>
