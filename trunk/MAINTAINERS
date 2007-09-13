@@ -25,6 +25,11 @@ Entire Library, including documentation:
   M: Sutra Zhou
   S: fixes/patches
 
+  M: Shihab Hamid
+  S: fixex/patches
+
+  M: Justen Stepka
+  S: fixes/patches
 
 ========================================================================
 Copyright 2006-2007 Sxip Identity Corporation
