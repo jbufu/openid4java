@@ -6,6 +6,7 @@ package org.openid4java.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
 
 import java.util.List;
 import java.util.Arrays;
@@ -45,8 +46,7 @@ public class VerifyResponse extends Message
     {
         VerifyResponse resp = new VerifyResponse(compatibility);
 
-        if (! resp.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        resp.validate();
 
         if (DEBUG) _log.debug("Created verification response:\n"
                               + resp.keyValueFormEncoding());
@@ -59,8 +59,7 @@ public class VerifyResponse extends Message
     {
         VerifyResponse resp = new VerifyResponse(params);
 
-        if (! resp.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        resp.validate();
 
         if (DEBUG) _log.debug("Created verification response:\n"
                               + resp.keyValueFormEncoding());
@@ -98,18 +97,17 @@ public class VerifyResponse extends Message
         return getParameterValue("invalidate_handle");
     }
 
-    public boolean isValid()
+    public void validate() throws MessageException
     {
-        if (! super.isValid()) return false;
+        super.validate();
 
         if (! "true".equals(getParameterValue("is_valid")) &&
                 ! "false".equals(getParameterValue("is_valid")) )
         {
-            _log.warn("Invalid is_valid value in verification response: "
-                      + getParameterValue("is_valid"));
-            return false;
+            throw new MessageException(
+                "Invalid is_valid value in verification response: "
+                 + getParameterValue("is_valid"),
+                OpenIDException.VERIFY_ERROR);
         }
-
-        return true;
     }
 }

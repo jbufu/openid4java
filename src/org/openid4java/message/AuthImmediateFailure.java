@@ -6,6 +6,7 @@ package org.openid4java.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
 
 import java.util.List;
 import java.util.Arrays;
@@ -57,8 +58,7 @@ public class AuthImmediateFailure extends Message
     {
         AuthImmediateFailure fail = new AuthImmediateFailure(url, returnTo, compatibility);
 
-        if (! fail.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        fail.validate();
 
         return fail;
     }
@@ -68,8 +68,7 @@ public class AuthImmediateFailure extends Message
     {
         AuthImmediateFailure fail = new AuthImmediateFailure(params);
 
-        if (! fail.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        fail.validate();
 
         if (DEBUG)
             _log.debug("Retrieved auth immediate failure from message parameters:\n"
@@ -94,11 +93,12 @@ public class AuthImmediateFailure extends Message
         return getParameterValue("openid.user_setup_url");
     }
 
-    public boolean isValid()
+    public void validate() throws MessageException
     {
-        if (!super.isValid()) return false;
+        super.validate();
 
         boolean compatibility = ! isVersion2();
+        String mode = getParameterValue("openid.mode");
 
         if (compatibility)
         {
@@ -108,13 +108,21 @@ public class AuthImmediateFailure extends Message
             }
             catch (MalformedURLException e)
             {
-                _log.error("Error verifying auth immediate response validity.", e);
-                return false;
+                throw new MessageException(
+                    "Invalid user_setup_url in auth failure response.",
+                    OpenIDException.AUTH_ERROR, e);
             }
 
-            return MODE_IDRES.equals(getParameterValue("openid.mode"));
+            if (! MODE_IDRES.equals(mode))
+                throw new MessageException(
+                    "Invalid openid.mode in auth failure response; " +
+                    "expected " + MODE_IDRES + " found: " + mode,
+                    OpenIDException.AUTH_ERROR);
         }
-        else
-            return MODE_SETUP_NEEDED.equals(getParameterValue("openid.mode"));
+        else if (! MODE_SETUP_NEEDED.equals(mode))
+            throw new MessageException(
+                "Invalid openid.mode in auth failure response; " +
+                "expected " + MODE_SETUP_NEEDED + "found: " + mode,
+                OpenIDException.AUTH_ERROR);
     }
 }

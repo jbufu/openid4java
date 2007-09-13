@@ -95,8 +95,7 @@ public class Message
     {
         Message message = new Message();
 
-        if (! message.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        message.validate();
 
         if (DEBUG) _log.debug("Created message:\n"
                               + message.keyValueFormEncoding());
@@ -109,8 +108,7 @@ public class Message
     {
         Message message = new Message(params);
 
-        if (! message.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        message.validate();
 
         if (DEBUG) _log.debug("Created message from parameter list:\n"
                               + message.keyValueFormEncoding());
@@ -159,9 +157,9 @@ public class Message
     }
 
     /**
-     * Check that all required parameters are present
+     * Checks that all required parameters are present
      */
-    public boolean isValid()
+    public void validate() throws MessageException
     {
         List requiredFields = getRequiredFields();
 
@@ -170,27 +168,20 @@ public class Message
         {
             Parameter param = (Parameter) paramIter.next();
             if (!param.isValid())
-            {
-                _log.warn("Invalid parameter: " + param);
-                return false;
-            }
+                throw new MessageException("Invalid parameter: " + param);
         }
 
         if (requiredFields == null)
-            return true;
+            return;
 
         Iterator reqIter = requiredFields.iterator();
         while(reqIter.hasNext())
         {
             String required = (String) reqIter.next();
             if (! hasParameter(required))
-            {
-                _log.warn("Required parameter missing: " + required);
-                return false;
-            }
+                throw new MessageException(
+                    "Required parameter missing: " + required);
         }
-
-        return true;
     }
 
     public List getRequiredFields()
