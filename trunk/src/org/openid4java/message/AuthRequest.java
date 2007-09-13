@@ -6,6 +6,7 @@ package org.openid4java.message;
 
 import org.openid4java.association.Association;
 import org.openid4java.server.RealmVerifier;
+import org.openid4java.OpenIDException;
 
 import java.util.List;
 import java.util.Arrays;
@@ -97,8 +98,7 @@ public class AuthRequest extends Message
         AuthRequest req = new AuthRequest(claimedId, delegate, compatibility,
                 returnToUrl, handle, realm, verifier);
 
-        if (! req.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        req.validate();
 
         if (DEBUG) _log.debug("Created auth request:\n" + req.keyValueFormEncoding());
 
@@ -113,8 +113,7 @@ public class AuthRequest extends Message
 
         req.setRealmVerifier(realmVerifier);
 
-        if (! req.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        req.validate();
 
         if (DEBUG) _log.debug("Created auth request:\n" + req.keyValueFormEncoding());
 
@@ -225,33 +224,35 @@ public class AuthRequest extends Message
         this._realmVerifier = realmVerifier;
     }
 
-    public boolean isValid()
+    public void validate() throws MessageException
     {
-        if (! super.isValid()) return false;
+        super.validate();
 
         boolean compatibility = ! isVersion2();
 
         if ( compatibility && hasParameter("openid.ns") )
         {
-            _log.warn("Invalid value for openid.ns field: "
-                      + getParameterValue("openid.ns"));
-            return false;
+            throw new MessageException(
+                "Invalid value for openid.ns field: "
+                + getParameterValue("openid.ns"),
+                OpenIDException.AUTH_ERROR);
         }
 
         if ( compatibility && hasParameter("openid.identity")  &&
                 SELECT_ID.equals(getParameterValue("openid.identity")))
         {
-            _log.warn(SELECT_ID + " not supported in OpenID1");
-            return false;
+            throw new MessageException(SELECT_ID + " not supported in OpenID1",
+                OpenIDException.AUTH_ERROR);
         }
 
         if ( hasParameter("openid.mode") &&
                 ! MODE_SETUP.equals(getParameterValue("openid.mode")) &&
                 ! MODE_IMMEDIATE.equals(getParameterValue("openid.mode")))
         {
-            _log.warn("Invalid openid.mode value in auth request: "
-                      + getParameterValue("openid.mode"));
-            return false;
+            throw new MessageException(
+                "Invalid openid.mode value in auth request: "
+                + getParameterValue("openid.mode"),
+                OpenIDException.AUTH_ERROR);
         }
 
         // return_to must be a valid URL, if present
@@ -261,35 +262,36 @@ public class AuthRequest extends Message
                 new URL(getReturnTo());
         } catch (MalformedURLException e)
         {
-            _log.error("Error verifying return URL in auth request.", e);
-            return false;
+            throw new MessageException(
+                "Error verifying return URL in auth request.",
+                OpenIDException.AUTH_ERROR, e);
         }
 
         if ( ! hasParameter("openid.return_to") )
         {
             if (compatibility)
             {
-                _log.warn("openid.return_to is mandatory in OpenID1 auth requests");
-                return false;
+                throw new MessageException(
+                    "openid.return_to is mandatory in OpenID1 auth requests",
+                    OpenIDException.AUTH_ERROR);
             }
 
             else if ( ! hasParameter("openid.realm") )
             {
-                _log.warn("openid.realm is mandatory if return_to is absent.");
-                return false;
+                throw new MessageException(
+                    "openid.realm is mandatory if return_to is absent.",
+                    OpenIDException.AUTH_REALM_ERROR);
             }
         }
 
         if ( compatibility && hasParameter("openid.realm") )
         {
             _log.warn("openid.realm should not be present in OpenID1 auth requests");
-//            return false;
         }
 
         if ( !compatibility && hasParameter("openid.trust_root") )
         {
             _log.warn("openid.trust_root should not be present in OpenID2 auth requests.");
-//            return false;
         }
 
         // figure out if 'claimed_id' and 'identity' are optional
@@ -298,8 +300,9 @@ public class AuthRequest extends Message
             // not optional in v1
             if (compatibility)
             {
-                _log.warn("openid.identity is required in OpenID1 auth requests");
-                return false;
+                throw new MessageException(
+                    "openid.identity is required in OpenID1 auth requests",
+                    OpenIDException.AUTH_ERROR);
             }
 
             boolean hasAuthProvider = false;
@@ -328,31 +331,33 @@ public class AuthRequest extends Message
             // no extension provides authentication sevices - invalid message
             if ( !hasAuthProvider )
             {
-                _log.warn("no identifier specified in auth request");
-                return false;
+                throw new MessageException(
+                    "no identifier specified in auth request",
+                    OpenIDException.AUTH_ERROR);
             }
 
             // claimed_id must be present if and only if identity is present
             if ( hasParameter("openid.claimed_id") )
             {
-                _log.warn("openid.claimed_id must be present if and only if " +
-                          "openid.identity is present.");
-                return false;
+                throw new MessageException(
+                    "openid.claimed_id must be present if and only if " +
+                    "openid.identity is present.",
+                    OpenIDException.AUTH_ERROR);
             }
         }
         else if ( ! compatibility && ! hasParameter("openid.claimed_id") )
         {
-            _log.warn("openid.clamied_id must be present in OpenID2 auth requests");
-            return false;
+            throw new MessageException(
+                "openid.clamied_id must be present in OpenID2 auth requests",
+                OpenIDException.AUTH_ERROR);
         }
 
         if (getRealm() != null &&  RealmVerifier.OK !=
                         _realmVerifier.validate(getRealm(), getReturnTo()) )
         {
-            _log.warn("Realm verification failed for: " + getRealm());
-            return false;
+            throw new MessageException(
+                "Realm verification failed for: " + getRealm(),
+                OpenIDException.AUTH_REALM_ERROR);
         }
-
-        return true;
     }
 }

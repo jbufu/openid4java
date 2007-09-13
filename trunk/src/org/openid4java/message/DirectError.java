@@ -56,7 +56,11 @@ public class DirectError extends Message
     {
         DirectError err = new DirectError(msg, compatibility);
 
-        if (! err.isValid())
+        try
+        {
+            err.validate();
+        }
+        catch (MessageException e)
         {
             _log.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
                        " direct error message created for message: " + msg);
@@ -71,7 +75,11 @@ public class DirectError extends Message
     {
         DirectError err = new DirectError(params);
 
-        if (! err.isValid())
+        try
+        {
+            err.validate();
+        }
+        catch (MessageException e)
         {
             _log.error("Invalid direct error message created: "
                        + err.keyValueFormEncoding() );

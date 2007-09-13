@@ -7,6 +7,7 @@ package org.openid4java.message;
 import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.association.AssociationException;
+import org.openid4java.OpenIDException;
 
 import java.util.List;
 import java.util.Arrays;
@@ -134,8 +135,7 @@ public class AssociationRequest extends Message
                     "Invalid association / session combination specified: " +
                             type + "DH session: " + dhSess);
 
-        if ( !req.isValid() ) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        req.validate();
 
         if (DEBUG) _log.debug("Created association request:\n"
                               + req.keyValueFormEncoding());
@@ -147,8 +147,7 @@ public class AssociationRequest extends Message
     {
         AssociationRequest req = new AssociationRequest(params);
 
-        if ( !req.isValid() ) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        req.validate();
 
         if (DEBUG)
             _log.debug("Created association request from message parameters:\n"
@@ -247,10 +246,10 @@ public class AssociationRequest extends Message
      *
      * @return True if all validation checkes passed, false otherwise.
      */
-    public boolean isValid()
+    public void validate() throws MessageException
     {
         // basic checks
-        if (! super.isValid()) return false;
+        super.validate();
 
         // association / session type checks
         // (includes most of the compatibility stuff)
@@ -263,39 +262,42 @@ public class AssociationRequest extends Message
             // make sure compatibility mode is the same for type and message
             if (type.isVersion2() != isVersion2())
             {
-                _log.warn("Protocol verison mismatch between association " +
-                          "session type: " + type +
-                          " and AssociationRequest message type.");
-                return false;
+                throw new MessageException("Protocol verison mismatch " +
+                    "between association session type: " + type +
+                    " and AssociationRequest message type.",
+                    OpenIDException.ASSOC_ERROR);
             }
 
-        } catch (AssociationException e) {
-            _log.error("Error verifying association request validity.", e);
-            return false;
+        }
+        catch (AssociationException e)
+        {
+            throw new MessageException(
+                "Error verifying association request validity.",
+                OpenIDException.ASSOC_ERROR, e);
         }
 
         // additional compatibility checks
         if (! isVersion2() && getSessionType() == null)
         {
-            _log.warn("sess_type cannot be omitted in OpenID1 association requests");
-            return false;
+            throw new MessageException(
+                "sess_type cannot be omitted in OpenID1 association requests",
+                OpenIDException.ASSOC_ERROR);
         }
 
         // DH seesion parameters
         if ( type.getHAlgorithm() != null && getDhPublicKey() == null)
         {
-            _log.warn("DH consumer public key not specified.");
-            return false;
+            throw new MessageException("DH consumer public key not specified.",
+                OpenIDException.ASSOC_ERROR);
         }
 
         // no-enc session
         if (type.getHAlgorithm() == null && (getDhGen() != null ||
                 getDhModulus() != null || getDhPublicKey() != null) )
         {
-            _log.warn("No-encryption session, but DH parameters specified.");
-            return false;
+            throw new MessageException(
+                "No-encryption session, but DH parameters specified.",
+                OpenIDException.ASSOC_ERROR);
         }
-
-        return true;
     }
 }

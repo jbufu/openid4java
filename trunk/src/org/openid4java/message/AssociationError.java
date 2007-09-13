@@ -5,6 +5,7 @@
 package org.openid4java.message;
 
 import org.openid4java.association.AssociationSessionType;
+import org.openid4java.OpenIDException;
 
 import java.util.List;
 import java.util.Arrays;
@@ -52,10 +53,14 @@ public class AssociationError extends DirectError
     {
         AssociationError err = new AssociationError(msg, type);
 
-        if (! err.isValid())
+        try
+        {
+            err.validate();
+        }
+        catch (MessageException e)
         {
             _log.error("Invalid association error message created, " +
-                       "type: " + type + " message: " + msg);
+                       "type: " + type + " message: " + msg, e);
         }
 
         return err;
@@ -65,10 +70,14 @@ public class AssociationError extends DirectError
     {
         AssociationError err = new AssociationError(params);
 
-        if (! err.isValid())
+        try
+        {
+            err.validate();
+        }
+        catch (MessageException e)
         {
             _log.error("Invalid association error message created: "
-                       + err.keyValueFormEncoding() );
+                       + err.keyValueFormEncoding(), e );
         }
 
         return err;
@@ -100,13 +109,15 @@ public class AssociationError extends DirectError
         return getParameterValue("error_code");
     }
 
-    public boolean isValid()
+    public void validate() throws MessageException
     {
-        if (!super.isValid()) return false;
+        super.validate();
 
-        return ASSOC_ERR.equals(getErrorCode()) &&
-                OPENID2_NS.equals(getParameterValue("ns"));
-
+        if ( ! (ASSOC_ERR.equals(getErrorCode()) &&
+                OPENID2_NS.equals(getParameterValue("ns")) ) )
+            throw new MessageException("Invalid Association Error: " +
+                "invalid error_code or missing ns param.",
+                OpenIDException.ASSOC_ERROR);
     }
 
 }

@@ -1009,9 +1009,7 @@ public class ConsumerManager
         if (! AuthRequest.SELECT_ID.equals(claimedId))
             authReq.setImmediate(_immediateAuth);
 
-        if (! authReq.isValid())
-            throw new MessageException("Invalid AuthRequest: " +
-                    authReq.wwwFormEncoding());
+        authReq.validate();
 
         return authReq;
     }
@@ -1080,9 +1078,8 @@ public class ConsumerManager
         AuthSuccess authResp = AuthSuccess.createAuthSuccess(response);
         _log.info("Received positive auth response.");
 
-        if (!authResp.isValid())
-            throw new MessageException("Invalid Authentication Response: " +
-                    authResp.wwwFormEncoding());
+        authResp.validate();
+
         result.setAuthResponse(authResp);
 
         // [1/4] return_to verification
@@ -1672,7 +1669,9 @@ public class ConsumerManager
                 VerifyResponse vrfyResp =
                         VerifyResponse.createVerifyResponse(responseParams);
 
-                if (vrfyResp.isValid() & vrfyResp.isSignatureVerified())
+                vrfyResp.validate();
+                
+                if (vrfyResp.isSignatureVerified())
                 {
                     // process the optional invalidate_handle first
                     String invalidateHandle = vrfyResp.getInvalidateHandle();

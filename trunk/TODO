@@ -44,8 +44,6 @@
     - Factory method for incoming messages
     - Review consumer verification flow
 
-    - Make isValid() throw exceptions
-
     - Interface for saving discovered information
         - into session, db, url/return_to, etc.
             - saveDiscoveryInfo(... , session, return_to)

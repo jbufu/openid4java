@@ -27,6 +27,7 @@ import java.util.List;
 import org.openid4java.util.HttpClientFactory;
 import org.openid4java.discovery.UrlIdentifier;
 import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.OpenIDException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -168,14 +169,16 @@ public class HtmlResolver
             int statusCode = client.executeMethod(get);
             if (statusCode != HttpStatus.SC_OK)
                 throw new DiscoveryException( "GET failed on " + url +
-                                " Received status code: " + statusCode);
+                    " Received status code: " + statusCode,
+                    OpenIDException.DISCOVERY_HTML_GET_ERROR);
 
             result.setClaimed( new UrlIdentifier(get.getURI().toString()) );
 
             InputStream htmlInput = get.getResponseBodyAsStream();
             if (htmlInput == null)
                 throw new DiscoveryException(
-                        "Cannot open inputstream for GET response from " + url);
+                    "Cannot open inputstream for GET response from " + url,
+                    OpenIDException.DISCOVERY_HTML_GET_ERROR);
 
             byte data[] = new byte[_maxHtmlSize];
 
@@ -193,7 +196,8 @@ public class HtmlResolver
             htmlInput.close();
 
             if (totalRead <= 0)
-                throw new DiscoveryException("No HTML data read from " + url);
+                throw new DiscoveryException("No HTML data read from " + url,
+                    OpenIDException.DISCOVERY_HTML_NODATA_ERROR);
 
             if (DEBUG) _log.debug("Read " + totalRead + " bytes.");
 
@@ -201,7 +205,8 @@ public class HtmlResolver
 
         } catch (IOException e)
         {
-            throw new DiscoveryException("Fatal transport error: ", e);
+            throw new DiscoveryException("Fatal transport error: ",
+                OpenIDException.DISCOVERY_HTML_GET_ERROR, e);
         }
         finally
         {
@@ -231,8 +236,9 @@ public class HtmlResolver
             NodeList heads = parser.parse(new TagNameFilter("HEAD"));
             if (heads.size() != 1)
                 throw new DiscoveryException(
-                        "HTML response must have exactly one HEAD element, " +
-                                "found " + heads.size() + " : " + heads.toHtml());
+                    "HTML response must have exactly one HEAD element, " +
+                    "found " + heads.size() + " : " + heads.toHtml(),
+                    OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
             Node head = heads.elementAt(0);
             for (NodeIterator i = head.getChildren().elements();
                  i.hasMoreNodes();)
@@ -252,7 +258,8 @@ public class HtmlResolver
                     {
                         if (result.getOP1Endpoint() != null)
                             throw new DiscoveryException(
-                                    "More than one openid.server entries found");
+                                "More than one openid.server entries found",
+                                OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
                         if (DEBUG)
                             _log.debug("Found OpenID1 endpoint: " + op1Endpoint);
@@ -264,7 +271,8 @@ public class HtmlResolver
                     {
                         if (result.getDelegate1() != null)
                             throw new DiscoveryException(
-                                    "More than one openid.delegate entries found");
+                                "More than one openid.delegate entries found",
+                                OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
                         if (DEBUG)
                             _log.debug("Found OpenID1 delegate: " + href);
@@ -275,7 +283,8 @@ public class HtmlResolver
                     {
                         if (result.getOP2Endpoint() != null)
                             throw new DiscoveryException(
-                                    "More than one openid.server entries found");
+                                "More than one openid.server entries found",
+                                OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
                         if (DEBUG)
                             _log.debug("Found OpenID2 endpoint: " + op2Endpoint);
@@ -287,7 +296,8 @@ public class HtmlResolver
                     {
                         if (result.getDelegate2() != null)
                             throw new DiscoveryException(
-                                    "More than one openid2.local_id entries found");
+                                "More than one openid2.local_id entries found",
+                                OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
                         if (DEBUG)
                             _log.debug("Found OpenID2 localID: " + href);
@@ -301,7 +311,8 @@ public class HtmlResolver
         }
         catch (ParserException e)
         {
-            throw new DiscoveryException("Error parsing HTML message", e);
+            throw new DiscoveryException("Error parsing HTML message",
+                OpenIDException.DISCOVERY_HTML_PARSE_ERROR, e);
         }
     }
 }

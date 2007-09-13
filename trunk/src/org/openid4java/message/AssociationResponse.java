@@ -8,6 +8,8 @@ import org.openid4java.association.Association;
 import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.AssociationException;
 import org.openid4java.association.AssociationSessionType;
+import org.openid4java.OpenIDException;
+
 import java.util.List;
 import java.util.Arrays;
 
@@ -100,8 +102,7 @@ public class AssociationResponse extends Message
     {
         AssociationResponse resp = new AssociationResponse(assocReq, assoc);
 
-        if (! resp.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        resp.validate();
 
         if (DEBUG) _log.debug("Created association response:\n"
                               + resp.keyValueFormEncoding());
@@ -114,8 +115,7 @@ public class AssociationResponse extends Message
     {
         AssociationResponse resp = new AssociationResponse(params);
 
-        if (! resp.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        resp.validate();
 
         if (DEBUG)
             _log.debug("Created association response from message parameters:\n"
@@ -229,10 +229,10 @@ public class AssociationResponse extends Message
      *
      * @return True if all validation checkes passed, false otherwise.
      */
-    public boolean isValid()
+    public void validate() throws MessageException
     {
         // basic checks
-        if (! super.isValid()) return false;
+        super.validate();
 
         // association / session type checks
         // (includes most of the compatibility stuff)
@@ -245,22 +245,27 @@ public class AssociationResponse extends Message
             // make sure compatibility mode is the same for type and message
             if (type.isVersion2() ^ isVersion2())
             {
-                _log.warn("Protocol verison mismatch between association " +
-                          "session type: " + type +
-                          " and AssociationResponse message type.");
-                return false;
+                throw new MessageException(
+                    "Protocol verison mismatch between association " +
+                    "session type: " + type +
+                    " and AssociationResponse message type.",
+                    OpenIDException.ASSOC_ERROR);
             }
 
-        } catch (AssociationException e) {
-            _log.error("Error verifying association response validity.", e);
-            return false;
+        }
+        catch (AssociationException e)
+        {
+            throw new MessageException(
+                "Error verifying association response validity.",
+                OpenIDException.ASSOC_ERROR, e);
         }
 
         // additional compatibility checks
         if (! isVersion2() && getAssociationType() == null)
         {
-            _log.warn("assoc_type cannot be omitted in OpenID1 responses");
-            return false;
+            throw new MessageException(
+                "assoc_type cannot be omitted in OpenID1 responses",
+                OpenIDException.ASSOC_ERROR);
         }
 
         String macKey;
@@ -269,8 +274,9 @@ public class AssociationResponse extends Message
             if ( ! hasParameter("dh_server_public") ||
                     ! hasParameter("enc_mac_key") )
             {
-                _log.warn("DH public key or encrypted MAC key missing.");
-                return false;
+                throw new MessageException(
+                    "DH public key or encrypted MAC key missing.",
+                    OpenIDException.ASSOC_ERROR);
             }
             else
                 macKey = getParameterValue("enc_mac_key");
@@ -278,8 +284,8 @@ public class AssociationResponse extends Message
         {
             if ( !hasParameter("mac_key") )
             {
-                _log.warn("Missing MAC key.");
-                return false;
+                throw new MessageException("Missing MAC key.",
+                    OpenIDException.ASSOC_ERROR);
             }
             else
                 macKey = getParameterValue("mac_key");
@@ -290,12 +296,10 @@ public class AssociationResponse extends Message
 
         if ( macSize != type.getKeySize())
         {
-            _log.warn("MAC key size: " + macSize +
-                      " doesn't match the association/session type: " + type);
-            return false;
+            throw new MessageException("MAC key size: " + macSize +
+                " doesn't match the association/session type: " + type,
+                OpenIDException.ASSOC_ERROR);
         }
-        else
-            return true;
     }
 
     /**

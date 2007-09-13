@@ -6,6 +6,7 @@ package org.openid4java.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
 
 
 /**
@@ -45,8 +46,7 @@ public class VerifyRequest extends AuthSuccess
     {
         VerifyRequest req = new VerifyRequest(authResp);
 
-        if (! req.isValid()) throw new MessageException(
-                "Invalid set of parameters for a verification request");
+        req.validate();
 
         if (DEBUG) _log.debug("Created verification request " +
                 "from a positive auth response:\n" + req.keyValueFormEncoding());
@@ -59,8 +59,7 @@ public class VerifyRequest extends AuthSuccess
     {
         VerifyRequest req = new VerifyRequest(params);
 
-        if (! req.isValid()) throw new MessageException(
-                "Invalid set of parameters for a verification request");
+        req.validate();
 
         if (DEBUG) _log.debug("Created verification request:\n"
                               + req.keyValueFormEncoding());
@@ -78,13 +77,14 @@ public class VerifyRequest extends AuthSuccess
         return getParameterValue("openid.invalidate_handle");
     }
 
-    public boolean isValid()
+    public void validate() throws MessageException
     {
         if (! MODE_CHKAUTH.equals(getParameterValue("openid.mode")))
         {
-            _log.warn("Invalid openid.mode in verification request: "
-                      + getParameterValue("openid.mode"));
-            return false;
+            throw new MessageException(
+                "Invalid openid.mode in verification request: "
+                + getParameterValue("openid.mode"),
+                OpenIDException.VERIFY_ERROR);
         }
 
         set("openid.mode", MODE_IDRES);
@@ -92,15 +92,8 @@ public class VerifyRequest extends AuthSuccess
         if (DEBUG) _log.debug("Delegating verification request validity check " +
                               "to auth response...");
 
-        if (! super.isValid() )
-        {
-            _log.warn("Invalid verification request: " +
-                      "related auth response verification failed.");
-            return false;
-        }
+        super.validate();
 
         set("openid.mode", MODE_CHKAUTH);
-
-        return true;
     }
 }

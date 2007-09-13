@@ -6,6 +6,7 @@ package org.openid4java.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
 
 import java.util.List;
 import java.util.Arrays;
@@ -46,8 +47,7 @@ public class AuthFailure extends Message
     {
         AuthFailure fail = new AuthFailure(params);
 
-        if (! fail.isValid()) throw new MessageException(
-                "Invalid set of parameters for the requested message type");
+        fail.validate();
 
         if (DEBUG)
             _log.debug("Retrieved auth failure from message parameters:\n"
@@ -67,10 +67,16 @@ public class AuthFailure extends Message
                 OPENID2_NS.equals(getParameterValue("openid.ns"));
     }
 
-    public boolean isValid()
+    public void validate() throws MessageException
     {
-        if (!super.isValid()) return false;
+        super.validate();
 
-        return MODE_CANCEL.equals(getParameterValue("openid.mode"));
+        String mode = getParameterValue("openid.mode");
+
+        if (! MODE_CANCEL.equals(mode))
+            throw new MessageException(
+                "Invalid openid.mode; expected " +
+                MODE_CANCEL + " found: " + mode,
+                OpenIDException.AUTH_ERROR);
     }
 }
