@@ -585,8 +585,8 @@ public class ServerManager
 
             if (authReq.getReturnTo() == null)
             {
-                _log.error("Received valid auth request, but no return_to " +
-                           "specified; authResponse() should not be called.");
+                _log.error("No return_to in the received (valid) auth request; "
+                           + "returning null auth response.");
                 return null;
             }
 
@@ -684,7 +684,7 @@ public class ServerManager
         {
             if (requestParams.hasParameter("openid.return_to"))
             {
-                _log.error("Error processing an authentication request; " +
+                _log.error("Error processing authentication request; " +
                            "responding with an indirect error message.", e);
 
                 return IndirectError.createIndirectError(e,
@@ -693,8 +693,8 @@ public class ServerManager
             }
             else
             {
-                _log.error("Error processing an authentication request; " +
-                           "responding with an direct error message.", e);
+                _log.error("Error processing authentication request; " +
+                           "responding with a direct error message.", e);
 
                 return DirectError.createDirectError( e, ! isVersion2 );
             }
