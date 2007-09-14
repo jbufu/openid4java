@@ -704,26 +704,30 @@ public class ServerManager
     /**
      * Signs an AuthSuccess message, using the association identified by the
      * handle specified within the message.
+     *
+     * @param   authSuccess     The Authentication Success message to be signed.
+     *
+     * @throws  ServerException If the Association corresponding to the handle
+     *                          in the @authSuccess cannot be retrieved from
+     *                          the store.
+     * @throws  AssociationException    If the signature cannot be computed.
+     *
      */
-    public void sign(Message msg) throws ServerException, AssociationException
+    public void sign(AuthSuccess authSuccess)
+        throws ServerException, AssociationException
     {
-        if (! (msg instanceof AuthSuccess) ) throw new ServerException(
-                    "Cannot sign message of type: " + msg.getClass());
-
-        AuthSuccess authResp = (AuthSuccess) msg;
-
-        String handle = authResp.getHandle();
+        String handle = authSuccess.getHandle();
 
         // try shared associations first, then private
         Association assoc = _sharedAssociations.load(handle);
 
         if (assoc == null)
-        assoc = _privateAssociations.load(handle);
+            assoc = _privateAssociations.load(handle);
 
         if (assoc == null) throw new ServerException(
                 "No association found for handle: " + handle);
 
-        authResp.setSignature(assoc.sign(authResp.getSignedText()));
+        authSuccess.setSignature(assoc.sign(authSuccess.getSignedText()));
     }
 
     /**
