@@ -567,12 +567,13 @@ public class ServerManager
         }
         catch (MalformedURLException e)
         {
-            _log.error("Invalid OP-endpoint configured; " +
-                  "cannot issue OpenID authentication responses." + opEndpoint);
+            String errMsg = "Invalid OP-endpoint configured; " +
+                  "cannot issue authentication responses." + opEndpoint;
+
+            _log.error(errMsg, e);
 
             return DirectError.createDirectError(
-                    "Invalid OpenID Provider endpoint URL; " +
-                    "cannot issue authentication response", isVersion2);
+                new ServerException(errMsg, e), isVersion2);
         }
 
         try
@@ -686,7 +687,7 @@ public class ServerManager
                 _log.error("Error processing an authentication request; " +
                            "responding with an indirect error message.", e);
 
-                return IndirectError.createIndirectError(e.getMessage(),
+                return IndirectError.createIndirectError(e,
                         requestParams.getParameterValue("openid.return_to"),
                         ! isVersion2 );
             }
@@ -695,7 +696,7 @@ public class ServerManager
                 _log.error("Error processing an authentication request; " +
                            "responding with an direct error message.", e);
 
-                return DirectError.createDirectError( e.getMessage(), isVersion2 );
+                return DirectError.createDirectError( e, ! isVersion2 );
             }
         }
     }
@@ -792,7 +793,7 @@ public class ServerManager
             _log.error("Error processing verification request; " +
                        "responding with verificatioin error.", e);
 
-            return DirectError.createDirectError(e.getMessage(), ! isVersion2);
+            return DirectError.createDirectError(e, ! isVersion2);
         }
     }
 }
