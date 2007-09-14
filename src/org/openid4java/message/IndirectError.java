@@ -6,6 +6,7 @@ package org.openid4java.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -21,17 +22,31 @@ public class IndirectError extends Message
     }
     protected IndirectError(String msg, String returnTo, boolean compatibility)
     {
+        this(null, msg, returnTo, compatibility);
+    }
+
+    protected IndirectError(OpenIDException e, String msg, String returnTo, boolean compatibility)
+    {
         set("openid.mode", "error");
         set("openid.error", msg);
         _destinationUrl = returnTo;
+        _exception = e;
 
         if (! compatibility)
             set("ns", OPENID2_NS);
     }
 
+    // exception that generated the error, if any
+    private OpenIDException _exception;
+
     protected IndirectError(ParameterList params)
     {
         super(params);
+    }
+
+    public static IndirectError createIndirectError(OpenIDException e, String returnTo)
+    {
+        return createIndirectError(e, returnTo, false);
     }
 
     public static IndirectError createIndirectError(String msg, String returnTo)
@@ -39,16 +54,31 @@ public class IndirectError extends Message
         return createIndirectError(msg, returnTo, false);
     }
 
+    public static IndirectError createIndirectError(OpenIDException e,
+                                                    String returnTo,
+                                                    boolean compatibility)
+    {
+        return createIndirectError(e, e.getMessage(), returnTo, compatibility);
+    }
+
+
     public static IndirectError createIndirectError(String msg, String returnTo,
                                                     boolean compatibility)
     {
-        IndirectError err = new IndirectError(msg, returnTo, compatibility);
+        return createIndirectError(null, msg, returnTo, compatibility);
+    }
+
+    public static IndirectError createIndirectError(OpenIDException e,
+                                                    String msg, String returnTo,
+                                                    boolean compatibility)
+    {
+        IndirectError err = new IndirectError(e, msg, returnTo, compatibility);
 
         try
         {
             err.validate();
         }
-        catch (MessageException e)
+        catch (MessageException ex)
         {
             _log.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
                        " indirect error message created for message: " + msg);
@@ -76,6 +106,16 @@ public class IndirectError extends Message
         _log.debug("Created indirect error message:\n" + err.keyValueFormEncoding());
 
         return err;
+    }
+
+    public OpenIDException getException()
+    {
+        return _exception;
+    }
+
+    public void setException(OpenIDException e)
+    {
+        this._exception = e;
     }
 
     public void setErrorMsg(String msg)
