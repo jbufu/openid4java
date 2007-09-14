@@ -60,9 +60,8 @@
         </javac>
     </target>
 
-  <target name="jar" depends="compile"
+  <target name="jar" depends="compile, get-version"
           description="Packages compiled class files into a jar archive">
-      <property file="VERSION"/>
       <jar jarfile="${build}/${component.name}.jar">
           <fileset dir="${classes}"/>
         <manifest>
@@ -71,13 +70,13 @@
             <attribute name="Specification-Version" value="2.0,1.1"/>
             <attribute name="Specification-Vendor" value="openid.net"/>
             <attribute name="Implementation-Title" value="openid4java"/>
-            <attribute name="Implementation-Version" value="${Version}"/>
+            <attribute name="Implementation-Version" value="${version}"/>
           </section>
         </manifest>
       </jar>
   </target>
 
-  <target name="version-update">
+  <target name="get-version">
     <taskdef resource="svntask.properties" classpathref="classpath"/>
     <svn>
         <status path="." lastchangedrevisionproperty="svn.rev" />
@@ -87,6 +86,9 @@
                property="version">
         <equals arg1="" arg2="${svn.rev}" />
     </condition>
+  </target>
+
+  <target name="version-update" depends="get-version">
     <propertyfile file="VERSION">
         <entry key="Version" value="${version}"/>
     </propertyfile>
