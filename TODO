@@ -49,6 +49,8 @@
             - saveDiscoveryInfo(... , session, return_to)
             - loadDiscoveryInfo(httpRequest)
 
+    - Extension Builder interface
+
 
 ========================================================================
 Copyright 2006-2007 Sxip Identity Corporation
