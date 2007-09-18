@@ -20,11 +20,11 @@ public class DirectError extends Message
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List requiredFields = Arrays.asList( new String[] {
-            "ns",
             "error"
     });
 
     protected final static List optionalFields = Arrays.asList( new String[] {
+            "ns",
             "contact",
             "reference"
     });
