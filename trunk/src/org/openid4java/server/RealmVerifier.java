@@ -175,7 +175,7 @@ public class RealmVerifier
         {
             if (OK != result)
                 _log.warn("Failed to validate return URL: " + returnTo +
-                    "against endpoints discovered from the RP's realm; " +
+                    " against endpoints discovered from the RP's realm; " +
                     "not enforced, returning OK; error code: " + result);
             return OK;
         }
@@ -251,7 +251,7 @@ public class RealmVerifier
             return PATH_MISMATCH;
         }
 
-        _log.info("Return URL: " + returnTo + "matches realm: " + realm);
+        _log.info("Return URL: " + returnTo + " matches realm: " + realm);
 
         return OK;
     }
