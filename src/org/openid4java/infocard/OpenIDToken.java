@@ -83,7 +83,7 @@ public class OpenIDToken
                     documentBuilderFactory.newDocumentBuilder();
 
             Document document = documentBuilder.parse(
-                    new ByteArrayInputStream(xmlToken.getBytes()));
+                    new ByteArrayInputStream(xmlToken.getBytes("utf-8")));
 
             String keyValueForm;
             try

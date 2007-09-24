@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.io.UnsupportedEncodingException;
 
 import org.eclipse.higgins.sts.api.*;
 import org.eclipse.higgins.sts.common.Fault;
@@ -380,9 +381,20 @@ public class OpenIDTokenGeneratorHandler
             return;
         }
 
-        String sha1base64 = Base64.encode(
-            md.digest(openidResp.keyValueFormEncoding().getBytes()));
-        
+        String sha1base64 = null;
+        try
+        {
+            sha1base64 = Base64.encode(
+            md.digest(openidResp.keyValueFormEncoding().getBytes("utf-8")));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            setWstFault(constants, response,
+                "Unsupported encoding for the OpenID message",
+                e.getMessage());
+            return;
+        }
+
         omKeyIdentifier1.setText(sha1base64);
         omKeyIdentifier2.setText(sha1base64);
 
