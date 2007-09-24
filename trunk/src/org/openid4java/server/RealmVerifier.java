@@ -157,7 +157,11 @@ public class RealmVerifier
         }
         catch (DiscoveryException e)
         {
-            _log.error("Discovery failed on realm: " + realm, e);
+            if (_enforceRpId)
+                _log.error("Discovery failed on realm: " + realm, e);
+            else
+                _log.warn("Discovery failed on realm: " + realm, e);
+            
             result = RP_DISCOVERY_FAILED;
         }
         catch (MalformedURLException e)
