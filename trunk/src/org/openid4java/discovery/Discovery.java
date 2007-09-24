@@ -647,22 +647,57 @@ public class Discovery
 
         if ( rpDiscovery.isSuccess() )
         {
-            result = extractDiscoveryInformation(rpDiscovery.getXrds(),
-                    new UrlIdentifier(rpDiscovery.getNormalizedUrl()) );
+            result = extractRpDiscoveryInformation(rpDiscovery.getXrds());
+        }
 
-            // return only OpenID 2.0 endpoints (RP realm validation only in v2)
-            Iterator iter = result.iterator();
-            DiscoveryInformation endpoint;
+        return result;
+    }
+
+    protected static List extractRpDiscoveryInformation(XRDS xrds)
+        throws DiscoveryException
+    {
+        ArrayList result = new ArrayList();
+
+        XRD xrd = xrds.getFinalXRD();
+
+        Service service;
+        URL endpointUrl;
+
+        // iterate through all services
+        Iterator iterS = xrd.getPrioritizedServices().iterator();
+        while (iterS.hasNext())
+        {
+            service = (Service) iterS.next();
+
+            //iterate through all URIs in the service
+            Iterator iter = service.getPrioritizedURIs().iterator();
             while (iter.hasNext())
             {
-                endpoint = (DiscoveryInformation)iter.next();
-
-                if (!DiscoveryInformation.OPENID2.equals(endpoint.getVersion()))
+                try
                 {
-                    iter.remove();
+                    endpointUrl = ((SEPUri) iter.next()).getURI().toURL();
+                }
+                catch (MalformedURLException e)
+                {
+                    continue;
+                }
+
+                if (matchType(service, DiscoveryInformation.OPENID2_RP))
+                {
+                    DiscoveryInformation extracted =
+                            new DiscoveryInformation(endpointUrl, null,
+                                DiscoveryInformation.OPENID2_RP);
+
+                    if (DEBUG) _log.debug("OpenID2-RP XRDS discovery result:\n"
+                            + extracted);
+
+                    result.add(extracted);
                 }
             }
         }
+
+        if (result.size() == 0)
+            _log.info("No OpenID service types found in the XRDS.");
 
         return result;
     }
