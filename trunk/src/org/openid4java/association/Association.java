@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -255,7 +256,14 @@ public class Association implements Serializable
     {
         if (DEBUG) _log.debug("Computing signature for input data:\n" + text);
 
-        return new String(Base64.encodeBase64(sign(text.getBytes())));
+        try
+        {
+            return new String(Base64.encodeBase64(sign(text.getBytes("utf-8"))), "utf-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new AssociationException("Unsupported encoding for signed text.", e);
+        }
     }
 
     public boolean verifySignature(String text, String signature) throws AssociationException
