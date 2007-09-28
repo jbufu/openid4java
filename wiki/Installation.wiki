@@ -1,9 +1,9 @@
-#summary How to install the package
+﻿#summary How to install the package
 #labels Phase-Deploy
 
 = Installing the package =
 
-The JAR files under the endorsed/ folder need to be copied under your environment's endorsed libraries folder. If you are running a web application under Apache Tomcat, this directory can be found at:
+The JAR files under the lib/endorsed/ folder need to be copied under your environment's endorsed libraries folder. If you are running a web application under Apache Tomcat, this directory can be found at:
 {{{
 JAVA_HOME/lib/endorsed
 }}}
