@@ -572,7 +572,8 @@ public class YadisResolver
         }
         catch (HttpException e)
         {
-            _log.error("HTTP error during HEAD request on: " + url, e);
+            throw new YadisException("HTTP error during HEAD request on: " + url,
+                    OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
         }
         catch (IOException e)
         {
