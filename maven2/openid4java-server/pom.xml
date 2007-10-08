@@ -41,14 +41,14 @@
             <include>org/openid4java/discovery/Discovery.java</include>
             <include>org/openid4java/discovery/DiscoveryInformation.java</include>
             <include>org/openid4java/discovery/DiscoveryException.java</include>
-            <include>org/openid4java/discovery/HtmlResolver.java</include>
             <include>org/openid4java/discovery/UrlIdentifier.java</include>
-            <include>org/openid4java/discovery/HtmlResult.java</include>
             <include>org/openid4java/discovery/XriIdentifier.java</include>
-            <include>org/openid4java/yadis/YadisResolver.java</include>
-            <include>org/openid4java/yadis/YadisResult.java</include>
-            <include>org/openid4java/yadis/YadisException.java</include>
-            <include>org/openid4java/yadis/YadisUrl.java</include>
+            <include>org/openid4java/discovery/html/HtmlResolver.java</include>
+            <include>org/openid4java/discovery/html/HtmlResult.java</include>
+            <include>org/openid4java/discovery/yadis/YadisResolver.java</include>
+            <include>org/openid4java/discovery/yadis/YadisResult.java</include>
+            <include>org/openid4java/discovery/yadis/YadisException.java</include>
+            <include>org/openid4java/discovery/yadis/YadisUrl.java</include>
           </includes>
           <excludes>
             <exclude>org/openid4java/server/JdbcServerAssociationStore.java</exclude>
