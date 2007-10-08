@@ -28,7 +28,8 @@ openid4java-server-SampleServer:
 	Sample code of server.
 
 openid4java-nodeps
-	OpenID4Java without dependencies.
+	Holds all java source of OpenID4Java, but without any dependencies.
+	This a private project for openid4java itself to use.
 
 
 Build:
