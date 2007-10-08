@@ -8,9 +8,9 @@
     <artifactId>openid4java-parent</artifactId>
     <version>0.9.3</version>
   </parent>
-  <artifactId>openid4java-server-SampleConsumer</artifactId>
+  <artifactId>openid4java-consumer-SampleConsumer</artifactId>
   <packaging>jar</packaging>
-  <name>OpenID4Java Server SampleConsumer</name>
+  <name>OpenID4Java Consumer SampleConsumer</name>
 
   <build>
     <sourceDirectory>../../src</sourceDirectory>
