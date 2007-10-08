@@ -9,7 +9,7 @@
   <version>0.9.3</version>
 
   <modules>
-    <module>openid4java</module>
+    <module>openid4java-nodeps</module>
     <module>openid4java-consumer</module>
     <module>openid4java-server</module>
     <module>openid4java-infocard</module>
@@ -390,7 +390,7 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.14</version>
-      <optional>true</optional>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   
