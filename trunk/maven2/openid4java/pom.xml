@@ -50,202 +50,10 @@
           </systemProperties>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>src</descriptorRef>
-            <descriptorRef>bin</descriptorRef>
-            <descriptorRef>
-              jar-with-dependencies
-            </descriptorRef>
-          </descriptorRefs>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-idea-plugin</artifactId>
-        <version>2.0</version>
-        <configuration>
-          <downloadSources>true</downloadSources>
-          <downloadJavadocs>true</downloadJavadocs>
-          <dependenciesAsLibraries>true</dependenciesAsLibraries>
-          <useFullNames>false</useFullNames>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <configuration>
-          <inputEncoding>UTF-8</inputEncoding>
-          <outputEncoding>UTF-8</outputEncoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <encoding>UTF-8</encoding>
-          <docencoding>UTF-8</docencoding>
-          <charset>UTF-8</charset>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting>
-
   <name>OpenID4Java</name>
-  <description>
-    OpenID4Java library offers support for OpenID-enabling a
-    consumer site or implementing an OpenID Provider server.
-  </description>
-  <url>http://code.sxip.com/openid4java</url>
-  <licenses>
-    <license>
-      <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-      <comments>Apache License 2.0</comments>
-    </license>
-  </licenses>
-  <organization>
-    <name>Sxip</name>
-    <url>http://code.sxip.com/</url>
-  </organization>
-  <developers>
-    <developer>
-      <id>dick.hardt</id>
-      <name>dick.hardt</name>
-      <url>http://code.google.com/u/dick.hardt/</url>
-      <roles>
-        <role>owner</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>dhuska</id>
-      <name>dhuska</name>
-      <url>http://code.google.com/u/dhuska/</url>
-      <roles>
-        <role>owner</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>tim.baur</id>
-      <name>tim.baur</name>
-      <url>http://code.google.com/u/tim.baur/</url>
-      <roles>
-        <role>owner</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>marius.scurtescu</id>
-      <name>marius.scurtescu</name>
-      <url>http://code.google.com/u/marius.scurtescu/</url>
-      <roles>
-        <role>owner</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>Johnny.Bufu</id>
-      <name>Johnny.Bufu</name>
-      <url>http://code.google.com/u/Johnny.Bufu/</url>
-      <roles>
-        <role>owner</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>rowan0</id>
-      <name>rowan0</name>
-      <url>http://code.google.com/u/rowan0/</url>
-      <roles>
-        <role>owner</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>zhoushuqun</id>
-      <name>Sutra</name>
-      <email>zhoushuqun@gmail.com</email>
-      <url>http://code.google.com/u/zhoushuqun/</url>
-      <roles>
-        <role>member</role>
-      </roles>
-      <timezone>+8</timezone>
-    </developer>
-    <developer>
-      <id>sappenin</id>
-      <name>sappenin</name>
-      <url>http://code.google.com/u/sappenin/</url>
-      <roles>
-        <role>member</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>gwachob</id>
-      <name>gwachob</name>
-      <url>http://code.google.com/u/gwachob/</url>
-      <roles>
-        <role>member</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>ibussed</id>
-      <name>ibussed</name>
-      <url>http://code.google.com/u/ibussed/</url>
-      <roles>
-        <role>member</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>justen.stepka</id>
-      <name>justen.stepka</name>
-      <url>http://code.google.com/u/justen.stepka/</url>
-      <roles>
-        <role>member</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>shihab</id>
-      <name>shihab</name>
-      <url>http://code.google.com/u/shihab/</url>
-      <roles>
-        <role>member</role>
-      </roles>
-    </developer>
-  </developers>
-
-  <mailingLists>
-    <mailingList>
-      <name>OpenID4Java</name>
-      <subscribe>openid4java@googlegroups.com</subscribe>
-      <unsubscribe>
-        openid4java-unsubscribe@googlegroups.com
-      </unsubscribe>
-      <post>openid4java@googlegroups.com</post>
-      <archive>
-        http://groups.google.com/group/openid4java
-      </archive>
-    </mailingList>
-  </mailingLists>
-  <issueManagement>
-    <system>Google Code Issue</system>
-    <url>http://code.google.com/p/openid4java/issues/list</url>
-  </issueManagement>
-
-  <scm>
-    <connection>
-      scm:svn:http://openid4java.googlecode.com/svn/trunk/
-    </connection>
-    <developerConnection>
-      scm:svn:https://openid4java.googlecode.com/svn/trunk/
-    </developerConnection>
-    <tag>HEAD</tag>
-    <url>http://openid4java.googlecode.com/svn/trunk/</url>
-  </scm>
 
   <dependencies>
     <dependency>
@@ -323,39 +131,29 @@
     <!-- higgins -->
     <!-- Resolve this basedir dependencies before upload to ibiblio. -->
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-configuration-api</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-configuration-api.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-api</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-api.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-common</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-common.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-server-token-handler</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-server-token-handler.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-spi</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-spi.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
