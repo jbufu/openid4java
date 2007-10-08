@@ -82,43 +82,26 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
     </dependency>
-
-    <!-- higgins -->
-    <!-- Resolve this basedir dependencies before upload to ibiblio. -->
+    
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-configuration-api</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-configuration-api.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-api</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-api.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-common</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-common.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-server-token-handler</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-server-token-handler.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>higgins</groupId>
+      <groupId>org.eclipse.higgins</groupId>
       <artifactId>higgins-sts-spi</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/../../lib/infocard/higgins-sts-spi.jar</systemPath>
     </dependency>
   </dependencies>
 </project>
