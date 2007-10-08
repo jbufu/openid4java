@@ -12,9 +12,6 @@ openid4java:
 openid4java-consumer:
 	OpenID consumer.
 
-openid4java-consumer-SampleConsumer:
-	Sample code of consumer.
-
 openid4java-infocard:
 	Infocard support.
 
@@ -24,8 +21,14 @@ openid4java-server:
 openid4java-server-JdbcServerAssociationStore:
 	An association store implementention with springframework(http://www.springframework.org/) jdbc.
 
+openid4java-consumer-SampleConsumer:
+	Sample code of consumer.
+
 openid4java-server-SampleServer:
 	Sample code of server.
+
+openid4java-nodeps
+	OpenID4Java without dependencies.
 
 
 Build:
