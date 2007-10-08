@@ -136,4 +136,15 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>
+      scm:svn:http://openid4java.googlecode.com/svn/trunk/
+    </connection>
+    <developerConnection>
+      scm:svn:https://openid4java.googlecode.com/svn/trunk/
+    </developerConnection>
+    <tag>HEAD</tag>
+    <url>http://openid4java.googlecode.com/svn/trunk/</url>
+  </scm>
 </project>
