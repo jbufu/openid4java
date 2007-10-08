@@ -12,11 +12,11 @@ openid4java:
 openid4java-consumer:
 	OpenID consumer.
 
-openid4java-infocard:
-	Infocard support.
-
 openid4java-server:
 	OpenID server.
+
+openid4java-infocard:
+	Infocard support.
 
 openid4java-server-JdbcServerAssociationStore:
 	An association store implementention with springframework(http://www.springframework.org/) jdbc.
