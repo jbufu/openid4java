@@ -26,18 +26,21 @@
       </plugin>
     </plugins>
   </build>
+
   <reporting>
     <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
   </reporting>
+
   <dependencies>
     <dependency>
-      <groupId>org.openid4java</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>openid4java-server</artifactId>
-      <version>${project.version}</version>
+      <version>${version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

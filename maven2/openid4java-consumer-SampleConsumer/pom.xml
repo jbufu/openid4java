@@ -26,14 +26,16 @@
       </plugin>
     </plugins>
   </build>
+
   <reporting>
     <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
   </reporting>
+
   <dependencies>
     <dependency>
-      <groupId>org.openid4java</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>openid4java-consumer</artifactId>
-      <version>${project.version}</version>
+      <version>${version}</version>
     </dependency>
   </dependencies>
 </project>
