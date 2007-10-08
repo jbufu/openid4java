@@ -9,7 +9,10 @@
   <version>0.9.3</version>
 
   <modules>
+    <!-- Only for holding java source -->
     <module>openid4java-nodeps</module>
+
+    <module>openid4java</module>
     <module>openid4java-consumer</module>
     <module>openid4java-server</module>
     <module>openid4java-infocard</module>
