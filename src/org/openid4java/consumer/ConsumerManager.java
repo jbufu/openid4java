@@ -1102,8 +1102,8 @@ public class ConsumerManager
         // [3/4] : nonce verification
         if (! verifyNonce(authResp, discovered))
         {
-            result.setStatusMsg("Nonce verification failed.");
-            _log.error("Nonce verification failed.");
+            result.setStatusMsg("Nonce verificaton failed.");
+            _log.error("Nonce verificaton failed.");
             return result;
         }
 
