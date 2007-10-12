@@ -59,19 +59,19 @@ You can use a sub project if you only need a part of it:
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-consumer</artifactId>
   <!-- Please change the version number to current. -->
-  <version>0.9.3</version>
+  <version>0.9.4</version>
 </dependency>
 or
 <dependency>
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-server</artifactId>
   <!-- Please change the version number to current. -->
-  <version>0.9.3</version>
+  <version>0.9.4</version>
 </dependency>
 ...
 <dependency>
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-infocard</artifactId>
   <!-- Please change the version number to current. -->
-  <version>0.9.3</version>
+  <version>0.9.4</version>
 </dependency>
