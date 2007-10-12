@@ -2,14 +2,13 @@
   <parent>
     <artifactId>openid4java-samples</artifactId>
     <groupId>org.openid4java</groupId>
-    <version>0.9.2</version>
+    <version>0.9.4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.openid4java</groupId>
   <artifactId>consumer-servlet</artifactId>
   <packaging>war</packaging>
   <name>OpenID consumer demo using servlet</name>
-  <version>1.0-SNAPSHOT</version>
   <url>http://openid4java.org</url>
   <build>
     <finalName>consumer-servlet</finalName>
