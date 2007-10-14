@@ -6,7 +6,7 @@
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.9.3</version>
+  <version>0.9.5-SNAPSHOT</version>
 
   <modules>
     <!-- Only for holding java source -->
@@ -26,22 +26,12 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.4</source>
-          <target>1.4</target>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptorRefs>
             <descriptorRef>src</descriptorRef>
             <descriptorRef>bin</descriptorRef>
-            <descriptorRef>
-              jar-with-dependencies
-            </descriptorRef>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
         </configuration>
       </plugin>
@@ -55,14 +45,6 @@
         <configuration>
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <encoding>UTF-8</encoding>
-          <docencoding>UTF-8</docencoding>
-          <charset>UTF-8</charset>
         </configuration>
       </plugin>
     </plugins>
@@ -192,7 +174,7 @@
       <organization>Alchim31</organization>
       <organizationUrl>http://alchim.sf.net/</organizationUrl>
       <roles>
-      	<role>maven deployment</role>
+        <role>maven deployment</role>
       </roles>
     </contributor>
   </contributors>
@@ -220,7 +202,7 @@
       <id>alchim.snapshots</id>
       <name>Achim Repository Snapshots</name>
       <url>http://alchim.sf.net/download/snapshots</url>
-      <snapshots/>
+      <snapshots />
     </repository>
   </repositories>
 
@@ -338,55 +320,27 @@
     </dependencies>
   </dependencyManagement>
 
-  <dependencies>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>avalon-framework</groupId>
-          <artifactId>avalon-framework</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>logkit</groupId>
-          <artifactId>logkit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.14</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-  
   <profiles>
     <profile>
-    	<id>alchim-deploy</id>
-        <distributionManagement>
-                <repository>
-                        <id>alchim.sf.net</id>
-                        <name>sourceforge</name>
-                        <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/download/releases</url>
-                </repository>
-                <snapshotRepository>
-                        <id>alchim.sf.net</id>
-                        <name>sourceforge</name>
-                        <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/download/snapshots</url>
-                        <uniqueVersion>false</uniqueVersion>
-                </snapshotRepository>
-                <site>
-                        <id>alchim.sf.net</id>
-                        <name>sourceforge</name>
-                        <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/${artifactId}</url>
-                </site>
-        </distributionManagement>    
+      <id>alchim-deploy</id>
+      <distributionManagement>
+        <repository>
+          <id>alchim.sf.net</id>
+          <name>sourceforge</name>
+          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/download/releases</url>
+        </repository>
+        <snapshotRepository>
+          <id>alchim.sf.net</id>
+          <name>sourceforge</name>
+          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/download/snapshots</url>
+          <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <site>
+          <id>alchim.sf.net</id>
+          <name>sourceforge</name>
+          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/${artifactId}</url>
+        </site>
+      </distributionManagement>
     </profile>
   </profiles>
 </project>
