@@ -338,7 +338,7 @@
         <site>
           <id>alchim.sf.net</id>
           <name>sourceforge</name>
-          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/${artifactId}</url>
+          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/openid4java</url>
         </site>
       </distributionManagement>
     </profile>
