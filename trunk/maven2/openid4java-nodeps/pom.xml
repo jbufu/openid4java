@@ -234,6 +234,33 @@
       <version>1.3.0</version>
       <scope>provided</scope>
     </dependency>
+    <!-- higgins -->
+    <!-- Resolve this basedir dependencies before upload to ibiblio. -->
+    <dependency>
+      <groupId>org.eclipse.higgins</groupId>
+      <artifactId>higgins-configuration-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.higgins</groupId>
+      <artifactId>higgins-sts-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.higgins</groupId>
+      <artifactId>higgins-sts-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.higgins</groupId>
+      <artifactId>higgins-sts-server-token-handler</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.higgins</groupId>
+      <artifactId>higgins-sts-spi</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- Discovery -->
     <dependency>
