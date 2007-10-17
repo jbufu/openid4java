@@ -352,12 +352,15 @@ public class AuthRequest extends Message
                 OpenIDException.AUTH_ERROR);
         }
 
-        if (getRealm() != null &&  RealmVerifier.OK !=
-                        _realmVerifier.validate(getRealm(), getReturnTo()) )
+        if (getRealm() != null)
         {
-            throw new MessageException(
-                "Realm verification failed for: " + getRealm(),
-                OpenIDException.AUTH_REALM_ERROR);
+            int validation = _realmVerifier.validate(getRealm(), getReturnTo());
+            if ( RealmVerifier.OK != validation )
+            {
+                throw new MessageException("Realm verification failed (" +
+                    validation + ") for: " + getRealm(), 
+                    OpenIDException.AUTH_REALM_ERROR);
+            }
         }
     }
 }
