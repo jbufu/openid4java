@@ -119,6 +119,7 @@ public class RealmVerifier
                         boolean compatibility, boolean enforceRpId)
     {
         int result;
+
         // 1. match the return_to against the realm
         result = match(realm, returnTo);
 
@@ -130,7 +131,26 @@ public class RealmVerifier
         }
 
         // 2. match the return_to against RP endpoints discovered from the realm
-        result = RP_INVALID_ENDPOINT; // assume there won't get a match
+        if ( ! compatibility && enforceRpId)
+        {
+            result = validateRpId(realm, returnTo);
+            if (OK != result)
+                _log.error("Failed to validate return URL: " + returnTo +
+                    " against endpoints discovered from the RP's realm.");
+        }
+        else if ( ! enforceRpId )
+        {
+            _log.warn("RP discovery / realm validation disabled; " +
+                      "this option SHOULD be enabled.");
+        }
+
+        return result;
+    }
+
+    private int validateRpId(String realm, String returnTo)
+    {
+        int result = RP_INVALID_ENDPOINT; // assume there won't be a match
+
         try
         {
             // replace '*.' with 'www.' in the authority part
@@ -169,7 +189,7 @@ public class RealmVerifier
                 _log.error("Discovery failed on realm: " + realm, e);
             else
                 _log.warn("Discovery failed on realm: " + realm, e);
-            
+
             result = RP_DISCOVERY_FAILED;
         }
         catch (MalformedURLException e)
@@ -178,19 +198,7 @@ public class RealmVerifier
             result = MALFORMED_REALM;
         }
 
-        // return the result
-        if (enforceRpId)
-        {
-            return result;
-        }
-        else
-        {
-            if (OK != result)
-                _log.warn("Failed to validate return URL: " + returnTo +
-                    " against endpoints discovered from the RP's realm; " +
-                    "not enforced, returning OK; error code: " + result);
-            return OK;
-        }
+        return result;
     }
 
     public int match(String realm, String returnTo)
