@@ -105,10 +105,18 @@ public class RealmVerifier
 
     public int validate(String realm, String returnTo)
     {
-        return validate(realm, returnTo, _enforceRpId);
+        // assume OpenID 2.0 / compatibility mode = false
+        return validate(realm, returnTo, false, _enforceRpId);
     }
 
-    public int validate(String realm, String returnTo, boolean enforceRpId)
+    public int validate(String realm, String returnTo, boolean compatibility)
+    {
+        return validate(realm, returnTo, compatibility, _enforceRpId);
+    }
+
+
+    public int validate(String realm, String returnTo,
+                        boolean compatibility, boolean enforceRpId)
     {
         int result;
         // 1. match the return_to against the realm
