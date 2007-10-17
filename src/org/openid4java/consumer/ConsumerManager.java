@@ -1479,7 +1479,8 @@ public class ConsumerManager
         // discovered info verification failed
         if (DEBUG)
             _log.debug("Identifier in the assertion doesn't match " +
-                       "the one in the discovered information.");
+                       "the one in the discovered information: " +
+                       assertId + " != " + opSpecific );
         return null;
     }
 
@@ -1668,9 +1669,9 @@ public class ConsumerManager
             {
                 VerifyResponse vrfyResp =
                         VerifyResponse.createVerifyResponse(responseParams);
-
-                vrfyResp.validate();
                 
+                vrfyResp.validate();
+
                 if (vrfyResp.isSignatureVerified())
                 {
                     // process the optional invalidate_handle first
