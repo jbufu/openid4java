@@ -139,7 +139,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$OPENID_HOME$" />
+          <root url="file://$MODULE_DIR$/../../../src" />
         </SOURCES>
       </library>
     </orderEntry>
