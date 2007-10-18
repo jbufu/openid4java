@@ -138,7 +138,7 @@ public class RealmVerifier
                 _log.error("Failed to validate return URL: " + returnTo +
                     " against endpoints discovered from the RP's realm.");
         }
-        else if ( ! enforceRpId )
+        else if ( ! compatibility && ! enforceRpId )
         {
             _log.warn("RP discovery / realm validation disabled; " +
                       "this option SHOULD be enabled.");
