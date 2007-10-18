@@ -23,7 +23,7 @@
             // determine a return_to URL where your application will receive
             // the authentication responses from the OpenID provider
             // YOU SHOULD CHANGE THIS TO GO TO THE
-            String returnToUrl = "http://localhost:8080/simple-openid/consumer_returnurl.jsp";
+            String returnToUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/simple-openid/consumer_returnurl.jsp";
 
 
             // perform discovery on the user-supplied identifier
