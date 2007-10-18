@@ -1,7 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                      http://maven.apache.org/maven-v4_0_0.xsd">
+                      http://maven.apache.org/maven-v4_0_0.xsd"
+>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-parent</artifactId>
@@ -182,13 +182,9 @@
     <mailingList>
       <name>OpenID4Java</name>
       <subscribe>openid4java@googlegroups.com</subscribe>
-      <unsubscribe>
-        openid4java-unsubscribe@googlegroups.com
-      </unsubscribe>
+      <unsubscribe>openid4java-unsubscribe@googlegroups.com</unsubscribe>
       <post>openid4java@googlegroups.com</post>
-      <archive>
-        http://groups.google.com/group/openid4java
-      </archive>
+      <archive>http://groups.google.com/group/openid4java</archive>
     </mailingList>
   </mailingLists>
   <issueManagement>

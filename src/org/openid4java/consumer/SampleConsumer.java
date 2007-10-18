@@ -17,6 +17,8 @@ import org.openid4java.OpenIDException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import java.util.List;
 import java.io.IOException;
 
@@ -148,24 +150,20 @@ public class SampleConsumer
             Identifier verified = verification.getVerifiedId();
             if (verified != null)
             {
-                AuthSuccess authSuccess =
-                    (AuthSuccess) verification.getAuthResponse();
+                AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
+
+                HttpSession session = httpReq.getSession(true);
+                session.setAttribute("openid_identifier", authSuccess.getIdentity());
 
                 if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
                 {
-                    FetchResponse fetchResp =
-                        (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-
-                    //TODO: process or return the AX email attribute
-                    fetchResp.getAttributeValues("email").get(0);
+                    FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+                    session.setAttribute("emailFromFetch", fetchResp.getAttributeValues("email").get(0));
                 }
                 if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
                 {
-                    SRegResponse sregResp =
-                        (SRegResponse) authSuccess.getExtension(SRegMessage.OPENID_NS_SREG);
-
-                    //TODO: process or return the SREG email attribute
-                    sregResp.getAttributeValue("email");
+                    SRegResponse sregResp = (SRegResponse) authSuccess.getExtension(SRegMessage.OPENID_NS_SREG);
+                    session.setAttribute("emailFromSReg", sregResp.getAttributeValue("email"));
                 }
                 return verified;  // success
             }
