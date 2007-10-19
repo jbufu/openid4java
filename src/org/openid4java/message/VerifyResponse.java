@@ -79,6 +79,9 @@ public class VerifyResponse extends Message
 
     public void setSignatureVerified(boolean verified)
     {
+        if (DEBUG)
+            _log.debug("Setting is_valid to: " + verified);
+        
         set("is_valid", verified ? "true" : "false");
     }
 
