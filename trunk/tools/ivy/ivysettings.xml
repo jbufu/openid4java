@@ -1,0 +1,7 @@
+<ivysettings>
+        <!--properties file="${ivy.settings.dir}/ivysettings-file.properties" /-->
+        <settings defaultResolver="ibiblio" checkUpToDate="false" />
+        <resolvers>
+                <ibiblio name="ibiblio" m2compatible="true"/>
+        </resolvers>
+</ivysettings>
