@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="OpenID4Java Library" default="jar" basedir=".">
+<project name="OpenID4Java Library" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <property environment="env"/>
     <property file="local.properties"/>
@@ -136,7 +136,16 @@
         </antcall>
     </target>
 
-    <target name="compile_test" depends="compile"
+    <target name="ivy-init" description="--> retrieve dependencies with ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${basedir}/tools/ivy/" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+        <ivy:settings id="ivy.instance" file="${basedir}/tools/ivy/ivysettings.xml"/>
+        <ivy:retrieve pattern="lib/[conf]/[artifact]-[revision].[ext]" conf="test" />
+    </target>
+
+    <target name="compile_test" depends="compile, ivy-init"
             description="Compiles test classes">
         <mkdir dir="${classes.test}"/>
         <javac srcdir="${test.src}"
