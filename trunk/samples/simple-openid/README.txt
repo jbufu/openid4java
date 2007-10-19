@@ -62,7 +62,8 @@ LOGGING
 You can tweak the incldued log4j.properties file and instruct maven
 to run the demo with various levels of logging. Example:
 
-mvn -Dlog4j.configuration=file:log4j.properties jetty:run
+mvn -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger
+    -Dlog4j.configuration=file:log4j.properties jetty:run
 
 ****
 TODO
