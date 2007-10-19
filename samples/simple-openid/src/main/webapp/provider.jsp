@@ -101,4 +101,6 @@
             responsem = DirectError.createDirectError("Unknown request");
             responseText = responsem.keyValueFormEncoding();
         }
+// make sure there are no empty lines at the end of this file:
+// they will end up in direct responses and thus compromise them
 %><%=responseText%>
