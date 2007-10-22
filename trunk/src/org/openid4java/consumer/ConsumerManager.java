@@ -744,7 +744,8 @@ public class ConsumerManager
                         break;
                     }
                     else
-                        _log.info("Discarding, not matching consumer criteria");
+                        _log.info("Discarding association response, " +
+                                  "not matching consumer criteria");
                 }
                 else if (status == HttpStatus.SC_BAD_REQUEST) // error response
                 {
