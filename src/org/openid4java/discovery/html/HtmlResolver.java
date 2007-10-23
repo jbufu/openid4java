@@ -139,7 +139,7 @@ public class HtmlResolver
 
         parseHtml(htmlData, result);
 
-        _log.info("HTML discovery succeeded on: " + identifier);
+        _log.info("HTML discovery completed on: " + identifier);
 
         return result;
     }
