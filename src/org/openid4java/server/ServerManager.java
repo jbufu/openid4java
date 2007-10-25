@@ -795,7 +795,7 @@ public class ServerManager
         catch (OpenIDException e)
         {
             _log.error("Error processing verification request; " +
-                       "responding with verificatioin error.", e);
+                       "responding with verification error.", e);
 
             return DirectError.createDirectError(e, ! isVersion2);
         }

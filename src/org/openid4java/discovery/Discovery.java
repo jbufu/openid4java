@@ -175,7 +175,7 @@ public class Discovery
                 // todo: this is not the right place to put isProviderAuthoritative
                 if (isProviderAuthoritative(xrd.getProviderID(), canonical))
                 {
-                    _log.info("XRI resolution succeeded on " + identifier);
+                    _log.info("XRI resolution succeeded on " + identifier.toString());
                     result = extractDiscoveryInformation(xrds,
                             (XriIdentifier)identifier, _xriResolver);
                 }
