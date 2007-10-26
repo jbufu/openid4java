@@ -1,4 +1,4 @@
-#Relying Party Discovery
+#summary Relying Party Discovery
 
 = Relying Parties =
 
