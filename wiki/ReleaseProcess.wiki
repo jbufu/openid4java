@@ -1,0 +1,33 @@
+#summary Release Process
+
+
+Sxip packages and distributes the OpenID4Java library at http://code.sxip.com/openid4java.
+
+The packaging is done with Ant, which is also the officially supported method for building the library from source. Maven2 is also provided as an alternate building and installation method.
+
+Release process is documented below in order to provide for a consistent package.
+
+
+keep the two methods in sync when creating a new release.
+
+
+= Ant =
+
+ * project.properties:
+		update the component.ver property to the desired new version number
+
+ * ant dist
+
+
+= Maven2 =
+
+ * ...
+ * submit bundle(s) to maven repo
+
+
+Issue: the version number appears a number of POM files. If possible, it should be taken from project.properties or the VERSION file.
+
+
+= SVN =
+
+ * tag release revision
