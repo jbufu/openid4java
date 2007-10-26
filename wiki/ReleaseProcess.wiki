@@ -5,10 +5,7 @@ Sxip packages and distributes the OpenID4Java library at http://code.sxip.com/op
 
 The packaging is done with Ant, which is also the officially supported method for building the library from source. Maven2 is also provided as an alternate building and installation method.
 
-Release process is documented below in order to provide for a consistent package.
-
-
-keep the two methods in sync when creating a new release.
+The release process is documented below in order to provide for a consistent package.
 
 
 = Ant =
