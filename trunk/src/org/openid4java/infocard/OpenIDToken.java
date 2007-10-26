@@ -133,7 +133,7 @@ public class OpenIDToken
 
     /**
      * Gets the OpenID message as a ParameterList.
-     * @return
+     * @return  ParameterList containing the OpenID message.
      */
     public ParameterList getOpenIDParams()
     {

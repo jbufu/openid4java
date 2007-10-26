@@ -128,7 +128,6 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
      *
      * @param name      The name of the parameter,
      *                  without the openid.<extension_alias> prefix.
-     * @return          The parameter value.
      */
     protected void set(String name, String value)
     {
