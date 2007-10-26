@@ -40,6 +40,12 @@ public class ParameterList implements Serializable
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
 
+    /**
+     * Constructs a ParameterList from a Map of parameters, ideally obtained
+     * with ServletRequest.getParameterMap().
+     *
+     * @param parameterMap  Map<String,String[]> or Map<String,String>
+     */
     public ParameterList(Map parameterMap)
     {
         _parameterMap  = new LinkedHashMap();
@@ -51,18 +57,24 @@ public class ParameterList implements Serializable
             Object v = parameterMap.get(name);
 
             String value;
-            if (v instanceof Object[])
+            if (v instanceof String[])
             {
-                Object[] values = (Object[]) v;
+                String[] values = (String[]) v;
                 if (values.length > 1 && name.startsWith("openid."))
                     throw new IllegalArgumentException(
                             "Multiple parameters with the same name: " + values);
 
-                value = values.length > 0 ? (String) values[0] : null;
+                value = values.length > 0 ? values[0] : null;
+            }
+            else if (v instanceof String)
+            {
+                value = (String) v;
             }
             else
             {
-                value = (String) v;
+                value="";
+                _log.error("Can extract parameter value; unexpected type: " +
+                    v.getClass().getName());
             }
 
             set(new Parameter(name, value));
