@@ -42,7 +42,7 @@ public class OpenIDTokenType
 
     /**
      * Gets the URI string value for the token type.
-     * @return
+     * @return  String representation of the token URI type.
      */
     public String toString()
     {

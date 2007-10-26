@@ -227,7 +227,7 @@ public class AssociationResponse extends Message
     /**
      * Checks if the message is a valid OpenID Association Response..
      *
-     * @return True if all validation checkes passed, false otherwise.
+     * @throws MessageException if message validation failed.
      */
     public void validate() throws MessageException
     {

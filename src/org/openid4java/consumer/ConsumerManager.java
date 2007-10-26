@@ -348,7 +348,6 @@ public class ConsumerManager
      * <p>
      * Default: no-encryption session, SHA1 MAC association
      * <p>
-     * See also: {@link #setAllowNoEncHttp(boolean)}
      */
     public AssociationSessionType getMinAssocSessEnc()
     {

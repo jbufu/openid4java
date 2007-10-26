@@ -209,7 +209,7 @@ public class YadisResolver
      * @return              YadisResult containing discovered information,
      *                      which includes the XRDS document associated with
      *                      the Yadis URL and additional meta-information
-     * @see YadisResult, #discover(String, int)
+     * @see YadisResult #discover(String, int)
      */
     public YadisResult discover(String url) throws YadisException
     {
