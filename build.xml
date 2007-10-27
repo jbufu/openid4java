@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="OpenID4Java Library" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="OpenID4Java Library" default="jar" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant"> 
 
     <property environment="env"/>
     <property file="local.properties"/>
@@ -17,11 +17,6 @@
             <fileset dir="${libext.dir}">
                 <include name="**/*.jar"/>
             </fileset>
-        </path>
-
-        <path id="classpath.test">
-            <path refid="classpath"/>
-            <pathelement location="${classes}"/>
         </path>
     </target>
 
@@ -136,16 +131,19 @@
         </antcall>
     </target>
 
-    <target name="ivy-init" description="--> retrieve dependencies with ivy">
-        <path id="ivy.lib.path">
-            <fileset dir="${basedir}/tools/ivy/" includes="*.jar"/>
+    <target name="maven-antlib" description="--> retreive dependencies with maven">
+        <path id="maven.lib.path">
+            <fileset dir="${basedir}/tools/maven-antlib/" includes="*.jar" />
         </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-        <ivy:settings id="ivy.instance" file="${basedir}/tools/ivy/ivysettings.xml"/>
-        <ivy:retrieve pattern="lib/[conf]/[artifact]-[revision].[ext]" conf="test" />
+        <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+            uri="antlib:org.apache.maven.artifact.ant"
+            classpathref="maven.lib.path"
+        />
+        <artifact:pom id="project" file="maven2/openid4java-nodeps/pom.xml" />
+        <artifact:dependencies verbose="true" pathId="classpath.test" pomRefId="project" useScope="test"/>
     </target>
 
-    <target name="compile_test" depends="compile, ivy-init"
+    <target name="compile_test" depends="compile, maven-antlib"
             description="Compiles test classes">
         <mkdir dir="${classes.test}"/>
         <javac srcdir="${test.src}"
@@ -157,8 +155,8 @@
                fork="true"
                includeAntRuntime="false">
             <classpath>
-                <path refid="classpath.test"/>
                 <pathelement location="${classes}"/>
+                <path refid="classpath.test"/>
             </classpath>
         </javac>
     </target>
@@ -180,7 +178,7 @@
             <classpath>
                 <pathelement location="${classes.test}"/>
                 <pathelement location="${classes}"/>
-                <path refid="classpath"/>
+                <path refid="classpath.test"/>
             </classpath>
             <!--<formatter type="xml"/>-->
             <formatter type="plain"/>
