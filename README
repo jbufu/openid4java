@@ -65,6 +65,9 @@ lib/          : Library dependencies.
 build.xml     : Ant build file; see INSTALL / Building the package.
 project.properties
 
+tools/
+ maven-antlib/: Library dependency resolver; used by 'ant test' target.
+
 maven2/       : Maven2 build scripts; see maven2/README.txt.
 
 ========================================================================
