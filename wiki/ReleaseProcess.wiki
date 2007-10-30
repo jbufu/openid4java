@@ -19,8 +19,8 @@ The release process is documented below in order to provide for a consistent pac
   * commit the change
   * tag the version on SVN: *tags/openid4java-x.b/*
   * publish the artifacts
-   * *ant*: code.sxip.com/openid4java
-   * *maven*: repository
+   * *ant*: java-openid-sxip-x.b.rev.tar.gz --> code.sxip.com/openid4java
+   * *maven*: openid4java-SUB_PROJECT/target/SUB_PROJECT-x.b.rev.jar --> repository
   * change/increment the version from *x.a* to *x.b-SNAPSHOT*
   * commit change
   * announce new release
