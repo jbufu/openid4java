@@ -50,7 +50,8 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
     /**
      * The Simple Registration Type URI.
      */
-    public static final String OPENID_NS_SREG = "http://openid.net/sreg/1.0";
+//    public static final String OPENID_NS_SREG = "http://openid.net/sreg/1.0";
+    public static final String OPENID_NS_SREG = "http://openid.net/extensions/sreg/1.1";
 
     /**
      * The Simple Registration extension-specific parameters.
