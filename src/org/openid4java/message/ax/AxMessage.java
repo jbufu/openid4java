@@ -31,7 +31,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     /**
      * The Attribute Exchange Type URI.
      */
-    public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0-draft7";
+    public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0";
 
     /**
      * The Attribute Exchange extension-specific parameters.
