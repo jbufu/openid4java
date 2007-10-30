@@ -15,7 +15,7 @@ The release process is documented below in order to provide for a consistent pac
   * commit the change (svn last modification revision used as part of the ant package name and VERSION file inside the package)
   * test and package the artifact
    * *ant:* 'ant dist' --> java-openid-sxip-x.b.rev.tar.gz
-   * *maven:* <INSTRUCTIONS_TODO>  --> <OUTPUT_TODO>
+   * *maven:* 'mvn package'  --> openid4java-SUB_PROJECT/target/SUB_PROJECT-x.b.rev.jar
   * commit the change
   * tag the version on SVN: *tags/openid4java-x.b/*
   * publish the artifacts
@@ -29,5 +29,4 @@ The release process is documented below in order to provide for a consistent pac
 
 = TODO =
 
- * Document TODOs above
  * Maven has the package version in a number of files; ideally it should take it from the main project.properties.
