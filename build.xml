@@ -81,16 +81,14 @@
                property="version">
         <equals arg1="" arg2="${svn.rev}" />
     </condition>
+    <echo>Version: ${version}</echo>
   </target>
 
-  <target name="version-update" depends="get-version">
-    <propertyfile file="VERSION">
-        <entry key="Version" value="${version}"/>
-    </propertyfile>
-  </target>
-
-  <target name="dist" depends="jar, apidoc, version-update"
+  <target name="dist" depends="jar, apidoc"
             description="Builds distribution zip package">
+        <propertyfile file="VERSION">
+            <entry key="Version" value="${version}"/>
+        </propertyfile>
         <move file="${build}/${component.name}.jar"
               tofile="${basedir}/${component.name}-${component.ver}.jar"/>
         <delete dir="${build}"/>
@@ -104,6 +102,7 @@
         </tar>
         <delete file="${component.name}-${component.ver}.jar"/>
         <delete dir="${apidoc}"/>
+        <delete file="VERSION"/>
     </target>
 
     <target name="apidoc" depends="prepare"
