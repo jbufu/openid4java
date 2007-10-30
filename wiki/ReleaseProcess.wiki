@@ -7,24 +7,27 @@ The packaging is done with Ant, which is also the officially supported method fo
 
 The release process is documented below in order to provide for a consistent package.
 
+= Release Process =
 
-= Ant =
-
- * project.properties:
-		update the component.ver property to the desired new version number
-
- * ant dist
-
-
-= Maven2 =
-
+ * work on *x.a-SNAPSHOT*
+ * Release:
+  * *project.properties:* change the version on local copy from *x.a-SNAPSHOT* to *x.a*
+  * commit the change (svn last modification revision used as part of the ant package name and VERSION file inside the package)
+  * test and package the artifact
+   * *ant:* 'ant dist' --> java-openid-sxip-x.b.rev.tar.gz
+   * *maven:* <INSTRUCTIONS_TODO>  --> <OUTPUT_TODO>
+  * commit the change
+  * tag the version on SVN: *tags/openid4java-x.b/*
+  * publish the artifacts
+   * *ant*: code.sxip.com/openid4java
+   * *maven*: repository
+  * change/increment the version from *x.a* to *x.b-SNAPSHOT*
+  * commit change
+  * announce new release
+ * work on *x.b-SNAPSHOT*
  * ...
- * submit bundle(s) to maven repo
 
+= TODO =
 
-Issue: the version number appears a number of POM files. If possible, it should be taken from project.properties or the VERSION file.
-
-
-= SVN =
-
- * tag release revision
+ * Document TODOs above
+ * Maven has the package version in a number of files; ideally it should take it from the main project.properties.
