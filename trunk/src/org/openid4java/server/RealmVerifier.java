@@ -141,7 +141,7 @@ public class RealmVerifier
         else if ( ! compatibility && ! enforceRpId )
         {
             _log.warn("RP discovery / realm validation disabled; " +
-                      "this option SHOULD be enabled.");
+                      "this option SHOULD be enabled for OPs");
         }
 
         return result;
