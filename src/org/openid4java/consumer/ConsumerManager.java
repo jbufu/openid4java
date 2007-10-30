@@ -156,6 +156,9 @@ public class ConsumerManager
 
         _realmVerifier = new RealmVerifier();
 
+        // don't verify own (RP) identity, disable RP discovery
+        _realmVerifier.setEnforceRpId(false);
+
         if (Association.isHmacSha256Supported())
             _prefAssocSessEnc = AssociationSessionType.DH_SHA256;
         else
