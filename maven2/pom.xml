@@ -191,6 +191,10 @@
     <system>Google Code Issue</system>
     <url>http://code.google.com/p/openid4java/issues/list</url>
   </issueManagement>
+  <scm>
+    <connection>scm:svn:http://openid4java.googlecode.com/svn/trunk/</connection>
+    <url>http://fisheye2.cenqua.com/browse/openid4java/</url>
+  </scm>
 
   <repositories>
     <!-- for org.eclipse.higgins -->
