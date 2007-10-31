@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-parent</artifactId>
-  <packaging>pom</packaging>
   <version>0.9.5-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <modules>
     <!-- Only for holding java source -->
