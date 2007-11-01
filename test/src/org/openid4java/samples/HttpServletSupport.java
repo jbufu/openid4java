@@ -20,13 +20,16 @@ public abstract class HttpServletSupport extends HttpServlet
 
     public HttpServletSupport()
     {
-        logger_ = Logger.getLogger(this.getClass());
+        logger_ = Logger.getLogger(getClass());
     }
 
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
         count_++;
-        NDC.push(this.getClass().getSimpleName() + "/" + count_);
+        String ndcName = getClass().getName();
+        ndcName = ndcName.substring(ndcName.lastIndexOf('.')+1);
+        NDC.push(ndcName);
+        NDC.push("call-" + count_);
         logger_.info("begin onService");
         try
         {
@@ -40,6 +43,7 @@ public abstract class HttpServletSupport extends HttpServlet
         finally
         {
             logger_.info("end onService");
+            NDC.pop();
             NDC.pop();
         }
     }
