@@ -10,7 +10,8 @@
 
   <modules>
     <!-- Only for holding java source -->
-    <module>openid4java-nodeps</module>
+    <!--module>openid4java-nodeps</module-->
+    <module>..</module>
 
     <module>openid4java</module>
     <module>openid4java-consumer</module>
