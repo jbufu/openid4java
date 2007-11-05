@@ -10,21 +10,25 @@ The release process is documented below in order to provide for a consistent pac
 = Release Process =
 
  * work on *x.a-SNAPSHOT*
- * Release:
+ * *Preparation*:
   * *project.properties:* change the version on local copy from *x.a-SNAPSHOT* to *x.a*
-  * run "ant sync-pom-version" to update version number in every pom.xml under maven2/
-  * commit the change (svn last modification revision used as part of the ant package name and VERSION file inside the package)
+  * *ant sync-pom-version* to update version number in every pom.xml under maven2/
+ * *Testing and Packaging*:
+  * commit changes and *svn update* (important for updating the last modification revision which is used as part of the ant package name and VERSION file inside the package)
   * test and package the artifact
    * *ant:* trunk/: "ant clean test dist" --> java-openid-sxip-x.a.tar.gz
    * *maven:* trunk/maven2/: "mvn clean package"  --> openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar
-  * commit the change
+  * if there are local changes, restart *Testing and Packaging*
+ * *Tagging and Publishing*:
   * tag the version on SVN: *tags/openid4java-x.a/*
   * publish the artifacts
    * *ant*: java-openid-sxip-x.a.tar.gz --> code.sxip.com/openid4java
    * *maven*: openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar --> repository
-  * change/increment the version from *x.a* to *x.b-SNAPSHOT* into project.properties
-  * run "ant sync-pom-version" to update version number in every pom.xml under maven2/
-  * commit change
+    * *TODO*: detail how
   * announce new release
+ * *Post Cleanup*:
+  * *project.properties*: change/increment the version from *x.a* to *x.b-SNAPSHOT*
+  * *ant sync-pom-version* to update version number in every pom.xml under maven2/
+  * commit changes
  * work on *x.b-SNAPSHOT*
  * ...
