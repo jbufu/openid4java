@@ -6,6 +6,7 @@ package org.openid4java.message;
 
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.sreg.SRegMessage;
+import org.openid4java.message.sreg.SReg11ExtensionFactory;
 import org.openid4java.message.pape.PapeMessage;
 
 import java.io.UnsupportedEncodingException;
@@ -49,6 +50,7 @@ public class Message
     {
         _extensionFactories.put(AxMessage.OPENID_NS_AX, AxMessage.class);
         _extensionFactories.put(SRegMessage.OPENID_NS_SREG, SRegMessage.class);
+        _extensionFactories.put(SRegMessage.OPENID_NS_SREG11, SReg11ExtensionFactory.class);
         _extensionFactories.put(PapeMessage.OPENID_NS_PAPE, PapeMessage.class);
     }
 

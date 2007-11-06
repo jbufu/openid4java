@@ -50,8 +50,8 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
     /**
      * The Simple Registration Type URI.
      */
-//    public static final String OPENID_NS_SREG = "http://openid.net/sreg/1.0";
-    public static final String OPENID_NS_SREG = "http://openid.net/extensions/sreg/1.1";
+    public static final String OPENID_NS_SREG = "http://openid.net/sreg/1.0";
+    public static final String OPENID_NS_SREG11 = "http://openid.net/extensions/sreg/1.1";
 
     /**
      * The Simple Registration extension-specific parameters.
@@ -59,6 +59,9 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
      * The openid.<extension_alias> prefix is not part of the parameter names
      */
     protected ParameterList _parameters;
+
+
+    private String _typeUri = OPENID_NS_SREG;
 
     /**
      * Constructs an empty (no parameters) Simple Registration extension.
@@ -90,7 +93,17 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
      */
     public String getTypeUri()
     {
-        return OPENID_NS_SREG;
+        return _typeUri;
+    }
+
+
+    /**
+     * Sets the SREG type URI. Hack to support both SREG 1.0 and 1.1,
+     * until 1.1 spec gets fixed.
+     */
+    public void setTypeUri(String typeUri)
+    {
+        _typeUri = typeUri;
     }
 
     /**
