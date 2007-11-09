@@ -156,7 +156,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
             else if ("store_request".equals(axMode))
                 return StoreRequest.createStoreRequest(parameterList);
 
-            else if ("store_response".equals(axMode))
+            else if (axMode.startsWith("store_response"))
                 return StoreResponse.createStoreResponse(parameterList);
         }
 
