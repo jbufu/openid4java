@@ -7,15 +7,15 @@
  * Copyright 2006-2007 Sxip Identity Corporation
  */
 
-package net.openid.consumer;
+package org.openid4java.consumer;
 
-import net.openid.discovery.Identifier;
-import net.openid.discovery.DiscoveryInformation;
-import net.openid.message.ax.FetchRequest;
-import net.openid.message.ax.FetchResponse;
-import net.openid.message.ax.AxMessage;
-import net.openid.message.*;
-import net.openid.OpenIDException;
+import org.openid4java.discovery.Identifier;
+import org.openid4java.discovery.DiscoveryInformation;
+import org.openid4java.message.ax.FetchRequest;
+import org.openid4java.message.ax.FetchResponse;
+import org.openid4java.message.ax.AxMessage;
+import org.openid4java.message.*;
+import org.openid4java.OpenIDException;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
