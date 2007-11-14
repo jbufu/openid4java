@@ -337,7 +337,7 @@ public class AuthSuccess extends Message
 
 
     /**
-     * Sets the list of messages fields that will be signed, in addition to
+     * Adds the list of messages fields that will be signed, in addition to
      * the ones required by the protocol to be signed and any additional
      * fields already configured to be signed. The OpenID signature will
      * only be applied to OpenID fields, starting with the "openid." prefix.
@@ -347,7 +347,7 @@ public class AuthSuccess extends Message
      * @param extensionNamespace  Extension namespace URI to be signed.
      * @see #setSignFields(String) #setSignExtensions
      */
-    public void setSignExtension(String extensionNamespace)
+    public void addSignExtension(String extensionNamespace)
     {
         if (! _signExtensions.contains(extensionNamespace))
         {
