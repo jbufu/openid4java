@@ -8,6 +8,10 @@ Please see the TODO for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20071113:
+    - Renamed AuthSuccess.setSignExtension() to AuthSuccess.addSignExtension()
+      to better reflect the operation performed.
+
 20071025:
     - Documented Relying Party Discovery requirements; 
       see INSTALL : Relying Party Discovery section
