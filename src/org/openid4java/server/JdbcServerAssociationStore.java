@@ -151,24 +151,26 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
                         "retrieved from database: " + type);
 
             if (DEBUG)
-                _log.debug("Retrieved association from database, handle: " + handle);
+                _log.debug("Retrieved association for handle: " + handle +
+                           " from table: " + _tableName);
 
             return assoc;
         }
         catch (AssociationException ase )
         {
-            _log.error("Error rerieving association from database.", ase);
+            _log.error("Error retrieving association from table: " + _tableName, ase);
             return null;
         }
         catch (IncorrectResultSizeDataAccessException rse)
         {
-            _log.warn("Association not found in the database for handle: " + handle);
+            _log.warn("Association not found for handle: " + handle +
+                      "in the table: " + _tableName);
             return null;
         }
         catch (DataAccessException dae)
         {
-            _log.error("Error retrieving association from database, handle: "
-                       + handle, dae);
+            _log.error("Error retrieving association for handle: " + handle +
+                       "from table: " + _tableName, dae);
             return null;
         }
     }
@@ -184,15 +186,17 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
             int cnt = jdbcTemplate.update(sql, new Object[] { handle } );
 
             if (cnt == 1 && DEBUG)
-                _log.debug("Removed association, handle: " + handle);
+                _log.debug("Removed association, handle: " + handle +
+                           " from table: " + _tableName);
 
             if (cnt != 1)
-                _log.warn("Trying to remove handle: " + handle +
-                          " from database; affected entries: " + cnt);
+                _log.warn("Trying to remove handle: " + handle + " from table: "
+                          + _tableName + "; affected entries: " + cnt);
         }
         catch (Exception e)
         {
-            _log.error("Error removing association from database.", e);
+            _log.error("Error removing association from table: " + _tableName, e);
         }
     }
 }
+
