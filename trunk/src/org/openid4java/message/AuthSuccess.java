@@ -329,7 +329,7 @@ public class AuthSuccess extends Message
     {
         if (extensions != null)
         {
-            _signExtensions = Arrays.asList(extensions);
+            _signExtensions = new ArrayList(Arrays.asList(extensions));
 
             buildSignedList();
         }
