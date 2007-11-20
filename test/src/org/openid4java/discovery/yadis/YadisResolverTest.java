@@ -12,6 +12,8 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.openid4java.OpenIDException;
+import org.openid4java.util.HttpRequestOptions;
+import org.openid4java.util.HttpCache;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -112,10 +114,13 @@ public class YadisResolverTest extends TestCase
     public void testIncompleteHtmlParsing() throws YadisException
     {
         // stop reading from the received HTML body shortly after the Yadis tag
-        _resolver.setMaxHtmlSize(146);
+        HttpCache cache = new HttpCache();
+        HttpRequestOptions requestOptions = cache.getRequestOptions();
+        requestOptions.setMaxBodySize(350);
+        cache.setDefaultRequestOptions(requestOptions);
 
         YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?html=simplehtml");
+                _servletPort + "/?html=simplehtml", cache);
 
         assertTrue(result.isSuccess());
     }
@@ -294,7 +299,7 @@ public class YadisResolverTest extends TestCase
         catch (YadisException expected)
         {
             assertEquals(expected.getMessage(),
-                OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR, expected.getErrorCode());
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
         }
     }
 
@@ -332,12 +337,16 @@ public class YadisResolverTest extends TestCase
 
     public void testXrdsSizeExceeded()
     {
-        _resolver.setMaxXmlSize(10);
+        HttpRequestOptions requestOptions = new HttpRequestOptions();
+        requestOptions.setMaxBodySize(10);
+
+        HttpCache cache = new HttpCache();
+        cache.setDefaultRequestOptions(requestOptions);
 
         try
         {
             _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=simpleheaders");
+                _servletPort + "/?headers=simpleheaders", cache);
 
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);

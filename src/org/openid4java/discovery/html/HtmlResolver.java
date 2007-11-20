@@ -24,6 +24,7 @@ import org.openid4java.discovery.UrlIdentifier;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.util.HttpCache;
 import org.openid4java.util.HttpResponse;
+import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.OpenIDException;
 
 /**
@@ -83,9 +84,12 @@ public class HtmlResolver
         // initialize the results of the HTML discovery
         HtmlResult result = new HtmlResult();
 
+        HttpRequestOptions requestOptions = cache.getRequestOptions();
+        requestOptions.setContentType("text/html");
+
         try
         {
-            HttpResponse resp = cache.get(identifier.toString());
+            HttpResponse resp = cache.get(identifier.toString(), requestOptions);
 
             if (HttpStatus.SC_OK != resp.getStatusCode())
                 throw new DiscoveryException( "GET failed on " +
