@@ -233,7 +233,7 @@ public class YadisResolver
         Map requestHeaders = new HashMap();
         requestHeaders.put("Accept", YADIS_ACCEPT_HEADER);
 
-        HttpRequestOptions requestOptions = new HttpRequestOptions();
+        HttpRequestOptions requestOptions = cache.getRequestOptions();
         requestOptions.setRequestHeaders(requestHeaders);
         requestOptions.setMaxRedirects(maxRedirects);
 
@@ -247,7 +247,7 @@ public class YadisResolver
 
             HttpResponse resp = cache.get(getUrl, requestOptions);
 
-            if (HttpStatus.SC_OK != resp.getStatusCode())
+            if (resp == null || HttpStatus.SC_OK != resp.getStatusCode())
                 throw new YadisException("GET failed on " + getUrl,
                         OpenIDException.YADIS_GET_ERROR);
 
@@ -261,6 +261,12 @@ public class YadisResolver
                     contentType.getValue()
                     .split(";")[0].equalsIgnoreCase(YADIS_CONTENT_TYPE) )
             {
+                if (resp.isBodySizeExceeded())
+                    throw new YadisException(
+                        "More than " + requestOptions.getMaxBodySize() +
+                        " bytes in HTTP response body from " + getUrl,
+                        OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
+
                 XRDS xrds = parseXrds(resp.getBody());
 
                 // todo: only if not set? could be different if redirects were followed

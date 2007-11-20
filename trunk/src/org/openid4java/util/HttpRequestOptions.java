@@ -5,6 +5,7 @@
 package org.openid4java.util;
 
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Container class for the various options associated with HTTP requests.
@@ -66,6 +67,24 @@ public class HttpRequestOptions
     }
 
     /**
+     * Creates a new HttpRequestOptions object as a clone of the provided
+     * parameter.
+     *
+     * @param other     HttpRequestOptions instance to be cloned.
+     */
+    public HttpRequestOptions(HttpRequestOptions other)
+    {
+        this._connTimeout = other._connTimeout;
+        this._socketTimeout = other._socketTimeout;
+        this._maxRedirects = other._maxRedirects;
+        this._maxBodySize = other._maxBodySize;
+        if (other._requestHeaders != null)
+            this._requestHeaders = new HashMap(other._requestHeaders);
+        this._useCache = other._useCache;
+        this._contentType = other._contentType;
+    }
+
+    /**
      * Gets the HTTP connect timeout, in milliseconds.
      */
     public int getConnTimeout()
@@ -114,44 +133,77 @@ public class HttpRequestOptions
         this._maxRedirects = maxRedirects;
     }
 
+    /**
+     * Gets configuration parameter for the maximum HTTP body size
+     * that will be downloaded.
+     */
     public int getMaxBodySize()
     {
         return _maxBodySize;
     }
 
+    /**
+     * Sets the maximum HTTP body size that will be downloaded.
+     */
     public void setMaxBodySize(int maxBodySize)
     {
         this._maxBodySize = maxBodySize;
     }
 
-
+    /**
+     * Gets the HTTP request headers that will be used when placing
+     * HTTP requests using the options in this object.
+     */
     public Map getRequestHeaders()
     {
         return _requestHeaders;
     }
 
+    /**
+     * Sets the HTTP request headers that will be used when placing
+     * HTTP requests using the options in this object.
+     */
     public void setRequestHeaders(Map requestHeaders)
     {
         this._requestHeaders = requestHeaders;
     }
 
-
+    /**
+     * Returns true if a cached copy can be used when placing HTTP requests
+     * using the options in this object. This applies to the internally
+     * implemented HTTP cache, NOT to the HTTP protocol cache-control.
+     */
     public boolean isUseCache()
     {
         return _useCache;
     }
 
+    /**
+     * Sets the flag for allowing cached copy to be used when placing
+     * HTTP requests using the options in this object. This applies
+     * to the internally implemented HTTP cache, NOT to the HTTP protocol
+     * cache-control.
+     */
     public void setUseCache(boolean useCache)
     {
         this._useCache = useCache;
     }
 
-
+    /**
+     * Gets the required content-type for the HTTP response. If this option
+     * matches the content-type of a cached response, the cached copy is used;
+     * otherwise a new HTTP request is made.
+     */
     public String getContentType()
     {
         return _contentType;
     }
 
+    /**
+     * Sets the required content-type for the HTTP response. If this option
+     * matches the content-type of a cached response, the cached copy is used;
+     * otherwise a new HTTP request is made.
+     */
     public void setContentType(String contentType)
     {
         this._contentType = contentType;

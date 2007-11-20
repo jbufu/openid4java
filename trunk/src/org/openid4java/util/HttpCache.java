@@ -5,14 +5,12 @@
 package org.openid4java.util;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openid4java.util.HttpClientFactory;
-import org.openid4java.util.HttpRequestOptions;
-import org.openid4java.util.HttpResponse;
 
 import java.util.Map;
 import java.util.Iterator;
@@ -56,7 +54,6 @@ public class HttpCache
      */
     private Map _headCache = new HashMap();
 
-
     /**
      * Constructs a new HttpCache object, that will be initialized with the
      * default set of HttpRequestOptions.
@@ -71,6 +68,26 @@ public class HttpCache
                 _defaultOptions.getSocketTimeout(),
                 _defaultOptions.getConnTimeout(),
                 CookiePolicy.IGNORE_COOKIES);
+    }
+
+
+    public HttpRequestOptions getDefaultRequestOptions()
+    {
+        return _defaultOptions;
+    }
+
+    /**
+     * Gets a clone of the default HttpRequestOptions.
+     * @return
+     */
+    public HttpRequestOptions getRequestOptions()
+    {
+        return new HttpRequestOptions(_defaultOptions);
+    }
+
+    public void setDefaultRequestOptions(HttpRequestOptions defaultOptions)
+    {
+        this._defaultOptions = defaultOptions;
     }
 
     /**
@@ -112,19 +129,21 @@ public class HttpCache
      * @see HttpRequestOptions, HttpResponse
      */
     public HttpResponse get(String url, HttpRequestOptions requestOptions)
-            throws IOException
+        throws IOException
     {
         HttpResponse resp = (HttpResponse) _getCache.get(url);
 
-        if (match(resp, requestOptions))
+        if (resp != null)
         {
-            _log.info("Returning cached GET response for " + url);
-            return resp;
-        }
-        else
-        {
-            _log.info("Removing cached GET for " + url);
-            removeGet(url);
+            if (match(resp, requestOptions))
+            {
+                _log.info("Returning cached GET response for " + url);
+                return resp;
+            } else
+            {
+                _log.info("Removing cached GET for " + url);
+                removeGet(url);
+            }
         }
 
         GetMethod get = new GetMethod(url);
@@ -156,9 +175,10 @@ public class HttpCache
             String statusLine = get.getStatusLine().toString();
 
             String httpBody = null;
+            boolean bodySizeExceeded = false;
             int maxBodySize = requestOptions.getMaxBodySize();
-            InputStream htmlInput = get.getResponseBodyAsStream();
-            if (htmlInput != null)
+            InputStream httpBodyInput = get.getResponseBodyAsStream();
+            if (httpBodyInput != null)
             {
                 byte data[] = new byte[maxBodySize];
 
@@ -166,7 +186,7 @@ public class HttpCache
                 int currentRead;
                 while (totalRead < maxBodySize)
                 {
-                    currentRead = htmlInput.read(
+                    currentRead = httpBodyInput.read(
                             data, totalRead, maxBodySize - totalRead);
 
                     if (currentRead == -1) break;
@@ -174,7 +194,10 @@ public class HttpCache
                     totalRead += currentRead;
                 }
 
-                htmlInput.close();
+                if (httpBodyInput.read() > 0)
+                    bodySizeExceeded = true;
+
+                httpBodyInput.close();
 
                 if (DEBUG) _log.debug("Read " + totalRead + " bytes.");
 
@@ -184,6 +207,7 @@ public class HttpCache
             resp = new HttpResponse(statusCode, statusLine,
                     requestOptions.getMaxRedirects(), get.getURI().toString(),
                     get.getResponseHeaders(), httpBody);
+            resp.setBodySizeExceeded(bodySizeExceeded);
 
             // save result in cache
             _getCache.put(url, resp);
@@ -205,15 +229,20 @@ public class HttpCache
             return false;
         }
 
-        // content type
+        // content type rules
         String requiredContentType = requestOptions.getContentType();
-        if (resp != null &&
-            requiredContentType != null &&
-            !requiredContentType.equals(resp.getResponseHeader("content-type")))
+        if (resp != null && requiredContentType != null)
         {
-            _log.info("Cached GET response does not match " +
-                      "the required content type, removing.");
-            return false;
+            Header responseContentType = resp.getResponseHeader("content-type");
+            if ( responseContentType != null &&
+                 responseContentType.getValue() != null &&
+                 !responseContentType.getValue().split(";")[0]
+                     .equalsIgnoreCase(requiredContentType) )
+            {
+                _log.info("Cached GET response does not match " +
+                    "the required content type, removing.");
+                return false;
+            }
         }
 
         if (resp != null &&
@@ -239,15 +268,17 @@ public class HttpCache
     {
         HttpResponse resp = (HttpResponse) _headCache.get(url);
 
-        if (match(resp, requestOptions))
+        if (resp != null)
         {
-            _log.info("Returning cached HEAD response for " + url);
-            return resp;
-        }
-        else
-        {
-            _log.info("Removing cached HEAD for " + url);
-            removeGet(url);
+            if (match(resp, requestOptions))
+            {
+                _log.info("Returning cached HEAD response for " + url);
+                return resp;
+            } else
+            {
+                _log.info("Removing cached HEAD for " + url);
+                removeGet(url);
+            }
         }
 
         HeadMethod head = new HeadMethod(url);
