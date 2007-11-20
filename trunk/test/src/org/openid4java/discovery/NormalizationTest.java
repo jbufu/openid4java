@@ -66,4 +66,10 @@ public class NormalizationTest extends TestCase
         identifier = Discovery.parseIdentifier("http://example.com#bla");
         assertEquals("http://example.com/#bla", identifier.getIdentifier());
     }
+
+    public void testFragmentNormalization() throws DiscoveryException
+    {
+        Identifier identifier = Discovery.parseIdentifier("http://example.com/#123");
+        assertEquals("http://example.com/#123", identifier.getIdentifier());
+    }
 }
