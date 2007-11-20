@@ -26,6 +26,7 @@ import org.openid4java.discovery.yadis.YadisResult;
 import org.openid4java.discovery.yadis.YadisException;
 import org.openid4java.discovery.html.HtmlResolver;
 import org.openid4java.discovery.html.HtmlResult;
+import org.openid4java.util.HttpCache;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -196,9 +197,12 @@ public class Discovery
 
             UrlIdentifier urlId = (UrlIdentifier) identifier;
 
+            HttpCache cache = new HttpCache();
+
             try
             {
-                YadisResult yadis = _yadisResolver.discover(urlId.toString());
+                YadisResult yadis =
+                        _yadisResolver.discover(urlId.toString(), cache);
 
                 if (yadis.isSuccess())
                 {
@@ -222,7 +226,8 @@ public class Discovery
                 _log.info("No OpenID service endpoints discovered through Yadis;" +
                         " attempting HTML discovery...");
 
-                result = extractDiscoveryInformation(_htmlResolver.discover(urlId));
+                result = extractDiscoveryInformation(
+                        _htmlResolver.discover(urlId, cache));
             }
         }
         else
