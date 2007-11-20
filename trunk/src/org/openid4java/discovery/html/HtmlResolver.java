@@ -4,10 +4,7 @@
 
 package org.openid4java.discovery.html;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.htmlparser.Parser;
@@ -19,14 +16,14 @@ import org.htmlparser.util.ParserException;
 import org.htmlparser.util.NodeIterator;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openid4java.util.HttpClientFactory;
 import org.openid4java.discovery.UrlIdentifier;
 import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.util.HttpCache;
+import org.openid4java.util.HttpResponse;
 import org.openid4java.OpenIDException;
 
 /**
@@ -41,21 +38,6 @@ public class HtmlResolver
      * Maximum number of redirects to be followed for the HTTP calls.
      */
     private int _maxRedirects = 10;
-
-    /**
-     * Maximum length (in bytes) to read when parsing a HTML response.
-     */
-    private int _maxHtmlSize = 100000;
-
-    /**
-     * HTTP connect timeout, in milliseconds.
-     */
-    private int _connTimeout = 3000;
-
-    /**
-     * HTTP socket (read) timeout, in milliseconds.
-     */
-    private int _socketTimeout = 5000;
 
     /**
      * Gets the internal limit configured for the maximum number of redirects
@@ -75,143 +57,60 @@ public class HtmlResolver
     }
 
     /**
-     * Gets the aximum length (in bytes) to read when parsing a HTML response.
+     * Performs HTML discovery on the supplied URL identifier.
+     *
+     * @param identifier        The URL identifier.
+     * @return                  HTML discovery data obtained from the URL.
+     *
+     * @see #discover(UrlIdentifier, HttpCache)
      */
-    public int getMaxHtmlSize()
+    public HtmlResult discover(UrlIdentifier identifier)
+            throws DiscoveryException
     {
-        return _maxHtmlSize;
-    }
-
-    /**
-     * Sets maximum length (in bytes) to read when parsing a HTML response.
-     */
-    public void setMaxHtmlSize(int maxHtmlSize)
-    {
-        this._maxHtmlSize = maxHtmlSize;
-    }
-
-    /**
-     * Gets the HTTP connect timeout, in milliseconds.
-     */
-    public int getConnTimeout()
-    {
-        return _connTimeout;
-    }
-
-    /**
-     * Sets the HTTP connect timeout, in milliseconds.
-     */
-    public void setConnTimeout(int connTimeout)
-    {
-        this._connTimeout = connTimeout;
-    }
-
-    /**
-     * Gets the HTTP socket (read) timeout, in milliseconds.
-     */
-    public int getSocketTimeout()
-    {
-        return _socketTimeout;
-    }
-
-    /**
-     * Sets HTTP socket (read) timeout, in milliseconds.
-     */
-    public void setSocketTimeout(int socketTimeout)
-    {
-        this._socketTimeout = socketTimeout;
+        return discover(identifier, new HttpCache());
     }
 
     /**
      * Performs HTML discovery on the supplied URL identifier.
      *
      * @param identifier        The URL identifier.
+     * @param cache             HttpClient object to use for placing the call
      * @return                  HTML discovery data obtained from the URL.
      */
-    public HtmlResult discover(UrlIdentifier identifier)
+    public HtmlResult discover(UrlIdentifier identifier, HttpCache cache)
             throws DiscoveryException
     {
         // initialize the results of the HTML discovery
         HtmlResult result = new HtmlResult();
 
-        // get the HTML data (and set the claimed identifier)
-        String htmlData = call(identifier.getUrl(), result);
+        try
+        {
+            HttpResponse resp = cache.get(identifier.toString());
 
-        parseHtml(htmlData, result);
+            if (HttpStatus.SC_OK != resp.getStatusCode())
+                throw new DiscoveryException( "GET failed on " +
+                    identifier.toString() +
+                    " Received status code: " + resp.getStatusCode(),
+                    OpenIDException.DISCOVERY_HTML_GET_ERROR);
+
+            result.setClaimed( new UrlIdentifier(resp.getFinalUri()) );
+
+            if (resp.getBody() == null)
+                throw new DiscoveryException(
+                        "No HTML data read from " + identifier.toString(),
+                OpenIDException.DISCOVERY_HTML_NODATA_ERROR);
+
+            parseHtml(resp.getBody(), result);
+        }
+        catch (IOException e)
+        {
+            throw new DiscoveryException("Fatal transport error: ",
+                    OpenIDException.DISCOVERY_HTML_GET_ERROR, e);
+        }
 
         _log.info("HTML discovery completed on: " + identifier);
 
         return result;
-    }
-
-    /**
-     * Performs a HTTP call on the provided URL identifier.
-     *
-     * @param url       The URL identifier.
-     * @param result    The HTML discovery result, in which the claimed
-     *                  identifier is set to the input URL after following
-     *                  redirects.
-     * @return          The retrieved HTML data.
-     */
-    private String call(URL url, HtmlResult result) throws DiscoveryException
-    {
-        HttpClient client = HttpClientFactory.getInstance(
-                _maxRedirects, Boolean.TRUE, _socketTimeout, _connTimeout,
-                CookiePolicy.IGNORE_COOKIES);
-
-        GetMethod get = new GetMethod(url.toString());
-        get.setFollowRedirects(true);
-
-        try
-        {
-            if (DEBUG) _log.debug("Fetching " + url + "...");
-
-            int statusCode = client.executeMethod(get);
-            if (statusCode != HttpStatus.SC_OK)
-                throw new DiscoveryException( "GET failed on " + url +
-                    " Received status code: " + statusCode,
-                    OpenIDException.DISCOVERY_HTML_GET_ERROR);
-
-            result.setClaimed( new UrlIdentifier(get.getURI().toString()) );
-
-            InputStream htmlInput = get.getResponseBodyAsStream();
-            if (htmlInput == null)
-                throw new DiscoveryException(
-                    "Cannot open inputstream for GET response from " + url,
-                    OpenIDException.DISCOVERY_HTML_GET_ERROR);
-
-            byte data[] = new byte[_maxHtmlSize];
-
-            int totalRead = 0;
-            int currentRead;
-            while (totalRead < _maxHtmlSize)
-            {
-                currentRead = htmlInput.read(data, totalRead, _maxHtmlSize - totalRead);
-
-                if (currentRead == -1) break;
-
-                totalRead += currentRead;
-            }
-
-            htmlInput.close();
-
-            if (totalRead <= 0)
-                throw new DiscoveryException("No HTML data read from " + url,
-                    OpenIDException.DISCOVERY_HTML_NODATA_ERROR);
-
-            if (DEBUG) _log.debug("Read " + totalRead + " bytes.");
-
-            return new String(data, 0, totalRead);
-
-        } catch (IOException e)
-        {
-            throw new DiscoveryException("Fatal transport error: ",
-                OpenIDException.DISCOVERY_HTML_GET_ERROR, e);
-        }
-        finally
-        {
-            get.releaseConnection();
-        }
     }
 
     /**

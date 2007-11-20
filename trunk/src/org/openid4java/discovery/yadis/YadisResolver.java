@@ -12,13 +12,9 @@ import org.htmlparser.util.NodeList;
 import org.htmlparser.util.NodeIterator;
 import org.htmlparser.util.ParserException;
 import org.openxri.xml.XRDS;
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.HeadMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -28,13 +24,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.openid4java.util.HttpClientFactory;
 import org.openid4java.OpenIDException;
+import org.openid4java.util.HttpCache;
+import org.openid4java.util.HttpRequestOptions;
+import org.openid4java.util.HttpResponse;
 
 /**
  * Yadis discovery protocol implementation.
@@ -54,13 +53,6 @@ import org.openid4java.OpenIDException;
  * <ul>
  * <li> max redirects (default 10): maximum number of redirects to be followed
  *      for YadisURL
- * <li> max HTML size (default 100,000 bytes): maximum size (in bytes)
- *      that will be retrived and parsed while trying to extract
- *      the XRDS location from the <HEAD><META> tag
- * <li> max XML size (default 100,000 bytes): maximum size (in bytes) that will
- *      be accepted for XRDS document
- * <li> HTTP connect timeout (default 3 seconds)
- * <li> HTTP read timeout (default 5 seconds)
  * </ul>
  *
  * @author Marius Scurtescu, Johnny Bufu
@@ -84,26 +76,6 @@ public class YadisResolver
     private int _maxRedirects = 10;
 
     /**
-     * Maximum length (in bytes) to read when parsing a HTML response.
-     */
-    private int _maxHtmlSize = 100000;
-
-    /**
-     * Maximum size in bytes for the XRDS document.
-     */
-    private int _maxXmlSize = 100000;
-
-    /**
-     * HTTP connect timeout, in milliseconds.
-     */
-    private int _connTimeout = 3000;
-
-    /**
-     * HTTP socket (read) timeout, in milliseconds.
-     */
-    private int _socketTimeout = 5000;
-
-    /**
      * Gets the internal limit configured for the maximum number of redirects
      * to be followed for the HTTP calls.
      */
@@ -118,70 +90,6 @@ public class YadisResolver
     public void setMaxRedirects(int maxRedirects)
     {
         this._maxRedirects = maxRedirects;
-    }
-
-    /**
-     * Gets the aximum length (in bytes) to read when parsing a HTML response.
-     */
-    public int getMaxHtmlSize()
-    {
-        return _maxHtmlSize;
-    }
-
-    /**
-     * Sets maximum length (in bytes) to read when parsing a HTML response.
-     */
-    public void setMaxHtmlSize(int maxHtmlSize)
-    {
-        this._maxHtmlSize = maxHtmlSize;
-    }
-
-    /**
-     * Gets the maximum size in bytes for the XRDS document.
-     */
-    public int getMaxXmlSize()
-    {
-        return _maxXmlSize;
-    }
-
-    /**
-     * Sets the maximum size in bytes for the XRDS document.
-     */
-    public void setMaxXmlSize(int maxXmlSize)
-    {
-        this._maxXmlSize = maxXmlSize;
-    }
-
-    /**
-     * Gets the HTTP connect timeout, in milliseconds.
-     */
-    public int getConnTimeout()
-    {
-        return _connTimeout;
-    }
-
-    /**
-     * Sets the HTTP connect timeout, in milliseconds.
-     */
-    public void setConnTimeout(int connTimeout)
-    {
-        this._connTimeout = connTimeout;
-    }
-
-    /**
-     * Gets the HTTP socket (read) timeout, in milliseconds.
-     */
-    public int getSocketTimeout()
-    {
-        return _socketTimeout;
-    }
-
-    /**
-     * Sets HTTP socket (read) timeout, in milliseconds.
-     */
-    public void setSocketTimeout(int socketTimeout)
-    {
-        this._socketTimeout = socketTimeout;
     }
 
     /**
@@ -209,11 +117,36 @@ public class YadisResolver
      * @return              YadisResult containing discovered information,
      *                      which includes the XRDS document associated with
      *                      the Yadis URL and additional meta-information
-     * @see YadisResult #discover(String, int)
+     * @see YadisResult #discover(String, int, HttpCache)
      */
     public YadisResult discover(String url) throws YadisException
     {
-        return discover(url, _maxRedirects);
+        return discover(url, _maxRedirects, new HttpCache() );
+    }
+
+
+    /**
+     * Performs Yadis discovery on the YadisURL.
+     * <p>
+     * <ul>
+     * <li> tries to retrieve the XRDS location via a HEAD call on the Yadis URL
+     * <li> retrieves the XRDS document with a GET on the above if available,
+     *      or through a GET on the YadisURL otherwise
+     * </ul>
+     * <p>
+     * The maximum number of redirects that are followed is determined by the
+     * #_maxRedirects member field.
+     *
+     * @param url           YadisURL on which discovery will be performed
+     * @param cache         HttpCache object for optimizing HTTP requests.
+     * @return              YadisResult containing discovered information,
+     *                      which includes the XRDS document associated with
+     *                      the Yadis URL and additional meta-information
+     * @see YadisResult #discover(String, int, HttpCache)
+     */
+    public YadisResult discover(String url, HttpCache cache) throws YadisException
+    {
+        return discover(url, _maxRedirects, cache);
     }
 
     /**
@@ -230,15 +163,33 @@ public class YadisResolver
      * @return              YadisResult containing discovered information,
      *                      which includes the XRDS document associated with
      *                      the Yadis URL and additional meta-information
+     * @see YadisResult #discover(String, int, HttpCache)
+     */
+    public YadisResult discover(String url, int maxRedirects) throws YadisException
+    {
+        return discover(url, maxRedirects, new HttpCache());
+    }
+
+    /**
+     * Performs Yadis discovery on the YadisURL.
+     * <p>
+     * <ul>
+     * <li> tries to retrieve the XRDS location via a HEAD call on the Yadis URL
+     * <li> retrieves the XRDS document with a GET on the above if available,
+     *      or through a GET on the YadisURL otherwise
+     * </ul>
+     *
+     * @param url           YadisURL on which discovery will be performed
+     * @param maxRedirects  The maximum number of redirects to be followed.
+     * @param cache         HttpCache object for optimizing HTTP requests.
+     * @return              YadisResult containing discovered information,
+     *                      which includes the XRDS document associated with
+     *                      the Yadis URL and additional meta-information
      * @see YadisResult
      */
-    public YadisResult discover(String url, int maxRedirects)
+    public YadisResult discover(String url, int maxRedirects, HttpCache cache)
         throws YadisException
     {
-        HttpClient client = HttpClientFactory.getInstance(
-                maxRedirects, Boolean.TRUE, _socketTimeout, _connTimeout,
-                CookiePolicy.IGNORE_COOKIES);
-
         // initialize the result
         YadisResult result = new YadisResult();
 
@@ -246,9 +197,9 @@ public class YadisResolver
         result.setYadisUrl(yadisUrl);
 
         // try to retrieve the Yadis Descriptor URL with a HEAD call first
-        headXrdsUrl(client, yadisUrl, result);
+        headXrdsUrl(cache, maxRedirects, yadisUrl, result);
 
-        getXrds(client, result, false);
+        getXrds(cache, maxRedirects, result, false);
 
         result.setSuccess(true);
 
@@ -260,17 +211,17 @@ public class YadisResolver
     /**
      * Tries to retrieve the XRDS document via a GET call on the provided URL.
      *
-     * @param client        The HttpClient object to use for placing the call
-     * @param result        The YadisResult object where discovery results
+     * @param cache        The HttpClient object to use for placing the call
+     * @param maxRedirects
+     *@param result        The YadisResult object where discovery results
      *                      will be stored
-     * @param secondCall    true on the second (recursive) call
-     * @throws YadisException   (hard-fail) if:
+     * @param secondCall    true on the second (recursive) call @throws YadisException   (hard-fail) if:
      *                      <ul>
      *                      <li>there's a transport error
      *                      <li>the returned status code is different than SC_OK
      *                      </ul>
      */
-    private void getXrds(HttpClient client, YadisResult result, boolean secondCall)
+    private void getXrds(HttpCache cache, int maxRedirects, YadisResult result, boolean secondCall)
             throws YadisException
     {
         // fall-back to the Yadis-URL if we don't know the X-XRDS-Location yet
@@ -278,11 +229,15 @@ public class YadisResolver
                 result.getXrdsLocation().toString() :
                 result.getYadisUrl().toString();
 
-        GetMethod get = new GetMethod(getUrl);
-        get.setFollowRedirects(true);
-
         // set the accept header
-        get.setRequestHeader("Accept", YADIS_ACCEPT_HEADER);
+        Map requestHeaders = new HashMap();
+        requestHeaders.put("Accept", YADIS_ACCEPT_HEADER);
+
+        HttpRequestOptions requestOptions = new HttpRequestOptions();
+        requestOptions.setRequestHeaders(requestHeaders);
+        requestOptions.setMaxRedirects(maxRedirects);
+
+        // todo: remove from cache if XRDS is received on first call
 
         try
         {
@@ -290,26 +245,27 @@ public class YadisResolver
                 _log.debug("Performing HTTP GET #" + (secondCall ? "2" : "1") +
                     " on: " + getUrl + " ...");
 
-            int statusCode = client.executeMethod(get);
-            if (statusCode != HttpStatus.SC_OK)
+            HttpResponse resp = cache.get(getUrl, requestOptions);
+
+            if (HttpStatus.SC_OK != resp.getStatusCode())
                 throw new YadisException("GET failed on " + getUrl,
                         OpenIDException.YADIS_GET_ERROR);
 
             // store the normalized / after redirects URL, if not already set
             if (result.getNormalizedUrl() == null)
-                    result.setNormalizedUrl(get.getURI().toString());
+                    result.setNormalizedUrl(resp.getFinalUri());
 
             // check first if there's a XRDS download stream available
-            Header contentType = get.getResponseHeader("content-type");
+            Header contentType = resp.getResponseHeader("content-type");
             if ( contentType != null && contentType.getValue() != null &&
                     contentType.getValue()
                     .split(";")[0].equalsIgnoreCase(YADIS_CONTENT_TYPE) )
             {
-                XRDS xrds = parseXrds(get.getResponseBodyAsStream());
+                XRDS xrds = parseXrds(resp.getBody());
 
                 // todo: only if not set? could be different if redirects were followed
                 // if (result.getXrdsLocation == null)
-                result.setXrdsLocation(get.getURI().toString(),
+                result.setXrdsLocation(resp.getFinalUri(),
                         OpenIDException.YADIS_GET_INVALID_RESPONSE);
 
                 result.setContentType(YADIS_ACCEPT_HEADER);
@@ -323,28 +279,28 @@ public class YadisResolver
             else if ( !secondCall )
             {
                 // fail if there are more than one YADIS_XRDS_LOCATION headers
-                if (get.getResponseHeaders(YADIS_XRDS_LOCATION).length > 1)
+                if (resp.getResponseHeaders(YADIS_XRDS_LOCATION).length > 1)
                     throw new YadisException("Found more than one " +
                             YADIS_XRDS_LOCATION + " headers: " +
-                            get.getResponseHeaders(YADIS_XRDS_LOCATION),
+                            resp.getResponseHeaders(YADIS_XRDS_LOCATION),
                             OpenIDException.YADIS_GET_INVALID_RESPONSE);
 
                 String xrdsLocation = null;
-                if (get.getResponseHeader(YADIS_XRDS_LOCATION) != null)
+                if (resp.getResponseHeader(YADIS_XRDS_LOCATION) != null)
                 {
-                    xrdsLocation = get.getResponseHeader(YADIS_XRDS_LOCATION).getValue();
+                    xrdsLocation = resp.getResponseHeader(YADIS_XRDS_LOCATION).getValue();
                     if (DEBUG)
                         _log.debug("Found " + YADIS_XRDS_LOCATION + " header.");
                 }
 
                 // XRDS location fallback to <HTML><HEAD><META...
                 if (xrdsLocation == null)
-                    xrdsLocation = getHtmlMeta(get.getResponseBodyAsStream());
+                    xrdsLocation = getHtmlMeta(resp.getBody());
 
                 result.setXrdsLocation(xrdsLocation,
                         OpenIDException.YADIS_GET_INVALID_RESPONSE);
 
-                getXrds(client, result, true);
+                getXrds(cache, maxRedirects, result, true);
 
             }
             else // secondCall == true
@@ -359,10 +315,6 @@ public class YadisResolver
             throw new YadisException("Fatal transport error: ",
                     OpenIDException.YADIS_GET_TRANSPORT_ERROR, e);
         }
-        finally
-        {
-            get.releaseConnection();
-        }
     }
 
     /**
@@ -373,7 +325,7 @@ public class YadisResolver
      * @return String           the XRDS location URL, or null if not found
      * @throws YadisException   on parsing errors or Yadis protocal violations
      */
-    private String getHtmlMeta(InputStream input) throws YadisException
+    private String getHtmlMeta(String input) throws YadisException
     {
         String xrdsLocation = null;
 
@@ -383,17 +335,7 @@ public class YadisResolver
 
         try
         {
-            byte data[] = new byte[_maxHtmlSize];
-
-            int bytesRead = input.read(data);
-            input.close();
-
-            // parse and extract the needed info
-            if (bytesRead <= 0)
-                throw new YadisException("No data read from the HTML message",
-                        OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
-
-            Parser parser = Parser.createParser(new String(data, 0, bytesRead), null);
+            Parser parser = Parser.createParser(input, null);
             NodeList heads = parser.parse(new TagNameFilter("HEAD"));
 
             if (heads.size() != 1)
@@ -426,11 +368,8 @@ public class YadisResolver
                     }
                 }
             }
-        } catch (IOException e)
-        {
-            throw new YadisException("I/O error while reading HTML message",
-                    OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR, e);
-        } catch (ParserException pe)
+        }
+        catch (ParserException pe)
         {
             throw new YadisException("Error parsing HTML message",
                     OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, pe);
@@ -446,7 +385,7 @@ public class YadisResolver
      * @return XRDS         Yadis Resource Descriptor (XRDS) document
      * @throws YadisException if the input stream does not contain a valid XRDS
      */
-    private XRDS parseXrds(InputStream input) throws YadisException
+    private XRDS parseXrds(String input) throws YadisException
     {
         XRDS xrds;
 
@@ -456,14 +395,6 @@ public class YadisResolver
 
         try
         {
-            byte[] data = new byte[_maxXmlSize];
-            int bytesRead = input.read(data);
-
-            if (input.read() != -1)
-                throw new YadisException("XRDS stream exceeds max allowed size: "
-                         + _maxXmlSize, OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
-            input.close();
-
             DocumentBuilderFactory documentBuilderFactory =
                     DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
@@ -472,7 +403,7 @@ public class YadisResolver
                     documentBuilderFactory.newDocumentBuilder();
 
             Document document = documentBuilder.parse(
-                    new ByteArrayInputStream(data, 0, bytesRead));
+                    new ByteArrayInputStream(input.getBytes()));
 
             xrds = new XRDS(document.getDocumentElement(), false);
 
@@ -514,7 +445,8 @@ public class YadisResolver
      * The returned string should be validated before being used
      * as a XRDS-Location URL.
      *
-     * @param client        The HttpClient object to use for placing the call
+     * @param cache         HttpClient object to use for placing the call
+     * @param maxRedirects
      * @param url           The YadisURL
      * @param result        The location of the XRDS document and the normalized
      *                      Url will be returned in the YadisResult object.
@@ -526,47 +458,47 @@ public class YadisResolver
      *              <li> there was an HTTP-level error
      *                  (allows fallback to GET + HTML response)
      *              </ul>
-     *
      * @throws YadisException if:
      *          <ul>
      *          <li> there's a (lower level) transport error
      *          <li> there are more than one Yadis headers present
      *          </ul>
      */
-    private void headXrdsUrl(HttpClient client, YadisUrl url, YadisResult result)
+    private void headXrdsUrl(HttpCache cache, int maxRedirects,
+                             YadisUrl url, YadisResult result)
             throws YadisException
     {
-        HeadMethod head = new HeadMethod(url.getUrl().toString());
-        head.setFollowRedirects(true);
-
         try
         {
             if (DEBUG) _log.debug("Performing HTTP HEAD on: " + url + " ...");
 
-            int statusCode = client.executeMethod(head);
-            if (statusCode != HttpStatus.SC_OK)
+            HttpRequestOptions requestOptions = new HttpRequestOptions();
+            requestOptions.setMaxRedirects(maxRedirects);
+
+            HttpResponse resp = cache.head(url.getUrl().toString(), requestOptions);
+            if (HttpStatus.SC_OK != resp.getStatusCode())
             {
                 if (DEBUG)
                     _log.debug("Cannot retrieve " + YADIS_XRDS_LOCATION +
                         " using HEAD from " + url.getUrl().toString() +
-                        "; status=" + head.getStatusLine());
+                        "; status=" + resp.getStatusLine());
                 return;
             }
 
             // fail if there are more than one YADIS_XRDS_LOCATION headers
-            if (head.getResponseHeaders(YADIS_XRDS_LOCATION).length > 1)
+            if (resp.getResponseHeaders(YADIS_XRDS_LOCATION).length > 1)
                 throw new YadisException("Found more than one " +
                         YADIS_XRDS_LOCATION + " headers: " +
-                        head.getResponseHeaders(YADIS_XRDS_LOCATION),
+                        resp.getResponseHeaders(YADIS_XRDS_LOCATION),
                         OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
 
-            Header xrdsLocation = head.getResponseHeader(YADIS_XRDS_LOCATION);
+            Header xrdsLocation = resp.getResponseHeader(YADIS_XRDS_LOCATION);
 
             if (xrdsLocation != null)
             {
                 result.setXrdsLocation(xrdsLocation.getValue(),
                         OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
-                result.setNormalizedUrl(head.getURI().toString());
+                result.setNormalizedUrl(resp.getFinalUri());
             }
 
         }
@@ -579,10 +511,6 @@ public class YadisResolver
         {
             throw new YadisException("I/O transport error: ",
                     OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
-        }
-        finally
-        {
-            head.releaseConnection();
         }
     }
 }
