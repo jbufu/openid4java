@@ -319,13 +319,24 @@ public class Discovery
 
             //iterate through all URIs in the service
             Iterator iter = service.getPrioritizedURIs().iterator();
+            SEPUri sepUri;
             while (iter.hasNext())
             {
+                sepUri = (SEPUri) iter.next();
                 try
                 {
-                    opEndpointUrl = ((SEPUri) iter.next()).getURI().toURL();
-                } catch (MalformedURLException e)
+                    opEndpointUrl = sepUri.getURI().toURL();
+                }
+                catch (MalformedURLException e)
                 {
+                    _log.warn("Ignoring malformed OP endpoint URL in XRDS file: "
+                              + sepUri.toString(), e);
+                    continue;
+                }
+                catch (IllegalArgumentException ee)
+                {
+                    _log.warn("Ignoring invalid OP endpoint URL in XRDS file: "
+                              + sepUri.toString(), ee);
                     continue;
                 }
 
@@ -510,11 +521,12 @@ public class Discovery
             {
                 Service srv = (Service)it.next();
                 Iterator itURI = srv.getPrioritizedURIs().iterator();
+                SEPUri sepURI;
                 while (itURI.hasNext())
                 {
+                    sepURI = (SEPUri) itURI.next();
                     try
                     {
-                        SEPUri sepURI = (SEPUri) itURI.next();
                         String urlString = xriResolver.constructURI(
                                 sepURI.getURI(),
                                 sepURI.getAppend(),
@@ -536,9 +548,15 @@ public class Discovery
                     }
                     catch (MalformedURLException mue)
                     {
-                        _log.error("Error parsing URI in XRDS result for "
-                                   + srvType, mue);
+                        _log.warn("Ignoring malformed OP endpoint URL in XRDS file: "
+                                  + sepURI.toString(), mue);
                     }
+                    catch (IllegalArgumentException ee)
+                    {
+                        _log.warn("Ignoring invalid OP endpoint URL in XRDS file: "
+                                  + sepURI.toString(), ee);
+                    }
+
                 }
             }
 
@@ -676,16 +694,27 @@ public class Discovery
 
             //iterate through all URIs in the service
             Iterator iter = service.getPrioritizedURIs().iterator();
+            SEPUri sepUri;
             while (iter.hasNext())
             {
+                sepUri = (SEPUri) iter.next();
                 try
                 {
-                    endpointUrl = ((SEPUri) iter.next()).getURI().toURL();
+                    endpointUrl = sepUri.getURI().toURL();
                 }
                 catch (MalformedURLException e)
                 {
+                    _log.warn("Ignoring malformed OP endpoint URL in XRDS file: "
+                              + sepUri.toString(), e);
                     continue;
                 }
+                catch (IllegalArgumentException ee)
+                {
+                    _log.warn("Ignoring invalid OP endpoint URL in XRDS file: "
+                              + sepUri.toString(), ee);
+                    continue;
+                }
+
 
                 if (matchType(service, DiscoveryInformation.OPENID2_RP))
                 {
