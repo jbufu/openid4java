@@ -653,7 +653,7 @@ public class ConsumerManager
         Association a = _associations.load(opEndpoint);
         if (a != null && a.getHandle() != null)
         {
-            _log.info("Found an existing association.");
+            _log.info("Found an existing association: " + a.getHandle());
             return 0;
         }
 
@@ -971,10 +971,15 @@ public class ConsumerManager
             throw new ConsumerException("Authentication cannot continue: " +
                     "no discovery information provided.");
 
-        associate(discovered, _maxAssocAttempts);
-
         Association assoc =
                 _associations.load(discovered.getOPEndpoint().toString());
+
+        if (assoc == null)
+        {
+            associate(discovered, _maxAssocAttempts);
+            assoc = _associations.load(discovered.getOPEndpoint().toString());
+        }
+
         String handle = assoc != null ?
                 assoc.getHandle() : Association.FAILED_ASSOC_HANDLE;
 
@@ -1300,7 +1305,7 @@ public class ConsumerManager
                     URLEncoder.encode(_privateAssociation.sign(returnTo),
                             "UTF-8");
 
-            _log.info("Inserted consumer nonce.");
+            _log.info("Inserted consumer nonce: " + nonce);
 
             if (DEBUG) _log.debug("return_to:" + returnTo);
         }
