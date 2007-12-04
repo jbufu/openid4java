@@ -1,4 +1,0 @@
-status=200
-X-XRDS-Location=http://localhost:SERVLET_PORT/?xrds=simplexrds&headers=simplexrds
-X-XRDS-Location=http://localhost:SERVLET_PORT/?xrds=simplexrds
-Content-Type=text/html

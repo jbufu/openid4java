@@ -1,2 +1,0 @@
-database.jndi=java:comp/env/jdbc/infocardop
-private.assoc.table=private_assoc
