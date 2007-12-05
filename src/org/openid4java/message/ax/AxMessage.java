@@ -124,6 +124,16 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
+     * Attribute exchange parameters are not REQUIRED to be signed.
+     *
+     * @return false
+     */
+    public boolean signRequired()
+    {
+        return false;
+    }
+
+    /**
      * Instantiates the apropriate Attribute Exchange object (fetch / store -
      * request / response) for the supplied parameter list.
      *

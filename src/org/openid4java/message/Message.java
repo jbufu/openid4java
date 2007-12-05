@@ -419,9 +419,15 @@ public class Message
             set(paramName, param.getValue());
         }
 
-        if (this instanceof AuthSuccess &&
-                ((AuthSuccess)this).getSignExtensions().contains(extension) )
-            ((AuthSuccess)this).buildSignedList();
+
+        if (this instanceof AuthSuccess)
+        {
+            if (extension.signRequired())
+                ((AuthSuccess)this).addSignExtension(typeUri);
+
+            if ( ((AuthSuccess)this).getSignExtensions().contains(typeUri) )
+                ((AuthSuccess)this).buildSignedList();
+        }
     }
 
     /**
@@ -486,6 +492,26 @@ public class Message
 
                 MessageExtension extension = extensionFactory.getExtension(
                         getExtensionParams(typeUri), mode.startsWith("checkid_"));
+
+                if (this instanceof AuthSuccess && extension.signRequired())
+                {
+                    List signedParams = Arrays.asList(
+                        ((AuthSuccess)this).getSignList().split(",") );
+
+                    String alias = getExtensionAlias(typeUri);
+
+                    Iterator iter = extension.getParameters().getParameters().iterator();
+                    while (iter.hasNext())
+                    {
+                        Parameter param = (Parameter) iter.next();
+                        if (! signedParams.contains(alias + "." + param.getKey()))
+                        {
+                            throw new MessageException(
+                                "Extension " + typeUri + " MUST be signed; " +
+                                "field " + param.getKey() + " is NOT signed.");
+                        }
+                    }
+                }
 
                 _extesion.put(typeUri, extension);
             }
