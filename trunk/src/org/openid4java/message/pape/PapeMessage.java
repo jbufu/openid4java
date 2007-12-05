@@ -170,6 +170,16 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
+     * PAPE parameters are REQUIRED to be signed.
+     *
+     * @return
+     */
+    public boolean signRequired()
+    {
+        return true;
+    }
+
+    /**
      * Instantiates the apropriate OpenID Provider Authentication Policy
      * extension object (request / response) for the supplied parameter 
      * list.

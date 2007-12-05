@@ -181,6 +181,17 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
+     * Simple registration parameters are not REQUIRED to be signed.
+     *
+     * @return false
+     */
+    public boolean signRequired()
+    {
+        return false;
+    }
+
+
+    /**
      * Instantiates the apropriate Simple Registration object
      * (request / response) for the supplied parameter list.
      *

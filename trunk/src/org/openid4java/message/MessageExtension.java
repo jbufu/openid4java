@@ -55,4 +55,13 @@ public interface MessageExtension
      */
     public boolean providesIdentifier();
 
+    /**
+     * Flag for indicating that an extension must be signed.
+     *
+     * @return  True if all the extension's parameters MUST be signed
+     *          in positive assertions, or false if there isn't such a
+     *          requirement.
+     */
+    public boolean signRequired();
+
 }
