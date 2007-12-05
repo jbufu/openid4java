@@ -15,10 +15,6 @@
 
 => Implementation
 
-  - Update based on finialized versions of the following:
-    - OpenID Authentication 2.0
-    - OpenID Attribute Exchange 1.0
-
   - Extensions to implement:
     - OpenID Signed Assertions 1.0
 
