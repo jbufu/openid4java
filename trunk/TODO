@@ -22,9 +22,6 @@
   - Extensions to implement:
     - OpenID Signed Assertions 1.0
 
-  - Normalization : review XRI parsing to mach the latest spec / XRI syntax 2.1
-    (when when syntax 2.1 goes out)
-
   - MessageExtension.providesIdentifier()
     - review interface to allow exchange of messages with no identifiers at all
     - review affected message validation logic
