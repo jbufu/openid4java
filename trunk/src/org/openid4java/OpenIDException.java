@@ -96,6 +96,6 @@ public class OpenIDException extends Exception
     // override getMessage() to prefix with the error code
     public String getMessage()
     {
-        return Integer.toString(_errorCode) + ": " + super.getMessage();
+        return "0x" + Integer.toHexString(_errorCode) + ": " + super.getMessage();
     }
 }
