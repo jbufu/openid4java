@@ -26,8 +26,6 @@
 
   --> Nice to have, but not essential:
 
-    - Don't normalize the url before redirects (not needed, extra cost)
-
     - Auth* class hierarchy reorganization
 
     - Factory method for incoming messages
