@@ -112,6 +112,14 @@ public class ConsumerManager
      */
     private int _failedAssocExpire = 300;
 
+    /**
+     * Interval before the expiration of an association (in seconds)
+     * in which the association should not be used, in order to avoid
+     * the expiration from occurring in the middle of an authentication
+     * transaction. Default: 300s.
+     */
+    private int _preExpiryAssocLockInterval = 300;
+
 
     // --- authentication preferences ---
 
@@ -404,6 +412,31 @@ public class ConsumerManager
     public int getFailedAssocExpire()
     {
         return _failedAssocExpire;
+    }
+
+    /**
+     * Gets the interval before the expiration of an association
+     * (in seconds) in which the association should not be used,
+     * in order to avoid the expiration from occurring in the middle
+     * of a authentication transaction. Default: 300s.
+     */
+    public int getPreExpiryAssocLockInterval()
+    {
+        return _preExpiryAssocLockInterval;
+    }
+
+    /**
+     * Sets the interval before the expiration of an association
+     * (in seconds) in which the association should not be used,
+     * in order to avoid the expiration from occurring in the middle
+     * of a authentication transaction. Default: 300s.
+     *
+     * @param preExpiryAssocLockInterval    The number of seconds for the
+     *                                      pre-expiry lock inteval.
+     */
+    public void setPreExpiryAssocLockInterval(int preExpiryAssocLockInterval)
+    {
+        this._preExpiryAssocLockInterval = preExpiryAssocLockInterval;
     }
 
     /**
@@ -973,6 +1006,21 @@ public class ConsumerManager
 
         Association assoc =
                 _associations.load(discovered.getOPEndpoint().toString());
+
+        // is the association about to expire?
+        if ( assoc != null &&
+             ! Association.FAILED_ASSOC_HANDLE.equals(assoc.getHandle()) &&
+             assoc.getExpiry().getTime() - System.currentTimeMillis() < _preExpiryAssocLockInterval * 1000)
+        {
+            _log.info("Association " + assoc.getHandle() +
+                " is within " + _preExpiryAssocLockInterval + " seconds of expiration, removing.");
+
+            _associations.remove(
+                discovered.getOPEndpoint().toString(),
+                assoc.getHandle());
+
+            assoc = null;
+        }
 
         if (assoc == null)
         {
