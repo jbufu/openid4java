@@ -431,8 +431,9 @@ public class ServerManager
             }
             else
             {
-                _log.warn("Error processing an OpenID1 association request; " +
-                          "responding with a dummy association", e);
+                _log.warn("Error processing an OpenID1 association request: " +
+                          e.getMessage() +
+                          " Responding with a dummy association.", e);
                 try
                 {
                     // generate dummy association & no-encryption response
