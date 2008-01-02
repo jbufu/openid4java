@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -18,6 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
+import org.openid4java.consumer.InMemoryConsumerAssociationStore;
+import org.openid4java.consumer.InMemoryNonceVerifier;
 import org.openid4java.consumer.VerificationResult;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
@@ -59,6 +62,8 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 		try {
 			this.manager = new ConsumerManager();
+			manager.setAssociations(new InMemoryConsumerAssociationStore());
+			manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
 		} catch (ConsumerException e) {
 			throw new ServletException(e);
 		}
@@ -72,8 +77,27 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		log.debug("------------------------");
-		log.debug("context: " + context);
+		doPost(req, resp);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		if ("true".equals(req.getParameter("is_return"))) {
+			processReturn(req, resp);
+		} else {
+			String identifier = req.getParameter("openid_identifier");
+			this.authRequest(identifier, req, resp);
+		}
+	}
+
+	private void processReturn(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
 		Identifier identifier = this.verifyResponse(req);
 		log.debug("identifier: " + identifier);
 		if (identifier == null) {
@@ -86,27 +110,16 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
-	 *      javax.servlet.http.HttpServletResponse)
-	 */
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		String identifier = req.getParameter("identifier");
-		this.authRequest(identifier, req, resp);
-	}
-
 	// --- placing the authentication request ---
 	public String authRequest(String userSuppliedString,
 			HttpServletRequest httpReq, HttpServletResponse httpResp)
-			throws IOException {
+			throws IOException, ServletException {
 		try {
 			// configure the return_to URL where your application will receive
 			// the authentication responses from the OpenID provider
 			// String returnToUrl = "http://example.com/openid";
-			String returnToUrl = httpReq.getRequestURL().toString();
+			String returnToUrl = httpReq.getRequestURL().toString()
+					+ "?is_return=true";
 
 			// --- Forward proxy setup (only if needed) ---
 			// ProxyProperties proxyProps = new ProxyProperties();
@@ -191,7 +204,9 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			}
 
 			// attach the extension to the authentication request
-			authReq.addExtension(fetch);
+			if (!fetch.getAttributes().isEmpty()) {
+				authReq.addExtension(fetch);
+			}
 
 			if (!discovered.isVersion2()) {
 				// Option 1: GET HTTP-redirect to the OpenID Provider endpoint
@@ -202,13 +217,13 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			} else {
 				// Option 2: HTML FORM Redirection (Allows payloads >2048 bytes)
 
-				// RequestDispatcher dispatcher =
-				// getServletContext().getRequestDispatcher("formredirection.jsp");
-				// httpReq.setAttribute("prameterMap",
-				// response.getParameterMap());
-				// httpReq.setAttribute("destinationUrl",
-				// response.getDestinationUrl(false));
-				// dispatcher.forward(request, response);
+				RequestDispatcher dispatcher = getServletContext()
+						.getRequestDispatcher("/formredirection.jsp");
+				httpReq.setAttribute("prameterMap", httpReq.getParameterMap());
+				httpReq.setAttribute("message", authReq);
+				// httpReq.setAttribute("destinationUrl", httpResp
+				// .getDestinationUrl(false));
+				dispatcher.forward(httpReq, httpResp);
 			}
 		} catch (OpenIDException e) {
 			// present error to the user
