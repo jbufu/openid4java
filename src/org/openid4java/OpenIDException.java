@@ -48,6 +48,11 @@ public class OpenIDException extends Exception
     public static final int CONSUMER_ERROR = 0x0A00;
     public static final int INFOCARD_ERROR = 0x0B00;
 
+    public static final int EXTENSION_ERROR = 0x0C00;
+    public static final int AX_ERROR = 0x0C10;
+    public static final int SREG_ERROR = 0x0C20;
+    public static final int PAPE_ERROR = 0x0C30;
+
     public OpenIDException(String message)
     {
         this(message, OPENID_ERROR);

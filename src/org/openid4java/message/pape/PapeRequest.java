@@ -7,6 +7,7 @@ package org.openid4java.message.pape;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
+import org.openid4java.OpenIDException;
 
 import java.util.*;
 
@@ -70,8 +71,7 @@ public class PapeRequest extends PapeMessage
     {
         PapeRequest req = new PapeRequest(params);
 
-        if (! req.isValid())
-            throw new MessageException("Invalid parameters for a PAPE request");
+        req.validate();
 
         if (DEBUG)
             _log.debug("Created PAPE request from parameter list:\n" + params);
@@ -171,14 +171,15 @@ public class PapeRequest extends PapeMessage
      * <p>
      * Used when constructing a extension from a parameter list.
      *
-     * @return      True if the extension is valid, false otherwise.
+     * @throws MessageException if the PapeRequest is not valid.
      */
-    public boolean isValid()
+    public void validate() throws MessageException
     {
         if (! _parameters.hasParameter("preferred_auth_policies"))
         {
-            _log.warn("preferred_auth_policies is required in a PAPE request.");
-            return false;
+            throw new MessageException(
+                "preferred_auth_policies is required in a PAPE request.",
+                OpenIDException.PAPE_ERROR);
         }
 
         Iterator it = _parameters.getParameters().iterator();
@@ -187,11 +188,10 @@ public class PapeRequest extends PapeMessage
             String paramName = ((Parameter) it.next()).getKey();
             if (! PAPE_FIELDS.contains(paramName) )
             {
-                _log.warn("Invalid parameter name in PAPE request: " + paramName);
-                return false;
+                throw new MessageException(
+                    "Invalid parameter name in PAPE request: " + paramName,
+                    OpenIDException.PAPE_ERROR);
             }
         }
-
-        return true;
     }
 }
