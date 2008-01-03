@@ -207,7 +207,7 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
             return PapeRequest.createPapeRequest(parameterList);
 
         else if ( parameterList.hasParameter("auth_policies") ||
-             parameterList.hasParameter("auth_age"))
+             parameterList.hasParameter("auth_time"))
 
             return PapeResponse.createPapeResponse(parameterList);
 
