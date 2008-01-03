@@ -669,8 +669,13 @@ public class ServerManager
                     _log.error("Responding with immediate authentication " +
                                "failure to " + authReq.getReturnTo());
 
+                    authReq.setImmediate(false);
+
+                    String separator = _userSetupUrl.contains("?") ? "&" : "?";
+
                     return AuthImmediateFailure.createAuthImmediateFailure(
-                            _userSetupUrl, authReq.getReturnTo(), ! isVersion2);
+                        _userSetupUrl + separator + authReq.wwwFormEncoding(),
+                        authReq.getReturnTo(), ! isVersion2);
                 }
                 else
                 {
