@@ -9,10 +9,10 @@ licensed under Apache 2.0.
 
 The library currently supports the following OpenID specifications:
 
-	- OpenID Authentication 2.0 (draft 12)
-	- OpenID Attribute Exchange 1.0, draft 7
+	- OpenID Authentication 2.0
+	- OpenID Attribute Exchange 1.0
 	- OpenID Simple Registration 1.0 and 1.1
-	- OpenID Provider Authentication Policy Extension 1.0, draft 1
+	- OpenID Provider Authentication Policy Extension 1.0, draft 2
 	- OpenID Information Cards 1.0, draft 1
 
 OpenID starts with the concept that anyone can identify themselves on the 
