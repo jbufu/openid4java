@@ -26,10 +26,14 @@ import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthRequest;
 import org.openid4java.message.AuthSuccess;
+import org.openid4java.message.MessageExtension;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
+import org.openid4java.message.sreg.SRegMessage;
+import org.openid4java.message.sreg.SRegRequest;
+import org.openid4java.message.sreg.SRegResponse;
 
 /**
  * @author Sutra Zhou
@@ -142,70 +146,57 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 			// Attribute Exchange example: fetching the 'email' attribute
 			FetchRequest fetch = FetchRequest.createFetchRequest();
+			SRegRequest sregReq = SRegRequest.createFetchRequest();
 
 			if ("1".equals(httpReq.getParameter("nickname"))) {
-				fetch.addAttribute("nickname",
-				// attribute alias
-						"http://schema.openid.net/contact/nickname", // type
-						// URI
-						true); // required
+				// fetch.addAttribute("nickname",
+				// "http://schema.openid.net/contact/nickname", false);
+				sregReq.addAttribute("nickname", false);
 			}
 			if ("1".equals(httpReq.getParameter("email"))) {
 				fetch.addAttribute("email",
-				// attribute alias
-						"http://schema.openid.net/contact/email", // type URI
-						true); // required
+						"http://schema.openid.net/contact/email", false);
+				sregReq.addAttribute("email", false);
 			}
 			if ("1".equals(httpReq.getParameter("fullname"))) {
 				fetch.addAttribute("fullname",
-				// attribute alias
-						"http://schema.openid.net/contact/fullname", // type
-						// URI
-						true); // required
+						"http://schema.openid.net/contact/fullname", false);
+				sregReq.addAttribute("fullname", false);
 			}
 			if ("1".equals(httpReq.getParameter("dob"))) {
 				fetch.addAttribute("dob",
-				// attribute alias
-						"http://schema.openid.net/contact/dob", // type URI
-						true); // required
+						"http://schema.openid.net/contact/dob", true);
+				sregReq.addAttribute("dob", false);
 			}
 			if ("1".equals(httpReq.getParameter("gender"))) {
 				fetch.addAttribute("gender",
-				// attribute alias
-						"http://schema.openid.net/contact/gender", // type URI
-						true); // required
+						"http://schema.openid.net/contact/gender", false);
+				sregReq.addAttribute("gender", false);
 			}
 			if ("1".equals(httpReq.getParameter("postcode"))) {
 				fetch.addAttribute("postcode",
-				// attribute alias
-						"http://schema.openid.net/contact/postcode", // type
-						// URI
-						true); // required
+						"http://schema.openid.net/contact/postcode", false);
+				sregReq.addAttribute("postcode", false);
 			}
 			if ("1".equals(httpReq.getParameter("country"))) {
 				fetch.addAttribute("country",
-				// attribute alias
-						"http://schema.openid.net/contact/country", // type URI
-						true); // required
+						"http://schema.openid.net/contact/country", false);
+				sregReq.addAttribute("country", false);
 			}
 			if ("1".equals(httpReq.getParameter("language"))) {
 				fetch.addAttribute("language",
-				// attribute alias
-						"http://schema.openid.net/contact/language", // type
-						// URI
-						true); // required
+						"http://schema.openid.net/contact/language", false);
+				sregReq.addAttribute("language", false);
 			}
 			if ("1".equals(httpReq.getParameter("timezone"))) {
 				fetch.addAttribute("timezone",
-				// attribute alias
-						"http://schema.openid.net/contact/timezone", // type
-						// URI
-						true); // required
+						"http://schema.openid.net/contact/timezone", false);
+				sregReq.addAttribute("timezone", false);
 			}
 
 			// attach the extension to the authentication request
-			if (!fetch.getAttributes().isEmpty()) {
-				authReq.addExtension(fetch);
+			if (!sregReq.getAttributes().isEmpty()) {
+				authReq.addExtension(sregReq);
 			}
 
 			if (!discovered.isVersion2()) {
@@ -262,6 +253,19 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 				AuthSuccess authSuccess = (AuthSuccess) verification
 						.getAuthResponse();
 
+				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
+					MessageExtension ext = authSuccess
+							.getExtension(SRegMessage.OPENID_NS_SREG);
+					if (ext instanceof SRegResponse) {
+						SRegResponse sregResp = (SRegResponse) ext;
+						for (Iterator iter = sregResp.getAttributeNames()
+								.iterator(); iter.hasNext();) {
+							String name = (String) iter.next();
+							String value = sregResp.getParameterValue(name);
+							httpReq.setAttribute(name, value);
+						}
+					}
+				}
 				if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
 					FetchResponse fetchResp = (FetchResponse) authSuccess
 							.getExtension(AxMessage.OPENID_NS_AX);
