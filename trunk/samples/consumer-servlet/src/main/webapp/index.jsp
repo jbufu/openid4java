@@ -23,7 +23,7 @@
 		</fieldset>
 
 		<fieldset>
-			<legend>Sample 2:</legend>
+			<legend>Sample 2: using the Simple Registration extension(doc: <a href="http://code.google.com/p/openid4java/wiki/SRegHowTo">SRegHowTo</a>)</legend>
 			<form action="consumer" method="post">
 				<div>
 					<input type="text" name="openid_identifier" class="openid_identifier" />
