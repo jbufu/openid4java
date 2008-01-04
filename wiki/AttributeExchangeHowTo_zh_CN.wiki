@@ -1,9 +1,9 @@
-#summary 如何使用Attribute Exchange扩展传递属性。
+#summary 如何使用 Attribute Exchange 扩展传递属性。
 
 = Attribute Exchange 教程 =
 
 
-== 依赖方发出一个 FetchRequest ==
+== 依赖方发出一个 !FetchRequest ==
 
 {{{
 FetchRequest fetch = FetchRequest.createFetchRequest();
@@ -19,7 +19,7 @@ AuthRequest req = _consumerManager.authenticate(discovered, return_to);
 req.addExtension(fetch);
 }}}
 
-== OpenID 提供方接受到 FetchRequest ==
+== OpenID 提供方接受到 !FetchRequest ==
 {{{
 if (authReq.hasExtension(AxMessage.OPENID_NS_AX))
 {
@@ -39,7 +39,7 @@ if (authReq.hasExtension(AxMessage.OPENID_NS_AX))
 }
 }}}
 
-== OpenID 提供方发送 FetchResponse ==
+== OpenID 提供方发送 !FetchResponse ==
 {{{
     // data released by the user
     Map userData = new HashMap();
@@ -53,7 +53,7 @@ if (authReq.hasExtension(AxMessage.OPENID_NS_AX))
     authSuccess.addExtension(fetchResp);
 }}}
 
-== 依赖方接受到 FetchResponse ==
+== 依赖方接受到 !FetchResponse ==
 {{{
 if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
 {
