@@ -1,4 +1,4 @@
-#summary 如何使用 Attribute Exchange 扩展传递属性。
+#summary 如何使用 Attribute Exchange 扩展传递参数。
 
 = Attribute Exchange 教程 =
 
