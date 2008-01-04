@@ -1,0 +1,29 @@
+#summary 日志配置
+
+
+= 日志配置 =
+
+OpenID4Java使用Apache的commons-logging API。这样就允许应用程序开发者自己选择
+（或更换）他们喜欢的日志系统，而不需要修改或重新编译类库。
+
+    http://commons.apache.org/logging/guide.html#Configuration
+
+== Log4J 配置 ==
+
+OpenID4Java类库里的例子使用了Log4J v1.2。Commons-logging使用Log4J作为
+默认日志系统，它会自己侦测Log4J是否可用，如果可用就是用Log4J。
+
+一个典型的Log4J配置，把log4j.properties文件放在classpath中，它包含下面的内容
+（可以根据需要修改日志级别）：
+
+{{{
+        log4j.rootLogger=INFO, A1
+        log4j.logger.org.openid4java=DEBUG, A1
+        log4j.appender.A1=org.apache.log4j.ConsoleAppender
+        log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+}}}
+
+http://logging.apache.org/log4j/1.2/
+
+
+

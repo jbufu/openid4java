@@ -3,7 +3,7 @@
 = Attribute Exchange 教程 =
 
 
-== 依赖方发出一个 !FetchRequest ==
+== 依赖方发送 !FetchRequest ==
 
 {{{
 FetchRequest fetch = FetchRequest.createFetchRequest();
@@ -19,7 +19,7 @@ AuthRequest req = _consumerManager.authenticate(discovered, return_to);
 req.addExtension(fetch);
 }}}
 
-== OpenID 提供方接受到 !FetchRequest ==
+== OpenID 提供方接受 !FetchRequest ==
 {{{
 if (authReq.hasExtension(AxMessage.OPENID_NS_AX))
 {
@@ -53,7 +53,7 @@ if (authReq.hasExtension(AxMessage.OPENID_NS_AX))
     authSuccess.addExtension(fetchResp);
 }}}
 
-== 依赖方接受到 !FetchResponse ==
+== 依赖方接受 !FetchResponse ==
 {{{
 if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
 {
