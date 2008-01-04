@@ -2,11 +2,11 @@
 
 = Simple Registration 教程 =
 
-该使用范例几乎和[AttributeExchangeHowTo_zh_CN Attribute Exchange]一样。
+该使用范例几乎和 [AttributeExchangeHowTo_zh_CN Attribute Exchange] 一样。
 
-Attribute Exchange可以传递任意类型的属性。要了解更多，请参考[http://openid.net/specs/openid-attribute-exchange-1_0-04.html OpenID Attribute Exchange 1.0 specification] 和 [http://openid.net/specs/openid-attribute-types-1_0-02.html OpenID Attribute Types]。
+Attribute Exchange可以传递任意类型的属性。要了解更多，请参考 [http://openid.net/specs/openid-attribute-exchange-1_0-04.html OpenID Attribute Exchange 1.0 规范] 和 [http://openid.net/specs/openid-attribute-types-1_0-02.html OpenID Attribute Types]。
  
-== 依赖方发送 !SRegRequest ==
+== 依赖方发送 SRegRequest ==
 
 {{{
 SRegRequest sregReq = SRegRequest.createFetchRequest();
@@ -19,7 +19,7 @@ AuthRequest req = _consumerManager.authenticate(discovered, return_to);
 req.addExtension(sregReq);
 }}}
 
-== OpenID 提供方接受 !SRegRequest ==
+== OpenID 提供方接受 SRegRequest ==
 {{{
 if (authReq.hasExtension(SRegMessage.OPENID_NS_SREG))
 {
@@ -35,7 +35,7 @@ if (authReq.hasExtension(SRegMessage.OPENID_NS_SREG))
 }
 }}}
 
-== OpenID 提供方发送 !SRegResponse ==
+== OpenID 提供方发送 SRegResponse ==
 {{{
     // data released by the user
     Map userData = new HashMap();
@@ -49,7 +49,7 @@ if (authReq.hasExtension(SRegMessage.OPENID_NS_SREG))
     authSuccess.addExtension(sregResp);
 }}}
 
-== 依赖方接受 !SRegResponse ==
+== 依赖方接受 SRegResponse ==
 {{{
 if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
 {
