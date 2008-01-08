@@ -2,7 +2,7 @@
 
 = Consumer Forward Proxy =
 
-If your Relying Party / consumer site needs to access the internet through a proxy, this is how the proxy access info is configured:
+If your Relying Party / consumer site needs to access the internet through a proxy, the following proxy configuration is necessary, *before the ConsumerManager is instantiated*:
 
 {{{
 // --- Forward proxy setup (only if needed) ---
