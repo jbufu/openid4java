@@ -65,6 +65,11 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		log.debug("context: " + context);
 
 		try {
+			// --- Forward proxy setup (only if needed) ---
+			// ProxyProperties proxyProps = new ProxyProperties();
+			// proxyProps.setProxyName("proxy.example.com");
+			// proxyProps.setProxyPort(8080);
+			// HttpClientFactory.setProxyProperties(proxyProps);
 			this.manager = new ConsumerManager();
 			manager.setAssociations(new InMemoryConsumerAssociationStore());
 			manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
@@ -124,12 +129,6 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			// String returnToUrl = "http://example.com/openid";
 			String returnToUrl = httpReq.getRequestURL().toString()
 					+ "?is_return=true";
-
-			// --- Forward proxy setup (only if needed) ---
-			// ProxyProperties proxyProps = new ProxyProperties();
-			// proxyProps.setProxyName("proxy.example.com");
-			// proxyProps.setProxyPort(8080);
-			// HttpClientFactory.setProxyProperties(proxyProps);
 
 			// perform discovery on the user-supplied identifier
 			List discoveries = manager.discover(userSuppliedString);
