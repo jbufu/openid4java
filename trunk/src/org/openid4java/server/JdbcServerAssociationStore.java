@@ -164,7 +164,7 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
         catch (IncorrectResultSizeDataAccessException rse)
         {
             _log.warn("Association not found for handle: " + handle +
-                      "in the table: " + _tableName);
+                      " in the table: " + _tableName);
             return null;
         }
         catch (DataAccessException dae)
