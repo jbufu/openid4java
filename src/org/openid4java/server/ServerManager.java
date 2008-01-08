@@ -485,6 +485,26 @@ public class ServerManager
      * <p>
      * Uses ServerManager's global OpenID Provider endpoint URL.
      *
+     * @return      A signed positive Authentication Response if successfull,
+     *              or an IndirectError / DirectError message.
+     * @see #authResponse(org.openid4java.message.AuthRequest, String, String,
+     *                    boolean, String, boolean)
+     */
+    public Message authResponse(AuthRequest authReq,
+                                String userSelId,
+                                String userSelClaimed,
+                                boolean authenticatedAndApproved)
+    {
+        return authResponse(authReq, userSelId, userSelClaimed,
+                authenticatedAndApproved, _opEndpointUrl, true);
+
+    }
+
+    /**
+     * Processes a Authentication Request received from a consumer site.
+     * <p>
+     * Uses ServerManager's global OpenID Provider endpoint URL.
+     *
      * @return      A positive Authentication Response if successfull,
      *              or an IndirectError / DirectError message.
      * @see #authResponse(org.openid4java.message.ParameterList, String, String,
@@ -504,8 +524,29 @@ public class ServerManager
     /**
      * Processes a Authentication Request received from a consumer site.
      * <p>
+     * Uses ServerManager's global OpenID Provider endpoint URL.
      *
-     * @return      An signed positive Authentication Response if successfull,
+     * @return      A positive Authentication Response if successfull,
+     *              or an IndirectError / DirectError message.
+     * @see #authResponse(org.openid4java.message.AuthRequest, String, String,
+     *                    boolean, String, boolean)
+     */
+    public Message authResponse(AuthRequest authReq,
+                                String userSelId,
+                                String userSelClaimed,
+                                boolean authenticatedAndApproved,
+                                boolean signNow)
+    {
+        return authResponse(authReq, userSelId, userSelClaimed,
+                authenticatedAndApproved, _opEndpointUrl, signNow);
+
+    }
+
+    /**
+     * Processes a Authentication Request received from a consumer site.
+     * <p>
+     *
+     * @return      A signed positive Authentication Response if successfull,
      *              or an IndirectError / DirectError message.
      * @see #authResponse(org.openid4java.message.ParameterList, String, String,
      *                    boolean, String, boolean)
@@ -522,12 +563,83 @@ public class ServerManager
 
     /**
      * Processes a Authentication Request received from a consumer site.
+     * <p>
+     *
+     * @return      A signed positive Authentication Response if successfull,
+     *              or an IndirectError / DirectError message.
+     * @see #authResponse(org.openid4java.message.AuthRequest, String, String,
+     *                    boolean, String, boolean)
+     */
+    public Message authResponse(AuthRequest auhtReq,
+                                String userSelId,
+                                String userSelClaimed,
+                                boolean authenticatedAndApproved,
+                                String opEndpoint)
+    {
+        return authResponse(auhtReq, userSelId, userSelClaimed,
+                authenticatedAndApproved, opEndpoint, true);
+    }
+
+    /**
+     * Processes a Authentication Request received from a consumer site,
+     * after parsing the request parameters into a valid AuthRequest.
+     * <p>
+     *
+     * @return      A signed positive Authentication Response if successfull,
+     *              or an IndirectError / DirectError message.
+     * @see #authResponse(org.openid4java.message.AuthRequest, String, String,
+     *                    boolean, String, boolean)
+     */
+    public Message authResponse(ParameterList requestParams,
+                                String userSelId,
+                                String userSelClaimed,
+                                boolean authenticatedAndApproved,
+                                String opEndpoint,
+                                boolean signNow)
+    {
+        _log.info("Parsing authentication request...");
+
+        AuthRequest authReq;
+
+        boolean isVersion2 = Message.OPENID2_NS.equals(
+                                requestParams.getParameterValue("openid.ns"));
+
+        try
+        {
+            // build request message from response params (+ integrity check)
+            authReq = AuthRequest.createAuthRequest(
+                requestParams, _realmVerifier);
+
+            return authResponse(authReq, userSelId, userSelClaimed,
+                                authenticatedAndApproved, opEndpoint, signNow);
+        }
+        catch (MessageException e)
+        {
+            if (requestParams.hasParameter("openid.return_to"))
+            {
+                _log.error("Invalid authentication request; " +
+                           "responding with an indirect error message.", e);
+
+                return IndirectError.createIndirectError(e,
+                        requestParams.getParameterValue("openid.return_to"),
+                        ! isVersion2 );
+            }
+            else
+            {
+                _log.error("Invalid authentication request; " +
+                           "responding with a direct error message.", e);
+
+                return DirectError.createDirectError( e, ! isVersion2 );
+            }
+        }
+    }
+
+    /**
+     * Processes a Authentication Request received from a consumer site.
      *
      * @param opEndpoint        The endpoint URL where the OP accepts OpenID
      *                          authentication requests.
-     * @param requestParams     The parameters contained
-     *                          in the authentication request message received
-     *                          from a consumer site.
+     * @param authReq           A valid authentication request.
      * @param userSelId         OP-specific Identifier selected by the user at
      *                          the OpenID Provider; if present it will override
      *                          the one received in the authentication request.
@@ -551,7 +663,7 @@ public class ServerManager
      *                          <li> Null if there was no return_to parameter
      *                          specified in the AuthRequest.</ul>
      */
-    public Message authResponse(ParameterList requestParams,
+    public Message authResponse(AuthRequest authReq,
                                 String userSelId,
                                 String userSelClaimed,
                                 boolean authenticatedAndApproved,
@@ -560,7 +672,7 @@ public class ServerManager
     {
         _log.info("Processing authentication request...");
 
-        boolean isVersion2 = true;
+        boolean isVersion2 = authReq.isVersion2();
 
         try
         {
@@ -579,11 +691,6 @@ public class ServerManager
 
         try
         {
-            // build request message from response params (+ integrity check)
-            AuthRequest authReq = AuthRequest.createAuthRequest(
-                    requestParams, _realmVerifier);
-            isVersion2 = authReq.isVersion2();
-
             if (authReq.getReturnTo() == null)
             {
                 _log.error("No return_to in the received (valid) auth request; "
@@ -688,13 +795,13 @@ public class ServerManager
         }
         catch (OpenIDException e)
         {
-            if (requestParams.hasParameter("openid.return_to"))
+            if (authReq.hasParameter("openid.return_to"))
             {
                 _log.error("Error processing authentication request; " +
                            "responding with an indirect error message.", e);
 
                 return IndirectError.createIndirectError(e,
-                        requestParams.getParameterValue("openid.return_to"),
+                        authReq.getReturnTo(),
                         ! isVersion2 );
             }
             else
