@@ -392,7 +392,8 @@ public class AuthSuccess extends Message
         {
             signedText.append(signedParams[i]);
             signedText.append(':');
-            signedText.append(getParameterValue("openid." + signedParams[i]));
+            String value = getParameterValue("openid." + signedParams[i]);
+            if (value != null) signedText.append(value);
             signedText.append('\n');
         }
 
