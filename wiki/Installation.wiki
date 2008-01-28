@@ -28,3 +28,21 @@ Add following to your project's pom.xml in section dependencies:
   <version>0.9.3</version>
 </dependency>
 }}}
+
+For version 0.9.5-SNAPSHOT, add the following to your pom.xml:
+{{{
+<project ...>
+...
+  <repositories>
+    <repository>
+      <id>alchim-snapshots</id>
+      <url>http://alchim.sourceforge.net/download/snapshots</url>
+    </repository>
+    <repository>
+      <id>alchim-releases</id>
+      <url>http://alchim.sourceforge.net/download/releases</url>
+    </repository>
+  <repositories>
+.....
+</project>
+}}}
