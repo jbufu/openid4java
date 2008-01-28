@@ -27,4 +27,22 @@ CATALINA_HOME/common/endorsed
   <version>0.9.3</version>
 </dependency>
 }}}
-其中的 0.9.2 请替换成你需要的版本。
+其中的 0.9.3 请替换成你需要的版本。
+
+如果你想使用0.9.5-SNAPSHOT版本，你可以在你的 pom.xml 中添加：
+{{{
+<project ...>
+...
+  <repositories>
+    <repository>
+      <id>alchim-snapshots</id>
+      <url>http://alchim.sourceforge.net/download/snapshots</url>
+    </repository>
+    <repository>
+      <id>alchim-releases</id>
+      <url>http://alchim.sourceforge.net/download/releases</url>
+    </repository>
+  <repositories>
+.....
+</project>
+}}}
