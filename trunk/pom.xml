@@ -2,6 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/maven-v4_0_0.xsd"
 >
+  <!--
+    - This pom is only for `mvn eclipse:eclipse',
+    - for complete structure, see directory maven2/.
+    -->
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.openid4java</groupId>
