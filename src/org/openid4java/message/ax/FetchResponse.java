@@ -250,7 +250,7 @@ public class FetchResponse extends AxMessage
      */
     public String getAttributeValue(String alias)
     {
-        return getCount(alias) > 1 ?
+        return (_parameters.hasParameter("count." + alias)) ?
             getParameterValue("value." + alias + ".1") :
             getParameterValue("value." + alias);
     }
