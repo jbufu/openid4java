@@ -1487,8 +1487,8 @@ public class ConsumerManager
      * @param authResp      The authentication response to be verified.
      * @param discovered    The discovery information obtained earlier during
      *                      the discovery stage, associated with the
-     *                      identifier(s) in the request. May be null for
-     *                      OpenID 2.0; must not be null for OpenID 1.x.
+     *                      identifier(s) in the request. Stateless operation
+     *                      is assumed if null.
      * @return              The discovery information associated with the
      *                      claimed identifier, that can be used further in
      *                      the verification process. Null if the discovery
@@ -1518,8 +1518,8 @@ public class ConsumerManager
      * @param authResp      The authentication response to be verified.
      * @param discovered    The discovery information obtained earlier during
      *                      the discovery stage, associated with the
-     *                      identifier(s) in the request. Must not be null,
-     *                      and must contain a claimed identifier.
+     *                      identifier(s) in the request. Stateless operation
+     *                      is assumed if null.
      * @return              The discovery information associated with the
      *                      claimed identifier, that can be used further in
      *                      the verification process. Null if the discovery
@@ -1530,40 +1530,82 @@ public class ConsumerManager
                                         DiscoveryInformation discovered)
             throws DiscoveryException
     {
-        if (authResp == null || authResp.isVersion2() ||
-                authResp.getIdentity() == null || discovered == null ||
-                discovered.getClaimedIdentifier() == null || discovered.isVersion2())
+        if ( authResp == null || authResp.isVersion2() ||
+             authResp.getIdentity() == null )
         {
             if (DEBUG)
-                _log.debug("Discovered information doesn't match " +
-                           "auth response / version");
+                _log.error("Invalid authentication response: " +
+                           "cannot verify v1 discovered information");
             return null;
         }
 
         // asserted identifier in the AuthResponse
         String assertId = authResp.getIdentity();
 
-        // claimed identifier
-        Identifier claimedId = discovered.getClaimedIdentifier();
+        if ( discovered != null && ! discovered.isVersion2() &&
+             discovered.getClaimedIdentifier() != null )
+        {
+            // statefull mode
+            if (DEBUG)
+                _log.debug("Verifying discovered information " +
+                           "for OpenID1 assertion about ClaimedID: " +
+                           discovered.getClaimedIdentifier().getIdentifier());
 
-        if (DEBUG)
-            _log.debug("Verifying discovered information for OpenID1 assertion " +
-                       "about ClaimedID: " + claimedId.getIdentifier());
+            String discoveredId = discovered.hasDelegateIdentifier() ?
+                discovered.getDelegateIdentifier() :
+                discovered.getClaimedIdentifier().getIdentifier();
 
-        // OP-specific ID
-        String opSpecific = discovered.hasDelegateIdentifier() ?
-                discovered.getDelegateIdentifier() : claimedId.getIdentifier();
+            if (assertId.equals(discoveredId))
+                return discovered;
+        }
 
-        // does the asserted ID match the OP-specific ID from the discovery?
-        if ( opSpecific.equals(assertId) )
-            return discovered;  // success
+        // stateless, bare response, or the user changed the ID at the OP
+        _log.info("Proceeding with stateless mode / bare response verification...");
 
-        // discovered info verification failed
-        if (DEBUG)
-            _log.debug("Identifier in the assertion doesn't match " +
-                       "the one in the discovered information: " +
-                       assertId + " != " + opSpecific );
-        return null;
+        DiscoveryInformation firstServiceMatch = null;
+
+        // assuming openid.identity is the claimedId
+        // (delegation can't work with stateless/bare resp v1 operation)
+        if (DEBUG) _log.debug(
+            "Performing discovery on the ClaimedID in the assertion: " + assertId);
+        List discoveries = _discovery.discover(assertId);
+
+        Iterator iter = discoveries.iterator();
+        while (iter.hasNext())
+        {
+            DiscoveryInformation service = (DiscoveryInformation) iter.next();
+
+            if (service.isVersion2() || // only interested in v1
+                ! service.hasClaimedIdentifier() || // need a claimedId
+                service.hasDelegateIdentifier() || // not allowing delegates
+                ! assertId.equals(service.getClaimedIdentifier()))
+                continue;
+
+            if (DEBUG) _log.debug("Found matching service: " + service);
+
+            // keep the first endpoint that matches
+            if (firstServiceMatch == null)
+                firstServiceMatch = service;
+
+            Association assoc = _associations.load(
+                service.getOPEndpoint().toString(),
+                authResp.getHandle());
+
+            // don't look further if there is an association with this endpoint
+            if (assoc != null)
+            {
+                if (DEBUG)
+                    _log.debug("Found existing association for  " + service +
+                        " Not looking for another service endpoint.");
+                return service;
+            }
+        }
+
+        if (firstServiceMatch == null)
+            _log.error("No service element found to match " +
+                "the identifier in the assertion.");
+
+        return firstServiceMatch;
     }
 
     /**
@@ -1573,9 +1615,8 @@ public class ConsumerManager
      * @param authResp      The authentication response to be verified.
      * @param discovered    The discovery information obtained earlier during
      *                      the discovery stage, associated with the
-     *                      identifier(s) in the request. May be null,
-     *                      in which case discovery will be performed on
-     *                      the claimed identifier in the response.
+     *                      identifier(s) in the request. Stateless operation
+     *                      is assumed if null.
      * @return              The discovery information associated with the
      *                      claimed identifier, that can be used further in
      *                      the verification process. Null if the discovery
