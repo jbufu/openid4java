@@ -320,11 +320,25 @@ public class ConsumerManager
      * Default: enabled.
      * <p>
      * Associations and stateless mode cannot be both disabled at the same time.
+     * @deprecated
+     * @see #setAllowStateless(boolean)
      */
-    public void allowStateless(boolean useStateless)
+    public void allowStateless(boolean allowStateless)
+    {
+        setAllowStateless(allowStateless);
+    }
+
+    /**
+     * Flag used to enable / disable the use of stateless mode.
+     * <p>
+     * Default: enabled.
+     * <p>
+     * Associations and stateless mode cannot be both disabled at the same time.
+     */
+    public void setAllowStateless(boolean allowStateless)
     {
         if (_allowStateless || _maxAssocAttempts > 0)
-            this._allowStateless = useStateless;
+            this._allowStateless = allowStateless;
         else
             throw new IllegalArgumentException(
                     "Associations and stateless mode " +
@@ -334,8 +348,20 @@ public class ConsumerManager
     /**
      * Returns true if the ConsumerManager is configured to fallback to
      * stateless mode when failing to associate with an OpenID Provider.
+     *
+     * @deprecated
+     * @see isAllowStateles()
      */
     public boolean statelessAllowed()
+    {
+        return _allowStateless;
+    }
+
+    /**
+     * Returns true if the ConsumerManager is configured to fallback to
+     * stateless mode when failing to associate with an OpenID Provider.
+     */
+    public boolean isAllowStateless()
     {
         return _allowStateless;
     }
