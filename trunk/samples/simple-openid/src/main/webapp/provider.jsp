@@ -11,8 +11,6 @@
             ServerManager newmgr=new ServerManager();
             newmgr.setSharedAssociations(new InMemoryServerAssociationStore());
             newmgr.setPrivateAssociations(new InMemoryServerAssociationStore());
-            //newmgr.setSignFields("op_endpoint,return_to,response_nonce,assoc_handle,claimed_id,identity");
-            newmgr.setSignFields("return_to,assoc_handle,claimed_id,identity"); // OpenID 1.x
             newmgr.setOPEndpointUrl(request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/simple-openid/provider.jsp");
             pageContext.setAttribute("servermanager", newmgr, PageContext.APPLICATION_SCOPE);
 
