@@ -17,6 +17,7 @@ public String getTypeUri();
 public ParameterList getParameters();
 public void  setParameters(ParameterList params);
 public boolean providesIdentifier();
+public boolean signRequired();
 }}}
 
 For working examples please have a look at the Attribute Exchange and Simple Registration implementation in the message.ax and message.sreg packages.
@@ -66,6 +67,4 @@ else if (ext instance of <ExampleMessageResponse>)
     ... process specific extension message ...
 }
 }}}
-
-
 
