@@ -7,7 +7,7 @@ Once you have [Installation installed] the library and have obtained the user's 
 
 == Instantiate a ConsumerManager Object ==
 {{{
-    public ConsumerManager _manager;
+    public ConsumerManager manager;
 
     public SampleConsumer() throws ConsumerException
     {
