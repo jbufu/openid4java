@@ -92,7 +92,7 @@ public class SampleConsumer
 
                 //RequestDispatcher dispatcher =
                 //        getServletContext().getRequestDispatcher("formredirection.jsp");
-                //httpReq.setAttribute("prameterMap", response.getParameterMap());
+                //httpReq.setAttribute("parameterMap", response.getParameterMap());
                 //httpReq.setAttribute("destinationUrl", response.getDestinationUrl(false));
                 //dispatcher.forward(request, response);
             }
