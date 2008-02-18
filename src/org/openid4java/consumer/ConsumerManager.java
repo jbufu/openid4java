@@ -350,7 +350,7 @@ public class ConsumerManager
      * stateless mode when failing to associate with an OpenID Provider.
      *
      * @deprecated
-     * @see isAllowStateles()
+     * @see isAllowStateless()
      */
     public boolean statelessAllowed()
     {
