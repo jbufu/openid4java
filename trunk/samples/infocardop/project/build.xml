@@ -218,7 +218,7 @@
             doctitle="Infocard OpenID Provider"
             source="${compile.source}">
       <bottom>
-        <![CDATA[<i>Copyright &#169; 2007 Sxip Identity Corp. All Rights Reserved.</i>]]></bottom>
+        <![CDATA[<i>Copyright &#169; 2006-2008 Sxip Identity Corp. All Rights Reserved.</i>]]></bottom>
       <link href="../common/build/apidoc" resolvelink="yes"/>
       <link href="http://bldbsf01.sxip.com/javadoc/jdk/1.5/"/>
       <link href="http://bldbsf01.sxip.com/javadoc/spring/2.0/"/>

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2006-2008 Sxip Identity Corporation
+ */
+
 package org.openid4java.samples;
 
 import java.io.IOException;
