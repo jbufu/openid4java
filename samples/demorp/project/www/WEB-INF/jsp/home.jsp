@@ -1,3 +1,7 @@
+<%--
+  ~ Copyright 2006-2008 Sxip Identity Corporation
+  --%>
+
 <%@ page import="java.util.Calendar"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -81,7 +85,7 @@ ${fn:escapeXml(openidAssertion)}
      <li class="footer_contact"><a href="http://nym.sxip.com/nymail/sendmail.pl?a=2a89335f448c01ac"
        target="_blank">Contact</a></li>
     </ul>
-    <div class="footer_copyright">&copy; 2007 <a href="http://www.sxip.com/">Sxip Identity Corporation.</a></div>
+    <div class="footer_copyright">&copy; 2006-2008 <a href="http://www.sxip.com/">Sxip Identity Corporation.</a></div>
     </div>
 </div>
 </body>

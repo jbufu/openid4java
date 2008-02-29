@@ -204,7 +204,7 @@
       doctitle="DemoRP"
       source="${compile.source}">
       <bottom>
-        <![CDATA[<i>Copyright &#169; 2007 Sxip Identity Corp. All Rights Reserved.</i>]]></bottom>
+        <![CDATA[<i>Copyright &#169; 2006-2008 Sxip Identity Corp. All Rights Reserved.</i>]]></bottom>
       <link href="http://bldbsf01.sxip.com/javadoc/jdk/1.5/"/>
       <link href="http://bldbsf01.sxip.com/javadoc/spring/2.0/"/>
       <link href="http://bldbsf01.sxip.com/javadoc/jug/2.0.0/"/>

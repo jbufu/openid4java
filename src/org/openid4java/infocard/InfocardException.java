@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 Sxip Identity Corporation
+ * Copyright 2006-2008 Sxip Identity Corporation
  */
 
 package org.openid4java.infocard;
