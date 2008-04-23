@@ -1079,19 +1079,17 @@ public class ConsumerManager
                 " claimedID: " + claimedId +
                 " OP-specific ID: " + delegate);
 
+        if (! discovered.isVersion2())
+            returnToUrl = insertConsumerNonce(returnToUrl);
+
         AuthRequest authReq = AuthRequest.createAuthRequest(claimedId, delegate,
                 ! discovered.isVersion2(), returnToUrl, handle, realm, _realmVerifier);
 
         authReq.setOPEndpoint(discovered.getOPEndpoint());
 
-        if (! discovered.isVersion2())
-            authReq.setReturnTo(insertConsumerNonce(authReq.getReturnTo()));
-
         // ignore the immediate flag for OP-directed identifier selection
         if (! AuthRequest.SELECT_ID.equals(claimedId))
             authReq.setImmediate(_immediateAuth);
-
-        authReq.validate();
 
         return authReq;
     }
