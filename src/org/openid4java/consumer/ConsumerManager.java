@@ -1775,7 +1775,11 @@ public class ConsumerManager
                 result.setVerifiedId(claimedId);
                 if (DEBUG) _log.debug("Local signature verification succeeded.");
             }
-            else if (DEBUG) _log.debug("Local signature verification failed.");
+            else if (DEBUG)
+            {
+                _log.debug("Local signature verification failed.");
+                result.setStatusMsg("Local signature verification failed");
+            }
 
         }
         else // no association, verify with the OP
@@ -1832,7 +1836,7 @@ public class ConsumerManager
             _log.info("Verification succeeded for: " + verifiedID);
 
         else
-            _log.error("Verification failed for: " + verifiedID
+            _log.error("Verification failed for: " + authResp.getClaimed()
                        + " reason: " + result.getStatusMsg());
 
         return result;
