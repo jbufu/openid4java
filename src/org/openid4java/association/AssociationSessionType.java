@@ -155,7 +155,7 @@ public class AssociationSessionType implements Comparable
 
         else if (! compatibility && "no-encryption".equals(sessType) &&
                 Association.TYPE_HMAC_SHA256.equals(assocType))
-                result =  NO_ENCRYPTION_SHA1MAC;
+                result =  NO_ENCRYPTION_SHA256MAC;
 
         else if ( compatibility &&
                 ("".equals(sessType) || sessType == null) &&
