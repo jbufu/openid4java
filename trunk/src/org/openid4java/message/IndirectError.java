@@ -33,7 +33,7 @@ public class IndirectError extends Message
         _exception = e;
 
         if (! compatibility)
-            set("ns", OPENID2_NS);
+            set("openid.ns", OPENID2_NS);
     }
 
     // exception that generated the error, if any
