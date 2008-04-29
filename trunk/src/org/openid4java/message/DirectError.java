@@ -52,7 +52,7 @@ public class DirectError extends Message
         set("error", msg);
         _exception = e;
 
-        if (compatibility)
+        if ( ! compatibility )
             set("ns", OPENID2_NS);
     }
 
