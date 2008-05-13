@@ -14,13 +14,10 @@
 Entire Library, including documentation:
 
   M: Marius Scurtescu <marius@sxip.com>
-  S: supported
+  S: maintained
 
   M: Johnny Bufu <johnny@sxip.com>
-  S: supported
-
-  M: David Huska <huska@sxip.com>
-  S: supported
+  S: maintained
 
   M: Sutra Zhou
   S: fixes/patches
