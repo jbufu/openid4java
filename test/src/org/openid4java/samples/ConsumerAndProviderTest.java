@@ -141,7 +141,9 @@ public class ConsumerAndProviderTest extends TestCase
         }
     }
 
-    public void testCycleWithDemoUserOnVidentity() throws Exception
+    // Ignore this test as `java.net.UnknownHostException: demouser.videntity.org' now.
+    // TODO: add another test to replace this.
+    public void _testCycleWithDemoUserOnVidentity() throws Exception
     {
         HttpServletSupport.lastException = null;
         HttpServletSupport.count_ = 0;

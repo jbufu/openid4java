@@ -5,6 +5,7 @@
 package org.openid4java.server;
 
 import org.openid4java.message.AuthRequest;
+import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.MessageExtension;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.Message;
@@ -90,7 +91,8 @@ public class SampleServer
             response = manager.authResponse(request,
                     opLocalId,
                     userSelectedClaimedId,
-                    authenticatedAndApproved.booleanValue());
+                    authenticatedAndApproved.booleanValue(),
+                    false); // Sign after we added extensions.
 
             if (response instanceof DirectError)
                 return directResponse(httpResp, response.keyValueFormEncoding());
@@ -147,6 +149,11 @@ public class SampleServer
                         throw new UnsupportedOperationException("TODO");
                     }
                 }
+
+                // Sign the auth success message.
+                // This is required as AuthSuccess.buildSignedList has a `todo' tag now.
+                manager.sign((AuthSuccess) response);
+
                 // caller will need to decide which of the following to use:
 
                 // option1: GET HTTP-redirect to the return_to URL
