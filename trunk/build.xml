@@ -53,6 +53,9 @@
             target="${jvm.ver}">
             <classpath refid="classpath"/>
         </javac>
+        <copy todir="${classes}">
+            <fileset dir="${src}" includes="**/*.properties"/>
+        </copy>
     </target>
 
   <target name="jar" depends="compile, get-version"
@@ -160,6 +163,9 @@
                 <path refid="classpath.test"/>
             </classpath>
         </javac>
+        <copy todir="${classes.test}">
+            <fileset dir="${test.src}" includes="**/*.properties"/>
+        </copy>
     </target>
 
     <target name="test" depends="compile_test"
