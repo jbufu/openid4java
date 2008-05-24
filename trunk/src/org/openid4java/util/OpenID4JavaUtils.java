@@ -12,6 +12,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * Load properties from classpath:<code>org.openid4java.util.openid4java-default.properties</code>,
+ * then load custom properties from classpath:<code>openid4java.properties</code>
+ * to replace the default if exists..
+ * 
  * @author Sutra Zhou
  * 
  */
@@ -23,6 +27,8 @@ public class OpenID4JavaUtils
 
     static
     {
+        // Load default properties first, then use custom properties to replace
+        // the default.
         _appProperties = new Properties();
         _appProperties.putAll(loadProperties("openid4java-default.properties"));
         Properties custom = loadProperties("/openid4java.properties");
