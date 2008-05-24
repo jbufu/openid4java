@@ -4,13 +4,6 @@
 
 package org.openid4java.discovery.yadis;
 
-import org.htmlparser.Parser;
-import org.htmlparser.Node;
-import org.htmlparser.tags.MetaTag;
-import org.htmlparser.filters.TagNameFilter;
-import org.htmlparser.util.NodeList;
-import org.htmlparser.util.NodeIterator;
-import org.htmlparser.util.ParserException;
 import org.openxri.xml.XRDS;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -34,6 +27,7 @@ import org.openid4java.OpenIDException;
 import org.openid4java.util.HttpCache;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
+import org.openid4java.util.OpenID4JavaUtils;
 
 /**
  * Yadis discovery protocol implementation.
@@ -55,7 +49,7 @@ import org.openid4java.util.HttpResponse;
  *      for YadisURL
  * </ul>
  *
- * @author Marius Scurtescu, Johnny Bufu
+ * @author Marius Scurtescu, Johnny Bufu, Sutra Zhou
  */
 public class YadisResolver
 {
@@ -63,11 +57,27 @@ public class YadisResolver
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     // Yadis constants
-    private static final String YADIS_XRDS_LOCATION = "X-XRDS-Location";
+    public static final String YADIS_XRDS_LOCATION = "X-XRDS-Location";
     private static final String YADIS_CONTENT_TYPE = "application/xrds+xml";
     private static final String YADIS_ACCEPT_HEADER =
             "text/html; q=0.3, application/xhtml+xml; q=0.5, " +
                     YADIS_CONTENT_TYPE;
+
+    private static final String YADIS_PARSER_CLASS_NAME_KEY = "discovery.yadis.parser";
+    private static final YadisParser YADIS_PARSER;
+
+    static {
+        String className = OpenID4JavaUtils.getProperty(YADIS_PARSER_CLASS_NAME_KEY);
+        if (DEBUG) _log.debug(YADIS_PARSER_CLASS_NAME_KEY + ":" + className);
+        try
+        {
+            YADIS_PARSER = (YadisParser) Class.forName(className).newInstance();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Maximum number of redirects to be followed for the HTTP calls.
@@ -339,48 +349,12 @@ public class YadisResolver
             throw new YadisException("Cannot download HTML message",
                     OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
 
-        try
+        xrdsLocation = YADIS_PARSER.getHtmlMeta(input);
+        if (DEBUG)
         {
-            Parser parser = Parser.createParser(input, null);
-            NodeList heads = parser.parse(new TagNameFilter("HEAD"));
-
-            if (heads.size() != 1)
-                throw new YadisException(
-                        "HTML response must have exactly one HEAD element, " +
-                                "found " + heads.size() + " : "
-                                + heads.toHtml(),
-                        OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
-
-            Node head = heads.elementAt(0);
-            for (NodeIterator i = head.getChildren().elements();
-                 i.hasMoreNodes();)
-            {
-                Node node = i.nextNode();
-                if (node instanceof MetaTag)
-                {
-                    MetaTag meta = (MetaTag) node;
-                    if ( meta.getHttpEquiv() != null &&
-                            meta.getHttpEquiv().equalsIgnoreCase(YADIS_XRDS_LOCATION) )
-                    {
-                        if ( xrdsLocation != null )
-                            throw new YadisException(
-                                "More than one " + YADIS_XRDS_LOCATION +
-                                "META tags found in HEAD: " + head.toHtml(),
-                                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
-
-                        xrdsLocation = meta.getMetaContent();
-                        if (DEBUG)
-                            _log.debug("Found " + YADIS_XRDS_LOCATION + "META tags.");
-                    }
-                }
-            }
+            _log.debug("input:\n" + input);
+            _log.debug("xrdsLocation: " + xrdsLocation);
         }
-        catch (ParserException pe)
-        {
-            throw new YadisException("Error parsing HTML message",
-                    OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, pe);
-        }
-
         return xrdsLocation;
     }
 
