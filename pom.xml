@@ -204,8 +204,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.htmlparser</groupId>
-      <artifactId>htmlparser</artifactId>
+      <groupId>net.sourceforge.nekohtml</groupId>
+      <artifactId>nekohtml</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

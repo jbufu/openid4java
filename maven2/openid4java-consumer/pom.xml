@@ -31,8 +31,8 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.htmlparser</groupId>
-      <artifactId>htmlparser</artifactId>
+      <groupId>net.sourceforge.nekohtml</groupId>
+      <artifactId>nekohtml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.openxri</groupId>
