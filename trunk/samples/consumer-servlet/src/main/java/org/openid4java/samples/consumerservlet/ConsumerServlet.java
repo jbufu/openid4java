@@ -101,7 +101,12 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			processReturn(req, resp);
 		} else {
 			String identifier = req.getParameter("openid_identifier");
-			this.authRequest(identifier, req, resp);
+			if (identifier != null) {
+				this.authRequest(identifier, req, resp);
+			} else {
+				this.getServletContext().getRequestDispatcher("/index.jsp")
+						.forward(req, resp);
+			}
 		}
 	}
 
