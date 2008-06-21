@@ -22,19 +22,24 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
 
     protected static InternetDateFormat _dateFormat = new InternetDateFormat();
 
-    protected int _maxAge;
+    protected int _maxAgeSeconds;
 
     /**
      * @param maxAge maximum token age in seconds
      */
     protected AbstractNonceVerifier(int maxAge)
     {
-        _maxAge = maxAge;
+        _maxAgeSeconds = maxAge;
     }
 
     public int getMaxAge()
     {
-        return _maxAge / 1000;
+        return _maxAgeSeconds;
+    }
+
+    public void setMaxAge(int ageSeconds)
+    {
+        _maxAgeSeconds = ageSeconds;  
     }
 
     /**
@@ -77,6 +82,6 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
     {
         long age = now.getTime() - nonce.getTime();
 
-        return age > _maxAge * 1000;
+        return age > _maxAgeSeconds * 1000;
     }
 }

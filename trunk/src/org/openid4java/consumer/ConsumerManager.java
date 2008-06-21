@@ -509,13 +509,24 @@ public class ConsumerManager
      * Nonces older than the max age will be removed from the store and
      * authentication responses will be considered failures.
      */
-    public long getMaxNonceAge()
+    public int getMaxNonceAge()
     {
         return _nonceVerifier.getMaxAge();
     }
 
     /**
-     * Does discover on an identifier. It delegates the call to its
+     * Sets the max age (in seconds) configured for keeping track of nonces.
+     * <p>
+     * Nonces older than the max age will be removed from the store and
+     * authentication responses will be considered failures.
+     */
+    public void setMaxNonceAge(int ageSeconds)
+    {
+        _nonceVerifier.setMaxAge(ageSeconds);
+    }
+
+    /**
+     * Does discovery on an identifier. It delegates the call to its
      * discovery manager.
      *
      * @return      A List of {@link DiscoveryInformation} objects.

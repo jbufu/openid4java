@@ -29,9 +29,9 @@ public class EhcacheNonceVerifier extends AbstractNonceVerifier
 
     public void setCache(Cache cache)
     {
-        if (cache.getTimeToLiveSeconds() != _maxAge)
+        if (cache.getTimeToLiveSeconds() != _maxAgeSeconds)
         {
-            throw new IllegalArgumentException("Max Age: " + _maxAge + ", same expected for cache, but found: " + cache.getTimeToLiveSeconds());
+            throw new IllegalArgumentException("Max Age: " + _maxAgeSeconds + ", same expected for cache, but found: " + cache.getTimeToLiveSeconds());
         }
 
         if (cache.getTimeToLiveSeconds() != cache.getTimeToIdleSeconds())
