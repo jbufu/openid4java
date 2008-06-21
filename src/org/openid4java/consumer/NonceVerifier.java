@@ -39,7 +39,12 @@ public interface NonceVerifier
     public int seen(String opUrl, String nonce);
 
     /**
-     * Returns the expiration timeout for nonces, in seconds
+     * Returns the expiration timeout for nonces, in seconds.
      */
     public int getMaxAge();
+
+    /**
+     * Sets the expiration timeout for nonces, in seconds.
+     */
+    public void setMaxAge(int ageSeconds);
 }
