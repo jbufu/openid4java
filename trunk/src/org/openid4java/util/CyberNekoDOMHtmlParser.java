@@ -55,15 +55,6 @@ public class CyberNekoDOMHtmlParser implements HtmlParser, YadisParser
         if (DEBUG)
             _log.debug("Parsing HTML data:\n" + htmlData);
 
-        int firstHead = htmlData.indexOf("<head");
-        if (firstHead == -1
-                || (firstHead != -1 && htmlData.indexOf("<head", firstHead + 1) != -1))
-        {
-            throw new DiscoveryException(
-                    "HTML response must have exactly one HEAD element.",
-                    OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
-        }
-
         Document doc = this.parse(htmlData);
         NodeList heads = doc.getElementsByTagName("head");
         if (heads.getLength() != 1)
@@ -253,15 +244,6 @@ public class CyberNekoDOMHtmlParser implements HtmlParser, YadisParser
      */
     public String getHtmlMeta(String input) throws YadisException
     {
-        int firstHead = input.indexOf("<head");
-        if (firstHead == -1
-                || (firstHead != -1 && input.indexOf("<head", firstHead + 1) != -1))
-        {
-            throw new YadisException(
-                    "HTML response must have exactly one HEAD element.",
-                    OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
-        }
-
         String xrdsLocation = null;
         DOMParser parser = new DOMParser();
         try
