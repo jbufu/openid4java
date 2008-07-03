@@ -12,8 +12,11 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.openid4java.OpenIDException;
+import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpCache;
+
+import java.util.List;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -432,6 +435,26 @@ public class YadisResolverTest extends TestCase
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
         }
+    }
+
+    public void testEmptyUri() throws Exception
+    {
+        // empty string is a valid java.net.URI...
+
+        YadisResult yadis = _resolver.discover("http://localhost:" +
+            _servletPort + "/?headers=simplexrds&xrds=malformedxrds6");
+
+        assertTrue("XRDS with an empty URI is valid; Yadis should have succeeded",
+                   yadis.isSuccess());
+
+        // also run through Discovery.extractDiscoveryInformation()
+        ConsumerManager manager = new ConsumerManager();
+
+        List results = manager.discover("http://localhost:" +
+            _servletPort + "/?headers=simplexrds&xrds=malformedxrds6");
+
+        assertEquals("No discovery information should have been returned for an empty URI",
+                     0, results.size());
 
     }
 }
