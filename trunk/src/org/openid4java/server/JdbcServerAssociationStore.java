@@ -42,9 +42,10 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
 
     private static Random _random = new Random(System.currentTimeMillis());
 
-    private String _tableName;
+    private static final int CLEANUP_INTERVAL = 60 * 1000; // 1 min in millis
+    private static long _lastCleanup = 0;
 
-    // todo: removeExpired();
+    private String _tableName;
 
     public JdbcServerAssociationStore()
     {
@@ -68,6 +69,8 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
     public Association generate(String type, int expiryIn)
             throws AssociationException
     {
+        cleanupExpired();
+        
         String sql = "INSERT INTO " + _tableName +
                 " (handle, type, mackey, expdate) VALUES (?,?,?,?)";
 
@@ -196,6 +199,31 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
         catch (Exception e)
         {
             _log.error("Error removing association from table: " + _tableName, e);
+        }
+    }
+
+    private void cleanupExpired()
+    {
+        if (System.currentTimeMillis() - _lastCleanup < CLEANUP_INTERVAL)
+            return;
+
+        try
+    	{
+    		String sql = "DELETE FROM " + _tableName + " WHERE expdate<?";
+
+            JdbcTemplate jdbcTemplate = getJdbcTemplate();
+
+            Date now = new Date ( ) ;
+            int cnt = jdbcTemplate.update(sql, new Object[] { now } );
+
+            _log.debug("Cleaned " + cnt + " expired associations from table: "
+                          + _tableName);
+
+            _lastCleanup = System.currentTimeMillis();
+        }
+    	catch (Exception e)
+        {
+            _log.error("Error removing expired associations from table: " + _tableName, e);
         }
     }
 }
