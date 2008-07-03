@@ -704,7 +704,8 @@ public class ConsumerManager
      * Tries to establish an association with the OpenID Provider.
      * <p>
      * The resulting association information will be kept on storage for later
-     * use at verification stage.
+     * use at verification stage. If there exists an association for the opUrl
+     * that is not near expiration, will not construct new association.
      *
      * @param discovered    DiscoveryInformation obtained during the discovery
      * @return              The number of association attempts performed.
@@ -721,7 +722,9 @@ public class ConsumerManager
 
         // check if there's an already established association
         Association a = _associations.load(opEndpoint);
-        if (a != null && a.getHandle() != null)
+        if ( a != null &&  
+                (Association.FAILED_ASSOC_HANDLE.equals(a.getHandle()) ||
+                a.getExpiry().getTime() - System.currentTimeMillis() > _preExpiryAssocLockInterval * 1000) )
         {
             _log.info("Found an existing association: " + a.getHandle());
             return 0;
@@ -1043,21 +1046,6 @@ public class ConsumerManager
 
         Association assoc =
                 _associations.load(discovered.getOPEndpoint().toString());
-
-        // is the association about to expire?
-        if ( assoc != null &&
-             ! Association.FAILED_ASSOC_HANDLE.equals(assoc.getHandle()) &&
-             assoc.getExpiry().getTime() - System.currentTimeMillis() < _preExpiryAssocLockInterval * 1000)
-        {
-            _log.info("Association " + assoc.getHandle() +
-                " is within " + _preExpiryAssocLockInterval + " seconds of expiration, removing.");
-
-            _associations.remove(
-                discovered.getOPEndpoint().toString(),
-                assoc.getHandle());
-
-            assoc = null;
-        }
 
         if (assoc == null)
         {
