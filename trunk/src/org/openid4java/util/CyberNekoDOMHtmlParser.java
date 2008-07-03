@@ -20,6 +20,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.xni.Augmentations;
+import org.apache.xerces.xni.QName;
+import org.apache.xerces.xni.XMLAttributes;
+import org.cyberneko.html.HTMLTagBalancingListener;
 import org.cyberneko.html.parsers.DOMParser;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryException;
@@ -202,7 +206,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser, YadisParser
      */
     private Document parse(String htmlData) throws DiscoveryException
     {
-        DOMParser parser = new DOMParser();
+    	OpenID4JavaDOMParser parser = new OpenID4JavaDOMParser();
         try
         {
             parser.parse(this.createInputSource(htmlData));
@@ -212,6 +216,14 @@ public class CyberNekoDOMHtmlParser implements HtmlParser, YadisParser
             throw new DiscoveryException("Error parsing HTML message",
                     OpenIDException.DISCOVERY_HTML_PARSE_ERROR, e);
         }
+
+        if (parser.isIgnoredHeadStartElement())
+        {
+            throw new DiscoveryException(
+                    "HTML response must have exactly one HEAD element.",
+                    OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
+        }
+
         return parser.getDocument();
     }
 
@@ -245,7 +257,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser, YadisParser
     public String getHtmlMeta(String input) throws YadisException
     {
         String xrdsLocation = null;
-        DOMParser parser = new DOMParser();
+        OpenID4JavaDOMParser parser = new OpenID4JavaDOMParser();
         try
         {
             parser.parse(this.createInputSource(input));
@@ -254,6 +266,12 @@ public class CyberNekoDOMHtmlParser implements HtmlParser, YadisParser
         {
             throw new YadisException("Error parsing HTML message",
                     OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, e);
+        }
+
+        if (parser.isIgnoredHeadStartElement())
+        {
+        	throw new YadisException("HTML response must have exactly one HEAD element.",
+        			OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
         }
 
         Document doc = parser.getDocument();
@@ -347,5 +365,29 @@ public class CyberNekoDOMHtmlParser implements HtmlParser, YadisParser
             throw new RuntimeException(e);
         }
         return xmlString.toString();
+    }
+}
+
+class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingListener
+{
+
+    private boolean ignoredHeadStartElement;
+
+    public boolean isIgnoredHeadStartElement()
+    {
+        return ignoredHeadStartElement;
+    }
+
+    public void ignoredEndElement(QName element, Augmentations augs)
+    {
+        // Do nothing.
+    }
+
+    public void ignoredStartElement(QName element, XMLAttributes attrs, Augmentations augs)
+    {
+        if (element.rawname.equals("HEAD"))
+        {
+            this.ignoredHeadStartElement = true;
+        }
     }
 }
