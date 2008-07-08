@@ -287,6 +287,21 @@ public class YadisResolverTest extends TestCase
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
         }
+
+        try
+        {
+            YadisResult result = _resolver.discover("http://localhost:" +
+                _servletPort + "/?html=extraheadinbody");
+
+            assertTrue("Discovery should have ignored a html/body/head; " +
+                       " we only care about spurious html/head's", result.isSuccess());
+
+        }
+        catch (YadisException e)
+        {
+            fail("Discovery should have ignored a html/body/head; " +
+                       " we only care about spurious html/head's");
+        }
     }
 
     public void testEmptyHtml()
