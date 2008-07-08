@@ -28,6 +28,8 @@
             description="Removes all build artifacts">
         <delete dir="${build}" />
         <delete dir="${apidoc}"/>
+        <delete dir="target" />
+        <delete file="testLog.txt"/>
         <delete file="${component.name}-${version}.tar.gz"/>
     </target>
 
