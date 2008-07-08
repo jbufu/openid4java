@@ -22,6 +22,7 @@ import org.apache.xerces.xni.XMLAttributes;
 import org.cyberneko.html.HTMLTagBalancingListener;
 import org.cyberneko.html.parsers.DOMParser;
 import org.w3c.dom.Document;
+import org.w3c.dom.html.HTMLHtmlElement;
 import org.xml.sax.InputSource;
 
 /**
@@ -96,7 +97,8 @@ public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingL
 
     public void ignoredStartElement(QName element, XMLAttributes attrs, Augmentations augs)
     {
-        if (element.rawname.equals("HEAD"))
+        if (element.rawname.equals("HEAD")
+                && this.fCurrentNode instanceof HTMLHtmlElement)
         {
             this.ignoredHeadStartElement = true;
         }
