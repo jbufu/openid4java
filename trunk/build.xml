@@ -137,7 +137,7 @@
 
     <target name="maven-antlib" description="--> retreive dependencies with maven">
         <path id="maven.lib.path">
-            <fileset dir="${basedir}/tools/maven-antlib/" includes="*.jar" />
+            <fileset dir="${basedir}/lib/extra/" includes="maven-ant-tasks*.jar" />
         </path>
         <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
             uri="antlib:org.apache.maven.artifact.ant"

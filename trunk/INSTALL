@@ -53,7 +53,7 @@ Installation:
                       - ehcache-1.2.4.jar : EhcacheNonceVerifier
                       - log4j-1.2.8.jar
       lib/extra/    : Extra libraries, not needed for deployments
-                      (JUnit tests, Jetty servlet container, SVN Ant utilities)
+                      (JUnit tests, Jetty servlet container, SVN/Ant utilities)
 
     => Relying Party Discovery:
 
