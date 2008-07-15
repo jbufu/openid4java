@@ -17,6 +17,8 @@
     <module>openid4java-consumer</module>
     <module>openid4java-server</module>
     <module>openid4java-infocard</module>
+    <module>openid4java-consumer-JdbcConsumerAssociationStore</module>
+    <module>openid4java-consumer-JdbcNonceVerifier</module>
     <module>openid4java-server-JdbcServerAssociationStore</module>
 
     <!-- Samples -->
