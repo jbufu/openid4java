@@ -4,15 +4,6 @@
 
 package org.openid4java.discovery;
 
-import org.openxri.xml.*;
-import org.openxri.resolve.exception.*;
-import org.openxri.resolve.Resolver;
-import org.openxri.resolve.TrustType;
-import org.openxri.resolve.ResolverState;
-import org.w3c.dom.Element;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.regex.Pattern;
 import java.util.Vector;
 import java.util.Iterator;
@@ -21,12 +12,22 @@ import java.util.List;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.openid4java.util.HttpCache;
+import org.openid4java.discovery.html.HtmlResolver;
+import org.openid4java.discovery.html.HtmlResult;
 import org.openid4java.discovery.yadis.YadisResolver;
 import org.openid4java.discovery.yadis.YadisResult;
 import org.openid4java.discovery.yadis.YadisException;
-import org.openid4java.discovery.html.HtmlResolver;
-import org.openid4java.discovery.html.HtmlResult;
-import org.openid4java.util.HttpCache;
+import org.openid4java.discovery.xri.XriDiscovery;
+import org.openid4java.discovery.xri.LocalXriResolver;
+
+import org.w3c.dom.Element;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openxri.xml.XRDS;
+import org.openxri.xml.XRD;
+import org.openxri.xml.Service;
+import org.openxri.xml.SEPUri;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -41,51 +42,15 @@ public class Discovery
     private static final Pattern XRI_PATTERN =
             Pattern.compile("^[!=@\\$\\+\\(]", Pattern.CASE_INSENSITIVE);
 
-    final private static String ROOT_DEF_EQ_URI   = "http://equal.xri.net";
-    final private static String ROOT_DEF_AT_URI   = "http://at.xri.net";
-    final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
-
-    private Resolver _xriResolver = new Resolver();
+    private XriDiscovery _xriResolver = new LocalXriResolver();
     private YadisResolver _yadisResolver = new YadisResolver();
     private HtmlResolver _htmlResolver = new HtmlResolver();
 
     public Discovery()
     {
-        if (DEBUG) _log.debug("Initializing Discovery object...");
-
-        // populate the root with whatever trustType the user requested
-        String trustParam = ";trust=none";
-
-        XRD eqRoot = new XRD();
-        Service eqAuthService = new Service();
-        eqAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
-        eqAuthService.addType(Tags.SERVICE_AUTH_RES);
-        eqAuthService.addURI(ROOT_DEF_EQ_URI);
-        eqRoot.setProviderID("xri://=");
-        eqRoot.addService(eqAuthService);
-
-        XRD atRoot = new XRD();
-        Service atAuthService = new Service();
-        atAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
-        atAuthService.addType(Tags.SERVICE_AUTH_RES);
-        atAuthService.addURI(ROOT_DEF_AT_URI);
-        atRoot.setProviderID("xri://@");
-        atRoot.addService(atAuthService);
-
-        XRD bangRoot = new XRD();
-        Service bangAuthService = new Service();
-        bangAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
-        bangAuthService.addType(Tags.SERVICE_AUTH_RES);
-        bangAuthService.addURI(ROOT_DEF_BANG_URI);
-        bangRoot.setProviderID("xri://!");
-        bangRoot.addService(bangAuthService);
-
-        _xriResolver.setAuthority("=", eqRoot);
-        _xriResolver.setAuthority("@", atRoot);
-        _xriResolver.setAuthority("!", bangRoot);
     }
 
-    public void setXriResolver(Resolver xriResolver)
+    public void setXriResolver(XriDiscovery xriResolver)
     {
         _xriResolver = xriResolver;
     }
@@ -158,38 +123,7 @@ public class Discovery
         if (identifier instanceof XriIdentifier)
         {
             _log.info("Starting discovery on XRI identifier: " + identifier);
-
-            XRDS xrds;
-            XriIdentifier xriIdentifier = (XriIdentifier) identifier;
-
-            try
-            {
-                TrustType trustAll = new TrustType(TrustType.TRUST_NONE);
-                xrds = _xriResolver.resolveAuthToXRDS(
-                        xriIdentifier.getXriIdentifier(), trustAll, true, new ResolverState());
-
-                if (DEBUG) _log.debug("Retrieved XRDS:\n" + xrds.dump());
-
-                XRD xrd = xrds.getFinalXRD();
-                CanonicalID canonical = xrd.getCanonicalidAt(0);
-
-                // todo: this is not the right place to put isProviderAuthoritative
-                if (isProviderAuthoritative(xrd.getProviderID(), canonical))
-                {
-                    _log.info("XRI resolution succeeded on " + identifier.toString());
-                    result = extractDiscoveryInformation(xrds,
-                            (XriIdentifier)identifier, _xriResolver);
-                }
-                else
-                    _log.warn("ProviderID is not authoritative for the CanonicalID. " +
-                            "Returning empty discovery result set.");
-            }
-            catch (Exception e)
-            {
-                throw new DiscoveryException(
-                        "Cannot resolve XRI: " + identifier.toString(), e);
-            }
-
+            result = _xriResolver.discover((XriIdentifier) identifier);
         }
         else if (identifier instanceof UrlIdentifier)
         {
@@ -286,9 +220,6 @@ public class Discovery
 
     /**
      * Extracts OpenID discovery endpoints from a XRDS discovery result.
-     * Can be used for both URLs and XRIs, however the
-     * {@link #extractDiscoveryInformation(XRDS, XriIdentifier, Resolver)}
-     * offers additional functionality for XRIs.
      *
      * @param xrds          The discovered XRDS document.
      * @param identifier    The identifier on which discovery was performed.
@@ -296,7 +227,7 @@ public class Discovery
      * @throws DiscoveryException when invalid information is discovered.
      */
     protected static List extractDiscoveryInformation(XRDS xrds,
-                                                      Identifier identifier)
+                                                      Identifier claimedIdentifier)
             throws DiscoveryException
     {
         ArrayList opSelectList = new ArrayList();
@@ -307,9 +238,6 @@ public class Discovery
 
         Service service;
         URL opEndpointUrl;
-        Identifier claimedIdentifier;
-        CanonicalID canonicalId;
-        String providerId;
 
         // iterate through all services
         Iterator iterS = xrd.getPrioritizedServices().iterator();
@@ -353,25 +281,6 @@ public class Discovery
 
                 if (matchType(service, DiscoveryInformation.OPENID2))
                 {
-                    claimedIdentifier = identifier;
-                    canonicalId = xrd.getCanonicalidAt(0);
-                    providerId = xrd.getProviderID();
-
-                    if (identifier instanceof XriIdentifier)
-                    {
-                        if (canonicalId == null)
-                            throw new DiscoveryException(
-                                    "No CanonicalID found after XRI resolution of: " +
-                                            identifier.getIdentifier());
-
-                        if (providerId == null || providerId.length() == 0)
-                            throw new DiscoveryException(
-                                    "No Provider ID found after XRI resolution of: " +
-                                            identifier.getIdentifier());
-
-                        claimedIdentifier = parseIdentifier(canonicalId.getValue());
-                    }
-
                     DiscoveryInformation extracted =
                             new DiscoveryInformation(opEndpointUrl,
                                     claimedIdentifier,
@@ -389,7 +298,7 @@ public class Discovery
                 {
                     DiscoveryInformation extracted =
                             new DiscoveryInformation(opEndpointUrl,
-                                    identifier, getDelegate(service, true),
+                                    claimedIdentifier, getDelegate(service, true),
                                     DiscoveryInformation.OPENID11);
 
                     if (DEBUG) _log.debug("OpenID1-signon XRDS discovery result:\n"
@@ -408,173 +317,6 @@ public class Discovery
 
         return opSelectList;
     }
-
-    // --- XRI discovery patch from William Tan ---
-
-    /**
-     * Extracts OpenID discovery endpoints from a XRDS discovery result
-     * for XRI identifiers.
-     *
-     * @param xrds          The discovered XRDS document.
-     * @param identifier    The identifier on which discovery was performed.
-     * @param xriResolver   The XRI resolver to use for extraction of OpenID
-     *                      service endpoints.
-     * @return              A list of DiscoveryInformation endpoints.
-     * @throws DiscoveryException when invalid information is discovered.
-     */
-    protected static List extractDiscoveryInformation(XRDS xrds,
-                                                      XriIdentifier identifier,
-                                                      Resolver xriResolver)
-            throws DiscoveryException
-    {
-        ArrayList endpoints = new ArrayList();
-
-        XRD xrd = xrds.getFinalXRD();
-
-        // try OP Identifier
-        extractDiscoveryInformationOpenID(
-            xriResolver,
-            endpoints,
-            xrd,
-            identifier,
-            DiscoveryInformation.OPENID2_OP,
-            false // no CID
-        );
-
-        // OpenID 2 signon
-        extractDiscoveryInformationOpenID(
-            xriResolver,
-            endpoints,
-            xrd,
-            identifier,
-            DiscoveryInformation.OPENID2, // sepType
-            true // want CID
-        );
-
-        // OpenID 1.x
-        extractDiscoveryInformationOpenID(
-            xriResolver,
-            endpoints,
-            xrd,
-            identifier,
-            DiscoveryInformation.OPENID11,
-            true // wantCID
-        );
-
-        extractDiscoveryInformationOpenID(
-            xriResolver,
-            endpoints,
-            xrd,
-            identifier,
-            DiscoveryInformation.OPENID10,
-            true // wantCID
-        );
-
-        if (endpoints.size() == 0)
-            _log.info("No OpenID service types found in the XRDS.");
-
-        return endpoints;
-    }
-
-    public static boolean extractDiscoveryInformationOpenID(
-            Resolver xriResolver, ArrayList out, XRD baseXRD,
-            XriIdentifier identifier, String srvType, boolean wantCID)
-    {
-        try
-        {
-            XRDS tmpXRDS = xriResolver.selectServiceFromXRD(
-                baseXRD,
-                identifier.getXriIdentifier(),
-                new TrustType(), 
-                srvType,
-                null, // sepMediaType
-                true, // followRefs
-                new ResolverState()
-            );
-
-            Identifier claimedIdentifier = null;
-            URL opEndpointUrl;
-            CanonicalID canonID;
-
-            XRD tmpXRD = tmpXRDS.getFinalXRD();
-
-            if (wantCID)
-            {
-                canonID = tmpXRD.getCanonicalidAt(0);
-
-                if (canonID == null) {
-                    _log.error("No CanonicalID found for " + srvType +
-                            " after XRI resolution of: "
-                            + identifier.getIdentifier());
-                    return false;
-                }
-
-                // todo: canonicalID verification?
-                claimedIdentifier = parseIdentifier(canonID.getValue());
-                _log.info("Using canonicalID as claimedID: " +
-                          claimedIdentifier.getIdentifier() +
-                          " for " + srvType);
-            }
-
-            Iterator it = tmpXRD.getSelectedServices().getList().iterator();
-            while (it.hasNext())
-            {
-                Service srv = (Service)it.next();
-                Iterator itURI = srv.getPrioritizedURIs().iterator();
-                SEPUri sepURI;
-                while (itURI.hasNext())
-                {
-                    sepURI = (SEPUri) itURI.next();
-                    try
-                    {
-                        String urlString = xriResolver.constructURI(
-                                sepURI.getURI(),
-                                sepURI.getAppend(),
-                                identifier.getXriIdentifier());
-
-                        opEndpointUrl = new URL(urlString);
-
-                        DiscoveryInformation extracted =
-                                new DiscoveryInformation(
-                                        opEndpointUrl,
-                                        wantCID ? claimedIdentifier : null,
-                                        null,
-                                        srvType);
-
-                        _log.info("Added " + srvType +
-                                  " endpoint: " + opEndpointUrl);
-
-                        out.add(extracted);
-                    }
-                    catch (MalformedURLException mue)
-                    {
-                        _log.warn("Ignoring malformed OP endpoint URL in XRDS file: "
-                                  + sepURI.toString(), mue);
-                    }
-                    catch (IllegalArgumentException ee)
-                    {
-                        _log.warn("Ignoring invalid OP endpoint URL in XRDS file: "
-                                  + sepURI.toString(), ee);
-                    }
-
-                }
-            }
-
-            return true;
-        }
-        catch (PartialResolutionException e)
-        {
-            _log.error("XRI resolution failed for " + srvType, e);
-        }
-        catch (DiscoveryException de)
-        {
-            _log.error("XRDS discovery failed for " + srvType, de);
-        }
-
-        return false;
-    }
-
-    // --- end XRI discovery patch from William Tan ---
 
     public static String getDelegate(Service service, boolean compatibility)
     {
@@ -613,40 +355,12 @@ public class Discovery
      // deprecated in open-xri, copied here to avoid warnings
     public static boolean matchType(Service service, String sVal)
     {
-        for (int i = 0; i < service.getNumTypes(); i++) {
-            SEPType type = service.getTypeAt(i);
-            if(type.match(sVal)) return true;
+        for (int i = 0; i < service.getNumTypes(); i++)
+        {
+            if (service.getTypeAt(i).match(sVal))
+                return true;
         }
         return false;
-
-    }
-
-    private boolean isProviderAuthoritative(String providerId,
-                                                   CanonicalID canonicalId)
-    {
-        // todo: also handle xri delegation / community names
-        // todo: isProviderAuthoritative does not work on multi-level i-names
-        if (canonicalId == null || canonicalId.getValue() == null)
-            return false;
-
-        String auth = canonicalId.getValue().substring(0,1);
-        XRD rootAuth = _xriResolver.getAuthority(auth);
-
-        if ( ! rootAuth.getProviderID().equals(providerId) )
-                return false;
-
-        int lastbang = canonicalId.getValue().lastIndexOf("!");
-        String parent = lastbang > -1 ?
-                canonicalId.getValue().substring(0, lastbang) :
-                canonicalId.getValue();
-
-        String parentNoPrefix = parent.startsWith("xri://") ?
-                parent.substring(6) : parent;
-
-        String providerIDNoPrefix = providerId.startsWith("xri://") ?
-                providerId.substring(6) : providerId;
-
-        return parentNoPrefix.equals(providerIDNoPrefix);
     }
 
     /**

@@ -7,8 +7,8 @@ package org.openid4java.discovery.yadis;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import org.openxri.XRI;
 import org.openid4java.OpenIDException;
+import org.openid4java.discovery.XriIdentifier;
 
 /**
  * Wrapper class for various identifiers that are resolvable to URLs
@@ -104,7 +104,7 @@ public class YadisUrl
      *
      * @param xriId             The XRI identifier
      */
-    public YadisUrl(XRI xriId) throws YadisException
+    public YadisUrl(XriIdentifier xriId) throws YadisException
     {
         this(urlFromString(xriId.toURINormalForm()));
     }

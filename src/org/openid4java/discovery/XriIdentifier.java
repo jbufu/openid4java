@@ -30,8 +30,8 @@ public class XriIdentifier implements Identifier
         final XriIdentifier that = (XriIdentifier) o;
 
         // workaround, XRI should properly implement equals
-        String thisNormalForm = this._xriIdentifier.toIRINormalForm();
-        String thatNormalForm = that._xriIdentifier.toIRINormalForm();
+        String thisNormalForm = this.toIRINormalForm();
+        String thatNormalForm = that.toIRINormalForm();
 
         return thisNormalForm.equals(thatNormalForm);
     }
@@ -46,8 +46,18 @@ public class XriIdentifier implements Identifier
         return _xriIdentifier.toString();
     }
 
-    public XRI getXriIdentifier()
+    public String toString()
     {
-        return _xriIdentifier;
+        return _xriIdentifier.toString();
+    }
+
+    public String toIRINormalForm()
+    {
+        return _xriIdentifier.toIRINormalForm();
+    }
+
+    public String toURINormalForm()
+    {
+        return _xriIdentifier.toURINormalForm();
     }
 }
