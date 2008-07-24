@@ -53,6 +53,10 @@ public class OpenIDException extends Exception
     public static final int SREG_ERROR = 0x0C20;
     public static final int PAPE_ERROR = 0x0C30;
 
+    public static final int CONFIG_ERROR = 0x0D00;
+    public static final int IDP_INVALID_ERROR = 0x0D10;
+    public static final int ATTRIBUTE_PROVIDER_ERROR = 0x0D20;
+
     public OpenIDException(String message)
     {
         this(message, OPENID_ERROR);
