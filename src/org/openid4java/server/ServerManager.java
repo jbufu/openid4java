@@ -11,6 +11,8 @@ import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.Association;
 import org.openid4java.OpenIDException;
 
+import org.openid4java.util.AttributeProviderDriver;
+
 import java.net.URL;
 import java.net.MalformedURLException;
 
@@ -758,6 +760,8 @@ public class ServerManager
 
                 _log.info("Returning positive assertion for " +
                           response.getReturnTo());
+
+                AttributeProviderDriver.addAttributesToResponse(response, id);
 
                 return response;
             }

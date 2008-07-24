@@ -21,6 +21,9 @@ import org.openid4java.discovery.yadis.YadisException;
 import org.openid4java.discovery.xri.XriDiscovery;
 import org.openid4java.discovery.xri.LocalXriResolver;
 
+import org.openid4java.util.IdPValidationDriver;
+import org.openid4java.util.IdPInvalidException;
+
 import org.w3c.dom.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -171,6 +174,18 @@ public class Discovery
         }
 
         _log.info("Discovered " + result.size() + " OpenID endpoints.");
+
+        try
+        {
+            result = IdPValidationDriver.performIdPValidation(identifier, result);
+        }
+        catch(IdPInvalidException iie)
+        {
+            throw new DiscoveryException(
+                "Discovery failed to return results: " + iie);
+        }
+
+        _log.info("Discovered " + result.size() + " validated OpenID endpoints.");
 
         return result;
     }

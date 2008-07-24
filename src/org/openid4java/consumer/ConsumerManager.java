@@ -630,6 +630,7 @@ public class ConsumerManager
             responseCode = _httpClient.executeMethod(post);
 
             String postResponse = post.getResponseBodyAsString();
+            postResponse = postResponse.trim();
             response.copyOf(ParameterList.createFromKeyValueForm(postResponse));
 
             if (DEBUG) _log.debug("Retrived response:\n" + postResponse);
@@ -1793,7 +1794,7 @@ public class ConsumerManager
             {
                 VerifyResponse vrfyResp =
                         VerifyResponse.createVerifyResponse(responseParams);
-                
+
                 vrfyResp.validate();
 
                 if (vrfyResp.isSignatureVerified())
