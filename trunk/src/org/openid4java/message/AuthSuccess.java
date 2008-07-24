@@ -406,13 +406,6 @@ public class AuthSuccess extends Message
 
         boolean compatibility = ! isVersion2();
 
-        if ( compatibility && hasParameter("openid.ns") )
-        {
-            throw new MessageException(
-                "openid.ns should not be present in OpenID1 auth responses",
-                OpenIDException.AUTH_ERROR);
-        }
-
         if ( ! compatibility && ! hasParameter("openid.op_endpoint"))
         {
             throw new MessageException(
