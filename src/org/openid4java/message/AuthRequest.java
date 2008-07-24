@@ -230,14 +230,6 @@ public class AuthRequest extends Message
 
         boolean compatibility = ! isVersion2();
 
-        if ( compatibility && hasParameter("openid.ns") )
-        {
-            throw new MessageException(
-                "Invalid value for openid.ns field: "
-                + getParameterValue("openid.ns"),
-                OpenIDException.AUTH_ERROR);
-        }
-
         if ( compatibility && hasParameter("openid.identity")  &&
                 SELECT_ID.equals(getParameterValue("openid.identity")))
         {
