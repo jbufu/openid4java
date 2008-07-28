@@ -31,7 +31,27 @@ public class AttributeProviderDriver
     private static Log _log = LogFactory.getLog(AttributeProviderDriver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
-    public static void addAttributesToResponse(AuthSuccess response, String identifier)
+    private Vector attrProviders = null;
+
+    public Vector getAttributeProviders()
+    {
+        return this.attrProviders;
+    }
+
+    public void setAttributeProviders(Vector attrProviders)
+    {
+        this.attrProviders = attrProviders;
+    }
+
+    /*
+      add all retrievable attributes for all configured attribute
+      providers.  if the setAttributeProviders method was used to
+      initialize a list of attrProviders before this method is called,
+      the configurations are still checked each time this method is
+      called and any valid attrProviders found are appended to the
+      initial list and run in addition.
+     */
+    public void addAttributesToResponse(AuthSuccess response, String identifier)
     {
         // initialize any Attribute Providers, if any are configured
         String attrProviderConfigFile = System.getenv("ATTR_PROVIDER_CONFIG_FILE");
@@ -40,8 +60,13 @@ public class AttributeProviderDriver
             int i = 0;
             XmlConfigReader configReader = new XmlConfigReader();
             Vector attrProviderConfigs = configReader.getAttrProviders(attrProviderConfigFile);
-            Vector attrProviders = new Vector();
+            Vector curAttrProviders = new Vector();
             AttributeProvider attrProvider = null;
+
+            if (this.attrProviders != null)
+            {
+                curAttrProviders.add(this.attrProviders);
+            }
 
             for(i = 0; i < attrProviderConfigs.size(); i++)
             {
@@ -55,7 +80,7 @@ public class AttributeProviderDriver
                     attrProvider = (AttributeProvider)
                         Class.forName(className).newInstance();
                     attrProvider.initialize(parameters);
-                    attrProviders.add(attrProvider);
+                    curAttrProviders.add(attrProvider);
                 }
                 catch(Exception e)
                 {   
@@ -63,14 +88,14 @@ public class AttributeProviderDriver
                 }
             }
 
-            _log.info(attrProviders.size() + " Attribute Providers initialized!");
+            _log.info(curAttrProviders.size() + " Attribute Providers initialized!");
 
             // retrieve the attributes from the configured attribute providers
-            if (attrProviders.size() > 0)
+            if (curAttrProviders.size() > 0)
             {
                 FetchResponse fetchResp = FetchResponse.createFetchResponse();
                 NameValuePair[] attributes = null;
-                Iterator attrProviderIter = attrProviders.iterator();
+                Iterator attrProviderIter = curAttrProviders.iterator();
                 while(attrProviderIter.hasNext())
                 {
                     attrProvider = (AttributeProvider)attrProviderIter.next();
