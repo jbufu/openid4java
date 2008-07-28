@@ -62,10 +62,24 @@ public class AttributeProviderDriver
             Vector attrProviderConfigs = configReader.getAttrProviders(attrProviderConfigFile);
             Vector curAttrProviders = new Vector();
             AttributeProvider attrProvider = null;
+            Iterator attrProviderIter = null;
 
             if (this.attrProviders != null)
             {
-                curAttrProviders.add(this.attrProviders);
+                attrProviderIter = this.attrProviders.iterator();
+                while(attrProviderIter.hasNext())
+                {
+                    try
+                    {
+                        attrProvider = (AttributeProvider)attrProviderIter.next();
+                        curAttrProviders.add(attrProvider);
+                    }
+                    catch(Exception e)
+                    {
+                        _log.error(
+                            "Failed to add initialized attribute providers: " + e);
+                    }
+                }
             }
 
             for(i = 0; i < attrProviderConfigs.size(); i++)
@@ -88,6 +102,7 @@ public class AttributeProviderDriver
                 }
             }
 
+            System.out.println(curAttrProviders.size() + " Attribute Providers initialized!");
             _log.info(curAttrProviders.size() + " Attribute Providers initialized!");
 
             // retrieve the attributes from the configured attribute providers
@@ -95,7 +110,7 @@ public class AttributeProviderDriver
             {
                 FetchResponse fetchResp = FetchResponse.createFetchResponse();
                 NameValuePair[] attributes = null;
-                Iterator attrProviderIter = curAttrProviders.iterator();
+                attrProviderIter = curAttrProviders.iterator();
                 while(attrProviderIter.hasNext())
                 {
                     attrProvider = (AttributeProvider)attrProviderIter.next();
