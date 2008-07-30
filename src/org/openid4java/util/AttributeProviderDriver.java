@@ -40,6 +40,7 @@ public class AttributeProviderDriver
 
     public void setAttributeProviders(Vector attrProviders)
     {
+        _log.debug("setAttributeProviders called with " + attrProviders);
         this.attrProviders = attrProviders;
     }
 
@@ -53,101 +54,108 @@ public class AttributeProviderDriver
      */
     public void addAttributesToResponse(AuthSuccess response, String identifier)
     {
-        // initialize any Attribute Providers, if any are configured
+        _log.debug("addAttributesToResponse called on id: " + identifier);
+
+        int i = 0;
+        XmlConfigReader configReader = new XmlConfigReader();
+        Vector attrProviderConfigs = null;
+        Vector curAttrProviders = new Vector();
+        AttributeProvider attrProvider = null;
+        Iterator attrProviderIter = null;
+
         String attrProviderConfigFile = System.getenv("ATTR_PROVIDER_CONFIG_FILE");
         if (attrProviderConfigFile != null)
         {
-            int i = 0;
-            XmlConfigReader configReader = new XmlConfigReader();
-            Vector attrProviderConfigs = configReader.getAttrProviders(attrProviderConfigFile);
-            Vector curAttrProviders = new Vector();
-            AttributeProvider attrProvider = null;
-            Iterator attrProviderIter = null;
+            attrProviderConfigs = configReader.getAttrProviders(
+                attrProviderConfigFile);
 
-            if (this.attrProviders != null)
+            if (attrProviderConfigs != null)
             {
-                attrProviderIter = this.attrProviders.iterator();
-                while(attrProviderIter.hasNext())
+                for(i = 0; i < attrProviderConfigs.size(); i++)
                 {
+                    AttributeProviderConfig attrProviderConfig =
+                        (AttributeProviderConfig)attrProviderConfigs.get(i);
+                    String className = attrProviderConfig.getClassName();
+                    NameValuePair[] parameters = attrProviderConfig.getParameters();
+
                     try
-                    {
-                        attrProvider = (AttributeProvider)attrProviderIter.next();
+                    {   
+                        attrProvider = (AttributeProvider)
+                            Class.forName(className).newInstance();
+                        attrProvider.initialize(parameters);
                         curAttrProviders.add(attrProvider);
                     }
                     catch(Exception e)
-                    {
-                        _log.error(
-                            "Failed to add initialized attribute providers: " + e);
+                    {   
+                        _log.error("Failed to initialize Attribute Provider: " + e);
                     }
                 }
             }
+        }
 
-            for(i = 0; i < attrProviderConfigs.size(); i++)
+        if (this.attrProviders != null)
+        {
+            attrProviderIter = this.attrProviders.iterator();
+            while(attrProviderIter.hasNext())
             {
-                AttributeProviderConfig attrProviderConfig =
-                    (AttributeProviderConfig)attrProviderConfigs.get(i);
-                String className = attrProviderConfig.getClassName();
-                NameValuePair[] parameters = attrProviderConfig.getParameters();
-
                 try
-                {   
-                    attrProvider = (AttributeProvider)
-                        Class.forName(className).newInstance();
-                    attrProvider.initialize(parameters);
+                {
+                    attrProvider = (AttributeProvider)attrProviderIter.next();
                     curAttrProviders.add(attrProvider);
                 }
                 catch(Exception e)
-                {   
-                    _log.error("Failed to initialize Attribute Provider: " + e);
+                {
+                    _log.error(
+                        "Failed to add initialized attribute providers: " + e);
                 }
             }
+        }
 
-            System.out.println(curAttrProviders.size() + " Attribute Providers initialized!");
-            _log.info(curAttrProviders.size() + " Attribute Providers initialized!");
+        System.out.println(curAttrProviders.size() + " Attribute Providers initialized!");
+        _log.info(curAttrProviders.size() + " Attribute Providers initialized!");
 
-            // retrieve the attributes from the configured attribute providers
-            if (curAttrProviders.size() > 0)
+        // retrieve the attributes from the configured attribute providers
+        if (curAttrProviders.size() > 0)
+        {
+            FetchResponse fetchResp = FetchResponse.createFetchResponse();
+            NameValuePair[] attributes = null;
+            attrProviderIter = curAttrProviders.iterator();
+            while(attrProviderIter.hasNext())
             {
-                FetchResponse fetchResp = FetchResponse.createFetchResponse();
-                NameValuePair[] attributes = null;
-                attrProviderIter = curAttrProviders.iterator();
-                while(attrProviderIter.hasNext())
-                {
-                    attrProvider = (AttributeProvider)attrProviderIter.next();
-                    try
-                    {
-                        attributes = attrProvider.getAttributes(identifier);
-
-                        // add each attribute to the auth response
-                        for(i = 0; i < attributes.length; i++)
-                        {
-                            fetchResp.addAttribute(
-                                attributes[i].getName(),
-                                "http://schema.mcs.anl.gov/esg/attribute",
-                                attributes[i].getValue());
-
-                            if (DEBUG) _log.debug(
-                                "Added attribute " + attributes[i].getName() +
-                                " = " + attributes[i].getValue());
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        _log.error("Failed to retrieve attributes from " +
-                                   "configured provider: " + e);
-                    }
-                }
-
+                attrProvider = (AttributeProvider)attrProviderIter.next();
                 try
                 {
-                    // finally, add the fetch response to the auth response
-                    ((AuthSuccess)response).addExtension(fetchResp);
+                    attributes = attrProvider.getAttributes(identifier);
+
+                    // add each attribute to the auth response
+                    for(i = 0; i < attributes.length; i++)
+                    {
+                        fetchResp.addAttribute(
+                            attributes[i].getName(),
+                            "http://schema.mcs.anl.gov/esg/attribute",
+                            attributes[i].getValue());
+
+                        if (DEBUG) _log.debug(
+                            "Added attribute " + attributes[i].getName() +
+                            " = " + attributes[i].getValue());
+                    }
                 }
                 catch(Exception e)
                 {
-                    _log.error("Failed to add attributes in " +
-                               "extension to response: " + e);
+                    _log.error("Failed to retrieve attributes from " +
+                               "configured provider: " + e);
                 }
+            }
+
+            try
+            {
+                // finally, add the fetch response to the auth response
+                ((AuthSuccess)response).addExtension(fetchResp);
+            }
+            catch(Exception e)
+            {
+                _log.error("Failed to add attributes in " +
+                           "extension to response: " + e);
             }
         }
     }
