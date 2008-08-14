@@ -108,7 +108,7 @@ public class ServerManager
     /**
      * AttributeProviderDriver instance used for managing all attribute providers.
      */
-    private AttributeProviderDriver attrProviderDriver;
+    private AttributeProviderDriver _attrProviderDriver;
 
     /**
      * Gets the store implementation used for keeping track of the generated
@@ -371,7 +371,7 @@ public class ServerManager
         _realmVerifier.setEnforceRpId(false);
 
         // initialize default Attribute Provider Driver instance
-        attrProviderDriver = new AttributeProviderDriver();
+        _attrProviderDriver = new AttributeProviderDriver();
     }
 
     /**
@@ -380,7 +380,7 @@ public class ServerManager
      */
     public Vector getAttributeProviders()
     {
-        return this.attrProviderDriver.getAttributeProviders();
+        return this._attrProviderDriver.getAttributeProviders();
     }
 
     /**
@@ -391,7 +391,7 @@ public class ServerManager
      */
     public void setAttributeProviders(Vector attrProviders)
     {
-        this.attrProviderDriver.setAttributeProviders(attrProviders);
+        this._attrProviderDriver.setAttributeProviders(attrProviders);
     }
 
 
@@ -789,7 +789,7 @@ public class ServerManager
                 _log.info("Returning positive assertion for " +
                           response.getReturnTo());
 
-                this.attrProviderDriver.addAttributesToResponse(response, id);
+                this._attrProviderDriver.addAttributesToResponse(response, id);
 
                 return response;
             }
