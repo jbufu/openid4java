@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import org.openid4java.util.IdPValidationDriver;
+import org.openid4java.util.IdPInvalidException;
+
 /**
  * Manages OpenID communications with an OpenID Provider (Server).
  * <p>
@@ -151,6 +154,11 @@ public class ConsumerManager
      */
     private int _maxRedirects = 0;
 
+    /**
+     * IdpValidatorDriver instance used for managing all IdPValidators.
+     */
+    private IdPValidationDriver _idPValidationDriver;
+
 
     /**
      * Instantiates a ConsumerManager with default settings.
@@ -161,6 +169,8 @@ public class ConsumerManager
         _httpClient = HttpClientFactory.getInstance(
                 _maxRedirects, Boolean.FALSE, _socketTimeout, _connectTimeout,
                 CookiePolicy.IGNORE_COOKIES);
+
+        _idPValidationDriver = new IdPValidationDriver();
 
         _realmVerifier = new RealmVerifier();
 
@@ -526,6 +536,25 @@ public class ConsumerManager
     }
 
     /**
+     * Returns the ConsumerManager's list of IdPValidators that's been
+     * previously set using setIdPValidators.
+     */
+    public Vector getIdPValidators()
+    {
+        return this._idPValidationDriver.getIdPValidators();
+    }
+
+    /**
+     * Sets a persistent list of IdPValidators in this ConsumerManager
+     * instance that will be used to perform IdPValidation in addition
+     * to any validators that are found through dynamic configuration.
+     */
+    public void setIdPValidators(Vector IdPValidators)
+    {
+        this._idPValidationDriver.setIdPValidators(IdPValidators);
+    }
+
+    /**
      * Does discovery on an identifier. It delegates the call to its
      * discovery manager.
      *
@@ -537,7 +566,22 @@ public class ConsumerManager
      */
     public List discover(String identifier) throws DiscoveryException
     {
-        return _discovery.discover(identifier);
+        List discoveries = _discovery.discover(identifier);
+        try
+        {
+            Identifier ident = _discovery.parseIdentifier(identifier);
+            discoveries = this._idPValidationDriver.performIdPValidation(
+                ident, discoveries);
+        }
+        catch(IdPInvalidException iie)
+        {
+            throw new DiscoveryException(
+                "Discovery failed to return results: " + iie);
+        }
+
+        _log.info("Discovered " + discoveries.size() + " validated OpenID endpoints.");
+
+        return discoveries;
     }
 
     /**

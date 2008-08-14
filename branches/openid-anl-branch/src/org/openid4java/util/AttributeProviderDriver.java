@@ -57,11 +57,11 @@ public class AttributeProviderDriver
         _log.debug("addAttributesToResponse called on id: " + identifier);
 
         int i = 0;
-        XmlConfigReader configReader = new XmlConfigReader();
-        Vector attrProviderConfigs = null;
         Vector curAttrProviders = new Vector();
+        Vector attrProviderConfigs = null;
         AttributeProvider attrProvider = null;
         Iterator attrProviderIter = null;
+        XmlConfigReader configReader = new XmlConfigReader();
 
         String attrProviderConfigFile = System.getenv("ATTR_PROVIDER_CONFIG_FILE");
         if (attrProviderConfigFile != null)
