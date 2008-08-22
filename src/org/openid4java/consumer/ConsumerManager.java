@@ -12,6 +12,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.*;
+import org.openid4java.message.ax.*;
+
 import org.openid4java.association.Association;
 import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.AssociationException;
@@ -157,7 +159,14 @@ public class ConsumerManager
     /**
      * IdpValidatorDriver instance used for managing all IdPValidators.
      */
-    private IdPValidationDriver _idPValidationDriver;
+    private IdPValidationDriver _idPValidationDriver = null;
+
+    /**
+     * A list of attributes (either required or optional) set on this
+     * consumer manager. The attributes are sent in a FetchRequest on
+     * auth.  Default none.
+     */
+    private Vector _attributeList = null;
 
 
     /**
@@ -552,6 +561,46 @@ public class ConsumerManager
     public void setIdPValidators(Vector IdPValidators)
     {
         this._idPValidationDriver.setIdPValidators(IdPValidators);
+    }
+
+    /**
+     * Returns the ConsumerManager's list of attributes set using
+     * setFetchAttributes, or null otherwise.
+     */
+    public Vector getFetchAttributes()
+    {
+        return this._attributeList;
+    }
+
+    /**
+     * Sets a list of Attribute types for this ConsumerManager
+     * instance to add as a FetchRequest when sending the auth message
+     * to the IP.  If this method has been called, the
+     * getValidatedFetchResponseAttributes() method can be called
+     * after receiving the response to enforce that the required
+     * attributes were retrieved.
+     */
+    public void setFetchAttributes(Vector attributes)
+    {
+        this._attributeList = attributes;
+    }
+
+    /**
+     * Adds a single Attribute to this ConsumerManager instance's
+     * internal list to add as a FetchRequest when sending the auth
+     * message to the IP.  If this method has been called, the
+     * getValidatedFetchResponseAttributes() method can be called
+     * after receiving the response to enforce that the required
+     * attributes were retrieved.
+     */
+    public void addFetchAttribute(String alias, String type, boolean required, int count)
+    {        
+        if (this._attributeList == null)
+        {
+            this._attributeList = new Vector();
+        }
+        this._attributeList.add(
+            (Object)new Attribute(alias, type, required, count));
     }
 
     /**
@@ -1134,6 +1183,22 @@ public class ConsumerManager
         // ignore the immediate flag for OP-directed identifier selection
         if (! AuthRequest.SELECT_ID.equals(claimedId))
             authReq.setImmediate(_immediateAuth);
+
+        // add FetchRequest extension if attributes are set
+        if ((this._attributeList != null) && (this._attributeList.size() > 0))
+        {
+            FetchRequest fetch = FetchRequest.createFetchRequest();
+            for(int i = 0; i < this._attributeList.size(); i++)
+            {
+                Attribute attr = (Attribute)this._attributeList.get(i);
+                fetch.addAttribute(attr.getAlias(), attr.getType(), attr.getRequired());
+                if (attr.getCount() != 0)
+                {
+                    fetch.setCount(attr.getAlias(), attr.getCount());
+                }
+            }
+            authReq.addExtension(fetch);
+        }
 
         return authReq;
     }
@@ -1882,5 +1947,107 @@ public class ConsumerManager
                        + " reason: " + result.getStatusMsg());
 
         return result;
+    }
+
+    public Attribute[] getValidatedFetchResponseAttributes(AuthSuccess authSuccess)
+        throws ConsumerException, IllegalArgumentException, MessageException
+    {
+        Attribute[] attrArray = null;
+
+        if ((this._attributeList != null) && (this._attributeList.size() > 0))
+        {
+            if ((authSuccess != null) &&
+                (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)))
+            {
+                MessageExtension ext = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+                if (ext instanceof FetchResponse)
+                {
+                    int i = 0;
+                    boolean isRequired = false;
+
+                    FetchResponse fetchResp = (FetchResponse)ext;
+
+                    List values = null;
+
+                    Map attrs = fetchResp.getAttributes();
+                    Map attrTypes = fetchResp.getAttributeTypes();
+
+                    Iterator attrIter = attrs.entrySet().iterator();
+                    Iterator attrTypeIter = attrTypes.entrySet().iterator();
+
+                    attrArray = new Attribute[attrs.size()];
+
+                    // first build an attribute array of all response attributes
+                    while(attrIter.hasNext())
+                    {
+                        Map.Entry pairs = (Map.Entry)attrIter.next();
+                        Map.Entry typePairs = (Map.Entry)attrTypeIter.next();
+
+                        if (DEBUG) _log.debug(
+                            "Validating Attribute: " + (String)pairs.getKey() +
+                            " = " + (List)pairs.getValue());
+
+                        isRequired = false;
+                        for(int j = 0; j < this._attributeList.size(); j++)
+                        {
+                            Attribute tmp = (Attribute)this._attributeList.get(j);
+                            if (tmp.getAlias().equals((String)pairs.getKey()))
+                            {
+                                isRequired = tmp.getRequired();
+                                break;
+                            }
+                        }
+
+                        attrArray[i++] = new Attribute(
+                            (String)pairs.getKey(), (String)typePairs.getValue(),
+                            (List)pairs.getValue(), isRequired,
+                            fetchResp.getCount((String)pairs.getKey()));
+                    }
+
+                    // then validate that we got all of the required attributes
+                    for(i = 0; i < this._attributeList.size(); i++)
+                    {
+                        Attribute attr = (Attribute)this._attributeList.get(i);
+
+                        if (attr.getRequired() == true)
+                        {
+                            values = fetchResp.getAttributeValues(attr.getAlias());
+                            if (values == null)
+                            {
+                                throw new ConsumerException(
+                                    "Failed to validate Attributes.  Missing \"" +
+                                    attr.getAlias() + "\"");
+                            }
+                            else if (values.size() != attr.getCount())
+                            {
+                                throw new ConsumerException(
+                                    "Failed to validate Attribute \"" + attr.getAlias() +
+                                    "\" Required " + attr.getCount() + " and received " +
+                                    values.size());
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new IllegalArgumentException(
+                        "authSuccess message is invalid " +
+                        "and does not contain a FetchResponse.");
+                }
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "authSuccess is invalid and does not " +
+                    "contain a message extension.");
+            }
+        }
+        else
+        {
+            throw new ConsumerException(
+                "Cannot validate Attributes before " +
+                "setFetchAttributes has been called.");
+        }
+        return attrArray;
     }
 }

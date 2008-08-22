@@ -6,6 +6,8 @@ package org.openid4java.util;
 
 import org.openid4java.util.NameValuePair;
 
+import org.openid4java.message.ax.Attribute;
+
 /**
  * @author Neill Miller, Rachana Ananthakrishnan
  */
@@ -16,6 +18,6 @@ public interface AttributeProvider
     public void initialize(NameValuePair[] parameters)
         throws ConfigException;
 
-    public NameValuePair[] getAttributes(String idpIdentity)
+    public Attribute[] getAttributes(String idpIdentity)
         throws AttributeProviderException, ConfigException;
 }
