@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import java.util.List;
 import java.util.Vector;
 import java.util.Iterator;
-import java.util.ArrayList;
 
 import org.openid4java.util.XmlConfigReader;
 import org.openid4java.util.NameValuePair;
@@ -19,6 +18,7 @@ import org.openid4java.util.IdPValidatorConfig;
 
 import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.ax.FetchResponse;
+import org.openid4java.message.ax.Attribute;
 
 import org.openid4java.discovery.Identifier;
 import org.openid4java.discovery.DiscoveryInformation;
@@ -111,14 +111,13 @@ public class AttributeProviderDriver
             }
         }
 
-        System.out.println(curAttrProviders.size() + " Attribute Providers initialized!");
         _log.info(curAttrProviders.size() + " Attribute Providers initialized!");
 
         // retrieve the attributes from the configured attribute providers
         if (curAttrProviders.size() > 0)
         {
             FetchResponse fetchResp = FetchResponse.createFetchResponse();
-            NameValuePair[] attributes = null;
+            Attribute[] attributes = null;
             attrProviderIter = curAttrProviders.iterator();
             while(attrProviderIter.hasNext())
             {
@@ -130,14 +129,28 @@ public class AttributeProviderDriver
                     // add each attribute to the auth response
                     for(i = 0; i < attributes.length; i++)
                     {
-                        fetchResp.addAttribute(
-                            attributes[i].getName(),
-                            "http://schema.mcs.anl.gov/esg/attribute",
-                            attributes[i].getValue());
+                        List tmp = attributes[i].getValues();
+                        if (tmp != null)
+                        {
+                            for(int j = 0; j < tmp.size(); j++)
+                            {
+                                String curValue = (String)attributes[i].getValues().get(j);
 
-                        if (DEBUG) _log.debug(
-                            "Added attribute " + attributes[i].getName() +
-                            " = " + attributes[i].getValue());
+                                fetchResp.addAttribute(
+                                    attributes[i].getAlias(),
+                                    attributes[i].getType(),
+                                    curValue);
+
+                                if (DEBUG) _log.debug(
+                                    "Added attribute " + attributes[i].getAlias() +
+                                    " = " + curValue);
+                            }
+                        }
+                        else
+                        {
+                            if (DEBUG) _log.debug("Attribute " + attributes[i].getAlias() +
+                                                  " has NULL value.  Skipping.");
+                        }
                     }
                 }
                 catch(Exception e)
