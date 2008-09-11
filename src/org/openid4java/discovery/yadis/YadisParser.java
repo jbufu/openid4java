@@ -5,8 +5,11 @@
 package org.openid4java.discovery.yadis;
 
 /**
- * @author Sutra Zhou
+ * Yadis parser.
  * 
+ * @author Sutra Zhou
+ * @since 0.9.4
+ * @see #getHtmlMeta(String)
  */
 public interface YadisParser
 {

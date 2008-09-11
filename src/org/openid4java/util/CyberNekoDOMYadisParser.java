@@ -16,8 +16,11 @@ import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLMetaElement;
 
 /**
- * @author Sutra Zhou
+ * A {@link YadisParser} implementation using the DOMParser of CyberNeko HTML.
  * 
+ * @author Sutra Zhou
+ * @since 0.9.4
+ * @see OpenID4JavaDOMParser
  */
 public class CyberNekoDOMYadisParser implements YadisParser
 {

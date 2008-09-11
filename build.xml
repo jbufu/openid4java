@@ -167,6 +167,7 @@
         </javac>
         <copy todir="${classes.test}">
             <fileset dir="${test.src}" includes="**/*.properties"/>
+            <fileset dir="${test.src}" includes="**/*.html"/>
         </copy>
     </target>
 
