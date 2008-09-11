@@ -7,8 +7,11 @@ package org.openid4java.discovery.html;
 import org.openid4java.discovery.DiscoveryException;
 
 /**
- * @author Sutra Zhou
+ * Html parser.
  * 
+ * @author Sutra Zhou
+ * @since 0.9.4
+ * @see #parseHtml(String, HtmlResult)
  */
 public interface HtmlParser
 {

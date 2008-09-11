@@ -24,10 +24,19 @@ import org.cyberneko.html.parsers.DOMParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.html.HTMLHtmlElement;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 /**
- * @author Sutra Zhou
+ * A DOMParser extends from Cyberneko HTML.
+ * <p>
+ * This extended parser marks that a(or more) HTML element <code>head</code> is
+ * ignored while parsing.
+ * </p>
  * 
+ * @author Sutra Zhou
+ * @see <a href="http://nekohtml.sourceforge.net/index.html">NekoHTML</a>
+ * @since 0.9.4
  */
 public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingListener
 {
@@ -84,6 +93,24 @@ public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingL
     }
 
     private boolean ignoredHeadStartElement;
+
+    /**
+     * @see <a href="http://nekohtml.sourceforge.net/settings.html">NekoHTML | Parser Settings</a>
+     */
+    public OpenID4JavaDOMParser() {
+        try
+        {
+            this.setFeature("http://xml.org/sax/features/namespaces", false);
+        }
+        catch (SAXNotRecognizedException e)
+        {
+            // Do nothing as this exception will not happen.
+        }
+        catch (SAXNotSupportedException e)
+        {
+            // Do nothing as this exception will not happen.
+        }
+    }
 
     public boolean isIgnoredHeadStartElement()
     {

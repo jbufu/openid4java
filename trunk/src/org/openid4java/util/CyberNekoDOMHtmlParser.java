@@ -19,8 +19,11 @@ import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLLinkElement;
 
 /**
- * @author Sutra Zhou
+ * A {@link HtmlParser} implementation using the DOMParser of CyberNeko HTML.
  * 
+ * @author Sutra Zhou
+ * @since 0.9.4
+ * @see OpenID4JavaDOMParser
  */
 public class CyberNekoDOMHtmlParser implements HtmlParser
 {
