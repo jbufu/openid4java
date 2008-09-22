@@ -1575,7 +1575,7 @@ public class ConsumerManager
             if (service.isVersion2() || // only interested in v1
                 ! service.hasClaimedIdentifier() || // need a claimedId
                 service.hasDelegateIdentifier() || // not allowing delegates
-                ! assertId.equals(service.getClaimedIdentifier()))
+                ! assertId.equals(service.getClaimedIdentifier().getIdentifier()))
                 continue;
 
             if (DEBUG) _log.debug("Found matching service: " + service);
