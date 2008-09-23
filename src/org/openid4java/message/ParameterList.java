@@ -42,7 +42,8 @@ public class ParameterList implements Serializable
 
     /**
      * Constructs a ParameterList from a Map of parameters, ideally obtained
-     * with ServletRequest.getParameterMap().
+     * with ServletRequest.getParameterMap(). The parameter keys and values
+     * must be in URL-decoded format.
      *
      * @param parameterMap  Map<String,String[]> or Map<String,String>
      */
