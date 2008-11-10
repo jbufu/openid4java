@@ -5,9 +5,8 @@
 package org.openid4java.discovery.yadis;
 
 import org.openxri.xml.XRDS;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.Header;
+import org.apache.http.HttpStatus;
+import org.apache.http.Header;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -481,11 +480,6 @@ public class YadisResolver
                 result.setNormalizedUrl(resp.getFinalUri());
             }
 
-        }
-        catch (HttpException e)
-        {
-            throw new YadisException("HTTP error during HEAD request on: " + url,
-                    OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
         }
         catch (IOException e)
         {
