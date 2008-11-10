@@ -4,11 +4,14 @@
 
 package org.openid4java.consumer;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.http.client.HttpClient;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.util.EntityUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.*;
@@ -151,6 +154,12 @@ public class ConsumerManager
      */
     private int _maxRedirects = 0;
 
+	static
+	{
+		System.getProperties().put("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+		System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog", "trace");
+	}
+
 
     /**
      * Instantiates a ConsumerManager with default settings.
@@ -160,7 +169,7 @@ public class ConsumerManager
         // global httpclient configuration parameters
         _httpClient = HttpClientFactory.getInstance(
                 _maxRedirects, Boolean.FALSE, _socketTimeout, _connectTimeout,
-                CookiePolicy.IGNORE_COOKIES);
+                null);
 
         _realmVerifier = new RealmVerifier();
 
@@ -580,23 +589,24 @@ public class ConsumerManager
     {
         _connectTimeout = connectTimeout;
 
-        _httpClient.getHttpConnectionManager()
-                .getParams().setConnectionTimeout(_connectTimeout);
+        _httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, _connectTimeout);
+        
     }
 
     public void setSocketTimeout(int socketTimeout)
     {
         _socketTimeout = socketTimeout;
 
-        _httpClient.getParams().setSoTimeout(_socketTimeout);
+        _httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, _socketTimeout);
+
     }
 
     public void setMaxRedirects(int maxRedirects)
     {
         _maxRedirects = maxRedirects;
 
-        _httpClient.getParams().setParameter(
-                "http.protocol.max-redirects", new Integer(_maxRedirects));
+        _httpClient.getParams().setIntParameter(ClientPNames.MAX_REDIRECTS, _maxRedirects);
+        
     }
 
     /**
@@ -612,24 +622,27 @@ public class ConsumerManager
     private int call(String url, Message request, ParameterList response)
             throws MessageException
     {
-        int responseCode = -1;
+        HttpResponse httpResponse = null;
 
         // build the post message with the parameters from the request
-        PostMethod post = new PostMethod(url);
+        HttpPost post = new HttpPost(url);
 
         try
         {
             // can't follow redirects on a POST (w/o user intervention)
-            //post.setFollowRedirects(true);
-            post.setRequestEntity(new StringRequestEntity(
-                    request.wwwFormEncoding(),
-                    "application/x-www-form-urlencoded", "UTF-8"));
+        	
+        	_httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
+            
+            post.setEntity(new StringEntity(request.wwwFormEncoding(), "UTF-8"));
 
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            
             // place the http call to the OP
             if (DEBUG) _log.debug("Performing HTTP POST on " + url);
-            responseCode = _httpClient.executeMethod(post);
+            httpResponse = _httpClient.execute(post);
 
-            String postResponse = post.getResponseBodyAsString();
+            String postResponse = EntityUtils.toString(httpResponse.getEntity());
+            
             response.copyOf(ParameterList.createFromKeyValueForm(postResponse));
 
             if (DEBUG) _log.debug("Retrived response:\n" + postResponse);
@@ -637,14 +650,25 @@ public class ConsumerManager
         catch (IOException e)
         {
             _log.error("Error talking to " + url +
-                    " response code: " + responseCode, e);
+                    " response code: " + httpResponse.getStatusLine().getStatusCode(), e);
         }
         finally
         {
-            post.releaseConnection();
+        	if ( (httpResponse != null) && (httpResponse.getEntity() != null) )
+        	{
+        		try
+				{
+					httpResponse.getEntity().consumeContent();
+				} 
+        		catch (IOException e)
+				{
+        			// ignore
+				}
+        	}
+        	
         }
 
-        return responseCode;
+        return httpResponse.getStatusLine().getStatusCode();
     }
 
     /**

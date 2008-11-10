@@ -7,11 +7,16 @@
  */
 package org.openid4java.util;
 
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.http.HttpHost;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.client.protocol.ResponseProcessCookies;
+import org.apache.http.client.protocol.RequestAddCookies;
 
 /**
  * This class handles all HTTPClient connections for the
@@ -42,30 +47,51 @@ public class HttpClientFactory
                                          int connTimeout, int socketTimeout,
                                          String cookiePolicy)
     {
-        HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
+    	
+        DefaultHttpClient client = new ThreadSafeHttpClient();
 
+        client.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
+        
+        client.getParams().setIntParameter(
+                ClientPNames.MAX_REDIRECTS, maxRedirects);
+        
         client.getParams().setParameter(
-                "http.protocol.max-redirects", new Integer(maxRedirects));
-        client.getParams().setParameter(
-                "http.protocol.allow-circular-redirects", allowCircularRedirects);
-        client.getParams().setSoTimeout(socketTimeout);
-        client.getHttpConnectionManager().getParams().setConnectionTimeout(connTimeout);
-        client.getParams().setParameter("http.protocol.cookie-policy",
-                cookiePolicy);
+        		ClientPNames.ALLOW_CIRCULAR_REDIRECTS, allowCircularRedirects);
+        
+        client.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, socketTimeout);
+        
+        client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connTimeout);
+        
+        if (cookiePolicy == null)
+        {
+        	client.removeRequestInterceptorByClass(RequestAddCookies.class);
+        	client.removeResponseInterceptorByClass(ResponseProcessCookies.class);
+        }
+        else
+        {
+        	client.getParams().setParameter(
+				            		ClientPNames.COOKIE_POLICY, 
+				                    cookiePolicy);
+        }
 
         if (proxyProperties != null)
         {
-            HostConfiguration hostConf = client.getHostConfiguration();
-
-            hostConf.setProxy(proxyProperties.getProxyHostName(), proxyProperties.getProxyPort());
-
-            //now set headers for auth
-            AuthScope authScope = new AuthScope(AuthScope.ANY_HOST,
-                    AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME);
-            client.getState().setProxyCredentials(authScope,
-                    new UsernamePasswordCredentials(
-                            proxyProperties.getUserName(),
-                            proxyProperties.getPassword()));
+        	
+        	 final HttpHost proxy = new HttpHost(
+        			 		proxyProperties.getProxyHostName(), 
+                		 	proxyProperties.getProxyPort(), 
+                		 	"http");
+        	 
+        	 client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        	 
+        	 AuthScope scope = new AuthScope(proxyProperties.getProxyHostName(),
+        			 					proxyProperties.getProxyPort());
+        			 					
+         	 client.getCredentialsProvider().setCredentials(scope, 
+         			 						new UsernamePasswordCredentials(
+         			 							proxyProperties.getUserName(),
+         			 							proxyProperties.getPassword()));
+        	 
         }
 
         return client;

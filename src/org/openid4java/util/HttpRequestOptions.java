@@ -7,6 +7,10 @@ package org.openid4java.util;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.params.CoreConnectionPNames;
+
 /**
  * Container class for the various options associated with HTTP requests.
  *
@@ -207,5 +211,16 @@ public class HttpRequestOptions
     public void setContentType(String contentType)
     {
         this._contentType = contentType;
+    }
+    
+    static public void setRequestOptions(HttpClient client, HttpRequestOptions options)
+    {
+        client.getParams().setIntParameter(
+                ClientPNames.MAX_REDIRECTS, options.getMaxRedirects());
+        
+        client.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, options.getSocketTimeout());
+        
+        client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, options.getConnTimeout());
+	
     }
 }
