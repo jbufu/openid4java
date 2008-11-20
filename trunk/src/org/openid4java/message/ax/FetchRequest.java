@@ -163,7 +163,7 @@ public class FetchRequest extends AxMessage
      */
     public int getCount(String alias)
     {
-        if ("unlimited".equals(_parameters.getParameterValue("count" + alias)))
+        if ("unlimited".equals(_parameters.getParameterValue("count." + alias)))
             return 0;
 
         else if (_parameters.hasParameter("count." + alias))
