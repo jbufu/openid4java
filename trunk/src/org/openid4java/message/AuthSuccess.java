@@ -429,7 +429,7 @@ public class AuthSuccess extends Message
         try
         {
             // op_endpoint must be a valid URL, if present
-            if (getOpEndpoint() != null)
+            if (isVersion2() && getOpEndpoint() != null)
                 new URL(getOpEndpoint());
         }
         catch (MalformedURLException e)
