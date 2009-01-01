@@ -43,9 +43,9 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
     }
 
     /**
-     * Checks if nonce date is valid and if it is in the max age boudary. Other checks are delegated to {@link #seen(java.util.Date, String, String)}
+     * Checks if nonce date is valid and if it is in the max age boundary. Other checks are delegated to {@link #seen(java.util.Date, String, String)}
      */
-    public int seen(String opUrl, String nonce)
+    public synchronized int seen(String opUrl, String nonce)
     {
         if (DEBUG) _log.debug("Verifying nonce: " + nonce);
 
