@@ -277,6 +277,20 @@ public class YadisResolverTest extends TestCase
         try
         {
             _resolver.discover("http://localhost:" +
+                _servletPort + "/?html=headnometa");
+
+            fail("Should have failed with error code " +
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
+        }
+        catch (YadisException expected)
+        {
+            assertEquals(expected.getMessage(),
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
+        }
+
+        try
+        {
+            _resolver.discover("http://localhost:" +
                 _servletPort + "/?html=twoheads");
 
             fail("Should have failed with error code " +
