@@ -81,6 +81,14 @@ public class YadisResolverTest extends TestCase
         assertTrue(result.isSuccess());
     }
 
+    public void testHeadersUrlToXmlContentTypeDocument() throws YadisException
+    {
+        YadisResult result = _resolver.discover("http://localhost:" +
+                _servletPort + "/?headers=simpleheaders_xml");
+
+        assertTrue(result.isSuccess());
+    }
+
     public void testHtmlUrl() throws YadisException
     {
         YadisResult result = _resolver.discover("http://localhost:" +
