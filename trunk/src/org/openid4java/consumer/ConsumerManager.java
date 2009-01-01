@@ -61,10 +61,10 @@ public class ConsumerManager
     private NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
 
     /**
-     * Private association used for signing consumer nonces when operating in
-     * compatibility (v1.x) mode.
+     * Private association store used for signing consumer nonces when operating 
+     * in compatibility (v1.x) mode.
      */
-    private Association _privateAssociation;
+    private ConsumerAssociationStore _privateAssociations = new InMemoryConsumerAssociationStore();
 
     /**
      * Verifier for the nonces in authentication responses;
@@ -171,19 +171,6 @@ public class ConsumerManager
             _prefAssocSessEnc = AssociationSessionType.DH_SHA256;
         else
             _prefAssocSessEnc = AssociationSessionType.DH_SHA1;
-
-        try
-        {
-            // initialize the private association for compat consumer nonces
-            _privateAssociation = Association.generate(
-                    getPrefAssocSessEnc().getAssociationType(), "", 0);
-        }
-        catch (AssociationException e)
-        {
-            throw new ConsumerException(
-                    "Cannot initialize private association, " +
-                    "needed for consumer nonces.");
-        }
     }
 
     /**
@@ -541,7 +528,7 @@ public class ConsumerManager
     }
 
     /**
-     * Configures a private association for signing consumer nonces.
+     * Configures a private association store for signing consumer nonces.
      * <p>
      * Consumer nonces are needed to prevent replay attacks in compatibility
      * mode, because OpenID 1.x Providers to not attach nonces to
@@ -551,29 +538,29 @@ public class ConsumerManager
      * authentication response was indeed issued by itself (and thus prevent
      * denial of service attacks), is by signing them.
      *
-     * @param assoc     The association to be used for signing consumer nonces;
+     * @param associations     The association store to be used for signing consumer nonces;
      *                  signing can be deactivated by setting this to null.
      *                  Signing is enabled by default.
      */
-    public void setPrivateAssociation(Association assoc)
+    public void setPrivateAssociationStore(ConsumerAssociationStore associations)
             throws ConsumerException
     {
-        if (assoc == null)
+        if (associations == null)
             throw new ConsumerException(
-                    "Cannot set null private association, " +
+                    "Cannot set null private association store, " +
                     "needed for consumer nonces.");
 
-        _privateAssociation = assoc;
+        _privateAssociations = associations;
     }
 
     /**
-     * Gets the private association used for signing consumer nonces.
+     * Gets the private association store used for signing consumer nonces.
      *
-     * @see #setPrivateAssociation(org.openid4java.association.Association)
+     * @see #setPrivateAssociationStore(ConsumerAssociationStore)
      */
-    public Association getPrivateAssociation()
+    public ConsumerAssociationStore getPrivateAssociationStore()
     {
-        return _privateAssociation;
+        return _privateAssociations;
     }
 
     public void setConnectTimeout(int connectTimeout)
@@ -1079,7 +1066,7 @@ public class ConsumerManager
                 " OP-specific ID: " + delegate);
 
         if (! discovered.isVersion2())
-            returnToUrl = insertConsumerNonce(returnToUrl);
+            returnToUrl = insertConsumerNonce(discovered.getOPEndpoint().toString(), returnToUrl);
 
         AuthRequest authReq = AuthRequest.createAuthRequest(claimedId, delegate,
                 ! discovered.isVersion2(), returnToUrl, handle, realm, _realmVerifier);
@@ -1341,7 +1328,8 @@ public class ConsumerManager
         String nonce = authResp.getNonce();
 
         if (nonce == null) // compatibility mode
-            nonce = extractConsumerNonce(authResp.getReturnTo());
+            nonce = extractConsumerNonce(authResp.getReturnTo(),
+                    discovered.getOPEndpoint().toString());
 
         if (nonce == null) return false;
 
@@ -1358,22 +1346,40 @@ public class ConsumerManager
      * OpenID 1.1 OpenID Providers do not generate nonces in authentication
      * responses.
      *
+     * @param opUrl             The endpoint to be used for private association.
      * @param returnTo          The return_to URL to which a custom nonce
      *                          parameter will be added.
      * @return                  The return_to URL containing the nonce.
      */
-    public String insertConsumerNonce(String returnTo)
+    public String insertConsumerNonce(String opUrl, String returnTo)
     {
         String nonce = _consumerNonceGenerator.next();
 
         returnTo += (returnTo.indexOf('?') != -1) ? '&' : '?';
-
+        
+        Association privateAssoc = _privateAssociations.load(opUrl);
+        if( privateAssoc == null )
+        {
+			try
+			{
+				if (DEBUG) _log.debug( "Creating private association for opUrl " + opUrl);
+				privateAssoc = Association.generate(
+				      getPrefAssocSessEnc().getAssociationType(), "", _failedAssocExpire);
+				_privateAssociations.save( opUrl, privateAssoc );
+			}
+			catch ( AssociationException e )
+			{
+				_log.error("Cannot initialize private association.", e);
+				return null;
+			}
+        }
+        
         try
         {
             returnTo += "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
 
             returnTo += "&openid.rpsig=" +
-                    URLEncoder.encode(_privateAssociation.sign(returnTo),
+                    URLEncoder.encode(privateAssoc.sign(returnTo),
                             "UTF-8");
 
             _log.info("Inserted consumer nonce: " + nonce);
@@ -1394,10 +1400,11 @@ public class ConsumerManager
      * authentication response from a OpenID 1.1 Provider.
      *
      * @param returnTo      return_to URL from the authentication response
+     * @param opUrl         URL for the appropriate OP endpoint
      * @return              The nonce found in the return_to URL, or null if
      *                      it wasn't found.
      */
-    public String extractConsumerNonce(String returnTo)
+    public String extractConsumerNonce(String returnTo, String opUrl)
     {
         if (DEBUG)
             _log.debug("Extracting consumer nonce...");
@@ -1458,7 +1465,15 @@ public class ConsumerManager
 
         try
         {
-            if (_privateAssociation.verifySignature(signed, signature))
+            if (DEBUG) _log.debug( "Loading private association for opUrl " + opUrl );
+            Association privateAssoc = _privateAssociations.load(opUrl);
+            if( privateAssoc == null )
+            {
+                _log.error("Null private association.");
+                return null;
+            }
+            
+            if (privateAssoc.verifySignature(signed, signature))
             {
                 _log.info("Consumer nonce signature verified.");
                 return nonce;
