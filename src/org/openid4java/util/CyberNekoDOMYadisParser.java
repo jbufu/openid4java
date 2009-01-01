@@ -52,6 +52,14 @@ public class CyberNekoDOMYadisParser implements YadisParser
 
         HTMLHeadElement head = (HTMLHeadElement) doc.getHead();
         NodeList metaElements = head.getElementsByTagName("META");
+        if (metaElements == null || metaElements.getLength() == 0)
+        {
+            throw new YadisException(
+                "No <meta> element found under <html><head>. " +
+                "See Yadis specification, section 6.2.5/1.",
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
+        }
+
         for (int i = 0, len = metaElements.getLength(); i < len; i++)
         {
         	HTMLMetaElement metaElement = (HTMLMetaElement) metaElements.item(i);
