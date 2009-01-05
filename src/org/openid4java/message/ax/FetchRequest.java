@@ -29,6 +29,8 @@ public class FetchRequest extends AxMessage
     private static Log _log = LogFactory.getLog(FetchRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
+    private int _aliasCounter = 0;
+
     /**
      * Constructs a Fetch Request with an empty parameter list.
      */
@@ -136,6 +138,20 @@ public class FetchRequest extends AxMessage
         throws MessageException
     {
         addAttribute(alias, typeUri, required, 1);
+    }
+
+    /**
+     * Adds an attribute to the fetch request, with a default value-count of 1.
+     * An alias is generated for the provided type URI.
+     *
+     * @see #addAttribute(String, String, boolean, int)
+     */
+    public String addAttribute(String typeUri, boolean required)
+        throws MessageException
+    {
+        String alias = generateAlias();
+        addAttribute(alias, typeUri, required, 1);
+        return alias;
     }
 
     /**
@@ -336,5 +352,10 @@ public class FetchRequest extends AxMessage
         }
 
         return true;
+    }
+
+    private synchronized String generateAlias()
+    {
+        return "attr" + Integer.toString(++ _aliasCounter);
     }
 }
