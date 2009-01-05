@@ -62,14 +62,14 @@ public class YadisResolver
                     YADIS_CONTENT_TYPE;
 
     private static final String YADIS_PARSER_CLASS_NAME_KEY = "discovery.yadis.parser";
-    private static final YadisParser YADIS_PARSER;
+    private static final YadisHtmlParser YADIS_HTML_PARSER;
 
     static {
         String className = OpenID4JavaUtils.getProperty(YADIS_PARSER_CLASS_NAME_KEY);
         if (DEBUG) _log.debug(YADIS_PARSER_CLASS_NAME_KEY + ":" + className);
         try
         {
-            YADIS_PARSER = (YadisParser) Class.forName(className).newInstance();
+            YADIS_HTML_PARSER = (YadisHtmlParser) Class.forName(className).newInstance();
         }
         catch (Exception e)
         {
@@ -285,7 +285,7 @@ public class YadisResolver
             throw new YadisException("Cannot download HTML message",
                     OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
 
-        xrdsLocation = YADIS_PARSER.getHtmlMeta(input);
+        xrdsLocation = YADIS_HTML_PARSER.getHtmlMeta(input);
         if (DEBUG)
         {
             _log.debug("input:\n" + input);

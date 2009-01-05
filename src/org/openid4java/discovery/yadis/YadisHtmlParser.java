@@ -11,7 +11,7 @@ package org.openid4java.discovery.yadis;
  * @since 0.9.4
  * @see #getHtmlMeta(String)
  */
-public interface YadisParser
+public interface YadisHtmlParser
 {
     /**
      * Parses the HTML input stream and scans for the Yadis XRDS location in the
