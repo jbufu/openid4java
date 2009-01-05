@@ -9,22 +9,22 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.yadis.YadisException;
-import org.openid4java.discovery.yadis.YadisParser;
+import org.openid4java.discovery.yadis.YadisHtmlParser;
 import org.openid4java.discovery.yadis.YadisResolver;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLMetaElement;
 
 /**
- * A {@link YadisParser} implementation using the DOMParser of CyberNeko HTML.
+ * A {@link org.openid4java.discovery.yadis.YadisHtmlParser} implementation using the DOMParser of CyberNeko HTML.
  * 
  * @author Sutra Zhou
  * @since 0.9.4
  * @see OpenID4JavaDOMParser
  */
-public class CyberNekoDOMYadisParser implements YadisParser
+public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
 {
-    private static final Log _log = LogFactory.getLog(CyberNekoDOMYadisParser.class);
+    private static final Log _log = LogFactory.getLog(CyberNekoDOMYadisHtmlParser.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /*
