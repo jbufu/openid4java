@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <groupId>org.openid4java</groupId>
+  <artifactId>openid4java-server-SampleServer</artifactId>
+  <version>0.9.5-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20090114000917</lastUpdated>
+  </versioning>
+</metadata>
