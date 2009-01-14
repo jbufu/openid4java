@@ -1,6 +1,6 @@
-#summary This is just for maven2 users
+#summary 下面的安装使用方法仅适用于Maven2用户
 
-Add following to your project's pom.xml in section dependencies:
+在你的项目的 pom.xml 的 dependencies 节点下增加如下依赖关系：
 {{{
 <dependency>
   <groupId>org.openid4java</groupId>
@@ -8,8 +8,9 @@ Add following to your project's pom.xml in section dependencies:
   <version>0.9.3</version>
 </dependency>
 }}}
+其中的 0.9.3 请替换成你需要的版本。
 
-0.9.5-SNAPSHOT
+如果你想使用0.9.5-SNAPSHOT版本，你可以在你的 pom.xml 中添加：
 {{{
 <project ...>
     ...

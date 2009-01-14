@@ -18,3 +18,5 @@ To make the library available to the web application the following
 need to be done:
 
   * Copy lib/`*`.jar and java-openid-sxip-`*`.jar to your application's Java classpath
+
+_For [http://maven.apache.org/ maven2] users: [MavenHowTo]_
