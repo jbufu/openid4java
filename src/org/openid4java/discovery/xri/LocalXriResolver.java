@@ -27,10 +27,13 @@ public class LocalXriResolver implements XriResolver
     final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
 
     private Resolver _openXriResolver = new Resolver();
+    private Discovery _discovery;
 
-    public LocalXriResolver()
+    public LocalXriResolver(Discovery discovery)
     {
-        if (DEBUG) _log.debug("Initializing Discovery object...");
+        if (DEBUG) _log.debug("Initializing local XRI resolver...");
+
+        _discovery = discovery;
 
         // populate the root with whatever trustType the user requested
         String trustParam = ";trust=none";
@@ -98,6 +101,16 @@ public class LocalXriResolver implements XriResolver
         }
     }
 
+    public String getIriNormalForm(String identifier) {
+        XRI xri = new XRI(identifier);
+        return xri.toIRINormalForm();
+    }
+
+    public String getUriNormalForm(String identifier) {
+        XRI xri = new XRI(identifier);
+        return xri.toURINormalForm();
+    }
+
     private boolean isProviderAuthoritative(String providerId,
                                                    CanonicalID canonicalId)
     {
@@ -139,7 +152,7 @@ public class LocalXriResolver implements XriResolver
      * @return              A list of DiscoveryInformation endpoints.
      * @throws DiscoveryException when invalid information is discovered.
      */
-    protected static List extractDiscoveryInformation(XRDS xrds,
+    protected List extractDiscoveryInformation(XRDS xrds,
                                                       XriIdentifier identifier,
                                                       Resolver xriResolver)
             throws DiscoveryException
@@ -193,7 +206,7 @@ public class LocalXriResolver implements XriResolver
         return endpoints;
     }
 
-    protected static boolean extractDiscoveryInformationOpenID(
+    protected boolean extractDiscoveryInformationOpenID(
             Resolver xriResolver, ArrayList out, XRD baseXRD,
             XriIdentifier identifier, String srvType, boolean wantCID)
     {
@@ -227,7 +240,7 @@ public class LocalXriResolver implements XriResolver
                 }
 
                 // todo: canonicalID verification?
-                claimedIdentifier = Discovery.parseIdentifier(canonID.getValue());
+                claimedIdentifier = _discovery.parseIdentifier(canonID.getValue());
                 _log.info("Using canonicalID as claimedID: " +
                           claimedIdentifier.getIdentifier() +
                           " for " + srvType);

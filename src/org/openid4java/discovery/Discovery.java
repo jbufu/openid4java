@@ -29,12 +29,15 @@ public class Discovery
     private static final Pattern XRI_PATTERN =
             Pattern.compile("^[!=@\\$\\+\\(]", Pattern.CASE_INSENSITIVE);
 
-    private XriResolver _xriResolver = new LocalXriResolver();
-    private YadisResolver _yadisResolver = new YadisResolver();
-    private HtmlResolver _htmlResolver = new HtmlResolver();
+    private XriResolver _xriResolver;
+    private YadisResolver _yadisResolver;
+    private HtmlResolver _htmlResolver;
 
     public Discovery()
     {
+        _htmlResolver = new HtmlResolver();
+        _yadisResolver = new YadisResolver();
+        _xriResolver = new LocalXriResolver(this);
     }
 
     public void setXriResolver(XriResolver xriResolver)
@@ -52,13 +55,13 @@ public class Discovery
         _htmlResolver = htmlResolver;
     }
 
-    public static Identifier parseIdentifier(String identifier)
+    public Identifier parseIdentifier(String identifier)
             throws DiscoveryException
     {
         return parseIdentifier(identifier, false);
     }
 
-    public static Identifier parseIdentifier(String identifier,
+    public Identifier parseIdentifier(String identifier,
                                              boolean removeFragment)
             throws DiscoveryException
     {
@@ -80,7 +83,7 @@ public class Discovery
             else if (XRI_PATTERN.matcher(identifier).find())
             {
                 if (DEBUG) _log.debug("Creating XRI identifier for: " + identifier);
-                return new XriIdentifier(identifier);
+                return new XriIdentifier(identifier, _xriResolver.getIriNormalForm(identifier), _xriResolver.getUriNormalForm(identifier));
             }
             else
             {

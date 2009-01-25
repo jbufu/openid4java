@@ -1653,7 +1653,7 @@ public class ConsumerManager
 
         // claimed identifier in the AuthResponse
         Identifier respClaimed =
-            Discovery.parseIdentifier(authResp.getClaimed(), true);
+            _discovery.parseIdentifier(authResp.getClaimed(), true);
 
         // the OP endpoint sent in the response
         String respEndpoint = authResp.getOpEndpoint();
@@ -1768,7 +1768,7 @@ public class ConsumerManager
         }
 
         Identifier claimedId = discovered.isVersion2() ?
-            Discovery.parseIdentifier(authResp.getClaimed()) : //may have frag
+            _discovery.parseIdentifier(authResp.getClaimed()) : //may have frag
             discovered.getClaimedIdentifier(); //assert id may be delegate in v1
 
         String handle = authResp.getHandle();
