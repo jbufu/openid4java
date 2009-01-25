@@ -11,12 +11,6 @@
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
             </fileset>
-            <fileset dir="${endorsed.dir}">
-                <include name="**/*.jar"/>
-            </fileset>
-            <fileset dir="${libext.dir}">
-                <include name="**/*.jar"/>
-            </fileset>
         </path>
     </target>
 
@@ -29,7 +23,6 @@
         <delete dir="${build}" />
         <delete dir="${apidoc}"/>
         <delete dir="target" />
-        <delete file="testLog.txt"/>
         <delete file="${component.name}-${version}.tar.gz"/>
     </target>
 
@@ -57,6 +50,7 @@
         </javac>
         <copy todir="${classes}">
             <fileset dir="${src}" includes="**/*.properties"/>
+            <fileset dir="${src}" includes="**/*.xsd"/>
         </copy>
     </target>
 
