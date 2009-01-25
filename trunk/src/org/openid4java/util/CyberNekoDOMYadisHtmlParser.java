@@ -54,31 +54,32 @@ public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
         NodeList metaElements = head.getElementsByTagName("META");
         if (metaElements == null || metaElements.getLength() == 0)
         {
-            throw new YadisException(
-                "No <meta> element found under <html><head>. " +
-                "See Yadis specification, section 6.2.5/1.",
-                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
+            if (DEBUG)
+                _log.debug("No <meta> element found under <html><head>. " +
+                "See Yadis specification, section 6.2.5/1.");
         }
-
-        for (int i = 0, len = metaElements.getLength(); i < len; i++)
+        else
         {
-        	HTMLMetaElement metaElement = (HTMLMetaElement) metaElements.item(i);
-
-            String httpEquiv = metaElement.getHttpEquiv();
-            if (YadisResolver.YADIS_XRDS_LOCATION.equalsIgnoreCase(httpEquiv))
+            for (int i = 0, len = metaElements.getLength(); i < len; i++)
             {
-                if (xrdsLocation != null)
-                    throw new YadisException(
+                HTMLMetaElement metaElement = (HTMLMetaElement) metaElements.item(i);
+
+                String httpEquiv = metaElement.getHttpEquiv();
+                if (YadisResolver.YADIS_XRDS_LOCATION.equalsIgnoreCase(httpEquiv))
+                {
+                    if (xrdsLocation != null)
+                        throw new YadisException(
                             "More than one "
-                                    + YadisResolver.YADIS_XRDS_LOCATION
-                                    + "META tags found in HEAD: "
-                                    + head.toString(),
+                                + YadisResolver.YADIS_XRDS_LOCATION
+                                + "META tags found in HEAD: "
+                                + head.toString(),
                             OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
 
-                xrdsLocation = metaElement.getContent();
-                if (DEBUG)
-                    _log.debug("Found " + YadisResolver.YADIS_XRDS_LOCATION
-                            + "META tags.");
+                    xrdsLocation = metaElement.getContent();
+                    if (DEBUG)
+                        _log.debug("Found " + YadisResolver.YADIS_XRDS_LOCATION
+                            + " META tags.");
+                }
             }
         }
         return xrdsLocation;
