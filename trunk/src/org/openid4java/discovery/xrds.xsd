@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xrds="xri://$xrds" targetNamespace="xri://$xrds" elementFormDefault="qualified">
+	<!-- Utility patterns -->
+	<xs:attributeGroup name="otherattribute">
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
+	</xs:attributeGroup>
+	<xs:group name="otherelement">
+		<xs:choice>
+			<xs:any namespace="##other" processContents="lax"/>
+			<xs:any namespace="##local" processContents="lax"/>
+		</xs:choice>
+	</xs:group>
+	<!-- Patterns for elements -->
+	<xs:element name="XRDS">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="xrds:otherelement" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="xrds:otherattribute"/>
+			<!--XML Schema does not currently offer a means to express that only one of the following two attributes may be used in any XRDS element, i.e., an XRDS document may describe EITHER a redirect identifier or a ref identifier but not both.-->
+			<xs:attribute name="redirect" type="xs:anyURI" use="optional"/>
+			<xs:attribute name="ref" type="xs:anyURI" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

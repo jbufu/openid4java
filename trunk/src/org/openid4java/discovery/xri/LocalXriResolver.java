@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-public class LocalXriResolver implements XriDiscovery
+public class LocalXriResolver implements XriResolver
 {
     private static Log _log = LogFactory.getLog(LocalXriResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
