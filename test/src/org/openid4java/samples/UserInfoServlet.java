@@ -16,12 +16,12 @@ public class UserInfoServlet extends HttpServletSupport
     protected void onService(HttpServletRequest req, HttpServletResponse resp) throws Exception
     {
         String serverUrl = "http://" + req.getServerName() + ":" + req.getServerPort() + "/provider";
-        String back = "";
+        String back;
         if ("html".equals(req.getParameter("format")))
         {
             resp.setContentType("text/html");
             back = "<html><head>\n" +
-                    "<link rel='openid.server' href='"+ serverUrl +"'/>\n" +
+                    "<link rel='openid.server' href='" + serverUrl + "'/>\n" +
                     "</head><body>in html</body></html>"
                     ;
         }

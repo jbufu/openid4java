@@ -9,9 +9,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.openid4java.discovery.UrlIdentifier;
 import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.util.HttpCache;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.HttpRequestOptions;
@@ -68,14 +71,15 @@ public class HtmlResolver
      * Performs HTML discovery on the supplied URL identifier.
      *
      * @param identifier        The URL identifier.
-     * @return                  HTML discovery data obtained from the URL.
+     * @return                  List of DiscoveryInformation entries discovered
+     *                          obtained from the URL Identifier.
      *
      * @see #discover(UrlIdentifier, HttpCache)
      */
-    public HtmlResult discover(UrlIdentifier identifier)
-            throws DiscoveryException
+    public List discoverHtml(UrlIdentifier identifier)
+        throws DiscoveryException
     {
-        return discover(identifier, new HttpCache());
+        return discoverHtml(identifier, new HttpCache());
     }
 
     /**
@@ -83,9 +87,10 @@ public class HtmlResolver
      *
      * @param identifier        The URL identifier.
      * @param cache             HttpClient object to use for placing the call
-     * @return                  HTML discovery data obtained from the URL.
+     * @return                  List of DiscoveryInformation entries discovered
+     *                          obtained from the URL Identifier.
      */
-    public HtmlResult discover(UrlIdentifier identifier, HttpCache cache)
+    public List discoverHtml(UrlIdentifier identifier, HttpCache cache)
             throws DiscoveryException
     {
         // initialize the results of the HTML discovery
@@ -121,6 +126,50 @@ public class HtmlResolver
 
         _log.info("HTML discovery completed on: " + identifier);
 
-        return result;
+        return extractDiscoveryInformation(result);
     }
+
+    /**
+     * Extracts OpenID discovery endpoints from a HTML discovery result.
+     *
+     * @param htmlResult    HTML discovery result.
+     * @return              List of DiscoveryInformation endpoints.
+     * @throws DiscoveryException when invalid information is discovered.
+     */
+    private List extractDiscoveryInformation(HtmlResult htmlResult)
+            throws DiscoveryException
+    {
+        ArrayList htmlList = new ArrayList();
+
+        if (htmlResult.getOP2Endpoint() != null)
+        {
+            DiscoveryInformation extracted = new DiscoveryInformation(
+                        htmlResult.getOP2Endpoint(),
+                        htmlResult.getClaimedId(),
+                        htmlResult.getDelegate2(),
+                        DiscoveryInformation.OPENID2);
+
+            if (DEBUG)
+                _log.debug("OpenID2-signon HTML discovery endpoint: " + extracted);
+
+            htmlList.add(extracted);
+        }
+
+        if (htmlResult.getOP1Endpoint() != null)
+        {
+            DiscoveryInformation extracted = new DiscoveryInformation(
+                        htmlResult.getOP1Endpoint(),
+                        htmlResult.getClaimedId(),
+                        htmlResult.getDelegate1(),
+                        DiscoveryInformation.OPENID11);
+
+            if (DEBUG)
+                _log.debug("OpenID1-signon HTML discovery endpoint: " + extracted);
+
+            htmlList.add(extracted);
+        }
+
+        return htmlList;
+    }
+
 }

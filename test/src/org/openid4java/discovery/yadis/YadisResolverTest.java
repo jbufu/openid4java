@@ -12,11 +12,13 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.openid4java.OpenIDException;
+import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpCache;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -73,56 +75,56 @@ public class YadisResolverTest extends TestCase
 
     // --------------------- positive tests ------------------------------------
 
-    public void testHeadersUrl() throws YadisException
+    public void testHeadersUrl() throws DiscoveryException
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=simpleheaders");
+        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simpleheaders",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
-        assertTrue(result.isSuccess());
+        assertTrue(result.getEndpoints().size() > 0);
     }
 
-    public void testHeadersUrlToXmlContentTypeDocument() throws YadisException
+    public void testHeadersUrlToXmlContentTypeDocument() throws DiscoveryException
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=simpleheaders_xml");
+        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simpleheaders_xml",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
-        assertTrue(result.isSuccess());
+        assertTrue(result.getEndpoints().size() > 0);
     }
 
-    public void testHtmlUrl() throws YadisException
+    public void testHtmlUrl() throws DiscoveryException
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?html=simplehtml");
+        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?html=simplehtml",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
-        assertTrue(result.isSuccess());
+        assertTrue(result.getEndpoints().size() > 0);
     }
 
-    public void testRedirectToHeaderResponse() throws YadisException
+    public void testRedirectToHeaderResponse() throws DiscoveryException
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=redir_simpleheaders");
+        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=redir_simpleheaders",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
-        assertTrue(result.isSuccess());
+        assertTrue(result.getEndpoints().size() > 0);
     }
 
-    public void testRedirectToHtmlResponse() throws YadisException
+    public void testRedirectToHtmlResponse() throws DiscoveryException
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=redir_simplehtml");
+        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=redir_simplehtml",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
-        assertTrue(result.isSuccess());
+        assertTrue(result.getEndpoints().size() > 0);
     }
 
-    public void testRedirectToXrdsResponse() throws YadisException
+    public void testRedirectToXrdsResponse() throws DiscoveryException
     {
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=redir_simplexrds");
+        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=redir_simplexrds",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
-        assertTrue(result.isSuccess());
+        assertTrue(result.getEndpoints().size() > 0);
     }
 
 
-    public void testIncompleteHtmlParsing() throws YadisException
+    public void testIncompleteHtmlParsing() throws DiscoveryException
     {
         // stop reading from the received HTML body shortly after the Yadis tag
         HttpCache cache = new HttpCache();
@@ -130,10 +132,10 @@ public class YadisResolverTest extends TestCase
         requestOptions.setMaxBodySize(350);
         cache.setDefaultRequestOptions(requestOptions);
 
-        YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?html=simplehtml", cache);
+        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?html=simplehtml",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
-        assertTrue(result.isSuccess());
+        assertTrue(result.getEndpoints().size() > 0);
     }
 
     // -------------------- error handling tests -------------------------------
@@ -147,7 +149,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                  OpenIDException.YADIS_INVALID_URL);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                     OpenIDException.YADIS_INVALID_URL, expected.getErrorCode());
@@ -197,7 +199,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                  OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                     OpenIDException.YADIS_HEAD_INVALID_RESPONSE, expected.getErrorCode());
@@ -211,7 +213,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                  OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HEAD_INVALID_RESPONSE, expected.getErrorCode());
@@ -228,7 +230,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                  OpenIDException.YADIS_GET_INVALID_RESPONSE);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                     OpenIDException.YADIS_GET_INVALID_RESPONSE, expected.getErrorCode());
@@ -242,7 +244,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                  OpenIDException.YADIS_GET_INVALID_RESPONSE);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_GET_INVALID_RESPONSE, expected.getErrorCode());
@@ -259,7 +261,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                  OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
@@ -276,21 +278,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
         }
-        catch (YadisException expected)
-        {
-            assertEquals(expected.getMessage(),
-                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
-        }
-
-        try
-        {
-            _resolver.discover("http://localhost:" +
-                _servletPort + "/?html=headnometa");
-
-            fail("Should have failed with error code " +
-                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
-        }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
@@ -304,7 +292,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
@@ -312,18 +300,25 @@ public class YadisResolverTest extends TestCase
 
         try
         {
-            YadisResult result = _resolver.discover("http://localhost:" +
-                _servletPort + "/?html=extraheadinbody");
+            YadisResult result = _resolver.discover("http://localhost:" +_servletPort + "/?html=extraheadinbody",
+                10, new HttpCache(), Collections.singleton("http://example.com/"));
 
             assertTrue("Discovery should have ignored a html/body/head; " +
-                       " we only care about spurious html/head's", result.isSuccess());
+                       " we only care about spurious html/head's", result.getEndpoints().size() == 1);
 
         }
-        catch (YadisException e)
+        catch (DiscoveryException e)
         {
             fail("Discovery should have ignored a html/body/head; " +
                        " we only care about spurious html/head's");
         }
+    }
+
+    public void testHtmlHeadNoMeta() throws DiscoveryException
+    {
+        List result = _resolver.discover("http://localhost:" + _servletPort + "/?html=headnometa");
+
+        assertEquals("Should have discovered no endpoints; found: " + result.size(), result.size(), 0);
     }
 
     public void testEmptyHtml()
@@ -336,7 +331,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
@@ -391,7 +386,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_XRDS_SIZE_EXCEEDED, expected.getErrorCode());
@@ -408,7 +403,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_XRDS_PARSING_ERROR);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
@@ -422,7 +417,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_XRDS_PARSING_ERROR);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
@@ -439,7 +434,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_XRDS_PARSING_ERROR);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
@@ -453,7 +448,7 @@ public class YadisResolverTest extends TestCase
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_XRDS_PARSING_ERROR);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
@@ -464,13 +459,14 @@ public class YadisResolverTest extends TestCase
             _resolver.discover("http://localhost:" +
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds5");
 
+            // "bla bla" matches xrd.xsd's URIPriorityAppendPattern type, so this one won't be a parse error; hmm...
             fail("Should have failed with error code " +
-                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+                OpenIDException.YADIS_INVALID_URL);
         }
-        catch (YadisException expected)
+        catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
-                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+                OpenIDException.YADIS_INVALID_URL, expected.getErrorCode());
         }
     }
 
@@ -478,11 +474,11 @@ public class YadisResolverTest extends TestCase
     {
         // empty string is a valid java.net.URI...
 
-        YadisResult yadis = _resolver.discover("http://localhost:" +
-            _servletPort + "/?headers=simplexrds&xrds=malformedxrds6");
+        YadisResult yadis = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simplexrds&xrds=malformedxrds6",
+            10, new HttpCache(), Collections.singleton("http://example.com/"));
 
         assertTrue("XRDS with an empty URI is valid; Yadis should have succeeded",
-                   yadis.isSuccess());
+                   yadis.getEndpoints().size() > 0);
 
         // also run through Discovery.extractDiscoveryInformation()
         ConsumerManager manager = new ConsumerManager();

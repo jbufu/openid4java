@@ -6,6 +6,8 @@ package org.openid4java.discovery;
 
 import java.net.URL;
 import java.io.Serializable;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -23,6 +25,22 @@ public class DiscoveryInformation implements Serializable
     public final static String OPENID2_OP = "http://specs.openid.net/auth/2.0/server";
     public final static String OPENID2_RP = "http://specs.openid.net/auth/2.0/return_to";
 
+    public static final Set OPENID_OP_TYPES = new HashSet() {{
+      add(DiscoveryInformation.OPENID10);
+      add(DiscoveryInformation.OPENID11);
+      add(DiscoveryInformation.OPENID2);
+      add(DiscoveryInformation.OPENID2_OP);
+    }};
+
+    public static final Set OPENID_TYPES = new HashSet() {{
+        addAll(OPENID_OP_TYPES);
+        add(DiscoveryInformation.OPENID2_RP);
+    }};
+
+    public static boolean isOpenIDType(String type)
+    {
+        return OPENID_TYPES.contains(type);
+    }
 
     public DiscoveryInformation(URL opEndpoint) throws DiscoveryException
     {
