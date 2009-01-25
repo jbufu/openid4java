@@ -16,4 +16,8 @@ public interface XriResolver
      * @throws DiscoveryException if discovery failed.
      */
     public List discover(XriIdentifier xri) throws DiscoveryException;
+
+    String getIriNormalForm(String identifier);
+
+    String getUriNormalForm(String identifier);
 }

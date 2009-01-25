@@ -17,50 +17,51 @@ import javax.servlet.ServletException;
 public class DiscoveryTest extends TestCase
 {
     private String _testDataPath;
+    private Discovery _discovery;
 
     public DiscoveryTest(String name) throws ServletException
     {
         super(name);
 
         _testDataPath = System.getProperty("TEST_DATA");
-
+        _discovery = new Discovery();
         if (_testDataPath == null)
             throw new ServletException("TEST_DATA path not initialized");
     }
 
     public void testParseUrl() throws DiscoveryException
     {
-        assertTrue(Discovery.parseIdentifier("http://example.com") instanceof UrlIdentifier);
-        assertTrue(Discovery.parseIdentifier("HTTP://EXAMPLE.COM") instanceof UrlIdentifier);
-        assertTrue(Discovery.parseIdentifier("http://example.com/a/b?q=1#end") instanceof UrlIdentifier);
-        assertTrue(Discovery.parseIdentifier("https://example.com") instanceof UrlIdentifier);
-        assertTrue(Discovery.parseIdentifier("HTTPS://EXAMPLE.COM") instanceof UrlIdentifier);
-        assertTrue(Discovery.parseIdentifier("https://example.com/a/b?q=1#end") instanceof UrlIdentifier);
-        assertTrue(Discovery.parseIdentifier("HttpS://Example.Com") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("http://example.com") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("HTTP://EXAMPLE.COM") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("http://example.com/a/b?q=1#end") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("https://example.com") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("HTTPS://EXAMPLE.COM") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("https://example.com/a/b?q=1#end") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("HttpS://Example.Com") instanceof UrlIdentifier);
     }
 
     public void testParseUrlNoProtocol() throws DiscoveryException
     {
-        assertTrue(Discovery.parseIdentifier("example.com") instanceof UrlIdentifier);
-        assertTrue(Discovery.parseIdentifier("example.com/a/b?q=1#end") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("example.com") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("example.com/a/b?q=1#end") instanceof UrlIdentifier);
 
-        UrlIdentifier identifier = (UrlIdentifier) Discovery.parseIdentifier("example.com");
+        UrlIdentifier identifier = (UrlIdentifier) _discovery.parseIdentifier("example.com");
         assertEquals("http", identifier.getUrl().getProtocol());
     }
 
     public void testParseXri() throws DiscoveryException
     {
-        assertTrue(Discovery.parseIdentifier("xri://=example") instanceof XriIdentifier);
-        assertTrue(Discovery.parseIdentifier("xri://example") instanceof UrlIdentifier);
+        assertTrue(_discovery.parseIdentifier("xri://=example") instanceof XriIdentifier);
+        assertTrue(_discovery.parseIdentifier("xri://example") instanceof UrlIdentifier);
     }
 
     public void testParseXriNoProtocol() throws DiscoveryException
     {
-        assertTrue(Discovery.parseIdentifier("=example") instanceof XriIdentifier);
-        assertTrue(Discovery.parseIdentifier("@example") instanceof XriIdentifier);
-        assertTrue(Discovery.parseIdentifier("$example") instanceof XriIdentifier);
-        assertTrue(Discovery.parseIdentifier("+example") instanceof XriIdentifier);
-        assertTrue(Discovery.parseIdentifier("!!1234") instanceof XriIdentifier);
+        assertTrue(_discovery.parseIdentifier("=example") instanceof XriIdentifier);
+        assertTrue(_discovery.parseIdentifier("@example") instanceof XriIdentifier);
+        assertTrue(_discovery.parseIdentifier("$example") instanceof XriIdentifier);
+        assertTrue(_discovery.parseIdentifier("+example") instanceof XriIdentifier);
+        assertTrue(_discovery.parseIdentifier("!!1234") instanceof XriIdentifier);
     }
 
     //todo: tests for multiple discovered services / priorities
