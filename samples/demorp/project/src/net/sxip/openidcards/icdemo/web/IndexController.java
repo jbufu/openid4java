@@ -21,7 +21,7 @@ import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.*;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.consumer.VerificationResult;
-import org.openid4java.consumer.InfocardException;
+import org.openid4java.infocard.InfocardException;
 import org.openid4java.OpenIDException;
 import org.openid4java.infocard.OpenIDToken;
 

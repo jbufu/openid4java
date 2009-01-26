@@ -79,7 +79,6 @@
 
         <div class="form">
 
-            <%--
             <form name="openid-login" action="<c:out value='${pageContext.request.context7Path}'/>/" method="post">
                 <table>
                     <tr>
@@ -92,7 +91,6 @@
                     </tr>
                 </table>
             </form>
---%>
 
 <%--
             <form name="infocard" method="post" action="./infocard"
