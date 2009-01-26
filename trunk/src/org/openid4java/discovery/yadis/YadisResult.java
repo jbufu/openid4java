@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.UrlIdentifier;
 import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.xrds.XrdsServiceEndpoint;
 import org.openid4java.OpenIDException;
 
 import java.net.URL;
@@ -134,7 +135,6 @@ public class YadisResult
     public void setEndpoints(List endpoints)
     {
         _endpoints = endpoints;
-        Collections.sort(_endpoints);
     }
 
     /**

@@ -18,6 +18,7 @@ import java.util.List;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.xrds.XrdsParser;
 import org.openid4java.util.HttpCache;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
@@ -60,8 +61,8 @@ public class YadisResolver
     private static final String YADIS_HTML_PARSER_CLASS_NAME_KEY = "discovery.yadis.html.parser";
     private static final YadisHtmlParser YADIS_HTML_PARSER;
 
-    private static final String YADIS_XRDS_PARSER_CLASS_NAME_KEY = "discovery.yadis.xrds.parser";
-    private static final YadisXrdsParser YADIS_XRDS_PARSER;
+    private static final String XRDS_PARSER_CLASS_NAME_KEY = "discovery.xrds.parser";
+    private static final XrdsParser XRDS_PARSER;
 
     static {
         String className = OpenID4JavaUtils.getProperty(YADIS_HTML_PARSER_CLASS_NAME_KEY);
@@ -74,11 +75,11 @@ public class YadisResolver
         {
             throw new RuntimeException(e);
         }
-        className = OpenID4JavaUtils.getProperty(YADIS_XRDS_PARSER_CLASS_NAME_KEY);
-        if (DEBUG) _log.debug(YADIS_XRDS_PARSER_CLASS_NAME_KEY + ":" + className);
+        className = OpenID4JavaUtils.getProperty(XRDS_PARSER_CLASS_NAME_KEY);
+        if (DEBUG) _log.debug(XRDS_PARSER_CLASS_NAME_KEY + ":" + className);
         try
         {
-            YADIS_XRDS_PARSER = (YadisXrdsParser) Class.forName(className).newInstance();
+            XRDS_PARSER = (XrdsParser) Class.forName(className).newInstance();
         }
         catch (Exception e)
         {
@@ -221,7 +222,7 @@ public class YadisResolver
             .getDiscoveredInformation(DiscoveryInformation.OPENID_OP_TYPES);
     }
 
-    public YadisResult discover(String url, int maxRedirects, HttpCache cache, Set serviceTypes) throws YadisException {
+    public YadisResult discover(String url, int maxRedirects, HttpCache cache, Set serviceTypes) throws DiscoveryException {
         YadisUrl yadisUrl = new YadisUrl(url);
 
         // try to retrieve the Yadis Descriptor URL with a HEAD call first
@@ -255,7 +256,7 @@ public class YadisResolver
      * @param maxRedirects
      */
     private void retrieveXrdsDocument(YadisResult result, HttpCache cache, int maxRedirects, Set serviceTypes)
-        throws YadisException {
+        throws DiscoveryException {
 
         cache.getRequestOptions().setMaxRedirects(maxRedirects);
 
@@ -278,7 +279,7 @@ public class YadisResolver
                     "More than " + cache.getRequestOptions().getMaxBodySize() +
                     " bytes in HTTP response body from " + result.getXrdsLocation(),
                     OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
-            result.setEndpoints(YADIS_XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
+            result.setEndpoints(XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
 
         } catch (IOException e) {
             throw new YadisException("Fatal transport error: ",
@@ -340,7 +341,7 @@ public class YadisResolver
 
     private YadisResult retrieveXrdsLocation(
         YadisUrl url, boolean useGet, HttpCache cache, int maxRedirects, Set serviceTypes)
-            throws YadisException
+        throws DiscoveryException
     {
         try
         {
@@ -405,7 +406,7 @@ public class YadisResolver
                         "More than " + requestOptions.getMaxBodySize() +
                         " bytes in HTTP response body from " + url,
                         OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
-                result.setEndpoints(YADIS_XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
+                result.setEndpoints(XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
             }
             else if (resp.getBody() != null)
             {

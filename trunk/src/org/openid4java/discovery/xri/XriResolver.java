@@ -2,6 +2,7 @@ package org.openid4java.discovery.xri;
 
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.XriIdentifier;
+import org.openid4java.discovery.Identifier;
 
 import java.util.List;
 
@@ -17,7 +18,5 @@ public interface XriResolver
      */
     public List discover(XriIdentifier xri) throws DiscoveryException;
 
-    String getIriNormalForm(String identifier);
-
-    String getUriNormalForm(String identifier);
+    XriIdentifier parseIdentifier(String identifier) throws DiscoveryException;
 }

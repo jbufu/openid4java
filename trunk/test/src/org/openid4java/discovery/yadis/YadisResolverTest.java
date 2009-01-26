@@ -401,12 +401,12 @@ public class YadisResolverTest extends TestCase
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds1");
 
             fail("Should have failed with error code " +
-                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+                OpenIDException.XRDS_PARSING_ERROR);
         }
         catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
-                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+                OpenIDException.XRDS_PARSING_ERROR, expected.getErrorCode());
         }
 
         try
@@ -415,12 +415,12 @@ public class YadisResolverTest extends TestCase
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds2");
 
             fail("Should have failed with error code " +
-                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+                OpenIDException.XRDS_PARSING_ERROR);
         }
         catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
-                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+                OpenIDException.XRDS_PARSING_ERROR, expected.getErrorCode());
         }
     }
 
@@ -432,12 +432,12 @@ public class YadisResolverTest extends TestCase
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds3");
 
             fail("Should have failed with error code " +
-                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+                OpenIDException.XRDS_PARSING_ERROR);
         }
         catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
-                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+                OpenIDException.XRDS_PARSING_ERROR, expected.getErrorCode());
         }
 
         try
@@ -446,12 +446,12 @@ public class YadisResolverTest extends TestCase
                 _servletPort + "/?headers=simplexrds&xrds=malformedxrds4");
 
             fail("Should have failed with error code " +
-                OpenIDException.YADIS_XRDS_PARSING_ERROR);
+                OpenIDException.XRDS_PARSING_ERROR);
         }
         catch (DiscoveryException expected)
         {
             assertEquals(expected.getMessage(),
-                OpenIDException.YADIS_XRDS_PARSING_ERROR, expected.getErrorCode());
+                OpenIDException.XRDS_PARSING_ERROR, expected.getErrorCode());
         }
 
         try

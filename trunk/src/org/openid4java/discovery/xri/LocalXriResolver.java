@@ -27,13 +27,10 @@ public class LocalXriResolver implements XriResolver
     final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
 
     private Resolver _openXriResolver = new Resolver();
-    private Discovery _discovery;
 
-    public LocalXriResolver(Discovery discovery)
+    public LocalXriResolver()
     {
         if (DEBUG) _log.debug("Initializing local XRI resolver...");
-
-        _discovery = discovery;
 
         // populate the root with whatever trustType the user requested
         String trustParam = ";trust=none";
@@ -101,14 +98,10 @@ public class LocalXriResolver implements XriResolver
         }
     }
 
-    public String getIriNormalForm(String identifier) {
-        XRI xri = new XRI(identifier);
-        return xri.toIRINormalForm();
-    }
+    public XriIdentifier parseIdentifier(String identifier) throws DiscoveryException {
 
-    public String getUriNormalForm(String identifier) {
         XRI xri = new XRI(identifier);
-        return xri.toURINormalForm();
+        return new XriIdentifier(identifier, xri.toIRINormalForm(), xri.toURINormalForm());
     }
 
     private boolean isProviderAuthoritative(String providerId,
@@ -240,7 +233,8 @@ public class LocalXriResolver implements XriResolver
                 }
 
                 // todo: canonicalID verification?
-                claimedIdentifier = _discovery.parseIdentifier(canonID.getValue());
+                // canonical ID is/should be an XRI?
+                claimedIdentifier = parseIdentifier(canonID.getValue());
                 _log.info("Using canonicalID as claimedID: " +
                           claimedIdentifier.getIdentifier() +
                           " for " + srvType);
