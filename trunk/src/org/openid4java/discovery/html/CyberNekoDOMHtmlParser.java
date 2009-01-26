@@ -2,7 +2,7 @@
  * Copyright 2006-2008 Sxip Identity Corporation
  */
 
-package org.openid4java.util;
+package org.openid4java.discovery.html;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
+import org.openid4java.util.OpenID4JavaDOMParser;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.html.HtmlParser;
 import org.openid4java.discovery.html.HtmlResult;
@@ -23,7 +24,7 @@ import org.w3c.dom.html.HTMLLinkElement;
  * 
  * @author Sutra Zhou
  * @since 0.9.4
- * @see OpenID4JavaDOMParser
+ * @see org.openid4java.util.OpenID4JavaDOMParser
  */
 public class CyberNekoDOMHtmlParser implements HtmlParser
 {
