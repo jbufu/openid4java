@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.html.HtmlResult;
+import org.openid4java.discovery.html.CyberNekoDOMHtmlParser;
 
 /**
  * @author Sutra Zhou
@@ -33,7 +34,7 @@ public class CyberNekoDOMHtmlParserTest extends TestCase
 
     /**
      * Test method for
-     * {@link org.openid4java.util.CyberNekoDOMHtmlParser#parseHtml(java.lang.String, org.openid4java.discovery.html.HtmlResult)}
+     * {@link org.openid4java.discovery.html.CyberNekoDOMHtmlParser#parseHtml(java.lang.String, org.openid4java.discovery.html.HtmlResult)}
      * .
      * 
      * @throws IOException
@@ -54,7 +55,7 @@ public class CyberNekoDOMHtmlParserTest extends TestCase
 
     /**
      * Test method for
-     * {@link org.openid4java.util.CyberNekoDOMHtmlParser#parseHtml(java.lang.String, org.openid4java.discovery.html.HtmlResult)}
+     * {@link org.openid4java.discovery.html.CyberNekoDOMHtmlParser#parseHtml(java.lang.String, org.openid4java.discovery.html.HtmlResult)}
      * .
      * 
      * @throws IOException
