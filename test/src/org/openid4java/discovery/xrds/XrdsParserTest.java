@@ -1,17 +1,16 @@
-package org.openid4java.discovery.yadis;
+package org.openid4java.discovery.xrds;
 
 import junit.framework.TestCase;
 import org.openid4java.discovery.DiscoveryInformation;
-import org.openid4java.util.YadisXrdsParserImpl;
 
 /**
  * @author jbufu
  */
-public class YadisXrdsParserTest extends TestCase
+public class XrdsParserTest extends TestCase
 {
-    public void testYadisXrdsParse() throws Exception
+    public void testXrdsParse() throws Exception
     {
-        YadisXrdsParser parser = new YadisXrdsParserImpl();
+        XrdsParser parser = new XrdsParserImpl();
         parser.parseXrds(XRD, DiscoveryInformation.OPENID_OP_TYPES);
     }
 

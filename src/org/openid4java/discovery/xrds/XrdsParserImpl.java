@@ -1,9 +1,7 @@
-package org.openid4java.util;
+package org.openid4java.discovery.xrds;
 
-import org.openid4java.discovery.yadis.YadisXrdsParser;
-import org.openid4java.discovery.yadis.YadisException;
-import org.openid4java.discovery.yadis.XrdsServiceEndpoint;
 import org.openid4java.discovery.Discovery;
+import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.OpenIDException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -22,9 +20,9 @@ import java.io.IOException;
 /**
  * @author jbufu
  */
-public class YadisXrdsParserImpl implements YadisXrdsParser
+public class XrdsParserImpl implements XrdsParser
 {
-    private static final Log _log = LogFactory.getLog(YadisXrdsParserImpl.class);
+    private static final Log _log = LogFactory.getLog(XrdsParserImpl.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
@@ -38,10 +36,11 @@ public class YadisXrdsParserImpl implements YadisXrdsParser
     private static final String XRD_ELEM_TYPE = "Type";
     private static final String XRD_ELEM_URI = "URI";
     private static final String XRD_ELEM_LOCALID = "LocalID";
+    private static final String XRD_ELEM_CANONICALID = "CanonicalID";
     private static final String XRD_ATTR_PRIORITY = "priority";
 
 
-    public List parseXrds(String input, Set targetTypes) throws YadisException
+    public List parseXrds(String input, Set targetTypes) throws DiscoveryException
     {
         if (DEBUG)
             _log.debug("Parsing XRDS input for service types: " + Arrays.toString(targetTypes.toArray()));
@@ -51,7 +50,22 @@ public class YadisXrdsParserImpl implements YadisXrdsParser
         NodeList XRDs = document.getElementsByTagNameNS(XRD_NS, XRD_ELEM_XRD);
         Node lastXRD;
         if (XRDs.getLength() < 1 || (lastXRD = XRDs.item(XRDs.getLength() - 1)) == null)
-            throw new YadisException("No XRD elements found.");
+            throw new DiscoveryException("No XRD elements found.");
+
+        // get the canonical ID, if any (needed for XRIs)
+        String canonicalId = null;
+        Node canonicalIdNode;
+        NodeList canonicalIDs = document.getElementsByTagNameNS(XRD_NS, XRD_ELEM_CANONICALID);
+        for (int i = 0; i < canonicalIDs.getLength(); i++) {
+            canonicalIdNode = canonicalIDs.item(i);
+            if (canonicalIdNode.getParentNode() != lastXRD) continue;
+            if (canonicalId != null)
+                throw new DiscoveryException("More than one Canonical ID found.");
+            canonicalId = canonicalIdNode.getFirstChild() != null && canonicalIdNode.getFirstChild().getNodeType() == Node.TEXT_NODE ?
+                canonicalIdNode.getFirstChild().getNodeValue() : null;
+        }
+
+
 
         // extract the services that match the specified target types
         NodeList types = document.getElementsByTagNameNS(XRD_NS, XRD_ELEM_TYPE);
@@ -104,12 +118,13 @@ public class YadisXrdsParserImpl implements YadisXrdsParser
             String localId = localIdNode != null && localIdNode.getFirstChild() != null && localIdNode.getFirstChild().getNodeType() == Node.TEXT_NODE ?
                 localIdNode.getFirstChild().getNodeValue() : null;
 
-            XrdsServiceEndpoint endpoint = new XrdsServiceEndpoint(uri, typeSet, getPriority(serviceNode), getPriority(uriNode), localId);
+            XrdsServiceEndpoint endpoint = new XrdsServiceEndpoint(uri, typeSet, getPriority(serviceNode), getPriority(uriNode), localId, canonicalId);
             if (DEBUG)
                 _log.debug("Discovered endpoint: \n" + endpoint);
             result.add(endpoint);
         }
 
+        Collections.sort(result);
         return result;
     }
 
@@ -127,11 +142,11 @@ public class YadisXrdsParserImpl implements YadisXrdsParser
         return 0;
     }
 
-    private Document parseXmlInput(String input) throws YadisException
+    private Document parseXmlInput(String input) throws DiscoveryException
     {
         if (input == null)
-            throw new YadisException("Cannot read XML message",
-                OpenIDException.YADIS_XRDS_DOWNLOAD_ERROR);
+            throw new DiscoveryException("Cannot read XML message",
+                OpenIDException.XRDS_DOWNLOAD_ERROR);
 
         if (DEBUG)
             _log.debug("Parsing XRDS input: " + input);
@@ -165,22 +180,23 @@ public class YadisXrdsParserImpl implements YadisXrdsParser
         }
         catch (ParserConfigurationException e)
         {
-            throw new YadisException("Parser configuration error",
-                    OpenIDException.YADIS_XRDS_PARSING_ERROR, e);
+            throw new DiscoveryException("Parser configuration error",
+                    OpenIDException.XRDS_PARSING_ERROR, e);
         }
         catch (SAXException e)
         {
-            throw new YadisException("Error parsing XML document",
-                    OpenIDException.YADIS_XRDS_PARSING_ERROR, e);
+            throw new DiscoveryException("Error parsing XML document",
+                    OpenIDException.XRDS_PARSING_ERROR, e);
         }
         catch (IOException e)
         {
-            throw new YadisException("Error reading XRDS document",
-                    OpenIDException.YADIS_XRDS_DOWNLOAD_ERROR, e);
+            throw new DiscoveryException("Error reading XRDS document",
+                    OpenIDException.XRDS_DOWNLOAD_ERROR, e);
         }
     }
 
-    private void addServiceType(Map serviceTypes, Node serviceNode, String type) {
+    private void addServiceType(Map serviceTypes, Node serviceNode, String type)
+    {
         Set types = (Set) serviceTypes.get(serviceNode);
         if (types == null)
         {

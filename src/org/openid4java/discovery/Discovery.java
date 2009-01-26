@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 import java.util.List;
 
 import org.openid4java.util.HttpCache;
+import org.openid4java.util.OpenID4JavaUtils;
 import org.openid4java.discovery.html.HtmlResolver;
 import org.openid4java.discovery.yadis.YadisResolver;
 import org.openid4java.discovery.xri.XriResolver;
-import org.openid4java.discovery.xri.LocalXriResolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,15 +29,24 @@ public class Discovery
     private static final Pattern XRI_PATTERN =
             Pattern.compile("^[!=@\\$\\+\\(]", Pattern.CASE_INSENSITIVE);
 
-    private XriResolver _xriResolver;
-    private YadisResolver _yadisResolver;
-    private HtmlResolver _htmlResolver;
+    private static HtmlResolver _htmlResolver = new HtmlResolver();
+    private static YadisResolver _yadisResolver = new YadisResolver();
+    
+    private static XriResolver _xriResolver;
+    private static final String XRI_RESOLVER_CLASS_NAME_KEY = "discovery.xri.resolver";
+
+    static {
+        String className = OpenID4JavaUtils.getProperty(XRI_RESOLVER_CLASS_NAME_KEY);
+        if (DEBUG) _log.debug(XRI_RESOLVER_CLASS_NAME_KEY + ":" + className);
+        try {
+            _xriResolver = (XriResolver) Class.forName(className).newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing XRI resolver.", e);
+        }
+    }
 
     public Discovery()
     {
-        _htmlResolver = new HtmlResolver();
-        _yadisResolver = new YadisResolver();
-        _xriResolver = new LocalXriResolver(this);
     }
 
     public void setXriResolver(XriResolver xriResolver)
@@ -83,7 +92,7 @@ public class Discovery
             else if (XRI_PATTERN.matcher(identifier).find())
             {
                 if (DEBUG) _log.debug("Creating XRI identifier for: " + identifier);
-                return new XriIdentifier(identifier, _xriResolver.getIriNormalForm(identifier), _xriResolver.getUriNormalForm(identifier));
+                return _xriResolver.parseIdentifier(identifier);
             }
             else
             {

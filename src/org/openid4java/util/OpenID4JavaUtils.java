@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
 
 /**
  * Load properties from classpath:<code>org.openid4java.util.openid4java-default.properties</code>,
@@ -41,7 +42,7 @@ public class OpenID4JavaUtils
     private static Properties loadProperties(String name)
     {
         Properties p = null;
-        InputStream is = OpenID4JavaUtils.class.getResourceAsStream(name);
+        InputStream is = OpenIDException.class.getResourceAsStream(name);
         if (is != null)
         {
             p = new Properties();
@@ -61,6 +62,7 @@ public class OpenID4JavaUtils
                 }
                 catch (IOException e)
                 {
+                    _log.warn("Error closing resource stream.", e);
                 }
             }
         }
@@ -84,5 +86,4 @@ public class OpenID4JavaUtils
     private OpenID4JavaUtils()
     {
     }
-
 }
