@@ -114,9 +114,7 @@ public class XrdsParserImpl implements XrdsParser
             serviceNode = uriNode.getParentNode();
             Set typeSet = (Set) serviceTypes.get(serviceNode);
 
-            localIdNode = (Node) serviceLocalIDs.get(serviceNode);
-            String localId = localIdNode != null && localIdNode.getFirstChild() != null && localIdNode.getFirstChild().getNodeType() == Node.TEXT_NODE ?
-                localIdNode.getFirstChild().getNodeValue() : null;
+            String localId = (String) serviceLocalIDs.get(serviceNode);
 
             XrdsServiceEndpoint endpoint = new XrdsServiceEndpoint(uri, typeSet, getPriority(serviceNode), getPriority(uriNode), localId, canonicalId);
             if (DEBUG)
