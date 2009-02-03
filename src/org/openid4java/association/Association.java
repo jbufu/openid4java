@@ -258,7 +258,10 @@ public class Association implements Serializable
 
         try
         {
-            return new String(Base64.encodeBase64(sign(text.getBytes("utf-8"))), "utf-8");
+            String signature = new String(Base64.encodeBase64(sign(text.getBytes("utf-8"))), "utf-8");
+            if (DEBUG)
+                _log.debug("Calculated signature: " + signature);
+            return signature;
         }
         catch (UnsupportedEncodingException e)
         {
