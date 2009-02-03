@@ -14,10 +14,31 @@ import java.util.HashSet;
  */
 public class DiscoveryInformation implements Serializable
 {
+    /**
+     * The OP endpoint URL.
+     */
     URL _opEndpoint;
+
+    /**
+     * The claimed identifier, i.e. the user's identity key.
+     */
     Identifier _claimedIdentifier;
+
+    /**
+     * The delegate, or OP-Local identifier.
+     * The key through which the OP remembers the user's account.
+     */
     String _delegate;
+
+    /**
+     * The OpenID protocol version, or target service type discovered through Yadis.
+     */
     String _version;
+
+    /**
+     * All service types discovered for the endpoint.
+     */
+    Set _types;
 
     public final static String OPENID10 = "http://openid.net/signon/1.0";
     public final static String OPENID11 = "http://openid.net/signon/1.1";
@@ -64,10 +85,18 @@ public class DiscoveryInformation implements Serializable
                                 String delegate, String version)
             throws DiscoveryException
     {
+        this(opEndpoint, claimedIdentifier, delegate, version, null);
+    }
+
+    public DiscoveryInformation(URL opEndpoint, Identifier claimedIdentifier,
+                                String delegate, String version, Set types)
+            throws DiscoveryException
+    {
         _opEndpoint = opEndpoint;
         _claimedIdentifier = claimedIdentifier;
-        _version = version;
         _delegate = delegate;
+        _version = version;
+        _types = types;
 
         if (_opEndpoint == null)
             throw new DiscoveryException("Null OpenID Provider endpoint.");
@@ -115,6 +144,21 @@ public class DiscoveryInformation implements Serializable
     public boolean isVersion2()
     {
         return OPENID2.equals(_version) || OPENID2_OP.equals(_version);
+    }
+
+    public Set getTypes()
+    {
+        return _types;
+    }
+
+    public void setTypes(Set types)
+    {
+        this._types = types;
+    }
+
+    public boolean hasType(String type)
+    {
+        return _types != null && _types.contains(type);
     }
 
     public String toString()

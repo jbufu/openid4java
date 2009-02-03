@@ -150,7 +150,7 @@ public class YadisResult
         return _endpoints == null ? 0 : _endpoints.size();
     }
 
-    public List getDiscoveredInformation(Set types) throws DiscoveryException
+    public List getDiscoveredInformation(Set targetTypes) throws DiscoveryException
     {
         List result = new ArrayList();
 
@@ -163,13 +163,14 @@ public class YadisResult
                 Iterator typesIter = endpoint.getTypes().iterator();
                 while (typesIter.hasNext()) {
                     String type = (String) typesIter.next();
-                    if (!types.contains(type)) continue;
+                    if (!targetTypes.contains(type)) continue;
                     try {
                         result.add(new DiscoveryInformation(
                             new URL(endpoint.getUri()),
                             new UrlIdentifier(_normalizedUrl),
                             endpoint.getLocalId(),
-                            type));
+                            type,
+                            endpoint.getTypes()));
                     } catch (MalformedURLException e) {
                         throw new YadisException("Invalid endpoint URL discovered: " + endpoint.getUri(), OpenIDException.YADIS_INVALID_URL);
                     }
