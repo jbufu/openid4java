@@ -65,21 +65,22 @@ public class XrdsParserImpl implements XrdsParser
                 canonicalIdNode.getFirstChild().getNodeValue() : null;
         }
 
-
-
         // extract the services that match the specified target types
         NodeList types = document.getElementsByTagNameNS(XRD_NS, XRD_ELEM_TYPE);
         Map serviceTypes = new HashMap();
+        Set selectedServices = new HashSet();
         Node typeNode, serviceNode;
         for (int i = 0; i < types.getLength(); i++) {
             typeNode = types.item(i);
             String type = typeNode != null && typeNode.getFirstChild() != null && typeNode.getFirstChild().getNodeType() == Node.TEXT_NODE ?
                 typeNode.getFirstChild().getNodeValue() : null;
-            if (type == null || !targetTypes.contains(type)) continue;
+            if (type == null) continue;
 
             serviceNode = typeNode.getParentNode();
             if (serviceNode.getParentNode() != lastXRD) continue;
 
+            if (targetTypes.contains(type))
+                selectedServices.add(serviceNode);
             addServiceType(serviceTypes, serviceNode, type);
         }
 
@@ -92,7 +93,7 @@ public class XrdsParserImpl implements XrdsParser
         Node localIdNode;
         for (int i = 0; i < localIDs.getLength(); i++) {
             localIdNode = localIDs.item(i);
-            if (localIdNode == null || !serviceTypes.containsKey(localIdNode.getParentNode())) continue;
+            if (localIdNode == null || !selectedServices.contains(localIdNode.getParentNode())) continue;
 
             String localId = localIdNode.getFirstChild() != null && localIdNode.getFirstChild().getNodeType() == Node.TEXT_NODE ?
                 localIdNode.getFirstChild().getNodeValue() : null;
@@ -106,7 +107,7 @@ public class XrdsParserImpl implements XrdsParser
         Node uriNode;
         for (int i = 0; i < uris.getLength(); i++) {
             uriNode = uris.item(i);
-            if (uriNode == null || !serviceTypes.containsKey(uriNode.getParentNode())) continue;
+            if (uriNode == null || !selectedServices.contains(uriNode.getParentNode())) continue;
 
             String uri = uriNode.getFirstChild() != null && uriNode.getFirstChild().getNodeType() == Node.TEXT_NODE ?
                 uriNode.getFirstChild().getNodeValue() : null;
