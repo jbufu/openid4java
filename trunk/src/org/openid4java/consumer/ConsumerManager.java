@@ -162,7 +162,7 @@ public class ConsumerManager
                 _maxRedirects, Boolean.FALSE, _socketTimeout, _connectTimeout,
                 CookiePolicy.IGNORE_COOKIES);
 
-        _realmVerifier = new RealmVerifier();
+        _realmVerifier = new RealmVerifier(false);
 
         // don't verify own (RP) identity, disable RP discovery
         _realmVerifier.setEnforceRpId(false);

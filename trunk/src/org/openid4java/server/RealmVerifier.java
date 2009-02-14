@@ -45,8 +45,9 @@ public class RealmVerifier
     private YadisResolver _yadisResolver;
 
     private boolean _enforceRpId;
+    private boolean _isOP;
 
-    public RealmVerifier()
+    public RealmVerifier(boolean isOP)
     {
         _deniedRealmDomains = new ArrayList();
 
@@ -56,6 +57,7 @@ public class RealmVerifier
         _yadisResolver = new YadisResolver();
 
         _enforceRpId = true;
+        _isOP = isOP;
     }
 
     public void addDeniedRealmDomain(String deniedRealmDomain)
@@ -101,6 +103,8 @@ public class RealmVerifier
     public void setEnforceRpId(boolean enforceRpId)
     {
         this._enforceRpId = enforceRpId;
+        if (! enforceRpId)
+            _log.warn("RP discovery / realm validation disabled; ");
     }
 
     public int validate(String realm, String returnTo)
@@ -138,7 +142,7 @@ public class RealmVerifier
                 _log.error("Failed to validate return URL: " + returnTo +
                     " against endpoints discovered from the RP's realm.");
         }
-        else if ( ! compatibility && ! enforceRpId )
+        else if ( ! compatibility && ! enforceRpId && _isOP)
         {
             _log.warn("RP discovery / realm validation disabled; " +
                       "this option SHOULD be enabled for OPs");
