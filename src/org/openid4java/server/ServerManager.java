@@ -360,7 +360,7 @@ public class ServerManager
     public ServerManager()
     {
         // initialize a default realm verifier
-        _realmVerifier = new RealmVerifier();
+        _realmVerifier = new RealmVerifier(true);
         _realmVerifier.setEnforceRpId(false);
     }
 
