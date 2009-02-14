@@ -167,7 +167,8 @@ public class YadisResult
                     try {
                         result.add(new DiscoveryInformation(
                             new URL(endpoint.getUri()),
-                            new UrlIdentifier(_normalizedUrl),
+                            DiscoveryInformation.OPENID_SIGNON_TYPES.contains(type) ?
+                                new UrlIdentifier(_normalizedUrl) : null,
                             endpoint.getLocalId(),
                             type,
                             endpoint.getTypes()));
