@@ -62,7 +62,15 @@ public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingL
         }
     }
 
-    public static String toXmlString(Document doc)
+    /**
+     * Transform the document to string.
+     * 
+     * @param doc the document
+     * @return a string
+     * @throws TransformerException If an unrecoverable error occurs
+     *   during the course of the transformation.
+     */
+    public static String toXmlString(Document doc) throws TransformerException
     {
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer;
@@ -81,14 +89,7 @@ public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingL
         DOMSource source = new DOMSource(doc);
         StringWriter xmlString = new StringWriter();
         StreamResult streamResult = new StreamResult(xmlString);
-        try
-        {
-            transformer.transform(source, streamResult);
-        }
-        catch (TransformerException e)
-        {
-            throw new RuntimeException(e);
-        }
+        transformer.transform(source, streamResult);
         return xmlString.toString();
     }
 

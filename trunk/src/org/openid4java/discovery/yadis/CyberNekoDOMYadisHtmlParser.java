@@ -4,6 +4,8 @@
 
 package org.openid4java.discovery.yadis;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
@@ -40,7 +42,13 @@ public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
         HTMLDocumentImpl doc = this.parseDocument(input);
         if (DEBUG)
         {
-            _log.debug("document:\n" + OpenID4JavaDOMParser.toXmlString(doc));
+            try
+            {
+                _log.debug("document:\n" + OpenID4JavaDOMParser.toXmlString(doc));
+            } catch (TransformerException e)
+            {
+                _log.debug("An exception occurs while transforming the document to string in debugging.", e);
+            }
         }
 
         NodeList heads = doc.getElementsByTagName("head");
