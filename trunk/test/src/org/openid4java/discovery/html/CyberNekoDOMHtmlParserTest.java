@@ -2,7 +2,7 @@
  * Copyright 2006-2008 Sxip Identity Corporation
  */
 
-package org.openid4java.util;
+package org.openid4java.discovery.html;
 
 import java.io.IOException;
 
@@ -10,8 +10,6 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
 import org.openid4java.discovery.DiscoveryException;
-import org.openid4java.discovery.html.HtmlResult;
-import org.openid4java.discovery.html.CyberNekoDOMHtmlParser;
 
 /**
  * @author Sutra Zhou
