@@ -96,18 +96,13 @@ public class DiscoveryInformation implements Serializable
                                 String delegate, String version, Set types)
             throws DiscoveryException
     {
+        if (opEndpoint == null)
+            throw new DiscoveryException("Null OpenID Provider endpoint.");
         _opEndpoint = opEndpoint;
         _claimedIdentifier = claimedIdentifier;
         _delegate = delegate;
         _version = version;
         _types = types;
-
-        if (_opEndpoint == null)
-            throw new DiscoveryException("Null OpenID Provider endpoint.");
-
-        if (_delegate != null && _claimedIdentifier == null)
-            throw new DiscoveryException("Claimed ID must be present " +
-                    "if delegated ID is used.");
     }
 
     public boolean hasClaimedIdentifier()
