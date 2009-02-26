@@ -1043,17 +1043,19 @@ public class ConsumerManager
         String handle = assoc != null ?
                 assoc.getHandle() : Association.FAILED_ASSOC_HANDLE;
 
-        // get the Claimed ID
-        String claimedId;
+        // get the Claimed ID and Delegate ID (aka OP-specific identifier)
+        String claimedId, delegate;
         if (discovered.hasClaimedIdentifier())
+        {
             claimedId = discovered.getClaimedIdentifier().getIdentifier();
+            delegate = discovered.hasDelegateIdentifier() ?
+                       discovered.getDelegateIdentifier() : claimedId;
+        }
         else
+        {
             claimedId = AuthRequest.SELECT_ID;
-
-        // set the Delegate ID (aka OP-specific identifier)
-        String delegate = claimedId;
-        if (discovered.hasDelegateIdentifier())
-            delegate = discovered.getDelegateIdentifier();
+            delegate = AuthRequest.SELECT_ID;
+        }
 
         // stateless mode disabled ?
         if ( !_allowStateless && Association.FAILED_ASSOC_HANDLE.equals(handle))
