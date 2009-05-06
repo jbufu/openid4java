@@ -23,37 +23,33 @@ Installation:
 
   1. Installing the package
 
-    => Endorsed libraries:
-
-    The JAR files under the lib/endorsed/ folder need to be copied under
-    your environment's endorsed libraries folder. If you are running a
-    webapplication under Apache Tomcat, this directory can be found at:
-
-        JAVA_HOME/lib/endorsed
-     or
-        CATALINA_HOME/common/endorsed
-
-    For other application servers or environments, please consult their
-    documentation for configuring endorsed libraries.
-
-    => To make the OpenID4Java library available to the web application
-    the following need to be done:
-
-      Copy lib/*.jar and java-openid-sxip-*.jar to your application's
-      Java classpath, along with any additional requirements as described 
-      in the library dependencies section below.
+    => To make the OpenID4Java library available to a (web) application
+       the following JAR files need to be copied to the application's
+       classpath:
+                        - openid4java-*.jar
+                        - library dependencies (see belo)
 
     => Library dependencies:
 
-      lib/xri/      : OpenXRI dependencies; needed for XRI support.
-      lib/endorsed/ : Endorsed libraries; documented above.   
-      lib/infocard/ : Higgins STS dependency; needed for OpenID-Infocards STS.
-      lib/optional/ : Optional libraries supporting alternative deployments.
-                      - spring.jar        : JdbcServerAssociationStore
-                      - ehcache-1.2.4.jar : EhcacheNonceVerifier
-                      - log4j-1.2.8.jar
-      lib/extra/    : Extra libraries, not needed for deployments
-                      (JUnit tests, Jetty servlet container, SVN/Ant utilities)
+      lib/*jar       : Required. Core OpenID4Java library dependencies.
+      lib/optional/  : Optional. Libraries supporting alternative deployments.
+                          - spring-*.jar        : JdbcServerAssociationStore
+                          - ehcache-1.2.4.jar   : EhcacheNonceVerifier
+                          - log4j-1.2.8.jar
+
+      lib/extra/     : Extra/development libraries, not needed for deployments.
+                       (JUnit tests, Jetty servlet container, SVN/Ant utilities)
+
+      lib/xri/       : Optional. Local OpenXRI resolver dependencies.
+                       Included only in the "openid4java-xri" and
+                       "openid4java-full" packages. (A dependency-less
+                       proxy XRI resolver is included in the standard package)
+                       See lib/xri/README for details.
+
+      lib/infocard/  : Optional. OpenID-Infocards/Higgins STS dependencies.
+                       Included only in the "openid4java-infocard" and
+                       "openid4java-full" packages.
+
 
     => Relying Party Discovery:
 
@@ -141,7 +137,7 @@ Installation:
 
         ant jar
 
-    - Builds distribution ZIP package
+    - Builds official distributable archive
 
         ant dist
 
@@ -364,17 +360,16 @@ Thanks for running OpenID!
 ========================================================================
 Copyright 2006-2008 Sxip Identity Corporation
 
-Package distribution:
-  => http://code.sxip.com
-
-Source code and defect management:
+Project home page and package distribution:
   => http://code.google.com/p/openid4java
+  => http://code.google.com/p/openid4java/downloads/
 
-For support, please join the Google Groups!
-  => http://groups.google.com/group/openid4java
+For support, please visit the wiki and join the Google Groups!
+  => http://groups.google.com/group/openid4java/
+  => http://code.google.com/p/openid4java/w/
 
 OpenID
-  => http://openid.net 
+  => http://openid.net/
 
 Released under the Apache License 2.0
   => see LICENSE
