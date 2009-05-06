@@ -1,5 +1,8 @@
 .... OpenID4Java Library - TODO
 
+README review
+lib/xri/README
+
 ========================================================================
 
 => Documentation and Packaging
@@ -17,6 +20,7 @@
 
   - Extensions to implement:
     - OpenID Signed Assertions 1.0
+	- OpenID Provider Authentication Policy Extension 1.0
 
   - MessageExtension.providesIdentifier()
     - review interface to allow exchange of messages with no identifiers at all

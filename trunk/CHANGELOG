@@ -75,18 +75,16 @@ Please see the TODO for outstanding items.
 ========================================================================
 Copyright 2006-2008 Sxip Identity Corporation
 
-Package distribution:
-  => http://code.sxip.com
-          
-Source code and defect management:
+Project home page and package distribution:
   => http://code.google.com/p/openid4java
-          
-For support, please join the Google Groups!
-  => http://groups.google.com/group/openid4java
+  => http://code.google.com/p/openid4java/downloads/
+
+For support, please visit the wiki and join the Google Groups!
+  => http://groups.google.com/group/openid4java/
+  => http://code.google.com/p/openid4java/w/
 
 OpenID
-  => http://openid.net 
+  => http://openid.net/
 
 Released under the Apache License 2.0
   => see LICENSE
-

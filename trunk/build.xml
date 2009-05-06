@@ -6,10 +6,30 @@
     <property file="local.properties"/>
     <property file="project.properties"/>
 
-    <target name="create_paths">
+    <target name="dist_type">
+        <condition property="dist.type" value="">
+            <not><isset property="dist.type"/></not>
+        </condition>
+        <condition property="include.xri">
+            <or>
+                <equals arg1="-xri" arg2="${dist.type}"/>
+                <equals arg1="-full" arg2="${dist.type}"/>
+            </or>
+        </condition>
+        <condition property="include.infocard">
+            <or>
+                <equals arg1="-infocard" arg2="${dist.type}"/>
+                <equals arg1="-full" arg2="${dist.type}"/>
+            </or>
+        </condition>
+    </target>
+
+    <target name="create_paths" depends="dist_type">
         <path id="classpath">
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
+                <exclude name="lib/xri/**" unless="include.xri"/>
+                <exclude name="lib/infocard/**" unless="include.infocard"/>
             </fileset>
         </path>
     </target>
@@ -26,7 +46,6 @@
         <delete file="${component.name}-${version}.tar.gz"/>
     </target>
 
-
     <target name="echoproperties" depends="create_paths"
             description="Displays properties; useful for debugging">
         <echoproperties/>
@@ -39,14 +58,12 @@
 
     <target name="compile" depends="prepare" description="Compiles main code">
         <mkdir dir="${classes}"/>
-        <javac srcdir="${src}"
-            destdir="${classes}"
-            includeAntRuntime="no"
-            debug="${debug}"
-            deprecation="yes"
-            source="${jvm.ver}"
-            target="${jvm.ver}">
+        <javac destdir="${classes}" source="${jvm.ver}" target="${jvm.ver}"
+               includeAntRuntime="no" debug="${debug}" deprecation="yes">
+            <src path="${src}"/>
             <classpath refid="classpath"/>
+            <exclude name="**/LocalXriResolver.java" unless="include.xri"/>
+            <exclude name="**/infocard/**" unless="include.infocard"/>
         </javac>
         <copy todir="${classes}">
             <fileset dir="${src}" includes="**/*.properties"/>
@@ -54,56 +71,97 @@
         </copy>
     </target>
 
-  <target name="jar" depends="compile, get-version"
-          description="Packages compiled class files into a jar archive">
-      <jar jarfile="${build}/${component.name}.jar">
-          <fileset dir="${classes}"/>
-        <manifest>
-          <section name="openid4java">
-            <attribute name="Specification-Title" value="OpenID Authentication"/>
-            <attribute name="Specification-Version" value="2.0,1.1"/>
-            <attribute name="Specification-Vendor" value="openid.net"/>
-            <attribute name="Implementation-Title" value="openid4java"/>
-            <attribute name="Implementation-Version" value="${version}"/>
-          </section>
-        </manifest>
-      </jar>
-  </target>
+    <target name="get-version">
+        <taskdef resource="svntask.properties" classpathref="classpath"/>
+        <svn>
+            <status path="." lastchangedrevisionproperty="svn.rev"/>
+        </svn>
+        <property file="VERSION"/>
+        <condition value="${Version}" else="${component.ver}.${svn.rev}"
+                   property="version">
+            <equals arg1="" arg2="${svn.rev}"/>
+        </condition>
+        <echo>Version: ${version}</echo>
+    </target>
 
-  <target name="get-version">
-    <taskdef resource="svntask.properties" classpathref="classpath"/>
-    <svn>
-        <status path="." lastchangedrevisionproperty="svn.rev" />
-    </svn>
-    <property file="VERSION"/>
-    <condition value="${Version}" else="${component.ver}.${svn.rev}"
-               property="version">
-        <equals arg1="" arg2="${svn.rev}" />
-    </condition>
-    <echo>Version: ${version}</echo>
-  </target>
+    <target name="jar" depends="compile, get-version"
+            description="Packages compiled class files into a jar archive">
+        <jar jarfile="${build}/${component.name}${dist.type}.jar">
+            <fileset dir="${classes}"/>
+            <manifest>
+                <section name="openid4java">
+                    <attribute name="Specification-Title" value="OpenID Authentication"/>
+                    <attribute name="Specification-Version" value="2.0,1.1"/>
+                    <attribute name="Specification-Vendor" value="openid.net"/>
+                    <attribute name="Implementation-Title" value="openid4java"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+                </section>
+            </manifest>
+        </jar>
+    </target>
 
-  <target name="dist" depends="jar, apidoc"
-            description="Builds distribution zip package">
+    <target name="dist" depends="jar, apidoc"
+            description="Packages official distributable archive">
         <propertyfile file="VERSION">
             <entry key="Version" value="${version}"/>
         </propertyfile>
-        <move file="${build}/${component.name}.jar"
-              tofile="${basedir}/${component.name}-${component.ver}.jar"/>
+        <move file="${build}/${component.name}${dist.type}.jar"
+              tofile="${basedir}/${component.name}${dist.type}-${component.ver}.jar"/>
         <delete dir="${build}"/>
-        <delete file="${component.name}-${version}.tar.gz"/>
-        <tar destfile="${component.name}-${version}.tar.gz"
-                compression="gzip">
-            <tarfileset dir="${basedir}" prefix="${component.name}-${version}">
-                <exclude name="OpenID Library*"/>
+        <delete file="${component.name}${dist.type}-${version}.tar.gz"/>
+        <tar destfile="${component.name}${dist.type}-${version}.tar.gz" compression="gzip">
+            <tarfileset dir="${basedir}" prefix="${component.name}${dist.type}-${version}">
+                <exclude name="lib/xri/**" unless="include.xri"/>
+                <exclude name="lib/infocard/**" unless="include.infocard"/>
+                <exclude name="*ipr"/>
+                <exclude name="*iml"/>
+                <exclude name="*iws"/>
                 <exclude name="libsrc/**"/>
+                <exclude name="lib/ignored/**"/>
+                <exclude name="lib/test"/>
+                <exclude name="target"/>
+                <exclude name="testLog.txt"/>
+                <exclude name=".classpath"/>
+                <exclude name=".project"/>
+                <exclude name=".settings"/>
+                <exclude name="*tar.gz"/>
             </tarfileset>
         </tar>
-        <delete file="${component.name}-${component.ver}.jar"/>
+        <delete file="${component.name}${dist.type}-${component.ver}.jar"/>
         <delete dir="${apidoc}"/>
         <delete file="VERSION"/>
     </target>
 
+    <target name="dist-xri"
+            description="Packages distributable archive with local XRI resolver support">
+        <property name="dist.type" value="-xri"/>
+        <antcall target="dist"/>
+    </target>
+
+    <target name="dist-infocard"
+            description="Packages distributable archive with OpenID-Infocard support">
+        <property name="dist.type" value="-infocard"/>
+        <antcall target="dist"/>
+    </target>
+
+    <target name="dist-full"
+            description="Packages full distributable archive (local XRI resolver and OpenID-Infocard support)">
+        <property name="dist.type" value="-full"/>
+        <antcall target="dist"/>
+    </target>
+
+    <target name="release"
+            description="Packages all distributable archives">
+        <antcall target="dist"/>
+        <antcall target="clean"/>
+        <antcall target="dist-xri"/>
+        <antcall target="clean"/>
+        <antcall target="dist-infocard"/>
+        <antcall target="clean"/>
+        <antcall target="dist-full"/>
+        <antcall target="clean"/>
+    </target>
+    
     <target name="apidoc" depends="prepare"
             description="Builds Javadoc documentation">
         <mkdir dir="${apidoc}"/>
@@ -129,7 +187,7 @@
         </antcall>
     </target>
 
-    <target name="maven-antlib" description="--> retreive dependencies with maven">
+    <target name="maven-antlib" description="retreive dependencies with maven">
         <path id="maven.lib.path">
             <fileset dir="${basedir}/lib/extra/" includes="maven-ant-tasks*.jar" />
         </path>
