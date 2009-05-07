@@ -45,7 +45,7 @@ public class XrdsParserImpl implements XrdsParser
     public List parseXrds(String input, Set targetTypes) throws DiscoveryException
     {
         if (DEBUG)
-            _log.debug("Parsing XRDS input for service types: " + Arrays.toString(targetTypes.toArray()));
+            _log.debug("Parsing XRDS input for service types: " + targetTypes.toString());
 
         Document document = parseXmlInput(input);
 

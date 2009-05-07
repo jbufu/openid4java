@@ -120,7 +120,7 @@ public class XrdsServiceEndpoint implements Comparable {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("Service priority: ").append(servicePriority);
-        sb.append("\nType: ").append(Arrays.toString(types.toArray()));
+        sb.append("\nType: ").append(types.toString());
         sb.append("\nURI: ").append(uri);
         sb.append("\nURI Priority: ").append(uriPriority);
         sb.append("\nLocalID: ").append(localId);
