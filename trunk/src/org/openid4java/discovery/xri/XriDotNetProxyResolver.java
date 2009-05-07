@@ -78,7 +78,8 @@ public class XriDotNetProxyResolver implements XriResolver
                         results.add(new DiscoveryInformation(
                             new URL(endpoint.getUri()),
                             parseIdentifier(endpoint.getCanonicalId()),
-                            endpoint.getLocalId(),
+                            DiscoveryInformation.OPENID2.equals(type) ? endpoint.getLocalId() :
+                            DiscoveryInformation.OPENID1_SIGNON_TYPES.contains(type) ? endpoint.getDelegate() : null,
                             type));
                     } catch (MalformedURLException e) {
                         throw new DiscoveryException("Invalid endpoint URL discovered: " + endpoint.getUri());

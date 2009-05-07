@@ -38,6 +38,8 @@ public class XrdsParserImpl implements XrdsParser
     private static final String XRD_ELEM_LOCALID = "LocalID";
     private static final String XRD_ELEM_CANONICALID = "CanonicalID";
     private static final String XRD_ATTR_PRIORITY = "priority";
+    private static final String OPENID_NS = "http://openid.net/xmlns/1.0";
+    private static final String OPENID_ELEM_DELEGATE = "Delegate";
 
 
     public List parseXrds(String input, Set targetTypes) throws DiscoveryException
@@ -88,18 +90,8 @@ public class XrdsParserImpl implements XrdsParser
             _log.debug("Found " + serviceTypes.size() + " services for the requested types.");
 
         // extract local IDs
-        NodeList localIDs = document.getElementsByTagNameNS(XRD_NS, XRD_ELEM_LOCALID);
-        Map serviceLocalIDs = new HashMap();
-        Node localIdNode;
-        for (int i = 0; i < localIDs.getLength(); i++) {
-            localIdNode = localIDs.item(i);
-            if (localIdNode == null || !selectedServices.contains(localIdNode.getParentNode())) continue;
-
-            String localId = localIdNode.getFirstChild() != null && localIdNode.getFirstChild().getNodeType() == Node.TEXT_NODE ?
-                localIdNode.getFirstChild().getNodeValue() : null;
-
-            serviceLocalIDs.put(localIdNode.getParentNode(), localId);
-        }
+        Map serviceLocalIDs = extractElementsByParent(XRD_NS, XRD_ELEM_LOCALID, selectedServices, document);
+        Map serviceDelegates = extractElementsByParent(OPENID_NS, OPENID_ELEM_DELEGATE, selectedServices, document);
 
         // build XrdsServiceEndpoints for all URIs in the found services
         List result = new ArrayList();
@@ -116,14 +108,32 @@ public class XrdsParserImpl implements XrdsParser
             Set typeSet = (Set) serviceTypes.get(serviceNode);
 
             String localId = (String) serviceLocalIDs.get(serviceNode);
+            String delegate = (String) serviceDelegates.get(serviceNode);
 
-            XrdsServiceEndpoint endpoint = new XrdsServiceEndpoint(uri, typeSet, getPriority(serviceNode), getPriority(uriNode), localId, canonicalId);
+            XrdsServiceEndpoint endpoint = new XrdsServiceEndpoint(uri, typeSet, getPriority(serviceNode), getPriority(uriNode), localId, delegate, canonicalId);
             if (DEBUG)
                 _log.debug("Discovered endpoint: \n" + endpoint);
             result.add(endpoint);
         }
 
         Collections.sort(result);
+        return result;
+    }
+
+    private Map extractElementsByParent(String ns, String elem, Set parents, Document document)
+    {
+        Map result = new HashMap();
+        NodeList nodes = document.getElementsByTagNameNS(ns, elem);
+        Node node;
+        for (int i = 0; i < nodes.getLength(); i++) {
+            node = nodes.item(i);
+            if (node == null || !parents.contains(node.getParentNode())) continue;
+
+            String localId = node.getFirstChild() != null && node.getFirstChild().getNodeType() == Node.TEXT_NODE ?
+                node.getFirstChild().getNodeValue() : null;
+
+            result.put(node.getParentNode(), localId);
+        }
         return result;
     }
 

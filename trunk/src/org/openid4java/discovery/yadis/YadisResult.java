@@ -169,7 +169,8 @@ public class YadisResult
                             new URL(endpoint.getUri()),
                             DiscoveryInformation.OPENID_SIGNON_TYPES.contains(type) ?
                                 new UrlIdentifier(_normalizedUrl) : null,
-                            endpoint.getLocalId(),
+                            DiscoveryInformation.OPENID2.equals(type) ? endpoint.getLocalId() :
+                            DiscoveryInformation.OPENID1_SIGNON_TYPES.contains(type) ? endpoint.getDelegate() : null,
                             type,
                             endpoint.getTypes()));
                     } catch (MalformedURLException e) {

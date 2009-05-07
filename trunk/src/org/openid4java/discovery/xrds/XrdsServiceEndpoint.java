@@ -19,17 +19,19 @@ public class XrdsServiceEndpoint implements Comparable {
     private Set types;
     private String uri;
     private String localId;
+    private String delegate;
     public static final int LOWEST_PRIORITY = -1;
     private String canonicalId;
 
     public XrdsServiceEndpoint(String uri, Set types,
-                        int servicePriority, int uriPriority, String localId, String canonicalId)
+                        int servicePriority, int uriPriority, String localId, String delegate, String canonicalId)
     {
         this.servicePriority = servicePriority;
         this.uriPriority = uriPriority;
         this.types = types;
         this.uri = uri;
         this.localId = localId;
+        this.delegate = delegate;
         this.canonicalId = canonicalId;
     }
 
@@ -76,6 +78,14 @@ public class XrdsServiceEndpoint implements Comparable {
 
     public void setLocalId(String localId) {
         this.localId = localId;
+    }
+
+    public String getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(String delegate) {
+        this.delegate = delegate;
     }
 
     public String getCanonicalId() {

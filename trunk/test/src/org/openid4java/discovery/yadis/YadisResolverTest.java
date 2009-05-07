@@ -13,6 +13,7 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpCache;
@@ -467,6 +468,22 @@ public class YadisResolverTest extends TestCase
         {
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_INVALID_URL, expected.getErrorCode());
+        }
+    }
+
+    public void testXrdsOpenidDelegate() throws Exception
+    {
+        List result;
+        try
+        {
+            result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simplexrds&xrds=xrdsdelegate");
+            assertEquals("Should have discovered one endpoint: ", result.size(), 1);
+            DiscoveryInformation info = (DiscoveryInformation) result.get(0);
+            assertNotNull("Should have discovered an openid:Delegate.", info.getDelegateIdentifier());
+        }
+        catch (DiscoveryException e)
+        {
+            fail("Discovery failed on xrdsdelegate: " + e.getMessage());
         }
     }
 
