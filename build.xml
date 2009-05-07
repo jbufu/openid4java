@@ -24,6 +24,10 @@
         </condition>
     </target>
 
+    <target name="set_full_dist">
+        <property name="dist.type" value="-full"/>
+    </target>
+
     <target name="create_paths" depends="dist_type">
         <path id="classpath">
             <fileset dir="${lib.dir}">
@@ -100,7 +104,7 @@
         </jar>
     </target>
 
-    <target name="dist" depends="jar, apidoc"
+    <target name="dist" depends="clean, jar, apidoc"
             description="Packages official distributable archive">
         <propertyfile file="VERSION">
             <entry key="Version" value="${version}"/>
@@ -223,7 +227,7 @@
         </copy>
     </target>
 
-    <target name="test" depends="compile_test"
+    <target name="test" depends="set_full_dist, compile_test"
             description="Runs tests">
         <delete dir="${build}/test/data"/>
         <copy todir="${build}/test/data">
