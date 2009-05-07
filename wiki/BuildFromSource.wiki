@@ -1,5 +1,5 @@
 #summary How to build the package from source
-=Building the OpenID4Java package from source =
+= Building the OpenID4Java package from source =
 
 == Requirements ==
 
