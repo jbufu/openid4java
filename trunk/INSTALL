@@ -44,7 +44,6 @@ Installation:
                        Included only in the "openid4java-xri" and
                        "openid4java-full" packages. (A dependency-less
                        proxy XRI resolver is included in the standard package)
-                       See lib/xri/README for details.
 
       lib/infocard/  : Optional. OpenID-Infocards/Higgins STS dependencies.
                        Included only in the "openid4java-infocard" and

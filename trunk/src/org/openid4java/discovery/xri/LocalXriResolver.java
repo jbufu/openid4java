@@ -1,95 +1,83 @@
 package org.openid4java.discovery.xri;
 
-import org.openid4java.discovery.*;
-import org.openxri.resolve.Resolver;
-import org.openxri.resolve.TrustType;
-import org.openxri.resolve.ResolverState;
-import org.openxri.resolve.exception.PartialResolutionException;
-import org.openxri.xml.*;
-import org.openxri.XRI;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.net.URL;
-import java.net.MalformedURLException;
+import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.DiscoveryInformation;
+import org.openid4java.discovery.Identifier;
+import org.openid4java.discovery.XriIdentifier;
+import org.openxri.XRI;
+import org.openxri.resolve.Resolver;
+import org.openxri.resolve.ResolverFlags;
+import org.openxri.resolve.ResolverState;
+import org.openxri.resolve.exception.PartialResolutionException;
+import org.openxri.xml.CanonicalID;
+import org.openxri.xml.SEPUri;
+import org.openxri.xml.Service;
+import org.openxri.xml.Status;
+import org.openxri.xml.XRD;
+import org.openxri.xml.XRDS;
 
 public class LocalXriResolver implements XriResolver
 {
     private static Log _log = LogFactory.getLog(LocalXriResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
-    final private static String ROOT_DEF_EQ_URI   = "http://equal.xri.net";
-    final private static String ROOT_DEF_AT_URI   = "http://at.xri.net";
-    final private static String ROOT_DEF_BANG_URI = "http://bang.xri.net";
-
-    private Resolver _openXriResolver = new Resolver();
+    private Resolver _openXriResolver;
+    
 
     public LocalXriResolver()
     {
         if (DEBUG) _log.debug("Initializing local XRI resolver...");
 
-        // populate the root with whatever trustType the user requested
-        String trustParam = ";trust=none";
+        try {
 
-        XRD eqRoot = new XRD();
-        Service eqAuthService = new Service();
-        eqAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
-        eqAuthService.addType(Tags.SERVICE_AUTH_RES);
-        eqAuthService.addURI(ROOT_DEF_EQ_URI);
-        eqRoot.setProviderID("xri://=");
-        eqRoot.addService(eqAuthService);
-
-        XRD atRoot = new XRD();
-        Service atAuthService = new Service();
-        atAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
-        atAuthService.addType(Tags.SERVICE_AUTH_RES);
-        atAuthService.addURI(ROOT_DEF_AT_URI);
-        atRoot.setProviderID("xri://@");
-        atRoot.addService(atAuthService);
-
-        XRD bangRoot = new XRD();
-        Service bangAuthService = new Service();
-        bangAuthService.addMediaType(Tags.CONTENT_TYPE_XRDS + trustParam, SEPElement.MATCH_ATTR_CONTENT, Boolean.FALSE);
-        bangAuthService.addType(Tags.SERVICE_AUTH_RES);
-        bangAuthService.addURI(ROOT_DEF_BANG_URI);
-        bangRoot.setProviderID("xri://!");
-        bangRoot.addService(bangAuthService);
-
-        _openXriResolver.setAuthority("=", eqRoot);
-        _openXriResolver.setAuthority("@", atRoot);
-        _openXriResolver.setAuthority("!", bangRoot);
-
+        	_openXriResolver = new Resolver(null);
+		} catch (Exception e) {
+			
+			throw new RuntimeException("Cannot initialize OpenXRI Resolver: " + e.getMessage(), e);
+		}
     }
 
+    public Resolver getResolver() {
+    	
+    	return _openXriResolver;
+    }
+    
     public List discover(XriIdentifier xri) throws DiscoveryException
     {
         try
         {
-            TrustType trustAll = new TrustType(TrustType.TRUST_NONE);
+        	ResolverFlags flags = new ResolverFlags();
+        	flags.setCid(true);
+        	flags.setRefs(true);
+        	ResolverState state = new ResolverState();
             XRDS xrds = _openXriResolver.resolveAuthToXRDS(
-                    xri.toString(), trustAll, true, new ResolverState());
+            		new XRI(xri.getIdentifier()), flags, state);
 
             if (DEBUG) _log.debug("Retrieved XRDS:\n" + xrds.dump());
 
             XRD xrd = xrds.getFinalXRD();
-            CanonicalID canonical = xrd.getCanonicalidAt(0);
 
-            // todo: this is not the right place to put isProviderAuthoritative
-            if (isProviderAuthoritative(xrd.getProviderID(), canonical))
+            if (! xrd.getStatus().getCID().equals(Status.CID_VERIFIED))
             {
-                _log.info("XRI resolution succeeded on " + xri);
-                return extractDiscoveryInformation(xrds, xri, _openXriResolver);
+            	_log.error("Unverified CanonicalID: " + xrd.getCanonicalID() + " of: " + xri.getIdentifier());
+            	throw new RuntimeException("Unverified CanonicalID: " + xrd.getCanonicalID() + " of: " + xri.getIdentifier());
             }
-            else
-            {
-                _log.warn("ProviderID is not authoritative for the CanonicalID. " +
-                        "Returning empty discovery result set.");
-                return new ArrayList();
-            }
+
+            CanonicalID canonical = xrd.getCanonicalID();
+            if (canonical == null) throw new RuntimeException("Missing CanonicalID of: " + xri.getIdentifier());
+            
+            _log.info("XRI resolution succeeded on " + xri.toString());
+
+            return extractDiscoveryInformation(xrds, xri, _openXriResolver);
+
         }
         catch (Exception e)
         {
@@ -102,34 +90,6 @@ public class LocalXriResolver implements XriResolver
 
         XRI xri = new XRI(identifier);
         return new XriIdentifier(identifier, xri.toIRINormalForm(), xri.toURINormalForm());
-    }
-
-    private boolean isProviderAuthoritative(String providerId,
-                                                   CanonicalID canonicalId)
-    {
-        // todo: also handle xri delegation / community names
-        // todo: isProviderAuthoritative does not work on multi-level i-names
-        if (canonicalId == null || canonicalId.getValue() == null)
-            return false;
-
-        String auth = canonicalId.getValue().substring(0,1);
-        XRD rootAuth = _openXriResolver.getAuthority(auth);
-
-        if ( ! rootAuth.getProviderID().equals(providerId) )
-                return false;
-
-        int lastbang = canonicalId.getValue().lastIndexOf("!");
-        String parent = lastbang > -1 ?
-                canonicalId.getValue().substring(0, lastbang) :
-                canonicalId.getValue();
-
-        String parentNoPrefix = parent.startsWith("xri://") ?
-                parent.substring(6) : parent;
-
-        String providerIDNoPrefix = providerId.startsWith("xri://") ?
-                providerId.substring(6) : providerId;
-
-        return parentNoPrefix.equals(providerIDNoPrefix);
     }
     
     // --- XRI discovery patch from William Tan ---
@@ -205,25 +165,34 @@ public class LocalXriResolver implements XriResolver
     {
         try
         {
-            XRDS tmpXRDS = xriResolver.selectServiceFromXRD(
-                baseXRD,
-                new XRI(identifier.toString()),
-                new TrustType(),
+        	ResolverFlags flags = new ResolverFlags();
+        	flags.setCid(true);
+        	flags.setRefs(true);
+        	flags.setNoDefaultT(srvType != null);	// we don't want default SEPs, only ones that really have the service type we are looking for
+        	ResolverState state = new ResolverState();
+
+        	List services = xriResolver.selectServiceFromXRD(
+        		new XRDS(),
+        		baseXRD,
+                new XRI(identifier.getIdentifier()),
                 srvType,
                 null, // sepMediaType
-                true, // followRefs
-                new ResolverState()
+                flags,
+                state
             );
 
             Identifier claimedIdentifier = null;
             URL opEndpointUrl;
             CanonicalID canonID;
 
-            XRD tmpXRD = tmpXRDS.getFinalXRD();
-
+            if (! baseXRD.getStatus().getCID().equals(Status.CID_VERIFIED)) {
+            	_log.error("Unverified CanonicalID: " + baseXRD.getCanonicalID() + " of:" + identifier.getIdentifier());
+            	return false;
+            }
+            
             if (wantCID)
             {
-                canonID = tmpXRD.getCanonicalidAt(0);
+                canonID = baseXRD.getCanonicalID();
 
                 if (canonID == null) {
                     _log.error("No CanonicalID found for " + srvType +
@@ -232,15 +201,13 @@ public class LocalXriResolver implements XriResolver
                     return false;
                 }
 
-                // todo: canonicalID verification?
-                // canonical ID is/should be an XRI?
                 claimedIdentifier = parseIdentifier(canonID.getValue());
                 _log.info("Using canonicalID as claimedID: " +
                           claimedIdentifier.getIdentifier() +
                           " for " + srvType);
             }
 
-            Iterator it = tmpXRD.getSelectedServices().getList().iterator();
+            Iterator it = services.iterator();
             while (it.hasNext())
             {
                 Service srv = (Service)it.next();
