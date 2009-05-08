@@ -19,7 +19,7 @@
 
   <properties>
     <encoding>UTF-8</encoding>
-    <java.src.version>1.4</java.src.version>
+    <java.src.version>1.5</java.src.version>
     <jetty.version>6.0.2</jetty.version>
     <test.servlet.port>8989</test.servlet.port>
     <test.data.src>${basedir}/test/yadisdata/</test.data.src>

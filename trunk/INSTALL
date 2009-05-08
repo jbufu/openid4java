@@ -12,7 +12,7 @@ For general information about the package please see the README document.
 
 Requirements:
 
-   - Java 1.4 JVM (or higher)
+   - Java 1.5 JVM (or higher)
 
    - Ant (optional: needed for building the package and running the tests)
    - Maven2 (optional: alternative to Ant; see maven2/README.txt)
@@ -116,7 +116,6 @@ Installation:
       can be found as separate downloads at the following URLs:
 
       http://java.sun.com/javase/downloads/index_jdk5.jsp
-      http://java.sun.com/j2se/1.4.2/download.html
 
     => Third party libraries
 
