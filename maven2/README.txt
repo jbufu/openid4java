@@ -7,7 +7,7 @@ The maven2(http://maven.apache.org/) scripts are the another choice for maven us
 Sub projects:
 
 openid4java:
-	All of openid4java.
+	All of openid4java but doesn't include either of the XRI/Infocard.
 
 openid4java-consumer:
 	OpenID consumer.
@@ -17,6 +17,12 @@ openid4java-server:
 
 openid4java-infocard:
 	Infocard support.
+
+openid4java-xri:
+	XRI support.
+
+openid4java-full:
+	All of openid4java include the XRI and Infocard.
 
 openid4java-server-JdbcServerAssociationStore:
 	An association store implementention with springframework(http://www.springframework.org/) jdbc.

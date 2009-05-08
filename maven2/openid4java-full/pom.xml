@@ -8,9 +8,9 @@
     <artifactId>openid4java-parent</artifactId>
     <version>0.9.5-SNAPSHOT</version>
   </parent>
-  <artifactId>openid4java</artifactId>
+  <artifactId>openid4java-full</artifactId>
   <packaging>jar</packaging>
-  <name>OpenID4Java</name>
+  <name>OpenID4Java Full</name>
 
   <reporting>
     <outputDirectory>../target/site/${artifactId}/</outputDirectory>
@@ -19,12 +19,17 @@
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>openid4java-consumer</artifactId>
+      <artifactId>openid4java</artifactId>
       <version>${version}</version>
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>openid4java-server</artifactId>
+      <artifactId>openid4java-infocard</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>openid4java-xri</artifactId>
       <version>${version}</version>
     </dependency>
     <dependency>

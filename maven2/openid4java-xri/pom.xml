@@ -8,12 +8,14 @@
     <artifactId>openid4java-parent</artifactId>
     <version>0.9.5-SNAPSHOT</version>
   </parent>
-  <artifactId>openid4java-consumer</artifactId>
+  <artifactId>openid4java-xri</artifactId>
   <packaging>jar</packaging>
-  <name>OpenID4Java Consumer</name>
+  <name>OpenID4Java XRI</name>
+
   <reporting>
     <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
   </reporting>
+
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
@@ -21,12 +23,12 @@
       <version>${version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.openxri</groupId>
+      <artifactId>openxri-syntax</artifactId>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.nekohtml</groupId>
-      <artifactId>nekohtml</artifactId>
+      <groupId>org.openxri</groupId>
+      <artifactId>openxri-client</artifactId>
     </dependency>
   </dependencies>
 </project>
