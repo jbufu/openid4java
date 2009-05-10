@@ -27,7 +27,7 @@ Installation:
        the following JAR files need to be copied to the application's
        classpath:
                         - openid4java-*.jar
-                        - library dependencies (see belo)
+                        - library dependencies (see below)
 
     => Library dependencies:
 
@@ -77,6 +77,12 @@ Installation:
       endpoints is enabled by default. This feature can be disabled with
       ServerManager.setEnforceRpId(false).
 
+
+    => Java 1.4 compatibility
+
+      The official OpenID4Java distribution is compiled with a Java 1.5 
+      compiler. The source, however, can be compiled with Java 1.4. 
+      See the "Building the package" section below.
 
   2. OPTIONAL: Configuring logging
 
