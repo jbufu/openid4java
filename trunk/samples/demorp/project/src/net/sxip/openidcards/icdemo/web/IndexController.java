@@ -325,10 +325,9 @@ public class IndexController extends AbstractController
 
         Map<String,String> attributes = new LinkedHashMap<String,String>();
 
-        MessageExtension ext = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-
-        if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX) &&
-                ext instanceof FetchResponse)
+        MessageExtension ext;
+        if ( authSuccess.hasExtension(AxMessage.OPENID_NS_AX) &&
+             (ext = authSuccess.getExtension(AxMessage.OPENID_NS_AX)) instanceof FetchResponse)
         {
             fetchResp = (FetchResponse) ext;
 
