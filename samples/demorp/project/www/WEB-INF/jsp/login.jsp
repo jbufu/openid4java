@@ -79,7 +79,7 @@
 
         <div class="form">
 
-            <form name="openid-login" action="<c:out value='${pageContext.request.context7Path}'/>/" method="post">
+            <form name="openid-login" action="<c:out value='${pageContext.request.contextPath}'/>/" method="post">
                 <table>
                     <tr>
                         <td>

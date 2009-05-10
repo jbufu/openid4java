@@ -113,7 +113,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -121,7 +121,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.5" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Tomcat 5.5.17" level="application_server_libraries" />
     <orderEntry type="module-library">
@@ -271,51 +271,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$OPENID_HOME$/lib/xri/openxri-client-1.0.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$OPENID_HOME$/lib/xri/openxri-syntax-1.0.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$OPENID_HOME$/lib/xri/icu4j_3_4_1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$OPENID_HOME$/lib/xri/jug-1.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$OPENID_HOME$/lib/xri/xmlsec-1.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$OPENID_HOME$/build/openid4java.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -331,13 +286,14 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="openid4java" />
     <orderEntryProperties />
   </component>
   <component name="copyright">
     <Base>
       <setting name="state" value="2" />
     </Base>
-    <LanguageOptions name="$TEMPLATE$">
+    <LanguageOptions name="$OPENID_HOME$">
       <option name="templateOptions">
         <value>
           <option name="block" value="true" />
