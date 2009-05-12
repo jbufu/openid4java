@@ -27,8 +27,10 @@ public class PapeResponse extends PapeMessage
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
-            "auth_policies", "auth_time", "nist_auth_level"
+            "auth_policies", "auth_time",
     });
+
+    private static final String AUTH_POLICY_NONE = "http://schemas.openid.net/pape/policies/2007/06/none";
 
     private static InternetDateFormat _dateFormat = new InternetDateFormat();
 
@@ -37,7 +39,7 @@ public class PapeResponse extends PapeMessage
      */
     protected PapeResponse()
     {
-        set("auth_policies", "none");
+        set("auth_policies", AUTH_POLICY_NONE);
 
         if (DEBUG) _log.debug("Created empty PAPE response.");
     }
@@ -59,7 +61,7 @@ public class PapeResponse extends PapeMessage
      */
     protected PapeResponse(ParameterList params)
     {
-        _parameters = params;
+        super(params);
     }
 
     public static PapeResponse createPapeResponse(ParameterList params)
@@ -112,7 +114,7 @@ public class PapeResponse extends PapeMessage
 
         String policies = getAuthPolicies();
 
-        if (policies == null || "none".equals(policies)) // should never be null
+        if (policies == null || AUTH_POLICY_NONE.equals(policies)) // should never be null
             setAuthPolicies(policyUri);
         else
             setAuthPolicies(policies + " " + policyUri);
@@ -126,7 +128,7 @@ public class PapeResponse extends PapeMessage
     {
         String policies = getParameterValue("auth_policies");
 
-        if (policies == null || "none".equals(policies)) // should never be null
+        if (policies == null || AUTH_POLICY_NONE.equals(policies)) // should never be null
             return new ArrayList();
         else
             return Arrays.asList(policies.split(" "));
@@ -191,33 +193,6 @@ public class PapeResponse extends PapeMessage
     }
 
     /**
-     * Gets the value of the nist_auth_level parameter.
-     * <p>
-     * NIST levels are integers between 1 and 4 inclusive. Level 0 is
-     * used to signify that the OP recognizes the parameter and the
-     * user authentication did not meet the requirements of Level 1.
-     *
-     * @return          The NIST level, or -1 if the parameter is not set.
-     */
-    public int getNistAuthLevel()
-    {
-        String level = getParameterValue("nist_auth_level");
-
-        if ( level != null && level.length() > 0 )
-            return Integer.parseInt(level);
-        else
-            return -1;
-    }
-
-    public void setNistAuthLevel(int level) throws MessageException
-    {
-        if (level < 0 || level > 4)
-            throw new MessageException("Invalid NIST level: " + level);
-
-        set("nist_auth_level", Integer.toString(level));
-    }
-
-    /**
      * Checks the validity of the extension.
      * <p>
      * Used when constructing a extension from a parameter list.
@@ -253,12 +228,31 @@ public class PapeResponse extends PapeMessage
         {
             String paramName = ((Parameter) it.next()).getKey();
 
-            if (! PAPE_FIELDS.contains(paramName))
-            {
-                throw new MessageException(
-                    "Invalid parameter name in PAPE response: " + paramName,
-                    OpenIDException.PAPE_ERROR);
-            }
+            if (PAPE_FIELDS.contains(paramName) ||  paramName.startsWith(PapeMessage.AUTH_LEVEL_NS_PREFIX))
+                continue;
+
+            if ( paramName.startsWith(AUTH_LEVEL_PREFIX) &&
+                 (authLevelAliases.values().contains(paramName.substring(AUTH_LEVEL_PREFIX.length()))))
+                continue;
+
+            throw new MessageException(
+                "Invalid parameter in PAPE response: " + paramName,
+                OpenIDException.PAPE_ERROR);
         }
     }
+
+    public void setCustomAuthLevel(String authLevelTypeUri, String level)
+    {
+        String alias = addAuthLevelExtension(authLevelTypeUri);
+        set(AUTH_LEVEL_PREFIX + alias, level);
+    }
+
+    public String getCustomAuthLevel(String authLevelTypeUri)
+    {
+        if (hasCustomAuthLevel(authLevelTypeUri))
+            return getParameterValue(AUTH_LEVEL_PREFIX + getCustomAuthLevelAlias(authLevelTypeUri));
+        else
+            return null;
+    }
+
 }
