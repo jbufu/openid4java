@@ -207,7 +207,9 @@ public class ParameterList implements Serializable
         return parameterList;
     }
 
-    // todo: same as Message.keyValueFormEncoding()
+    /**
+     * @return The key-value form encoding of for this ParameterList.
+     */
     public String toString()
     {
         StringBuffer allParams = new StringBuffer("");

@@ -193,20 +193,7 @@ public class Message
 
     public String keyValueFormEncoding()
     {
-        StringBuffer allParams = new StringBuffer("");
-
-        List parameters = _params.getParameters();
-        Iterator iterator = parameters.iterator();
-        while (iterator.hasNext())
-        {
-            Parameter parameter = (Parameter) iterator.next();
-            allParams.append(parameter.getKey());
-            allParams.append(':');
-            allParams.append(parameter.getValue());
-            allParams.append('\n');
-        }
-
-        return allParams.toString();
+        return _params.toString();
     }
 
     public String wwwFormEncoding()
