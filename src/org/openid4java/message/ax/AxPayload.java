@@ -12,8 +12,6 @@ import java.util.*;
  */
 public abstract class AxPayload extends AxMessage {
 
-    // todo: s/fetch/.../
-
     private static Log _log = LogFactory.getLog(AxPayload.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 

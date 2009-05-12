@@ -96,7 +96,7 @@ public class XriDotNetProxyResolver implements XriResolver
 
     public XriIdentifier parseIdentifier(String identifier) throws DiscoveryException
     {
-        // todo: fix this
+        // todo: http://code.google.com/p/openid4java/issues/detail?id=63
         _log.warn("Creating XRI identifier with the friendly XRI identifier as the IRI/URI normal forms.");
         return new XriIdentifier(identifier, identifier, identifier);
     }
