@@ -56,6 +56,8 @@ VERSION       : The released version of this package.
 
 apidoc/       : JavaDoc API documentation.
 
+samples/      : Sample implementation projects. See samples/README for details.
+
 src/          : Source code.
 
 test/         : Test cases source code and test data.

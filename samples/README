@@ -1,6 +1,6 @@
 OpenID4Java Samples
 
-* formredirection.jsp
+* formredirection
   JSP helper file for generating indirect messages (Authentication Requests
   and Responses) through HTML FORM Redirection.
 
@@ -11,7 +11,8 @@ OpenID4Java Samples
   An openid demo consumer using servlet.
 
 * demorp
-  Infocard-enabled OpenID Relying Party : accepts logins with OpenID Infocards.
+  Demonstrative Relying Party implementation, featuring Attribute Exchange 
+  and OpenID Infocards support.
   See demorp/INSTALL for installation and configuration instructions.
 
 * infocardop
