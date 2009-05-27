@@ -12,6 +12,7 @@ import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.discovery.XriIdentifier;
+import org.openid4java.util.HttpCache;
 import org.openxri.XRI;
 import org.openxri.resolve.Resolver;
 import org.openxri.resolve.ResolverFlags;
@@ -52,6 +53,17 @@ public class LocalXriResolver implements XriResolver
     
     public List discover(XriIdentifier xri) throws DiscoveryException
     {
+        return discover(xri, null);
+    }
+
+    /**
+     * @param cache *NOT USED* by the OpenXRI resolver.
+     */
+    public List discover(XriIdentifier xri, HttpCache cache) throws DiscoveryException
+    {
+        if (cache != null)
+            _log.warn("HttpCache / configuration provided discovery " +
+                      "but will not be used by the LocalXriResolver.");
         try
         {
         	ResolverFlags flags = new ResolverFlags();
