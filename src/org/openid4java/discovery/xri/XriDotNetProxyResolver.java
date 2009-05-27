@@ -51,11 +51,17 @@ public class XriDotNetProxyResolver implements XriResolver
 
     public List discover(XriIdentifier xri) throws DiscoveryException
     {
+        return discover(xri, cache);
+    }
+
+    public List discover(XriIdentifier xri, HttpCache cache) throws DiscoveryException
+    {
         String hxri = PROXY_URL + xri.getIdentifier() + "?" + XRDS_QUERY;
         _log.info("Performing discovery on HXRI: " + hxri);
 
         try
         {
+            if (cache == null) cache = new HttpCache();
             HttpResponse resp = cache.get(hxri);
             if (resp == null || HttpStatus.SC_OK != resp.getStatusCode())
                 throw new DiscoveryException("Error retrieving HXRI: " + hxri);

@@ -128,7 +128,7 @@ public class YadisResolver
      */
     public List discoverRP(String url) throws DiscoveryException
     {
-        return discover(url, 0, new HttpCache(),
+        return discover(url, 0, null,
             Collections.singleton(DiscoveryInformation.OPENID2_RP))
             .getDiscoveredInformation(Collections.singleton(DiscoveryInformation.OPENID2_RP));
     }
@@ -152,7 +152,7 @@ public class YadisResolver
      */
     public List discover(String url) throws DiscoveryException
     {
-        return discover(url, _maxRedirects, new HttpCache() );
+        return discover(url, _maxRedirects, null);
     }
 
 
@@ -196,7 +196,7 @@ public class YadisResolver
      */
     public List discover(String url, int maxRedirects) throws DiscoveryException
     {
-        return discover(url, maxRedirects, new HttpCache());
+        return discover(url, maxRedirects, null);
     }
 
     /**
@@ -222,8 +222,10 @@ public class YadisResolver
             .getDiscoveredInformation(DiscoveryInformation.OPENID_OP_TYPES);
     }
 
-    public YadisResult discover(String url, int maxRedirects, HttpCache cache, Set serviceTypes) throws DiscoveryException {
+    public YadisResult discover(String url, int maxRedirects, HttpCache cache, Set serviceTypes) throws DiscoveryException
+    {
         YadisUrl yadisUrl = new YadisUrl(url);
+        if (cache == null) cache = new HttpCache();
 
         // try to retrieve the Yadis Descriptor URL with a HEAD call first
         YadisResult result = retrieveXrdsLocation(yadisUrl, false, cache, maxRedirects, serviceTypes);
@@ -256,8 +258,9 @@ public class YadisResolver
      * @param maxRedirects
      */
     private void retrieveXrdsDocument(YadisResult result, HttpCache cache, int maxRedirects, Set serviceTypes)
-        throws DiscoveryException {
-
+        throws DiscoveryException
+    {
+        if (cache == null) cache = new HttpCache();
         cache.getRequestOptions().setMaxRedirects(maxRedirects);
 
         try {
@@ -313,8 +316,7 @@ public class YadisResolver
     }
 
     /**
-     * Tries to retrieve the XRDS location url by performing a cheap HEAD call
-     * on the YadisURL.
+     * Tries to retrieve the XRDS location from the provided YadisURL.
      * <p>
      * The returned string should be validated before being used
      * as a XRDS-Location URL.
@@ -352,6 +354,7 @@ public class YadisResolver
                 "Performing HTTP " + (useGet ? "GET" : "HEAD") +
                 " on: " + url + " ...");
 
+            if (cache == null) cache = new HttpCache();
             HttpRequestOptions requestOptions = cache.getRequestOptions();
             requestOptions.setMaxRedirects(maxRedirects);
             if (useGet)
