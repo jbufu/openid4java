@@ -108,70 +108,28 @@ public class Discovery
         }
     }
 
-    /**
-     * Performs OpenID discovery on the provided identifier.
-     *
-     * @param identifier        The identifier on which OpenID discovery is performed.
-     * @return                  List of DiscoveryInformation entries discovered
-     *                          obtained from the identifier.
-     * @throws DiscoveryException
-     */
-    public List discover(String identifier) throws DiscoveryException
+    public List discover(String identifier)
+            throws DiscoveryException
     {
-        return discover(identifier, null);
+        return discover(parseIdentifier(identifier, true)); // remove fragment
     }
 
-    /**
-     * Performs OpenID discovery on the provided identifier.
-     *
-     * Note: For XRIs, the LocalXriResolver doesn't use the HttpCache.
-     *
-     * @param identifier      The identifier on which OpenID discovery is performed.
-     * @param cache HttpCache instance for caching HTTP requests made by resolvers.
-     */
-    public List discover(String identifier, HttpCache cache) throws DiscoveryException
-    {
-        return discover(parseIdentifier(identifier, true), cache); // remove fragment
-    }
-
-    /**
-     * Performs OpenID discovery on the provided identifier.
-     *
-     * @param identifier      The identifier on which OpenID discovery is performed.
-     * @return                  List of DiscoveryInformation entries discovered
-     *                          obtained from the identifier.
-     * @throws DiscoveryException
-     */
     public List discover(Identifier identifier) throws DiscoveryException
-    {
-        return discover(identifier, null);
-    }
-
-    /**
-     * Performs OpenID discovery on the provided identifier.
-     *
-     * Note: For XRIs, the LocalXriResolver doesn't use the HttpCache.
-     *
-     * @param identifier      The identifier on which OpenID discovery is performed.
-     * @param cache HttpCache instance for caching HTTP requests made by resolvers.
-     * @return                  List of DiscoveryInformation entries discovered
-     *                          obtained from the identifier.
-     */
-    public List discover(Identifier identifier, HttpCache cache) throws DiscoveryException
     {
         List result;
 
         if (identifier instanceof XriIdentifier)
         {
             _log.info("Starting discovery on XRI identifier: " + identifier);
-            result = _xriResolver.discover((XriIdentifier) identifier, cache);
+            result = _xriResolver.discover((XriIdentifier) identifier);
         }
         else if (identifier instanceof UrlIdentifier)
         {
             _log.info("Starting discovery on URL identifier: " + identifier);
 
-            if (cache == null) cache = new HttpCache();
             UrlIdentifier urlId = (UrlIdentifier) identifier;
+
+            HttpCache cache = new HttpCache();
 
             result = _yadisResolver.discover(urlId.getIdentifier(), cache);
 
