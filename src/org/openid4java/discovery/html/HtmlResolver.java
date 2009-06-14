@@ -79,7 +79,7 @@ public class HtmlResolver
     public List discoverHtml(UrlIdentifier identifier)
         throws DiscoveryException
     {
-        return discoverHtml(identifier, null);
+        return discoverHtml(identifier, new HttpCache());
     }
 
     /**
@@ -95,8 +95,6 @@ public class HtmlResolver
     {
         // initialize the results of the HTML discovery
         HtmlResult result = new HtmlResult();
-        
-        if (cache == null) cache = new HttpCache();
 
         HttpRequestOptions requestOptions = cache.getRequestOptions();
         requestOptions.setContentType("text/html");

@@ -2,7 +2,7 @@ package org.openid4java.discovery.xri;
 
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.XriIdentifier;
-import org.openid4java.util.HttpCache;
+import org.openid4java.discovery.Identifier;
 
 import java.util.List;
 
@@ -17,8 +17,6 @@ public interface XriResolver
      * @throws DiscoveryException if discovery failed.
      */
     public List discover(XriIdentifier xri) throws DiscoveryException;
-
-    public List discover(XriIdentifier xri, HttpCache cache) throws DiscoveryException;
 
     XriIdentifier parseIdentifier(String identifier) throws DiscoveryException;
 }
