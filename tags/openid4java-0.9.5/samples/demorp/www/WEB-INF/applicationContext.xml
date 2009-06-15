@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+  <!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+  <bean id="defaultPropertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath:config.defaults.properties</value>
+      </list>
+    </property>
+    <property name="order" value="1"/>
+  </bean>
+  <bean id="externalPropertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath:config.properties</value>
+        <value>file:/www/sxweb/server/openidcards/icdemo/conf/config.properties</value>
+      </list>
+    </property>
+    <property name="ignoreResourceNotFound" value="true"/>
+    <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    <property name="order" value="0"/>
+  </bean>
+
+
+  <bean id="consumerManager" class="org.openid4java.consumer.ConsumerManager">
+    <property name="associations" ref="associationStore"/>
+    <property name="maxAssocAttempts" value="4"/>
+    <property name="nonceVerifier" ref="nonceVerifier"/>
+  </bean>
+
+  <bean id="associationStore"
+        class="org.openid4java.consumer.InMemoryConsumerAssociationStore"/>
+
+  <bean id="nonceVerifier" class="org.openid4java.consumer.InMemoryNonceVerifier">
+    <constructor-arg index="0" value="60"/>
+  </bean>
+
+</beans>

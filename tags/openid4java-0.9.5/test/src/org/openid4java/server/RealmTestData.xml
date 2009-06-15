@@ -1,0 +1,135 @@
+<testSuite>
+
+    <!--
+    The following result codes defined in RealmVerifier are used:
+    - OK
+    - DENIED_REALM
+    - MALFORMED_REALM
+    - MALFORMED_RETURN_TO_URL
+    - FRAGMENT_NOT_ALLOWED
+    - PROTOCOL_MISMATCH
+    - PORT_MISMATCH
+    - PATH_MISMATCH
+    - DOMAIN_MISMATCH
+
+    Only OK means a match, all the other are error codes.
+    -->
+
+    <!-- fragment -->
+    <test result="FRAGMENT_NOT_ALLOWED" realm="http://example.com/path#fragment" returnTo="http://example.com/path"
+        message="Fragment not allowed" />
+
+    <!-- protocol -->
+    <test result="OK" realm="http://example.com/" returnTo="http://example.com/"
+        message="Protocol matches." />
+    <test result="OK" realm="https://example.com/" returnTo="https://example.com/"
+        message="Protocol matches." />
+    <test result="PROTOCOL_MISMATCH" realm="http://example.com/" returnTo="https://example.com/"
+        message="Protocol does not match." />
+    <test result="PROTOCOL_MISMATCH" realm="https://example.com/" returnTo="http://example.com/"
+        message="Protocol does not match." />
+
+
+    <!-- port -->
+    <test result="OK" realm="http://example.com/" returnTo="http://example.com:80/"
+		message="Default port match."/>
+    <test result="PORT_MISMATCH" realm="http://example.com/" returnTo="http://example.com:81/"
+		message="Port does not match."/>
+    <test result="OK" realm="http://example.com:80/" returnTo="http://example.com/"
+		message="Default port match."/>
+    <test result="PORT_MISMATCH" realm="http://example.com:81/" returnTo="http://example.com/"
+		message="Port does not match."/>
+    <test result="OK" realm="http://example.com:80/" returnTo="http://example.com:80/"
+		message="Explicit port match."/>
+    <test result="OK" realm="http://example.com:8080/" returnTo="http://example.com:8080/"
+		message="Explicit port match."/>
+
+    <test result="OK" realm="https://example.com/" returnTo="https://example.com:443/"
+		message="Default port match."/>
+    <test result="PORT_MISMATCH" realm="https://example.com/" returnTo="https://example.com:444/"
+		message="Port does not match."/>
+    <test result="OK" realm="https://example.com:443/" returnTo="https://example.com/"
+		message="Default port match."/>
+    <test result="PORT_MISMATCH" realm="https://example.com:444/" returnTo="https://example.com/"
+		message="Port does not match."/>
+    <test result="OK" realm="https://example.com:443/" returnTo="https://example.com:443/"
+		message="Explicit port match."/>
+    <test result="OK" realm="https://example.com:1443/" returnTo="https://example.com:1443/"
+		message="Explicit port match."/>
+
+    <!-- wild card -->
+    <test result="OK" realm="http://*.example.com/" returnTo="http://www.example.com/"
+        message="Wild card match."/>
+    <test result="OK" realm="http://*.example.com/" returnTo="http://WWW.Example.Com/"
+        message="Wild card match, case insensitive."/>
+    <test result="OK" realm="http://*.Example.Com/" returnTo="http://www.example.com/"
+        message="Wild card match, case insensitive."/>
+    <test result="OK" realm="http://*.example.com/" returnTo="http://example.com/"
+        message="Wild card match, same level."/>
+    <test result="DOMAIN_MISMATCH" realm="http://*.example.com/" returnTo="http://example.ca/"
+        message="Wild card does not match."/>
+    <test result="DOMAIN_MISMATCH" realm="http://*.example.com/" returnTo="http://xexample.com/"
+        message="Wild card does not match, substring domain part."/>
+    <test result="DOMAIN_MISMATCH" realm="http://*.example.com/" returnTo="http://xample.com/"
+        message="Wild card does not match, substring domain part."/>
+
+    <!-- denied Realm -->
+    <test result="DENIED_REALM" realm="http://*.com/" returnTo="http://www.example.com/"
+        message="Top level TLD is denied."/>
+    <test result="DENIED_REALM" realm="http://*.info/" returnTo="http://www.example.info/"
+        message="Top level TLD is denied."/>
+    <test result="DENIED_REALM" realm="http://*.ca/" returnTo="http://www.example.ca/"
+        message="Top level TLD is denied."/>
+    <test result="DENIED_REALM" realm="http://*.bc.ca/" returnTo="http://www.example.bc.ca/"
+        message="Two letter country specific domain is denied."/>
+
+    <test result="OK" realm="http://*.sfu.ca/" returnTo="http://www.example.sfu.ca/"
+        message="Three letter contry specific domain is allowed."/>
+
+    <!-- path -->
+    <test result="OK" realm="http://example.com/" returnTo="http://example.com/"
+        message="Same root path, with slash."/>
+    <test result="OK" realm="http://example.com" returnTo="http://example.com"
+        message="Same root path, no slash."/>
+
+    <test result="OK" realm="http://example.com/" returnTo="http://example.com"
+        message="Same root path, slash difference."/>
+    <test result="OK" realm="http://example.com" returnTo="http://example.com/"
+        message="Same root path, slash difference."/>
+
+    <test result="OK" realm="http://example.com/sub/folder/" returnTo="http://example.com/sub/folder/"
+        message="Same path, with slash."/>
+    <test result="OK" realm="http://example.com/sub/folder" returnTo="http://example.com/sub/folder"
+        message="Same path, no slash."/>
+    <test result="OK" realm="http://example.com/sub/folder/" returnTo="http://example.com/sub/folder"
+        message="Same path, slash difference."/>
+    <test result="OK" realm="http://example.com/sub/folder" returnTo="http://example.com/sub/folder/"
+        message="Same path, slash difference."/>
+
+    <test result="OK" realm="http://example.com/sub/" returnTo="http://example.com/sub/folder/"
+        message="Sub-directory."/>
+    <test result="OK" realm="http://example.com/sub" returnTo="http://example.com/sub/folder/"
+        message="Sub-directory."/>
+    <test result="OK" realm="http://example.com/sub/" returnTo="http://example.com/sub/folder"
+        message="Sub-directory."/>
+    <test result="OK" realm="http://example.com/sub" returnTo="http://example.com/sub/folder"
+        message="Sub-directory."/>
+
+    <test result="PATH_MISMATCH" realm="http://example.com/sub/folder/" returnTo="http://example.com/sub/fold"
+        message="Directory name substring."/>
+    <test result="PATH_MISMATCH" realm="http://example.com/sub/folder/" returnTo="http://example.com/sub/fold/"
+        message="Directory name substring."/>
+    <test result="PATH_MISMATCH" realm="http://example.com/sub/folder" returnTo="http://example.com/sub/fold"
+        message="Directory name substring."/>
+    <test result="PATH_MISMATCH" realm="http://example.com/sub/folder" returnTo="http://example.com/sub/fold/"
+        message="Directory name substring."/>
+
+    <test result="PATH_MISMATCH" realm="http://example.com/sub/folder/" returnTo="http://example.com/Sub/Folder/"
+        message="Paths are case sensitive."/>
+    <test result="PATH_MISMATCH" realm="http://example.com/Sub/Folder/" returnTo="http://example.com/sub/folder/"
+        message="Paths are case sensitive."/>
+
+    <test result="PATH_MISMATCH" realm="http://example.com/sub/*" returnTo="http://example.com/sub/folder"
+        message="Wildcard (*) should be treated as literal in realm paths."/>
+
+</testSuite>
