@@ -18,12 +18,9 @@ openid4java-*.jar
 
   * *lib/optional/ : Optional.* Libraries supporting alternative deployments.
 
-  * *lib/extra/ : Optional.* Extra/development libraries, not needed for deployments. (JUnit tests, Jetty servlet container, SVN/Ant utilities)
+  * *lib/extra/ : Optional.* Extra/development libraries, not needed for deployment (JUnit tests, Jetty servlet container, SVN/Ant utilities)
 
-  * *lib/xri/ : Optional.* Local OpenXRI resolver dependencies.
-                       Included only in the "openid4java-xri" and
-                       "openid4java-full" packages. (A dependency-less
-                       proxy XRI resolver is included in the standard package)
+  * *lib/xri/ : Optional.* Local OpenXRI resolver dependencies. Included only in the "openid4java-xri" and "openid4java-full" packages. (A dependency-less proxy XRI resolver is included in the standard package)
 
   * *lib/infocard/ : Optional.* OpenID-Infocards/Higgins STS dependencies. Included only in the "openid4java-infocard" and "openid4java-full" packages.
 
