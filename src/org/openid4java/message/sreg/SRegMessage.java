@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message.sreg;
@@ -51,7 +51,6 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
      * The Simple Registration Type URI.
      */
     public static final String OPENID_NS_SREG = "http://openid.net/sreg/1.0";
-    public static final String OPENID_NS_SREG11 = "http://openid.net/extensions/sreg/1.1";
 
     /**
      * The Simple Registration extension-specific parameters.
@@ -59,9 +58,6 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
      * The openid.<extension_alias> prefix is not part of the parameter names
      */
     protected ParameterList _parameters;
-
-
-    private String _typeUri = OPENID_NS_SREG;
 
     /**
      * Constructs an empty (no parameters) Simple Registration extension.
@@ -93,17 +89,7 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
      */
     public String getTypeUri()
     {
-        return _typeUri;
-    }
-
-
-    /**
-     * Sets the SREG type URI. Hack to support both SREG 1.0 and 1.1,
-     * until 1.1 spec gets fixed.
-     */
-    public void setTypeUri(String typeUri)
-    {
-        _typeUri = typeUri;
+        return OPENID_NS_SREG;
     }
 
     /**
@@ -179,17 +165,6 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
     {
         return false;
     }
-
-    /**
-     * Simple registration parameters are REQUIRED to be signed.
-     *
-     * @return true
-     */
-    public boolean signRequired()
-    {
-        return true;
-    }
-
 
     /**
      * Instantiates the apropriate Simple Registration object

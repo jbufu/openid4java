@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
@@ -52,7 +52,7 @@ public class DirectError extends Message
         set("error", msg);
         _exception = e;
 
-        if ( ! compatibility )
+        if (compatibility)
             set("ns", OPENID2_NS);
     }
 

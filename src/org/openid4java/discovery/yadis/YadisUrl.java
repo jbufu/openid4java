@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.discovery.yadis;
@@ -7,8 +7,8 @@ package org.openid4java.discovery.yadis;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import org.openxri.XRI;
 import org.openid4java.OpenIDException;
-import org.openid4java.discovery.XriIdentifier;
 
 /**
  * Wrapper class for various identifiers that are resolvable to URLs
@@ -104,7 +104,7 @@ public class YadisUrl
      *
      * @param xriId             The XRI identifier
      */
-    public YadisUrl(XriIdentifier xriId) throws YadisException
+    public YadisUrl(XRI xriId) throws YadisException
     {
         this(urlFromString(xriId.toURINormalForm()));
     }

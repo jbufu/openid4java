@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message.ax;
@@ -28,8 +28,6 @@ public class FetchRequest extends AxMessage
 {
     private static Log _log = LogFactory.getLog(FetchRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
-
-    private int _aliasCounter = 0;
 
     /**
      * Constructs a Fetch Request with an empty parameter list.
@@ -141,20 +139,6 @@ public class FetchRequest extends AxMessage
     }
 
     /**
-     * Adds an attribute to the fetch request, with a default value-count of 1.
-     * An alias is generated for the provided type URI.
-     *
-     * @see #addAttribute(String, String, boolean, int)
-     */
-    public String addAttribute(String typeUri, boolean required)
-        throws MessageException
-    {
-        String alias = generateAlias();
-        addAttribute(alias, typeUri, required, 1);
-        return alias;
-    }
-
-    /**
      * Sets the desired number of attribute vaules requested for the specified
      * attribute alias. Special value 0 means "unlimited".
      *
@@ -179,7 +163,7 @@ public class FetchRequest extends AxMessage
      */
     public int getCount(String alias)
     {
-        if ("unlimited".equals(_parameters.getParameterValue("count." + alias)))
+        if ("unlimited".equals(_parameters.getParameterValue("count" + alias)))
             return 0;
 
         else if (_parameters.hasParameter("count." + alias))
@@ -352,10 +336,5 @@ public class FetchRequest extends AxMessage
         }
 
         return true;
-    }
-
-    private synchronized String generateAlias()
-    {
-        return "attr" + Integer.toString(++ _aliasCounter);
     }
 }

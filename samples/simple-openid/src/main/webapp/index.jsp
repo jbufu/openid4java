@@ -14,7 +14,7 @@
 %>
 <form method="POST" action="consumer_redirect.jsp">
 <strong>OpenID:</strong>
-<input type="text" name="openid" size="60"/><br>
+<input type="text" name="openid" width="30"/><br>
 <input type="submit"/>
 </form>
 <%	

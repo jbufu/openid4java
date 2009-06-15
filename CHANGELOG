@@ -2,42 +2,11 @@
 
 ========================================================================
 
-This document highlights the major changes in the OpenID4Java library.
-Please see the TODO file for outstanding items.
+This document highlights of the major changes in the OpenID4Java library. 
+Please see the TODO for outstanding items.
 
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
-
-20090614:
-
-A number of related specifications have been finalized since the previous
-official release in November 2007, and are supported by OpenID4Java:
-
-* OpenID Authentication 2.0
-* Attribute Exchange 1.0
-* PAPE 1.0
-
-* Java 1.5 binaries are now released; source still compilable with Java 1.4
-
-Under the hood:
-
-* internal XRDS parsing to ensure correct identity data is discovered
-* discovery code has been revised to be more robust
-* discovery HTTP requests are transparently cached for increased performance
-* a minimal set of library dependencies are packaged with the official release
-* alternative packages are released with optional / extra functionality
-* proxy XRI resolver delegating to the service provided by XRI.net
-* local XRI resolver updated to use the latest openXRI 1.2.0 library
-* JDBC implementations for nonces and associations stores
-
-
-20071113:
-    - Renamed AuthSuccess.setSignExtension() to AuthSuccess.addSignExtension()
-      to better reflect the operation performed.
-
-20071025:
-    - Documented Relying Party Discovery requirements; 
-      see INSTALL : Relying Party Discovery section
 
 20070913:
     - Improved error reporting and message validation.
@@ -96,18 +65,20 @@ Under the hood:
 
 
 ========================================================================
-Copyright 2006-2008 Sxip Identity Corporation
+Copyright 2006-2007 Sxip Identity Corporation
 
-Project home page and package distribution:
+Package distribution:
+  => http://code.sxip.com
+          
+Source code and defect management:
   => http://code.google.com/p/openid4java
-  => http://code.google.com/p/openid4java/downloads/
-
-For support, please visit the wiki and join the Google Groups!
-  => http://groups.google.com/group/openid4java/
-  => http://code.google.com/p/openid4java/w/
+          
+For support, please join the Google Groups!
+  => http://groups.google.com/group/openid4java
 
 OpenID
-  => http://openid.net/
+  => http://openid.net 
 
 Released under the Apache License 2.0
   => see LICENSE
+

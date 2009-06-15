@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.infocard;
@@ -42,7 +42,7 @@ public class OpenIDTokenType
 
     /**
      * Gets the URI string value for the token type.
-     * @return  String representation of the token URI type.
+     * @return
      */
     public String toString()
     {

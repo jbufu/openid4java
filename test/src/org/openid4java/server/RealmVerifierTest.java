@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.server;
@@ -61,7 +61,7 @@ public class RealmVerifierTest extends TestCase
 
     public void setUp() throws Exception
     {
-        _realmVerifier = new RealmVerifier(false);
+        _realmVerifier = new RealmVerifier();
     }
 
     public void testXmlFile() throws IOException, JDOMException

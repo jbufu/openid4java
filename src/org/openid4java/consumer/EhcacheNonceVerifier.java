@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.consumer;
@@ -29,9 +29,9 @@ public class EhcacheNonceVerifier extends AbstractNonceVerifier
 
     public void setCache(Cache cache)
     {
-        if (cache.getTimeToLiveSeconds() != _maxAgeSeconds)
+        if (cache.getTimeToLiveSeconds() != _maxAge)
         {
-            throw new IllegalArgumentException("Max Age: " + _maxAgeSeconds + ", same expected for cache, but found: " + cache.getTimeToLiveSeconds());
+            throw new IllegalArgumentException("Max Age: " + _maxAge + ", same expected for cache, but found: " + cache.getTimeToLiveSeconds());
         }
 
         if (cache.getTimeToLiveSeconds() != cache.getTimeToIdleSeconds())

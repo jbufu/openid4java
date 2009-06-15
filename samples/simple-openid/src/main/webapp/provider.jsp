@@ -11,7 +11,9 @@
             ServerManager newmgr=new ServerManager();
             newmgr.setSharedAssociations(new InMemoryServerAssociationStore());
             newmgr.setPrivateAssociations(new InMemoryServerAssociationStore());
-            newmgr.setOPEndpointUrl(request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/simple-openid/provider.jsp");
+            //newmgr.setSignFields("op_endpoint,return_to,response_nonce,assoc_handle,claimed_id,identity");
+            newmgr.setSignFields("return_to,assoc_handle,claimed_id,identity"); // OpenID 1.x
+            newmgr.setOPEndpointUrl("http://localhost:8080/simple-openid/provider.jsp");
             pageContext.setAttribute("servermanager", newmgr, PageContext.APPLICATION_SCOPE);
 
             // The attribute com.mycompany.name1 may not have a value or may have the value null
@@ -99,6 +101,4 @@
             responsem = DirectError.createDirectError("Unknown request");
             responseText = responsem.keyValueFormEncoding();
         }
-// make sure there are no empty lines at the end of this file:
-// they will end up in direct responses and thus compromise them
 %><%=responseText%>

@@ -1,12 +1,11 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
 
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.sreg.SRegMessage;
-import org.openid4java.message.sreg.SReg11ExtensionFactory;
 import org.openid4java.message.pape.PapeMessage;
 
 import java.io.UnsupportedEncodingException;
@@ -50,7 +49,6 @@ public class Message
     {
         _extensionFactories.put(AxMessage.OPENID_NS_AX, AxMessage.class);
         _extensionFactories.put(SRegMessage.OPENID_NS_SREG, SRegMessage.class);
-        _extensionFactories.put(SRegMessage.OPENID_NS_SREG11, SReg11ExtensionFactory.class);
         _extensionFactories.put(PapeMessage.OPENID_NS_PAPE, PapeMessage.class);
     }
 
@@ -71,12 +69,9 @@ public class Message
         Iterator iter = _params.getParameters().iterator();
 
         // simple registration is a special case; we support only:
-        // SREG1.0 (no namespace, "sreg" alias hardcoded) in :
-        //   - OpenID1 messages
-        //   - OpenID2 messages (against the 2.0 spec),
-        //     to accomodate Yahoo's non-2.0-compliant implementation
+        // SREG1.0 (no namespace, "sreg" alias hardcoded) in OpenID1 messages
         // SREG1.1 (namespace, any possible alias) in OpenID2 messages
-        boolean hasOpenidDotSreg = false;
+        boolean hasSReg10 = false;
 
         while (iter.hasNext())
         {
@@ -86,12 +81,11 @@ public class Message
                         key.substring(10));
 
             if (key.startsWith("openid.sreg."))
-                hasOpenidDotSreg = true;
+                hasSReg10 = true;
         }
 
         // only do the workaround for OpenID1 messages
-        if ( hasOpenidDotSreg && ! _extAliases.values().contains("sreg")
-             /*! todo: revert this: hasParameter("openid.ns")*/ )
+        if ( hasSReg10 && ! hasParameter("openid.ns") )
             _extAliases.put(SRegMessage.OPENID_NS_SREG, "sreg");
 
         _extCounter = _extAliases.size();
@@ -197,7 +191,20 @@ public class Message
 
     public String keyValueFormEncoding()
     {
-        return _params.toString();
+        StringBuffer allParams = new StringBuffer("");
+
+        List parameters = _params.getParameters();
+        Iterator iterator = parameters.iterator();
+        while (iterator.hasNext())
+        {
+            Parameter parameter = (Parameter) iterator.next();
+            allParams.append(parameter.getKey());
+            allParams.append(':');
+            allParams.append(parameter.getValue());
+            allParams.append('\n');
+        }
+
+        return allParams.toString();
     }
 
     public String wwwFormEncoding()
@@ -410,15 +417,9 @@ public class Message
             set(paramName, param.getValue());
         }
 
-
-        if (this instanceof AuthSuccess)
-        {
-            if (extension.signRequired())
-                ((AuthSuccess)this).addSignExtension(typeUri);
-
-            if ( ((AuthSuccess)this).getSignExtensions().contains(typeUri) )
-                ((AuthSuccess)this).buildSignedList();
-        }
+        if (this instanceof AuthSuccess &&
+                ((AuthSuccess)this).getSignExtensions().contains(extension) )
+            ((AuthSuccess)this).buildSignedList();
     }
 
     /**
@@ -483,26 +484,6 @@ public class Message
 
                 MessageExtension extension = extensionFactory.getExtension(
                         getExtensionParams(typeUri), mode.startsWith("checkid_"));
-
-                if (this instanceof AuthSuccess && extension.signRequired())
-                {
-                    List signedParams = Arrays.asList(
-                        ((AuthSuccess)this).getSignList().split(",") );
-
-                    String alias = getExtensionAlias(typeUri);
-
-                    Iterator iter = extension.getParameters().getParameters().iterator();
-                    while (iter.hasNext())
-                    {
-                        Parameter param = (Parameter) iter.next();
-                        if (! signedParams.contains(alias + "." + param.getKey()))
-                        {
-                            throw new MessageException(
-                                "Extension " + typeUri + " MUST be signed; " +
-                                "field " + param.getKey() + " is NOT signed.");
-                        }
-                    }
-                }
 
                 _extesion.put(typeUri, extension);
             }

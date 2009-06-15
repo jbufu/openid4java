@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.server;
@@ -45,9 +45,8 @@ public class RealmVerifier
     private YadisResolver _yadisResolver;
 
     private boolean _enforceRpId;
-    private boolean _isOP;
 
-    public RealmVerifier(boolean isOP)
+    public RealmVerifier()
     {
         _deniedRealmDomains = new ArrayList();
 
@@ -57,7 +56,6 @@ public class RealmVerifier
         _yadisResolver = new YadisResolver();
 
         _enforceRpId = true;
-        _isOP = isOP;
     }
 
     public void addDeniedRealmDomain(String deniedRealmDomain)
@@ -103,27 +101,16 @@ public class RealmVerifier
     public void setEnforceRpId(boolean enforceRpId)
     {
         this._enforceRpId = enforceRpId;
-        if (! enforceRpId)
-            _log.warn("RP discovery / realm validation disabled; ");
     }
 
     public int validate(String realm, String returnTo)
     {
-        // assume OpenID 2.0 / compatibility mode = false
-        return validate(realm, returnTo, false, _enforceRpId);
+        return validate(realm, returnTo, _enforceRpId);
     }
 
-    public int validate(String realm, String returnTo, boolean compatibility)
-    {
-        return validate(realm, returnTo, compatibility, _enforceRpId);
-    }
-
-
-    public int validate(String realm, String returnTo,
-                        boolean compatibility, boolean enforceRpId)
+    public int validate(String realm, String returnTo, boolean enforceRpId)
     {
         int result;
-
         // 1. match the return_to against the realm
         result = match(realm, returnTo);
 
@@ -135,26 +122,7 @@ public class RealmVerifier
         }
 
         // 2. match the return_to against RP endpoints discovered from the realm
-        if ( ! compatibility && enforceRpId)
-        {
-            result = validateRpId(realm, returnTo);
-            if (OK != result)
-                _log.error("Failed to validate return URL: " + returnTo +
-                    " against endpoints discovered from the RP's realm.");
-        }
-        else if ( ! compatibility && ! enforceRpId && _isOP)
-        {
-            _log.warn("RP discovery / realm validation disabled; " +
-                      "this option SHOULD be enabled for OPs");
-        }
-
-        return result;
-    }
-
-    private int validateRpId(String realm, String returnTo)
-    {
-        int result = RP_INVALID_ENDPOINT; // assume there won't be a match
-
+        result = RP_INVALID_ENDPOINT; // assume there won't get a match
         try
         {
             // replace '*.' with 'www.' in the authority part
@@ -193,7 +161,7 @@ public class RealmVerifier
                 _log.error("Discovery failed on realm: " + realm, e);
             else
                 _log.warn("Discovery failed on realm: " + realm, e);
-
+            
             result = RP_DISCOVERY_FAILED;
         }
         catch (MalformedURLException e)
@@ -202,7 +170,19 @@ public class RealmVerifier
             result = MALFORMED_REALM;
         }
 
-        return result;
+        // return the result
+        if (enforceRpId)
+        {
+            return result;
+        }
+        else
+        {
+            if (OK != result)
+                _log.warn("Failed to validate return URL: " + returnTo +
+                    " against endpoints discovered from the RP's realm; " +
+                    "not enforced, returning OK; error code: " + result);
+            return OK;
+        }
     }
 
     public int match(String realm, String returnTo)

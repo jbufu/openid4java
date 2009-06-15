@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.association;
@@ -155,7 +155,7 @@ public class AssociationSessionType implements Comparable
 
         else if (! compatibility && "no-encryption".equals(sessType) &&
                 Association.TYPE_HMAC_SHA256.equals(assocType))
-                result =  NO_ENCRYPTION_SHA256MAC;
+                result =  NO_ENCRYPTION_SHA1MAC;
 
         else if ( compatibility &&
                 ("".equals(sessType) || sessType == null) &&

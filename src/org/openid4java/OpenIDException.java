@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java;
@@ -38,8 +38,8 @@ public class OpenIDException extends Exception
     public static final int YADIS_GET_NO_XRDS = 0x0709;
     public static final int YADIS_HTMLMETA_DOWNLOAD_ERROR = 0x070A;
     public static final int YADIS_HTMLMETA_INVALID_RESPONSE = 0x070B;
-    public static final int XRDS_DOWNLOAD_ERROR = 0x070C;
-    public static final int XRDS_PARSING_ERROR = 0x070D;
+    public static final int YADIS_XRDS_DOWNLOAD_ERROR = 0x070C;
+    public static final int YADIS_XRDS_PARSING_ERROR = 0x070D;
     public static final int YADIS_XRDS_SIZE_EXCEEDED = 0x070E;
 
     public static final int XRI_ERROR = 0x0800;
@@ -47,11 +47,6 @@ public class OpenIDException extends Exception
     public static final int SERVER_ERROR = 0x0900;
     public static final int CONSUMER_ERROR = 0x0A00;
     public static final int INFOCARD_ERROR = 0x0B00;
-
-    public static final int EXTENSION_ERROR = 0x0C00;
-    public static final int AX_ERROR = 0x0C10;
-    public static final int SREG_ERROR = 0x0C20;
-    public static final int PAPE_ERROR = 0x0C30;
 
     public OpenIDException(String message)
     {
@@ -101,6 +96,6 @@ public class OpenIDException extends Exception
     // override getMessage() to prefix with the error code
     public String getMessage()
     {
-        return "0x" + Integer.toHexString(_errorCode) + ": " + super.getMessage();
+        return Integer.toString(_errorCode) + ": " + super.getMessage();
     }
 }

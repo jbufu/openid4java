@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.consumer;
@@ -9,16 +9,11 @@ import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.ax.AxMessage;
-import org.openid4java.message.sreg.SRegMessage;
-import org.openid4java.message.sreg.SRegRequest;
-import org.openid4java.message.sreg.SRegResponse;
 import org.openid4java.message.*;
 import org.openid4java.OpenIDException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import java.util.List;
 import java.io.IOException;
 
@@ -27,28 +22,12 @@ import java.io.IOException;
  */
 public class SampleConsumer
 {
-    private ConsumerManager manager;
-    private String returnToUrl;
+    public ConsumerManager manager;
 
     public SampleConsumer() throws ConsumerException
     {
-        this("http://example.com/openid");
-    }
-
-    public SampleConsumer(String returnToUrl) throws ConsumerException
-    {
-        // configure the return_to URL where your application will receive
-        // the authentication responses from the OpenID provider
-        this.returnToUrl = returnToUrl;
-
         // instantiate a ConsumerManager object
         manager = new ConsumerManager();
-        manager.setAssociations(new InMemoryConsumerAssociationStore());
-        manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
-
-        // for a working demo, not enforcing RP realm discovery
-        // since this new feature is not deployed
-        manager.getRealmVerifier().setEnforceRpId(false);
     }
 
     // --- placing the authentication request ---
@@ -59,6 +38,9 @@ public class SampleConsumer
     {
         try
         {
+            // configure the return_to URL where your application will receive
+            // the authentication responses from the OpenID provider
+            String returnToUrl = "http://example.com/openid";
 
             // --- Forward proxy setup (only if needed) ---
             // ProxyProperties proxyProps = new ProxyProperties();
@@ -81,16 +63,14 @@ public class SampleConsumer
 
             // Attribute Exchange example: fetching the 'email' attribute
             FetchRequest fetch = FetchRequest.createFetchRequest();
-            fetch.addAttribute("email", // attribute alias
-                "http://schema.openid.net/contact/email", // type URI
-                true); // required
+            fetch.addAttribute("email",
+                    // attribute alias
+                    "http://schema.openid.net/contact/email",   // type URI
+                    true);                                      // required
+
             // attach the extension to the authentication request
             authReq.addExtension(fetch);
 
-            // example using Simple Registration to fetching the 'email' attribute
-            SRegRequest sregReq = SRegRequest.createFetchRequest();
-            sregReq.addAttribute("email", true);
-            authReq.addExtension(sregReq);
 
             if (! discovered.isVersion2() )
             {
@@ -114,7 +94,6 @@ public class SampleConsumer
         catch (OpenIDException e)
         {
             // present error to the user
-            throw new RuntimeException("wrap:" + e.getMessage(), e);
         }
 
         return null;
@@ -150,28 +129,24 @@ public class SampleConsumer
             Identifier verified = verification.getVerifiedId();
             if (verified != null)
             {
-                AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
-
-                HttpSession session = httpReq.getSession(true);
-                session.setAttribute("openid_identifier", authSuccess.getIdentity());
+                AuthSuccess authSuccess =
+                        (AuthSuccess) verification.getAuthResponse();
 
                 if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
                 {
-                    FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-                    session.setAttribute("emailFromFetch", fetchResp.getAttributeValues("email").get(0));
+                    FetchResponse fetchResp = (FetchResponse) authSuccess
+                            .getExtension(AxMessage.OPENID_NS_AX);
+
+                    List emails = fetchResp.getAttributeValues("email");
+                    String email = (String) emails.get(0);
                 }
-                if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
-                {
-                    SRegResponse sregResp = (SRegResponse) authSuccess.getExtension(SRegMessage.OPENID_NS_SREG);
-                    session.setAttribute("emailFromSReg", sregResp.getAttributeValue("email"));
-                }
+
                 return verified;  // success
             }
         }
         catch (OpenIDException e)
         {
             // present error to the user
-            throw new RuntimeException("wrap:" + e.getMessage(), e);
         }
 
         return null;

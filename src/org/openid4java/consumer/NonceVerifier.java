@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.consumer;
@@ -39,12 +39,7 @@ public interface NonceVerifier
     public int seen(String opUrl, String nonce);
 
     /**
-     * Returns the expiration timeout for nonces, in seconds.
+     * Returns the expiration timeout for nonces, in seconds
      */
     public int getMaxAge();
-
-    /**
-     * Sets the expiration timeout for nonces, in seconds.
-     */
-    public void setMaxAge(int ageSeconds);
 }

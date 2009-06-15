@@ -1,26 +1,18 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.discovery.yadis;
 
+import org.openxri.xml.XRDS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openid4java.discovery.DiscoveryInformation;
-import org.openid4java.discovery.UrlIdentifier;
-import org.openid4java.discovery.DiscoveryException;
-import org.openid4java.discovery.xrds.XrdsServiceEndpoint;
-import org.openid4java.OpenIDException;
 
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.*;
 
 /**
- * The results of Yadis discovery performed on a YadisURL,
- * represented through a stripped-down XRDS model,
- * containing only the those discovery information pieces
- * that are relevant for OpenID.
+ * The results of Yadis discovery performed on a YadisURL.
  * <p>
  * The payload is represented by the XRDS document. Along with it other
  * meta-information is contained, which can be useful while consuming
@@ -34,9 +26,9 @@ public class YadisResult
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**
-     * XRDS endpoints obtained by performing Yadis discovery on the YadisURL.
+     * The XRDS document obtained by performing Yadis discovery on the YadisURL.
      */
-    private List _endpoints;
+    private XRDS _xrds;
 
     /**
      * The content-type of the XRDS response.
@@ -57,6 +49,12 @@ public class YadisResult
      * The URL from where the XRDS document was retrieved.
      */
     private URL _xrdsLocation;
+
+
+    /**
+     * Flag indicating whether the discovery was successfull.
+     */
+    private boolean _success = false;
 
     /**
      * The throwable or exception that caused the failure, if available.
@@ -130,65 +128,25 @@ public class YadisResult
     }
 
     /**
-     * Sets the OpenID XRDS endpoints discovered from an identifier.
+     * Sets the Yadis Resource Descriptor (XRDS)
+     *
+     * @param xrds          The XRDS document associated with the YadisURL
+     *                      obtained through Yadis discovery
      */
-    public void setEndpoints(List endpoints)
+    public void setXrds(XRDS xrds)
     {
-        _endpoints = endpoints;
+        _xrds = xrds;
     }
 
     /**
-     * Gets the OpenID XRDS endpoints discovered from an identifier.
+     * Gets the Yadis Resource Descriptor (XRDS) document.
+     *
+     * @return              The XRDS document associated with the YadisURL
+     *                      obtained through Yadis discovery
      */
-    public List getEndpoints()
+    public XRDS getXrds()
     {
-        return _endpoints;
-    }
-
-    public int getEndpointCount()
-    {
-        return _endpoints == null ? 0 : _endpoints.size();
-    }
-
-    public List getDiscoveredInformation(Set targetTypes) throws DiscoveryException
-    {
-        List result = new ArrayList();
-
-        if (hasEndpoints()) 
-        {
-            XrdsServiceEndpoint endpoint;
-            Iterator endpointsIter = _endpoints.iterator();
-            while (endpointsIter.hasNext()) {
-                endpoint = (XrdsServiceEndpoint) endpointsIter.next();
-                Iterator typesIter = endpoint.getTypes().iterator();
-                while (typesIter.hasNext()) {
-                    String type = (String) typesIter.next();
-                    if (!targetTypes.contains(type)) continue;
-                    try {
-                        result.add(new DiscoveryInformation(
-                            new URL(endpoint.getUri()),
-                            DiscoveryInformation.OPENID_SIGNON_TYPES.contains(type) ?
-                                new UrlIdentifier(_normalizedUrl) : null,
-                            DiscoveryInformation.OPENID2.equals(type) ? endpoint.getLocalId() :
-                            DiscoveryInformation.OPENID1_SIGNON_TYPES.contains(type) ? endpoint.getDelegate() : null,
-                            type,
-                            endpoint.getTypes()));
-                    } catch (MalformedURLException e) {
-                        throw new YadisException("Invalid endpoint URL discovered: " + endpoint.getUri(), OpenIDException.YADIS_INVALID_URL);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * @return true if the YadisResult has at least one XRDS endpoint,
-     *         false otherwise.
-     */
-    public boolean hasEndpoints()
-    {
-        return _endpoints != null && ! _endpoints.isEmpty();
+        return _xrds;
     }
 
     /**
@@ -230,6 +188,25 @@ public class YadisResult
     }
 
     /**
+     * Returns true if Yadis discovery succeeded.
+     *
+     */
+    public boolean isSuccess()
+    {
+        return _success;
+    }
+
+    /**
+     * Sets the Yadis discovery success flag.
+     *
+     * @param   status  True if Yadis succeeded, false otherwise.
+     */
+    public void setSuccess(boolean status)
+    {
+        this._success = status;
+    }
+
+    /**
      * Sets the throwable or exception that caused the failure of the Yadis
      * discovery, if one was thrown and intercepted
      */
@@ -255,21 +232,7 @@ public class YadisResult
         dump.append("\nNormalizedURL:").append(_normalizedUrl);
         dump.append("\nX-XRDS-Location:").append(_xrdsLocation);
         dump.append("\nContent-type:").append(_contentType);
-
-        if (_endpoints != null)
-        {
-            dump.append("\nXRDS:");
-            XrdsServiceEndpoint endpoint;
-            Iterator iter = _endpoints.iterator();
-            while(iter.hasNext())
-            {
-                endpoint = (XrdsServiceEndpoint) iter.next();
-                dump.append("\n\tType: ").append(endpoint.getTypes().toArray());
-                dump.append("\n\tServicePriority: ").append(endpoint.getServicePriority());
-                dump.append("\n\tUriPriority: ").append(endpoint.getUriPriority());
-                dump.append("\n\tURI: ").append(endpoint.getUri());
-            }
-        }
+        dump.append("\nXRDS:\n").append(_xrds.dump());
 
         return dump.toString();
     }

@@ -1,7 +1,7 @@
 <testSuite>
 
     <!--
-    The following result codes defined in RealmVerifier are used:
+    The following result codes are used:
     - OK
     - DENIED_REALM
     - MALFORMED_REALM

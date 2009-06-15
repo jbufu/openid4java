@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.consumer;
@@ -22,30 +22,25 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
 
     protected static InternetDateFormat _dateFormat = new InternetDateFormat();
 
-    protected int _maxAgeSeconds;
+    protected int _maxAge;
 
     /**
      * @param maxAge maximum token age in seconds
      */
     protected AbstractNonceVerifier(int maxAge)
     {
-        _maxAgeSeconds = maxAge;
+        _maxAge = maxAge;
     }
 
     public int getMaxAge()
     {
-        return _maxAgeSeconds;
-    }
-
-    public void setMaxAge(int ageSeconds)
-    {
-        _maxAgeSeconds = ageSeconds;  
+        return _maxAge / 1000;
     }
 
     /**
-     * Checks if nonce date is valid and if it is in the max age boundary. Other checks are delegated to {@link #seen(java.util.Date, String, String)}
+     * Checks if nonce date is valid and if it is in the max age boudary. Other checks are delegated to {@link #seen(java.util.Date, String, String)}
      */
-    public synchronized int seen(String opUrl, String nonce)
+    public int seen(String opUrl, String nonce)
     {
         if (DEBUG) _log.debug("Verifying nonce: " + nonce);
 
@@ -82,6 +77,6 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
     {
         long age = now.getTime() - nonce.getTime();
 
-        return age > _maxAgeSeconds * 1000;
+        return age > _maxAge * 1000;
     }
 }

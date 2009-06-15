@@ -28,7 +28,7 @@ This JSP just asks you to click a link without authentication.</em><p>
     <strong>ClaimedID:</strong> <pre><%= openidclaimedid%></pre><br>
     <strong>Identity:</strong> <pre><%= openididentity %> </pre><br>
     <strong>Site:</strong> <pre> <%= site %></pre><br>
-    Click <a href="?action=authorize" id="login">To become logged in and authorize</a>
+    Click <a href="?action=authorize">To become logged in and authorize</a>
 <%
     }
     else // Logged in

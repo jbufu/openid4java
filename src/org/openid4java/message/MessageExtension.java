@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
@@ -54,14 +54,5 @@ public interface MessageExtension
      *          false otherwise.
      */
     public boolean providesIdentifier();
-
-    /**
-     * Flag for indicating that an extension must be signed.
-     *
-     * @return  True if all the extension's parameters MUST be signed
-     *          in positive assertions, or false if there isn't such a
-     *          requirement.
-     */
-    public boolean signRequired();
 
 }

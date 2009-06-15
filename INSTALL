@@ -12,7 +12,7 @@ For general information about the package please see the README document.
 
 Requirements:
 
-   - Java 1.5 JVM (or higher)
+   - Java 1.4 JVM (or higher)
 
    - Ant (optional: needed for building the package and running the tests)
    - Maven2 (optional: alternative to Ant; see maven2/README.txt)
@@ -23,66 +23,38 @@ Installation:
 
   1. Installing the package
 
-    => To make the OpenID4Java library available to a (web) application
-       the following JAR files need to be copied to the application's
-       classpath:
-                        - openid4java-*.jar
-                        - library dependencies (see below)
+    => Endorsed libraries:
+
+    The JAR files under the lib/endorsed/ folder need to be copied under
+    your environment's endorsed libraries folder. If you are running a
+    webapplication under Apache Tomcat, this directory can be found at:
+
+        JAVA_HOME/lib/endorsed
+     or
+        CATALINA_HOME/common/endorsed
+
+    For other application servers or environments, please consult their
+    documentation for configuring endorsed libraries.
+
+    => To make the OpenID4Java library available to the web application
+    the following need to be done:
+
+      Copy lib/*.jar and java-openid-sxip-*.jar to your application's
+      Java classpath, along with any additional requirements as described 
+      in the library dependencies section below.
 
     => Library dependencies:
 
-      lib/*jar       : Required. Core OpenID4Java library dependencies.
-      lib/optional/  : Optional. Libraries supporting alternative deployments.
-                          - spring-*.jar        : JdbcServerAssociationStore
-                          - ehcache-1.2.4.jar   : EhcacheNonceVerifier
-                          - log4j-1.2.8.jar
+      lib/xri/      : OpenXRI dependencies; needed for XRI support.
+      lib/endorsed/ : Endorsed libraries; documented above.   
+      lib/infocard/ : Higgins STS dependency; needed for OpenID-Infocards STS.
+      lib/optional/ : Optional libraries supporting alternative deployments.
+                      - spring.jar        : JdbcServerAssociationStore
+                      - ehcache-1.2.4.jar : EhcacheNonceVerifier
+                      - log4j-1.2.8.jar
+      lib/extra/    : Extra libraries, not needed for deployments
+                      (JUnit tests, Jetty servlet container, SVN Ant utilities)
 
-      lib/extra/     : Extra/development libraries, not needed for deployments.
-                       (JUnit tests, Jetty servlet container, SVN/Ant utilities)
-
-      lib/xri/       : Optional. Local OpenXRI resolver dependencies.
-                       Included only in the "openid4java-xri" and
-                       "openid4java-full" packages. (A dependency-less
-                       proxy XRI resolver is included in the standard package)
-
-      lib/infocard/  : Optional. OpenID-Infocards/Higgins STS dependencies.
-                       Included only in the "openid4java-infocard" and
-                       "openid4java-full" packages.
-
-
-    => Relying Party Discovery:
-
-      Relying Parties must publish their endpoints in order for the OpenID
-      Providers to be able to verify authentication requests and prevent
-      proxy attacks. The Yadis protocol and realm verification mechanisms
-      are used for this purpose. See the section "Discovering OpenID
-      Relying Parties" of the OpenID Authentication specification for
-      details.
-
-      Example:
-
-        <Service xmlns="xri://$xrd*($v*2.0)">
-          <Type>http://specs.openid.net/auth/2.0/return_to</Type>
-          <URI>http://consumer.example.com/return</URI>
-        </Service>
-
-      The RP should publish the above <Service> element at their realm URL.
-      All OpenID Authentication request sent by this RP should contain
-      openid.return_to values matching the http://consumer.example.com/return
-      realm.
-
-      OpenID Providers:
-
-      Validation of openid.return_to values against Relying Party Discovery
-      endpoints is enabled by default. This feature can be disabled with
-      ServerManager.setEnforceRpId(false).
-
-
-    => Java 1.4 compatibility
-
-      The official OpenID4Java distribution is compiled with a Java 1.5 
-      compiler. The source, however, can be compiled with Java 1.4. 
-      See the "Building the package" section below.
 
   2. OPTIONAL: Configuring logging
 
@@ -122,6 +94,7 @@ Installation:
       can be found as separate downloads at the following URLs:
 
       http://java.sun.com/javase/downloads/index_jdk5.jsp
+      http://java.sun.com/j2se/1.4.2/download.html
 
     => Third party libraries
 
@@ -141,7 +114,7 @@ Installation:
 
         ant jar
 
-    - Builds official distributable archive
+    - Builds distribution ZIP package
 
         ant dist
 
@@ -362,18 +335,19 @@ Thanks for running OpenID!
 
 
 ========================================================================
-Copyright 2006-2008 Sxip Identity Corporation
+Copyright 2006-2007 Sxip Identity Corporation
 
-Project home page and package distribution:
+Package distribution:
+  => http://code.sxip.com
+
+Source code and defect management:
   => http://code.google.com/p/openid4java
-  => http://code.google.com/p/openid4java/downloads/
 
-For support, please visit the wiki and join the Google Groups!
-  => http://groups.google.com/group/openid4java/
-  => http://code.google.com/p/openid4java/w/
+For support, please join the Google Groups!
+  => http://groups.google.com/group/openid4java
 
 OpenID
-  => http://openid.net/
+  => http://openid.net 
 
 Released under the Apache License 2.0
   => see LICENSE

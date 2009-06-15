@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
@@ -227,7 +227,7 @@ public class AssociationResponse extends Message
     /**
      * Checks if the message is a valid OpenID Association Response..
      *
-     * @throws MessageException if message validation failed.
+     * @return True if all validation checkes passed, false otherwise.
      */
     public void validate() throws MessageException
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.consumer;
@@ -61,10 +61,10 @@ public class ConsumerManager
     private NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
 
     /**
-     * Private association store used for signing consumer nonces when operating 
-     * in compatibility (v1.x) mode.
+     * Private association used for signing consumer nonces when operating in
+     * compatibility (v1.x) mode.
      */
-    private ConsumerAssociationStore _privateAssociations = new InMemoryConsumerAssociationStore();
+    private Association _privateAssociation;
 
     /**
      * Verifier for the nonces in authentication responses;
@@ -112,14 +112,6 @@ public class ConsumerManager
      */
     private int _failedAssocExpire = 300;
 
-    /**
-     * Interval before the expiration of an association (in seconds)
-     * in which the association should not be used, in order to avoid
-     * the expiration from occurring in the middle of an authentication
-     * transaction. Default: 300s.
-     */
-    private int _preExpiryAssocLockInterval = 300;
-
 
     // --- authentication preferences ---
 
@@ -162,15 +154,25 @@ public class ConsumerManager
                 _maxRedirects, Boolean.FALSE, _socketTimeout, _connectTimeout,
                 CookiePolicy.IGNORE_COOKIES);
 
-        _realmVerifier = new RealmVerifier(false);
-
-        // don't verify own (RP) identity, disable RP discovery
-        _realmVerifier.setEnforceRpId(false);
+        _realmVerifier = new RealmVerifier();
 
         if (Association.isHmacSha256Supported())
             _prefAssocSessEnc = AssociationSessionType.DH_SHA256;
         else
             _prefAssocSessEnc = AssociationSessionType.DH_SHA1;
+
+        try
+        {
+            // initialize the private association for compat consumer nonces
+            _privateAssociation = Association.generate(
+                    getPrefAssocSessEnc().getAssociationType(), "", 0);
+        }
+        catch (AssociationException e)
+        {
+            throw new ConsumerException(
+                    "Cannot initialize private association, " +
+                    "needed for consumer nonces.");
+        }
     }
 
     /**
@@ -307,25 +309,11 @@ public class ConsumerManager
      * Default: enabled.
      * <p>
      * Associations and stateless mode cannot be both disabled at the same time.
-     * @deprecated
-     * @see #setAllowStateless(boolean)
      */
-    public void allowStateless(boolean allowStateless)
-    {
-        setAllowStateless(allowStateless);
-    }
-
-    /**
-     * Flag used to enable / disable the use of stateless mode.
-     * <p>
-     * Default: enabled.
-     * <p>
-     * Associations and stateless mode cannot be both disabled at the same time.
-     */
-    public void setAllowStateless(boolean allowStateless)
+    public void allowStateless(boolean useStateless)
     {
         if (_allowStateless || _maxAssocAttempts > 0)
-            this._allowStateless = allowStateless;
+            this._allowStateless = useStateless;
         else
             throw new IllegalArgumentException(
                     "Associations and stateless mode " +
@@ -335,20 +323,8 @@ public class ConsumerManager
     /**
      * Returns true if the ConsumerManager is configured to fallback to
      * stateless mode when failing to associate with an OpenID Provider.
-     *
-     * @deprecated
-     * @see isAllowStateless()
      */
     public boolean statelessAllowed()
-    {
-        return _allowStateless;
-    }
-
-    /**
-     * Returns true if the ConsumerManager is configured to fallback to
-     * stateless mode when failing to associate with an OpenID Provider.
-     */
-    public boolean isAllowStateless()
     {
         return _allowStateless;
     }
@@ -372,6 +348,7 @@ public class ConsumerManager
      * <p>
      * Default: no-encryption session, SHA1 MAC association
      * <p>
+     * See also: {@link #setAllowNoEncHttp(boolean)}
      */
     public AssociationSessionType getMinAssocSessEnc()
     {
@@ -428,31 +405,6 @@ public class ConsumerManager
     }
 
     /**
-     * Gets the interval before the expiration of an association
-     * (in seconds) in which the association should not be used,
-     * in order to avoid the expiration from occurring in the middle
-     * of a authentication transaction. Default: 300s.
-     */
-    public int getPreExpiryAssocLockInterval()
-    {
-        return _preExpiryAssocLockInterval;
-    }
-
-    /**
-     * Sets the interval before the expiration of an association
-     * (in seconds) in which the association should not be used,
-     * in order to avoid the expiration from occurring in the middle
-     * of a authentication transaction. Default: 300s.
-     *
-     * @param preExpiryAssocLockInterval    The number of seconds for the
-     *                                      pre-expiry lock inteval.
-     */
-    public void setPreExpiryAssocLockInterval(int preExpiryAssocLockInterval)
-    {
-        this._preExpiryAssocLockInterval = preExpiryAssocLockInterval;
-    }
-
-    /**
      * Configures the authentication request mode:
      * checkid_immediate (true) or checkid_setup (false).
      * <p>
@@ -496,24 +448,13 @@ public class ConsumerManager
      * Nonces older than the max age will be removed from the store and
      * authentication responses will be considered failures.
      */
-    public int getMaxNonceAge()
+    public long getMaxNonceAge()
     {
         return _nonceVerifier.getMaxAge();
     }
 
     /**
-     * Sets the max age (in seconds) configured for keeping track of nonces.
-     * <p>
-     * Nonces older than the max age will be removed from the store and
-     * authentication responses will be considered failures.
-     */
-    public void setMaxNonceAge(int ageSeconds)
-    {
-        _nonceVerifier.setMaxAge(ageSeconds);
-    }
-
-    /**
-     * Does discovery on an identifier. It delegates the call to its
+     * Does discover on an identifier. It delegates the call to its
      * discovery manager.
      *
      * @return      A List of {@link DiscoveryInformation} objects.
@@ -528,7 +469,7 @@ public class ConsumerManager
     }
 
     /**
-     * Configures a private association store for signing consumer nonces.
+     * Configures a private association for signing consumer nonces.
      * <p>
      * Consumer nonces are needed to prevent replay attacks in compatibility
      * mode, because OpenID 1.x Providers to not attach nonces to
@@ -538,29 +479,29 @@ public class ConsumerManager
      * authentication response was indeed issued by itself (and thus prevent
      * denial of service attacks), is by signing them.
      *
-     * @param associations     The association store to be used for signing consumer nonces;
+     * @param assoc     The association to be used for signing consumer nonces;
      *                  signing can be deactivated by setting this to null.
      *                  Signing is enabled by default.
      */
-    public void setPrivateAssociationStore(ConsumerAssociationStore associations)
+    public void setPrivateAssociation(Association assoc)
             throws ConsumerException
     {
-        if (associations == null)
+        if (assoc == null)
             throw new ConsumerException(
-                    "Cannot set null private association store, " +
+                    "Cannot set null private association, " +
                     "needed for consumer nonces.");
 
-        _privateAssociations = associations;
+        _privateAssociation = assoc;
     }
 
     /**
-     * Gets the private association store used for signing consumer nonces.
+     * Gets the private association used for signing consumer nonces.
      *
-     * @see #setPrivateAssociationStore(ConsumerAssociationStore)
+     * @see #setPrivateAssociation(org.openid4java.association.Association)
      */
-    public ConsumerAssociationStore getPrivateAssociationStore()
+    public Association getPrivateAssociation()
     {
-        return _privateAssociations;
+        return _privateAssociation;
     }
 
     public void setConnectTimeout(int connectTimeout)
@@ -691,8 +632,7 @@ public class ConsumerManager
      * Tries to establish an association with the OpenID Provider.
      * <p>
      * The resulting association information will be kept on storage for later
-     * use at verification stage. If there exists an association for the opUrl
-     * that is not near expiration, will not construct new association.
+     * use at verification stage.
      *
      * @param discovered    DiscoveryInformation obtained during the discovery
      * @return              The number of association attempts performed.
@@ -709,11 +649,9 @@ public class ConsumerManager
 
         // check if there's an already established association
         Association a = _associations.load(opEndpoint);
-        if ( a != null &&  
-                (Association.FAILED_ASSOC_HANDLE.equals(a.getHandle()) ||
-                a.getExpiry().getTime() - System.currentTimeMillis() > _preExpiryAssocLockInterval * 1000) )
+        if (a != null && a.getHandle() != null)
         {
-            _log.info("Found an existing association: " + a.getHandle());
+            _log.info("Found an existing association.");
             return 0;
         }
 
@@ -806,8 +744,7 @@ public class ConsumerManager
                         break;
                     }
                     else
-                        _log.info("Discarding association response, " +
-                                  "not matching consumer criteria");
+                        _log.info("Discarding, not matching consumer criteria");
                 }
                 else if (status == HttpStatus.SC_BAD_REQUEST) // error response
                 {
@@ -1031,31 +968,24 @@ public class ConsumerManager
             throw new ConsumerException("Authentication cannot continue: " +
                     "no discovery information provided.");
 
+        associate(discovered, _maxAssocAttempts);
+
         Association assoc =
                 _associations.load(discovered.getOPEndpoint().toString());
-
-        if (assoc == null)
-        {
-            associate(discovered, _maxAssocAttempts);
-            assoc = _associations.load(discovered.getOPEndpoint().toString());
-        }
-
         String handle = assoc != null ?
                 assoc.getHandle() : Association.FAILED_ASSOC_HANDLE;
 
-        // get the Claimed ID and Delegate ID (aka OP-specific identifier)
-        String claimedId, delegate;
+        // get the Claimed ID
+        String claimedId;
         if (discovered.hasClaimedIdentifier())
-        {
             claimedId = discovered.getClaimedIdentifier().getIdentifier();
-            delegate = discovered.hasDelegateIdentifier() ?
-                       discovered.getDelegateIdentifier() : claimedId;
-        }
         else
-        {
             claimedId = AuthRequest.SELECT_ID;
-            delegate = AuthRequest.SELECT_ID;
-        }
+
+        // set the Delegate ID (aka OP-specific identifier)
+        String delegate = claimedId;
+        if (discovered.hasDelegateIdentifier())
+            delegate = discovered.getDelegateIdentifier();
 
         // stateless mode disabled ?
         if ( !_allowStateless && Association.FAILED_ASSOC_HANDLE.equals(handle))
@@ -1067,17 +997,19 @@ public class ConsumerManager
                 " claimedID: " + claimedId +
                 " OP-specific ID: " + delegate);
 
-        if (! discovered.isVersion2())
-            returnToUrl = insertConsumerNonce(discovered.getOPEndpoint().toString(), returnToUrl);
-
         AuthRequest authReq = AuthRequest.createAuthRequest(claimedId, delegate,
                 ! discovered.isVersion2(), returnToUrl, handle, realm, _realmVerifier);
 
         authReq.setOPEndpoint(discovered.getOPEndpoint());
 
+        if (! discovered.isVersion2())
+            authReq.setReturnTo(insertConsumerNonce(authReq.getReturnTo()));
+
         // ignore the immediate flag for OP-directed identifier selection
         if (! AuthRequest.SELECT_ID.equals(claimedId))
             authReq.setImmediate(_immediateAuth);
+
+        authReq.validate();
 
         return authReq;
     }
@@ -1170,8 +1102,8 @@ public class ConsumerManager
         // [3/4] : nonce verification
         if (! verifyNonce(authResp, discovered))
         {
-            result.setStatusMsg("Nonce verification failed.");
-            _log.error("Nonce verification failed.");
+            result.setStatusMsg("Nonce verificaton failed.");
+            _log.error("Nonce verificaton failed.");
             return result;
         }
 
@@ -1330,8 +1262,7 @@ public class ConsumerManager
         String nonce = authResp.getNonce();
 
         if (nonce == null) // compatibility mode
-            nonce = extractConsumerNonce(authResp.getReturnTo(),
-                    discovered.getOPEndpoint().toString());
+            nonce = extractConsumerNonce(authResp.getReturnTo());
 
         if (nonce == null) return false;
 
@@ -1348,43 +1279,25 @@ public class ConsumerManager
      * OpenID 1.1 OpenID Providers do not generate nonces in authentication
      * responses.
      *
-     * @param opUrl             The endpoint to be used for private association.
      * @param returnTo          The return_to URL to which a custom nonce
      *                          parameter will be added.
      * @return                  The return_to URL containing the nonce.
      */
-    public String insertConsumerNonce(String opUrl, String returnTo)
+    public String insertConsumerNonce(String returnTo)
     {
         String nonce = _consumerNonceGenerator.next();
 
         returnTo += (returnTo.indexOf('?') != -1) ? '&' : '?';
-        
-        Association privateAssoc = _privateAssociations.load(opUrl);
-        if( privateAssoc == null )
-        {
-			try
-			{
-				if (DEBUG) _log.debug( "Creating private association for opUrl " + opUrl);
-				privateAssoc = Association.generate(
-				      getPrefAssocSessEnc().getAssociationType(), "", _failedAssocExpire);
-				_privateAssociations.save( opUrl, privateAssoc );
-			}
-			catch ( AssociationException e )
-			{
-				_log.error("Cannot initialize private association.", e);
-				return null;
-			}
-        }
-        
+
         try
         {
             returnTo += "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
 
             returnTo += "&openid.rpsig=" +
-                    URLEncoder.encode(privateAssoc.sign(returnTo),
+                    URLEncoder.encode(_privateAssociation.sign(returnTo),
                             "UTF-8");
 
-            _log.info("Inserted consumer nonce: " + nonce);
+            _log.info("Inserted consumer nonce.");
 
             if (DEBUG) _log.debug("return_to:" + returnTo);
         }
@@ -1402,11 +1315,10 @@ public class ConsumerManager
      * authentication response from a OpenID 1.1 Provider.
      *
      * @param returnTo      return_to URL from the authentication response
-     * @param opUrl         URL for the appropriate OP endpoint
      * @return              The nonce found in the return_to URL, or null if
      *                      it wasn't found.
      */
-    public String extractConsumerNonce(String returnTo, String opUrl)
+    public String extractConsumerNonce(String returnTo)
     {
         if (DEBUG)
             _log.debug("Extracting consumer nonce...");
@@ -1467,15 +1379,7 @@ public class ConsumerManager
 
         try
         {
-            if (DEBUG) _log.debug( "Loading private association for opUrl " + opUrl );
-            Association privateAssoc = _privateAssociations.load(opUrl);
-            if( privateAssoc == null )
-            {
-                _log.error("Null private association.");
-                return null;
-            }
-            
-            if (privateAssoc.verifySignature(signed, signature))
+            if (_privateAssociation.verifySignature(signed, signature))
             {
                 _log.info("Consumer nonce signature verified.");
                 return nonce;
@@ -1501,8 +1405,8 @@ public class ConsumerManager
      * @param authResp      The authentication response to be verified.
      * @param discovered    The discovery information obtained earlier during
      *                      the discovery stage, associated with the
-     *                      identifier(s) in the request. Stateless operation
-     *                      is assumed if null.
+     *                      identifier(s) in the request. May be null for
+     *                      OpenID 2.0; must not be null for OpenID 1.x.
      * @return              The discovery information associated with the
      *                      claimed identifier, that can be used further in
      *                      the verification process. Null if the discovery
@@ -1532,8 +1436,8 @@ public class ConsumerManager
      * @param authResp      The authentication response to be verified.
      * @param discovered    The discovery information obtained earlier during
      *                      the discovery stage, associated with the
-     *                      identifier(s) in the request. Stateless operation
-     *                      is assumed if null.
+     *                      identifier(s) in the request. Must not be null,
+     *                      and must contain a claimed identifier.
      * @return              The discovery information associated with the
      *                      claimed identifier, that can be used further in
      *                      the verification process. Null if the discovery
@@ -1544,82 +1448,39 @@ public class ConsumerManager
                                         DiscoveryInformation discovered)
             throws DiscoveryException
     {
-        if ( authResp == null || authResp.isVersion2() ||
-             authResp.getIdentity() == null )
+        if (authResp == null || authResp.isVersion2() ||
+                authResp.getIdentity() == null || discovered == null ||
+                discovered.getClaimedIdentifier() == null || discovered.isVersion2())
         {
             if (DEBUG)
-                _log.error("Invalid authentication response: " +
-                           "cannot verify v1 discovered information");
+                _log.debug("Discovered information doesn't match " +
+                           "auth response / version");
             return null;
         }
 
         // asserted identifier in the AuthResponse
         String assertId = authResp.getIdentity();
 
-        if ( discovered != null && ! discovered.isVersion2() &&
-             discovered.getClaimedIdentifier() != null )
-        {
-            // statefull mode
-            if (DEBUG)
-                _log.debug("Verifying discovered information " +
-                           "for OpenID1 assertion about ClaimedID: " +
-                           discovered.getClaimedIdentifier().getIdentifier());
+        // claimed identifier
+        Identifier claimedId = discovered.getClaimedIdentifier();
 
-            String discoveredId = discovered.hasDelegateIdentifier() ?
-                discovered.getDelegateIdentifier() :
-                discovered.getClaimedIdentifier().getIdentifier();
+        if (DEBUG)
+            _log.debug("Verifying discovered information for OpenID1 assertion " +
+                       "about ClaimedID: " + claimedId.getIdentifier());
 
-            if (assertId.equals(discoveredId))
-                return discovered;
-        }
+        // OP-specific ID
+        String opSpecific = discovered.hasDelegateIdentifier() ?
+                discovered.getDelegateIdentifier() : claimedId.getIdentifier();
 
-        // stateless, bare response, or the user changed the ID at the OP
-        _log.info("Proceeding with stateless mode / bare response verification...");
+        // does the asserted ID match the OP-specific ID from the discovery?
+        if ( opSpecific.equals(assertId) )
+            return discovered;  // success
 
-        DiscoveryInformation firstServiceMatch = null;
-
-        // assuming openid.identity is the claimedId
-        // (delegation can't work with stateless/bare resp v1 operation)
-        if (DEBUG) _log.debug(
-            "Performing discovery on the ClaimedID in the assertion: " + assertId);
-        List discoveries = _discovery.discover(assertId);
-
-        Iterator iter = discoveries.iterator();
-        while (iter.hasNext())
-        {
-            DiscoveryInformation service = (DiscoveryInformation) iter.next();
-
-            if (service.isVersion2() || // only interested in v1
-                ! service.hasClaimedIdentifier() || // need a claimedId
-                service.hasDelegateIdentifier() || // not allowing delegates
-                ! assertId.equals(service.getClaimedIdentifier().getIdentifier()))
-                continue;
-
-            if (DEBUG) _log.debug("Found matching service: " + service);
-
-            // keep the first endpoint that matches
-            if (firstServiceMatch == null)
-                firstServiceMatch = service;
-
-            Association assoc = _associations.load(
-                service.getOPEndpoint().toString(),
-                authResp.getHandle());
-
-            // don't look further if there is an association with this endpoint
-            if (assoc != null)
-            {
-                if (DEBUG)
-                    _log.debug("Found existing association for  " + service +
-                        " Not looking for another service endpoint.");
-                return service;
-            }
-        }
-
-        if (firstServiceMatch == null)
-            _log.error("No service element found to match " +
-                "the identifier in the assertion.");
-
-        return firstServiceMatch;
+        // discovered info verification failed
+        if (DEBUG)
+            _log.debug("Identifier in the assertion doesn't match " +
+                       "the one in the discovered information.");
+        return null;
     }
 
     /**
@@ -1629,8 +1490,9 @@ public class ConsumerManager
      * @param authResp      The authentication response to be verified.
      * @param discovered    The discovery information obtained earlier during
      *                      the discovery stage, associated with the
-     *                      identifier(s) in the request. Stateless operation
-     *                      is assumed if null.
+     *                      identifier(s) in the request. May be null,
+     *                      in which case discovery will be performed on
+     *                      the claimed identifier in the response.
      * @return              The discovery information associated with the
      *                      claimed identifier, that can be used further in
      *                      the verification process. Null if the discovery
@@ -1655,7 +1517,7 @@ public class ConsumerManager
 
         // claimed identifier in the AuthResponse
         Identifier respClaimed =
-            _discovery.parseIdentifier(authResp.getClaimed(), true);
+            Discovery.parseIdentifier(authResp.getClaimed(), true);
 
         // the OP endpoint sent in the response
         String respEndpoint = authResp.getOpEndpoint();
@@ -1770,7 +1632,7 @@ public class ConsumerManager
         }
 
         Identifier claimedId = discovered.isVersion2() ?
-            _discovery.parseIdentifier(authResp.getClaimed()) : //may have frag
+            Discovery.parseIdentifier(authResp.getClaimed()) : //may have frag
             discovered.getClaimedIdentifier(); //assert id may be delegate in v1
 
         String handle = authResp.getHandle();
@@ -1789,11 +1651,7 @@ public class ConsumerManager
                 result.setVerifiedId(claimedId);
                 if (DEBUG) _log.debug("Local signature verification succeeded.");
             }
-            else if (DEBUG)
-            {
-                _log.debug("Local signature verification failed.");
-                result.setStatusMsg("Local signature verification failed");
-            }
+            else if (DEBUG) _log.debug("Local signature verification failed.");
 
         }
         else // no association, verify with the OP
@@ -1810,9 +1668,9 @@ public class ConsumerManager
             {
                 VerifyResponse vrfyResp =
                         VerifyResponse.createVerifyResponse(responseParams);
-                
-                vrfyResp.validate();
 
+                vrfyResp.validate();
+                
                 if (vrfyResp.isSignatureVerified())
                 {
                     // process the optional invalidate_handle first
@@ -1850,7 +1708,7 @@ public class ConsumerManager
             _log.info("Verification succeeded for: " + verifiedID);
 
         else
-            _log.error("Verification failed for: " + authResp.getClaimed()
+            _log.error("Verification failed for: " + verifiedID
                        + " reason: " + result.getStatusMsg());
 
         return result;

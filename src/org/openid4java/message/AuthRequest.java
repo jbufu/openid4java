@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
@@ -230,6 +230,14 @@ public class AuthRequest extends Message
 
         boolean compatibility = ! isVersion2();
 
+        if ( compatibility && hasParameter("openid.ns") )
+        {
+            throw new MessageException(
+                "Invalid value for openid.ns field: "
+                + getParameterValue("openid.ns"),
+                OpenIDException.AUTH_ERROR);
+        }
+
         if ( compatibility && hasParameter("openid.identity")  &&
                 SELECT_ID.equals(getParameterValue("openid.identity")))
         {
@@ -344,17 +352,12 @@ public class AuthRequest extends Message
                 OpenIDException.AUTH_ERROR);
         }
 
-        if (getRealm() != null)
+        if (getRealm() != null &&  RealmVerifier.OK !=
+                        _realmVerifier.validate(getRealm(), getReturnTo()) )
         {
-            int validation = _realmVerifier.validate(
-                                getRealm(), getReturnTo(), compatibility);
-
-            if ( RealmVerifier.OK != validation )
-            {
-                throw new MessageException("Realm verification failed (" +
-                    validation + ") for: " + getRealm(), 
-                    OpenIDException.AUTH_REALM_ERROR);
-            }
+            throw new MessageException(
+                "Realm verification failed for: " + getRealm(),
+                OpenIDException.AUTH_REALM_ERROR);
         }
     }
 }

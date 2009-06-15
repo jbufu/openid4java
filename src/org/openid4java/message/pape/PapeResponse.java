@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message.pape;
@@ -7,11 +7,8 @@ package org.openid4java.message.pape;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
-import org.openid4java.util.InternetDateFormat;
-import org.openid4java.OpenIDException;
 
 import java.util.*;
-import java.text.ParseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,20 +23,20 @@ public class PapeResponse extends PapeMessage
     private static Log _log = LogFactory.getLog(PapeResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
+    public static final String AUTH_AGE_UNKNOWN = "none";
+
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
-            "auth_policies", "auth_time",
+            "auth_policies", "auth_age", "nist_auth_level"
     });
 
-    private static final String AUTH_POLICY_NONE = "http://schemas.openid.net/pape/policies/2007/06/none";
 
-    private static InternetDateFormat _dateFormat = new InternetDateFormat();
 
     /**
      * Constructs a Pape Response with an empty parameter list.
      */
     protected PapeResponse()
     {
-        set("auth_policies", AUTH_POLICY_NONE);
+        set("auth_policies", "");
 
         if (DEBUG) _log.debug("Created empty PAPE response.");
     }
@@ -61,7 +58,7 @@ public class PapeResponse extends PapeMessage
      */
     protected PapeResponse(ParameterList params)
     {
-        super(params);
+        _parameters = params;
     }
 
     public static PapeResponse createPapeResponse(ParameterList params)
@@ -69,7 +66,8 @@ public class PapeResponse extends PapeMessage
     {
         PapeResponse resp = new PapeResponse(params);
 
-        resp.validate();
+        if (! resp.isValid())
+            throw new MessageException("Invalid parameters for a PAPE response");
 
         if (DEBUG)
             _log.debug("Created PAPE response from parameter list:\n" + params);
@@ -114,8 +112,9 @@ public class PapeResponse extends PapeMessage
 
         String policies = getAuthPolicies();
 
-        if (policies == null || AUTH_POLICY_NONE.equals(policies)) // should never be null
+        if (policies == null || policies.length() == 0)
             setAuthPolicies(policyUri);
+
         else
             setAuthPolicies(policies + " " + policyUri);
     }
@@ -128,68 +127,76 @@ public class PapeResponse extends PapeMessage
     {
         String policies = getParameterValue("auth_policies");
 
-        if (policies == null || AUTH_POLICY_NONE.equals(policies)) // should never be null
-            return new ArrayList();
-        else
+        if (policies != null)
             return Arrays.asList(policies.split(" "));
+        else
+            return new ArrayList();
     }
 
     /**
-     * Sets the auth_time parameter.
+     * Sets the auth_age parameter.
      *
-     * @param timestamp The most recent timestamp when the End User has
-     *                  actively authenticated to the OP in a manner
-     *                  fitting the asserted policies.
+     * @param seconds   The number of seconds since the user was actively
+     *                  authenticated by the OP, or -1 if the auth_age
+     *                  is unknown.
      */
-    public void setAuthTime(Date timestamp)
+    public void setAuthAge(int seconds)
     {
-        set("auth_time", _dateFormat.format(timestamp));
+        // todo: have a timestamp field; convert it to auth_age when sending?
+
+        if (-1 == seconds)
+            set("auth_age", AUTH_AGE_UNKNOWN);
+        else
+            set("auth_age", Integer.toString(seconds));
     }
 
     /**
-     * Gets the timestamp when the End User has most recentnly authenticated
-     * to the OpenID Provider in a manner fitting the asserted policies.
+     * Gets the value of the auth_age parameter.
      *
-     * @return          The verbatim value of the auth_time parameter.
-     *                  Null is returned if the parameter is not present
-     *                  in the PapeResponse.
-     *
-     * @see #getAuthDate()
+     * @return          The number of seconds since the user was actively
+     *                  authenticated by the OP. For the special value
+     *                  "unknown" 0 is returned; if the parameter is not
+     *                  present, -1 is returned.
      */
-    public String getAuthTime()
+    public int getAuthAge()
     {
-        return getParameterValue("auth_time");
+        String authAge = getParameterValue("auth_age");
+
+        if (authAge == null)
+            return -1;
+
+        else if (AUTH_AGE_UNKNOWN.equals(authAge))
+            return 0;
+        
+        else
+            return Integer.parseInt(authAge);
     }
 
     /**
-     * Gets the timestamp when the End User has most recentnly authenticated
-     * to the OpenID Provider in a manner fitting the asserted policies.
+     * Gets the value of the nist_auth_level parameter.
+     * <p>
+     * NIST levels are integers between 1 and 4 inclusive. Level 0 is
+     * used to signify that the OP recognizes the parameter and the
+     * user authentication did not meet the requirements of Level 1.
      *
-     * @return          The value of the auth_time parameter parsed into
-     *                  a java.util.Date. Null is returned if the parameter
-     *                  is not present in the PapeResponse, or if the
-     *                  parameter value is invalid.
-     *
-     * @see #getAuthTime()
+     * @return          The NIST level, or -1 if the parameter is not set.
      */
-    public Date getAuthDate()
+    public int getNistAuthLevel()
     {
-        String authTime = getParameterValue("auth_time");
+        String level = getParameterValue("nist_auth_level");
 
-        if (authTime != null)
-        {
-            try
-            {
-                return _dateFormat.parse(authTime);
-            }
-            catch (ParseException e)
-            {
-                _log.warn("Invalid auth_time: " + authTime + 
-                          "; returning null.");
-            }
-        }
+        if ( level != null && level.length() > 0 )
+            return Integer.parseInt(level);
+        else
+            return -1;
+    }
 
-        return null;
+    public void setNistAuthLevel(int level) throws MessageException
+    {
+        if (level < 0 || level > 4)
+            throw new MessageException("Invalid NIST level: " + level);
+
+        set("nist_auth_level", Integer.toString(level));
     }
 
     /**
@@ -197,30 +204,14 @@ public class PapeResponse extends PapeMessage
      * <p>
      * Used when constructing a extension from a parameter list.
      *
-     * @throws MessageException if the PapeResponse is not valid.
+     * @return      True if the extension is valid, false otherwise.
      */
-    private void validate() throws MessageException
+    private boolean isValid()
     {
         if (! _parameters.hasParameter("auth_policies"))
         {
-            throw new MessageException(
-                "auth_policies is required in a PAPE response.",
-                OpenIDException.PAPE_ERROR);
-        }
-
-        String authTime = getAuthTime();
-        if (authTime != null)
-        {
-            try
-            {
-                _dateFormat.parse(authTime);
-            }
-            catch (ParseException e)
-            {
-                throw new MessageException(
-                    "Invalid auth_time in PAPE response: " + authTime,
-                    OpenIDException.PAPE_ERROR, e);
-            }
+            _log.warn("auth_policies is required in a PAPE response.");
+            return false;
         }
 
         Iterator it = _parameters.getParameters().iterator();
@@ -228,31 +219,13 @@ public class PapeResponse extends PapeMessage
         {
             String paramName = ((Parameter) it.next()).getKey();
 
-            if (PAPE_FIELDS.contains(paramName) ||  paramName.startsWith(PapeMessage.AUTH_LEVEL_NS_PREFIX))
-                continue;
-
-            if ( paramName.startsWith(AUTH_LEVEL_PREFIX) &&
-                 (authLevelAliases.values().contains(paramName.substring(AUTH_LEVEL_PREFIX.length()))))
-                continue;
-
-            throw new MessageException(
-                "Invalid parameter in PAPE response: " + paramName,
-                OpenIDException.PAPE_ERROR);
+            if (! PAPE_FIELDS.contains(paramName))
+            {
+                _log.warn("Invalid parameter name in PAPE response: " + paramName);
+                return false;
+            }
         }
-    }
 
-    public void setCustomAuthLevel(String authLevelTypeUri, String level)
-    {
-        String alias = addAuthLevelExtension(authLevelTypeUri);
-        set(AUTH_LEVEL_PREFIX + alias, level);
+        return true;
     }
-
-    public String getCustomAuthLevel(String authLevelTypeUri)
-    {
-        if (hasCustomAuthLevel(authLevelTypeUri))
-            return getParameterValue(AUTH_LEVEL_PREFIX + getCustomAuthLevelAlias(authLevelTypeUri));
-        else
-            return null;
-    }
-
 }

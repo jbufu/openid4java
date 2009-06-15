@@ -1,51 +1,36 @@
-... OpenID Demo RP - featuring Attribute Exchange and OpenID Infocards
+... OpenID Infocards / OpenID Infocard Demo RP : INSTALL
 
 ========================================================================
 
 INSTALLATION AND CONFIGURATION INSTRUCTIONS
 
 
-=> Introduction:
+Introduction:
 
-This document describes how to install, configure and use the sample
-OpenID Demo Relying Party.
+This document describes how to install, configure and use the OpenID
+Infocard Relying Party.
 
-The Relying Party requires an OpenID Identifier for login; the identifier
-is requested and can be provided through either of the following
-two mechanisms:
+The Relying Party requires an OpenID Identifier for login, but unlike
+regular OpenID Relying Parties, login is requested using Information
+Cards mechanisms (see the "application/x-informationCard" <OBJECT> element
+in project/www/WEB-INF/jsp/login.jsp).
 
-   - the regular form-based text entry
-
-   - using OpenID Information Cards
-
-
-=> OpenID Infocard login
-
-The OpenID protocol transactions are enhanced with the use of a
-client-side (Information Card) Identity Selector, as described in:
-
-    https://openidcards.sxip.com/spec/openid-infocards.html
-
-The Relying Party's login page contains an additional
-"application/x-informationCard" <OBJECT> element
-(see www/WEB-INF/jsp/login.jsp).
-
-The Relying Party extracts the OpenID Authentication Response
-from the xmlToken parameter POST'ed by Identity Selector, after
-which point the regular OpenID (direct) verification is performed.
+After the Identity Selector posts the response, the Relying Party extracts
+the OpenID Authentication Response from the xmlToken POST parameter and
+continues with the regular OpenID (direct) verification.
 
 
-=> Configuration:
+Configuration:
 
-    www/WEB-INF/classes/config.properties :
+    project/www/WEB-INF/classes/config.properties :
 
     - base.url : The base URL (without the context path)
                  where the RP will be deployed
 
 
-=> Build and Installation:
+Build and Installation:
 
-  In the project's folder, run
+  In the project/ folder, run
 
     ant
 

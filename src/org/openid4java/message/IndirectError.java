@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
@@ -33,7 +33,7 @@ public class IndirectError extends Message
         _exception = e;
 
         if (! compatibility)
-            set("openid.ns", OPENID2_NS);
+            set("ns", OPENID2_NS);
     }
 
     // exception that generated the error, if any

@@ -4,7 +4,7 @@
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-samples</artifactId>
   <packaging>pom</packaging>
-  <version>0.9.5</version>
+  <version>0.9.2</version>
   <name>OpenID4Java Samples</name>
   <modules>
     <module>simple-openid</module>
@@ -28,7 +28,7 @@
     <dependency>
       <groupId>org.openid4java</groupId>
       <artifactId>openid4java</artifactId>
-      <version>${version}</version>
+      <version>0.9.2</version>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>

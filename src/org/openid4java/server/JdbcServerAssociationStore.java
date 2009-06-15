@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.server;
@@ -42,10 +42,9 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
 
     private static Random _random = new Random(System.currentTimeMillis());
 
-    private static final int CLEANUP_INTERVAL = 60 * 1000; // 1 min in millis
-    private static long _lastCleanup = 0;
-
     private String _tableName;
+
+    // todo: removeExpired();
 
     public JdbcServerAssociationStore()
     {
@@ -69,8 +68,6 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
     public Association generate(String type, int expiryIn)
             throws AssociationException
     {
-        cleanupExpired();
-        
         String sql = "INSERT INTO " + _tableName +
                 " (handle, type, mackey, expdate) VALUES (?,?,?,?)";
 
@@ -154,26 +151,24 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
                         "retrieved from database: " + type);
 
             if (DEBUG)
-                _log.debug("Retrieved association for handle: " + handle +
-                           " from table: " + _tableName);
+                _log.debug("Retrieved association from database, handle: " + handle);
 
             return assoc;
         }
         catch (AssociationException ase )
         {
-            _log.error("Error retrieving association from table: " + _tableName, ase);
+            _log.error("Error rerieving association from database.", ase);
             return null;
         }
         catch (IncorrectResultSizeDataAccessException rse)
         {
-            _log.warn("Association not found for handle: " + handle +
-                      " in the table: " + _tableName);
+            _log.warn("Association not found in the database for handle: " + handle);
             return null;
         }
         catch (DataAccessException dae)
         {
-            _log.error("Error retrieving association for handle: " + handle +
-                       "from table: " + _tableName, dae);
+            _log.error("Error retrieving association from database, handle: "
+                       + handle, dae);
             return null;
         }
     }
@@ -189,42 +184,15 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
             int cnt = jdbcTemplate.update(sql, new Object[] { handle } );
 
             if (cnt == 1 && DEBUG)
-                _log.debug("Removed association, handle: " + handle +
-                           " from table: " + _tableName);
+                _log.debug("Removed association, handle: " + handle);
 
             if (cnt != 1)
-                _log.warn("Trying to remove handle: " + handle + " from table: "
-                          + _tableName + "; affected entries: " + cnt);
+                _log.warn("Trying to remove handle: " + handle +
+                          " from database; affected entries: " + cnt);
         }
         catch (Exception e)
         {
-            _log.error("Error removing association from table: " + _tableName, e);
-        }
-    }
-
-    private void cleanupExpired()
-    {
-        if (System.currentTimeMillis() - _lastCleanup < CLEANUP_INTERVAL)
-            return;
-
-        try
-    	{
-    		String sql = "DELETE FROM " + _tableName + " WHERE expdate<?";
-
-            JdbcTemplate jdbcTemplate = getJdbcTemplate();
-
-            Date now = new Date ( ) ;
-            int cnt = jdbcTemplate.update(sql, new Object[] { now } );
-
-            _log.debug("Cleaned " + cnt + " expired associations from table: "
-                          + _tableName);
-
-            _lastCleanup = System.currentTimeMillis();
-        }
-    	catch (Exception e)
-        {
-            _log.error("Error removing expired associations from table: " + _tableName, e);
+            _log.error("Error removing association from database.", e);
         }
     }
 }
-

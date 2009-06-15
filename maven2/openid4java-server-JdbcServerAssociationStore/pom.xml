@@ -6,14 +6,23 @@
   <parent>
     <groupId>org.openid4java</groupId>
     <artifactId>openid4java-parent</artifactId>
-    <version>0.9.5</version>
+    <version>0.9.3</version>
   </parent>
+  <groupId>org.openid4java</groupId>
   <artifactId>openid4java-server-JdbcServerAssociationStore</artifactId>
   <packaging>jar</packaging>
   <name>OpenID4Java Server JdbcServerAssociationStore</name>
 
   <build>
     <sourceDirectory>../../src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>../../src</directory>
+        <excludes>
+          <exclude>**/*</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -26,22 +35,21 @@
       </plugin>
     </plugins>
   </build>
-
   <reporting>
     <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
   </reporting>
-
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>org.openid4java</groupId>
       <artifactId>openid4java-server</artifactId>
-      <version>${version}</version>
+      <version>0.9.3</version>
     </dependency>
 
     <!-- JdbcServerAssociationStore -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
+      <version>2.0.6</version>
     </dependency>
   </dependencies>
 </project>

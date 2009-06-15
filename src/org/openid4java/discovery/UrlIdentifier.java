@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.discovery;
@@ -27,7 +27,7 @@ public class UrlIdentifier implements Identifier
         for (char c = 'a'; c <= 'z'; c++)
             UNRESERVED_CHARACTERS.add(new Character(c));
 
-        for (char c = 'A'; c <= 'Z'; c++)
+        for (char c = 'A'; c <= 'A'; c++)
             UNRESERVED_CHARACTERS.add(new Character(c));
 
         for (char c = '0'; c <= '9'; c++)

@@ -15,8 +15,15 @@
 
 => Implementation
 
+  - Update based on finialized versions of the following:
+    - OpenID Authentication 2.0
+    - OpenID Attribute Exchange 1.0
+
   - Extensions to implement:
     - OpenID Signed Assertions 1.0
+
+  - Normalization : review XRI parsing to mach the latest spec / XRI syntax 2.1
+    (when when syntax 2.1 goes out)
 
   - MessageExtension.providesIdentifier()
     - review interface to allow exchange of messages with no identifiers at all
@@ -25,6 +32,12 @@
   - Compatibility mode - check/enforce limits defined in v1
 
   --> Nice to have, but not essential:
+
+    - Add a 'stop-using-timeout' to associations on the RP side, when they are 
+      about to expire (e.g. 5 min before expiration): improves user-experience 
+      (associations will not expire in the middle of a transaction).
+
+    - Don't normalize the url before redirects (not needed, extra cost)
 
     - Auth* class hierarchy reorganization
 
@@ -40,7 +53,7 @@
 
 
 ========================================================================
-Copyright 2006-2008 Sxip Identity Corporation
+Copyright 2006-2007 Sxip Identity Corporation
 
 Package distribution:
   => http://code.sxip.com

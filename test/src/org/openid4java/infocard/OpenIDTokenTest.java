@@ -1,7 +1,3 @@
-/*
- * Copyright 2006-2008 Sxip Identity Corporation
- */
-
 package org.openid4java.infocard;
 
 import junit.framework.TestCase;

@@ -6,7 +6,7 @@
   <XRD>
 
     <Service priority="0">
-      <Type>http://specs.openid.net/auth/2.0/signon</Type>
+      <Type>http://example.com/</Type>
       <URI>bla bla</URI>
     </Service>
 

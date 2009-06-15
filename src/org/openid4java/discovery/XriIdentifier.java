@@ -1,60 +1,53 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.discovery;
+
+import org.openxri.XRI;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class XriIdentifier implements Identifier
 {
-    private String identifier;
-    private String iriNormalForm;
-    private String uriNormalForm;
+    private XRI _xriIdentifier;
 
-    public XriIdentifier(String identifier, String iriNormalForm, String uriNormalForm) throws DiscoveryException
+    public XriIdentifier(String identifier) throws DiscoveryException
     {
-        this.identifier = identifier;
-        this.iriNormalForm = iriNormalForm;
-        this.uriNormalForm = uriNormalForm;
+        // should be in the canonical form
+        _xriIdentifier = new XRI(identifier);
     }
 
     public boolean equals(Object o)
     {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
 
-        XriIdentifier that = (XriIdentifier) o;
-
-        if (iriNormalForm != null ? !iriNormalForm.equals(that.iriNormalForm) : that.iriNormalForm != null)
+        if (o == null || getClass() != o.getClass())
             return false;
 
-        return true;
+        final XriIdentifier that = (XriIdentifier) o;
+
+        // workaround, XRI should properly implement equals
+        String thisNormalForm = this._xriIdentifier.toIRINormalForm();
+        String thatNormalForm = that._xriIdentifier.toIRINormalForm();
+
+        return thisNormalForm.equals(thatNormalForm);
     }
 
     public int hashCode()
     {
-        return (iriNormalForm != null ? iriNormalForm.hashCode() : 0);
+        return _xriIdentifier.hashCode();
     }
 
     public String getIdentifier()
     {
-        return identifier;
+        return _xriIdentifier.toString();
     }
 
-    public String toString()
+    public XRI getXriIdentifier()
     {
-        return identifier;
-    }
-
-    public String toIRINormalForm()
-    {
-        return iriNormalForm;
-    }
-
-    public String toURINormalForm()
-    {
-        return uriNormalForm;
+        return _xriIdentifier;
     }
 }

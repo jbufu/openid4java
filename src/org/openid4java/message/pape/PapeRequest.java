@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message.pape;
@@ -7,7 +7,6 @@ package org.openid4java.message.pape;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
-import org.openid4java.OpenIDException;
 
 import java.util.*;
 
@@ -26,7 +25,7 @@ public class PapeRequest extends PapeMessage
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
-            "preferred_auth_policies", "preferred_auth_level_types", "max_auth_age"
+            "preferred_auth_policies", "max_auth_age"
     });
 
     /**
@@ -56,7 +55,7 @@ public class PapeRequest extends PapeMessage
      */
     protected PapeRequest(ParameterList params)
     {
-        super(params);
+        _parameters = params;
     }
 
     /**
@@ -71,7 +70,8 @@ public class PapeRequest extends PapeMessage
     {
         PapeRequest req = new PapeRequest(params);
 
-        req.validate();
+        if (! req.isValid())
+            throw new MessageException("Invalid parameters for a PAPE request");
 
         if (DEBUG)
             _log.debug("Created PAPE request from parameter list:\n" + params);
@@ -171,34 +171,27 @@ public class PapeRequest extends PapeMessage
      * <p>
      * Used when constructing a extension from a parameter list.
      *
-     * @throws MessageException if the PapeRequest is not valid.
+     * @return      True if the extension is valid, false otherwise.
      */
-    public void validate() throws MessageException
+    public boolean isValid()
     {
         if (! _parameters.hasParameter("preferred_auth_policies"))
         {
-            throw new MessageException(
-                "preferred_auth_policies is required in a PAPE request.",
-                OpenIDException.PAPE_ERROR);
+            _log.warn("preferred_auth_policies is required in a PAPE request.");
+            return false;
         }
 
         Iterator it = _parameters.getParameters().iterator();
         while (it.hasNext())
         {
             String paramName = ((Parameter) it.next()).getKey();
-            if (! PAPE_FIELDS.contains(paramName) && ! paramName.startsWith(PapeMessage.AUTH_LEVEL_NS_PREFIX))
+            if (! PAPE_FIELDS.contains(paramName) )
             {
-                throw new MessageException(
-                    "Invalid parameter name in PAPE request: " + paramName,
-                    OpenIDException.PAPE_ERROR);
+                _log.warn("Invalid parameter name in PAPE request: " + paramName);
+                return false;
             }
         }
-    }
 
-    public void addPreferredCustomAuthLevel(String authLevelTypeUri)
-    {
-        String alias = addAuthLevelExtension(authLevelTypeUri);
-        String preferred = getParameterValue("preferred_auth_level_types");
-        set("preferred_auth_level_types", preferred == null ? alias : preferred + " " + alias);
+        return true;
     }
 }

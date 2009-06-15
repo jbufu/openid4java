@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.infocard;
@@ -133,7 +133,7 @@ public class OpenIDToken
 
     /**
      * Gets the OpenID message as a ParameterList.
-     * @return  ParameterList containing the OpenID message.
+     * @return
      */
     public ParameterList getOpenIDParams()
     {

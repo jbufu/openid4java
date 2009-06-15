@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
@@ -40,13 +40,6 @@ public class ParameterList implements Serializable
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
 
-    /**
-     * Constructs a ParameterList from a Map of parameters, ideally obtained
-     * with ServletRequest.getParameterMap(). The parameter keys and values
-     * must be in URL-decoded format.
-     *
-     * @param parameterMap  Map<String,String[]> or Map<String,String>
-     */
     public ParameterList(Map parameterMap)
     {
         _parameterMap  = new LinkedHashMap();
@@ -58,24 +51,18 @@ public class ParameterList implements Serializable
             Object v = parameterMap.get(name);
 
             String value;
-            if (v instanceof String[])
+            if (v instanceof Object[])
             {
-                String[] values = (String[]) v;
+                Object[] values = (Object[]) v;
                 if (values.length > 1 && name.startsWith("openid."))
                     throw new IllegalArgumentException(
                             "Multiple parameters with the same name: " + values);
 
-                value = values.length > 0 ? values[0] : null;
-            }
-            else if (v instanceof String)
-            {
-                value = (String) v;
+                value = values.length > 0 ? (String) values[0] : null;
             }
             else
             {
-                value="";
-                _log.error("Can extract parameter value; unexpected type: " +
-                    v.getClass().getName());
+                value = (String) v;
             }
 
             set(new Parameter(name, value));
@@ -207,9 +194,7 @@ public class ParameterList implements Serializable
         return parameterList;
     }
 
-    /**
-     * @return The key-value form encoding of for this ParameterList.
-     */
+    // todo: same as Message.keyValueFormEncoding()
     public String toString()
     {
         StringBuffer allParams = new StringBuffer("");

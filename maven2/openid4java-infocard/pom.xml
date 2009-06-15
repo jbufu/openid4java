@@ -6,55 +6,123 @@
   <parent>
     <groupId>org.openid4java</groupId>
     <artifactId>openid4java-parent</artifactId>
-    <version>0.9.5</version>
+    <version>0.9.3</version>
   </parent>
+  <groupId>org.openid4java</groupId>
   <artifactId>openid4java-infocard</artifactId>
   <packaging>jar</packaging>
   <name>OpenID4Java Infocard</name>
 
+  <build>
+    <sourceDirectory>../../src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>../../src</directory>
+        <includes>
+          <include>overview.html</include>
+          <include>org/openid4java/infocard/package.html</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>org/openid4java/*.java</include>
+            <include>org/openid4java/infocard/*.java</include>
+            <include>org/openid4java/infocard/rp/*.java</include>
+            <include>org/openid4java/infocard/sts/*.java</include>
+            <include>org/openid4java/message/AuthSuccess.java</include>
+            <include>org/openid4java/message/ax/FetchResponse.java</include>
+            <include>org/openid4java/discovery/DiscoveryException.java</include>
+            <include>org/openid4java/util/InternetDateFormat.java</include>
+            <include>org/openid4java/association/Association.java</include>
+            <include>org/openid4java/association/AssociationException.java</include>
+            <include>org/openid4java/message/MessageException.java</include>
+            <include>org/openid4java/message/Message.java</include>
+            <include>org/openid4java/message/ParameterList.java</include>
+            <include>org/openid4java/message/ax/AxMessage.java</include>
+            <include>org/openid4java/message/ax/FetchRequest.java</include>
+            <include>org/openid4java/message/ax/StoreRequest.java</include>
+            <include>org/openid4java/message/ax/StoreResponse.java</include>
+            <include>org/openid4java/message/sreg/SRegMessage.java</include>
+            <include>org/openid4java/message/sreg/SRegRequest.java</include>
+            <include>org/openid4java/message/sreg/SRegResponse.java</include>
+            <include>org/openid4java/message/pape/PapeMessage.java</include>
+            <include>org/openid4java/message/pape/PapeRequest.java</include>
+            <include>org/openid4java/message/pape/PapeResponse.java</include>
+            <include>org/openid4java/message/MessageExtension.java</include>
+            <include>org/openid4java/message/MessageExtensionFactory.java</include>
+            <include>org/openid4java/message/Parameter.java</include>
+            <include>org/openid4java/server/ServerAssociationStore.java</include>
+            <include>org/openid4java/server/JdbcServerAssociationStore.java</include>
+            <include>org/openid4java/server/NonceGenerator.java</include>
+            <include>org/openid4java/server/IncrementalNonceGenerator.java</include>
+
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <reporting>
     <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
   </reporting>
-
   <dependencies>
-    <dependency>
-      <groupId>${groupId}</groupId>
-      <artifactId>openid4java-nodeps</artifactId>
-      <version>${version}</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.ws.commons.axiom</groupId>
       <artifactId>axiom-api</artifactId>
+      <version>1.2.5</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
+      <version>1.3</version>
     </dependency>
     <!-- JdbcServerAssociationStore -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
+      <version>2.0.6</version>
     </dependency>
-
+    
+    <!-- higgins -->
+    <!-- Resolve this basedir dependencies before upload to ibiblio. -->
     <dependency>
-      <groupId>org.eclipse.higgins</groupId>
+      <groupId>higgins</groupId>
       <artifactId>higgins-configuration-api</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../../lib/infocard/higgins-configuration-api.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.higgins</groupId>
+      <groupId>higgins</groupId>
       <artifactId>higgins-sts-api</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-api.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.higgins</groupId>
+      <groupId>higgins</groupId>
       <artifactId>higgins-sts-common</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-common.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.higgins</groupId>
+      <groupId>higgins</groupId>
       <artifactId>higgins-sts-server-token-handler</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-server-token-handler.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.higgins</groupId>
+      <groupId>higgins</groupId>
       <artifactId>higgins-sts-spi</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../../lib/infocard/higgins-sts-spi.jar</systemPath>
     </dependency>
   </dependencies>
 </project>

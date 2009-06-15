@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message.ax;
@@ -31,7 +31,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     /**
      * The Attribute Exchange Type URI.
      */
-    public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0";
+    public static final String OPENID_NS_AX = "http://openid.net/srv/ax/1.0-draft7";
 
     /**
      * The Attribute Exchange extension-specific parameters.
@@ -124,16 +124,6 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
-     * Attribute exchange parameters are not REQUIRED to be signed.
-     *
-     * @return false
-     */
-    public boolean signRequired()
-    {
-        return false;
-    }
-
-    /**
      * Instantiates the apropriate Attribute Exchange object (fetch / store -
      * request / response) for the supplied parameter list.
      *
@@ -166,8 +156,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
             else if ("store_request".equals(axMode))
                 return StoreRequest.createStoreRequest(parameterList);
 
-            else if ("store_response_success".equals(axMode) ||
-                    "store_response_failure".equals(axMode))
+            else if ("store_response".equals(axMode))
                 return StoreResponse.createStoreResponse(parameterList);
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message;
@@ -259,6 +259,11 @@ public class AuthSuccess extends Message
             String alias = getExtensionAlias((String) iter.next());
             if (alias != null)
             {
+                // openid.ns.<ext_alias> needs to be signed
+                //String nsSign = "ns." + alias;
+                //toSign.append(",").append(nsSign);
+                //signList.add(nsSign);
+
                 extensionPrefixes.add(alias);
             }
         }
@@ -324,7 +329,7 @@ public class AuthSuccess extends Message
     {
         if (extensions != null)
         {
-            _signExtensions = new ArrayList(Arrays.asList(extensions));
+            _signExtensions = Arrays.asList(extensions);
 
             buildSignedList();
         }
@@ -332,7 +337,7 @@ public class AuthSuccess extends Message
 
 
     /**
-     * Adds the list of messages fields that will be signed, in addition to
+     * Sets the list of messages fields that will be signed, in addition to
      * the ones required by the protocol to be signed and any additional
      * fields already configured to be signed. The OpenID signature will
      * only be applied to OpenID fields, starting with the "openid." prefix.
@@ -342,7 +347,7 @@ public class AuthSuccess extends Message
      * @param extensionNamespace  Extension namespace URI to be signed.
      * @see #setSignFields(String) #setSignExtensions
      */
-    public void addSignExtension(String extensionNamespace)
+    public void setSignExtension(String extensionNamespace)
     {
         if (! _signExtensions.contains(extensionNamespace))
         {
@@ -387,8 +392,7 @@ public class AuthSuccess extends Message
         {
             signedText.append(signedParams[i]);
             signedText.append(':');
-            String value = getParameterValue("openid." + signedParams[i]);
-            if (value != null) signedText.append(value);
+            signedText.append(getParameterValue("openid." + signedParams[i]));
             signedText.append('\n');
         }
 
@@ -400,6 +404,13 @@ public class AuthSuccess extends Message
         super.validate();
 
         boolean compatibility = ! isVersion2();
+
+        if ( compatibility && hasParameter("openid.ns") )
+        {
+            throw new MessageException(
+                "openid.ns should not be present in OpenID1 auth responses",
+                OpenIDException.AUTH_ERROR);
+        }
 
         if ( ! compatibility && ! hasParameter("openid.op_endpoint"))
         {
@@ -424,7 +435,7 @@ public class AuthSuccess extends Message
         try
         {
             // op_endpoint must be a valid URL, if present
-            if (isVersion2() && getOpEndpoint() != null)
+            if (getOpEndpoint() != null)
                 new URL(getOpEndpoint());
         }
         catch (MalformedURLException e)

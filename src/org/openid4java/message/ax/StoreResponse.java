@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Sxip Identity Corporation
+ * Copyright 2006-2007 Sxip Identity Corporation
  */
 
 package org.openid4java.message.ax;
@@ -81,7 +81,7 @@ public class StoreResponse extends AxMessage
      * @param       description     Describes the error condition leading to
      *                              the failure response
      */
-    public void setFailure(String description)
+    protected void setFailure(String description)
     {
         _parameters.set(new Parameter("mode", "store_response_failure"));
 

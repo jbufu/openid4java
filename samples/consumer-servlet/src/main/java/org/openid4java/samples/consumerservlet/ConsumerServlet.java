@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -19,21 +18,15 @@ import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
-import org.openid4java.consumer.InMemoryConsumerAssociationStore;
-import org.openid4java.consumer.InMemoryNonceVerifier;
 import org.openid4java.consumer.VerificationResult;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthRequest;
 import org.openid4java.message.AuthSuccess;
-import org.openid4java.message.MessageExtension;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
-import org.openid4java.message.sreg.SRegMessage;
-import org.openid4java.message.sreg.SRegRequest;
-import org.openid4java.message.sreg.SRegResponse;
 
 /**
  * @author Sutra Zhou
@@ -65,14 +58,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		log.debug("context: " + context);
 
 		try {
-			// --- Forward proxy setup (only if needed) ---
-			// ProxyProperties proxyProps = new ProxyProperties();
-			// proxyProps.setProxyName("proxy.example.com");
-			// proxyProps.setProxyPort(8080);
-			// HttpClientFactory.setProxyProperties(proxyProps);
 			this.manager = new ConsumerManager();
-			manager.setAssociations(new InMemoryConsumerAssociationStore());
-			manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
 		} catch (ConsumerException e) {
 			throw new ServletException(e);
 		}
@@ -86,32 +72,8 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		doPost(req, resp);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
-	 *      javax.servlet.http.HttpServletResponse)
-	 */
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		if ("true".equals(req.getParameter("is_return"))) {
-			processReturn(req, resp);
-		} else {
-			String identifier = req.getParameter("openid_identifier");
-			if (identifier != null) {
-				this.authRequest(identifier, req, resp);
-			} else {
-				this.getServletContext().getRequestDispatcher("/index.jsp")
-						.forward(req, resp);
-			}
-		}
-	}
-
-	private void processReturn(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+		log.debug("------------------------");
+		log.debug("context: " + context);
 		Identifier identifier = this.verifyResponse(req);
 		log.debug("identifier: " + identifier);
 		if (identifier == null) {
@@ -124,16 +86,33 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		String identifier = req.getParameter("identifier");
+		this.authRequest(identifier, req, resp);
+	}
+
 	// --- placing the authentication request ---
 	public String authRequest(String userSuppliedString,
 			HttpServletRequest httpReq, HttpServletResponse httpResp)
-			throws IOException, ServletException {
+			throws IOException {
 		try {
 			// configure the return_to URL where your application will receive
 			// the authentication responses from the OpenID provider
 			// String returnToUrl = "http://example.com/openid";
-			String returnToUrl = httpReq.getRequestURL().toString()
-					+ "?is_return=true";
+			String returnToUrl = httpReq.getRequestURL().toString();
+
+			// --- Forward proxy setup (only if needed) ---
+			// ProxyProperties proxyProps = new ProxyProperties();
+			// proxyProps.setProxyName("proxy.example.com");
+			// proxyProps.setProxyPort(8080);
+			// HttpClientFactory.setProxyProperties(proxyProps);
 
 			// perform discovery on the user-supplied identifier
 			List discoveries = manager.discover(userSuppliedString);
@@ -150,58 +129,69 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 			// Attribute Exchange example: fetching the 'email' attribute
 			FetchRequest fetch = FetchRequest.createFetchRequest();
-			SRegRequest sregReq = SRegRequest.createFetchRequest();
 
 			if ("1".equals(httpReq.getParameter("nickname"))) {
-				// fetch.addAttribute("nickname",
-				// "http://schema.openid.net/contact/nickname", false);
-				sregReq.addAttribute("nickname", false);
+				fetch.addAttribute("nickname",
+				// attribute alias
+						"http://schema.openid.net/contact/nickname", // type
+						// URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("email"))) {
 				fetch.addAttribute("email",
-						"http://schema.openid.net/contact/email", false);
-				sregReq.addAttribute("email", false);
+				// attribute alias
+						"http://schema.openid.net/contact/email", // type URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("fullname"))) {
 				fetch.addAttribute("fullname",
-						"http://schema.openid.net/contact/fullname", false);
-				sregReq.addAttribute("fullname", false);
+				// attribute alias
+						"http://schema.openid.net/contact/fullname", // type
+						// URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("dob"))) {
 				fetch.addAttribute("dob",
-						"http://schema.openid.net/contact/dob", true);
-				sregReq.addAttribute("dob", false);
+				// attribute alias
+						"http://schema.openid.net/contact/dob", // type URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("gender"))) {
 				fetch.addAttribute("gender",
-						"http://schema.openid.net/contact/gender", false);
-				sregReq.addAttribute("gender", false);
+				// attribute alias
+						"http://schema.openid.net/contact/gender", // type URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("postcode"))) {
 				fetch.addAttribute("postcode",
-						"http://schema.openid.net/contact/postcode", false);
-				sregReq.addAttribute("postcode", false);
+				// attribute alias
+						"http://schema.openid.net/contact/postcode", // type
+						// URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("country"))) {
 				fetch.addAttribute("country",
-						"http://schema.openid.net/contact/country", false);
-				sregReq.addAttribute("country", false);
+				// attribute alias
+						"http://schema.openid.net/contact/country", // type URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("language"))) {
 				fetch.addAttribute("language",
-						"http://schema.openid.net/contact/language", false);
-				sregReq.addAttribute("language", false);
+				// attribute alias
+						"http://schema.openid.net/contact/language", // type
+						// URI
+						true); // required
 			}
 			if ("1".equals(httpReq.getParameter("timezone"))) {
 				fetch.addAttribute("timezone",
-						"http://schema.openid.net/contact/timezone", false);
-				sregReq.addAttribute("timezone", false);
+				// attribute alias
+						"http://schema.openid.net/contact/timezone", // type
+						// URI
+						true); // required
 			}
 
 			// attach the extension to the authentication request
-			if (!sregReq.getAttributes().isEmpty()) {
-				authReq.addExtension(sregReq);
-			}
+			authReq.addExtension(fetch);
 
 			if (!discovered.isVersion2()) {
 				// Option 1: GET HTTP-redirect to the OpenID Provider endpoint
@@ -212,13 +202,13 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			} else {
 				// Option 2: HTML FORM Redirection (Allows payloads >2048 bytes)
 
-				RequestDispatcher dispatcher = getServletContext()
-						.getRequestDispatcher("/formredirection.jsp");
-				httpReq.setAttribute("prameterMap", httpReq.getParameterMap());
-				httpReq.setAttribute("message", authReq);
-				// httpReq.setAttribute("destinationUrl", httpResp
-				// .getDestinationUrl(false));
-				dispatcher.forward(httpReq, httpResp);
+				// RequestDispatcher dispatcher =
+				// getServletContext().getRequestDispatcher("formredirection.jsp");
+				// httpReq.setAttribute("prameterMap",
+				// response.getParameterMap());
+				// httpReq.setAttribute("destinationUrl",
+				// response.getDestinationUrl(false));
+				// dispatcher.forward(request, response);
 			}
 		} catch (OpenIDException e) {
 			// present error to the user
@@ -257,19 +247,6 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 				AuthSuccess authSuccess = (AuthSuccess) verification
 						.getAuthResponse();
 
-				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
-					MessageExtension ext = authSuccess
-							.getExtension(SRegMessage.OPENID_NS_SREG);
-					if (ext instanceof SRegResponse) {
-						SRegResponse sregResp = (SRegResponse) ext;
-						for (Iterator iter = sregResp.getAttributeNames()
-								.iterator(); iter.hasNext();) {
-							String name = (String) iter.next();
-							String value = sregResp.getParameterValue(name);
-							httpReq.setAttribute(name, value);
-						}
-					}
-				}
 				if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
 					FetchResponse fetchResp = (FetchResponse) authSuccess
 							.getExtension(AxMessage.OPENID_NS_AX);
