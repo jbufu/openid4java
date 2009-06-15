@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.openid4java</groupId>
+    <artifactId>openid4java-parent</artifactId>
+    <version>0.9.5</version>
+  </parent>
+  <artifactId>openid4java-server-JdbcServerAssociationStore</artifactId>
+  <packaging>jar</packaging>
+  <name>OpenID4Java Server JdbcServerAssociationStore</name>
+
+  <build>
+    <sourceDirectory>../../src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>org/openid4java/server/JdbcServerAssociationStore.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <outputDirectory>../target/site/${project.artifactId}/</outputDirectory>
+  </reporting>
+
+  <dependencies>
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>openid4java-server</artifactId>
+      <version>${version}</version>
+    </dependency>
+
+    <!-- JdbcServerAssociationStore -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+  </dependencies>
+</project>

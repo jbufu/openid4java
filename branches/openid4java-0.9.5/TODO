@@ -1,0 +1,59 @@
+.... OpenID4Java Library - TODO
+
+========================================================================
+
+=> Documentation and Packaging
+
+ - Complete JavaDocs
+
+=> Tests
+
+=> Samples
+
+  - Sample code
+  - Documentation
+
+=> Implementation
+
+  - Extensions to implement:
+    - OpenID Signed Assertions 1.0
+
+  - MessageExtension.providesIdentifier()
+    - review interface to allow exchange of messages with no identifiers at all
+    - review affected message validation logic
+
+  - Compatibility mode - check/enforce limits defined in v1
+
+  --> Nice to have, but not essential:
+
+    - Auth* class hierarchy reorganization
+
+    - Factory method for incoming messages
+    - Review consumer verification flow
+
+    - Interface for saving discovered information
+        - into session, db, url/return_to, etc.
+            - saveDiscoveryInfo(... , session, return_to)
+            - loadDiscoveryInfo(httpRequest)
+
+    - Extension Builder interface
+
+
+========================================================================
+Copyright 2006-2008 Sxip Identity Corporation
+
+Package distribution:
+  => http://code.sxip.com
+
+Source code and defect management:
+  => http://code.google.com/p/openid4java
+
+For support, please join the Google Groups!
+  => http://groups.google.com/group/openid4java
+
+OpenID
+  => http://openid.net
+
+Released under the Apache License 2.0
+  => see LICENSE
+
