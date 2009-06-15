@@ -13,16 +13,18 @@ The release process is documented below in order to provide for a consistent pac
  * *Preparation*:
   * *project.properties:* change the version on local copy from *x.a-SNAPSHOT* to *x.a*
   * *ant sync-pom-version* to update version number in every pom.xml under maven2/
+  * check for version in other POM files possibly missed by sync-pom-version
  * *Testing and Packaging*:
   * commit changes and *svn update* (important for updating the last modification revision which is used as part of the ant package name and VERSION file inside the package)
   * test and package the artifact
-   * *ant:* trunk/: "ant clean test dist" --> java-openid-sxip-x.a.tar.gz
+   * *clean sub-projects*: ant's 'build' folders, maven's 'target' folders, etc.
+   * *ant:* trunk/: "ant clean test release" --> 4x java4java-<dist.type>-x.a.tar.gz
    * *maven:* trunk/maven2/: "mvn clean package"  --> openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar
   * if there are local changes, restart *Testing and Packaging*
  * *Tagging and Publishing*:
   * tag the version on SVN: *tags/openid4java-x.a/*
   * publish the artifacts
-   * *ant*: java-openid-sxip-x.a.tar.gz --> code.sxip.com/openid4java
+   * *ant*: java-openid-sxip-x.a.tar.gz --> http://code.google.com/p/openid4java/downloads/list
    * *maven*: openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar --> repository
     * *TODO*: detail how
   * announce new release
