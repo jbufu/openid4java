@@ -1,3 +1,0 @@
-status=302
-Location=http://localhost:SERVLET_PORT/?headers=simpleheaders
-Content-Type=text/plain
