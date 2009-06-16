@@ -323,8 +323,8 @@
   <distributionManagement>
     <!-- https://docs.sonatype.com/display/NX/OSS+Repository+Hosting -->
     <repository>
-      <id>openid4java-releases</id>
-      <name>OpenID4Java Release Repository</name>
+      <id>openid4java-staging</id>
+      <name>OpenID4Java Staging Repository</name>
       <url>http://oss.sonatype.org/content/repositories/openid4java-with-staging/</url>
     </repository>
     <snapshotRepository>
