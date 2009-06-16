@@ -307,6 +307,13 @@
     </dependencies>
   </dependencyManagement>
 
+  <distributionManagement>
+    <!-- https://docs.sonatype.com/display/NX/OSS+Repository+Hosting -->
+    <repository>
+      <id></id>
+    </repository>
+  </distributionManagement>
+
   <profiles>
     <profile>
       <id>alchim-deploy</id>
