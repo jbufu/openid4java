@@ -2,33 +2,16 @@
 
 Add following to your project's pom.xml in section dependencies:
 {{{
-<dependency>
-  <groupId>org.openid4java</groupId>
-  <artifactId>openid4java</artifactId>
-  <version>0.9.3</version>
-</dependency>
-}}}
-
-0.9.5-SNAPSHOT
-{{{
 <project ...>
-    ...
-    <repositories>
-        <repository>
-            <id>openid4java repository</id>
-            <name>openid4java repository</name>
-            <url>http://openid4java.googlecode.com/svn/maven-repo</url>
-            <snapshots />
-        </repository>
-    </repositories>
     ...
     <dependency>
         <groupId>org.openid4java</groupId>
         <artifactId>openid4java-consumer</artifactId>
         <!--artifactId>openid4java-server</artifactId-->
         <!--artifactId>openid4java-infocard</artifactId-->
+        <!--artifactId>openid4java-xri</artifactId-->
         <!--artifactId>openid4java</artifactId-->
-        <version>0.9.5-SNAPSHOT</version>
+        <version>0.9.5</version>
     </dependency>
     ...
 </project>
