@@ -14,7 +14,7 @@ implementations, without the need to modify or recompile the library.
 Log4J v1.2 is used as the logging implementation for the sample
 projects included with the OpenID4Java library. Commons-logging
 uses Log4J as the primary default and automatically detects if
-Log4J is available when discoverying available logging 
+Log4J is available when discovering available logging 
 implementations.
 
 A typical way to configure Log4J is using a log4j.properties file
@@ -29,6 +29,4 @@ levels as desired):
 }}}
 
 http://logging.apache.org/log4j/1.2/
-
-
 
