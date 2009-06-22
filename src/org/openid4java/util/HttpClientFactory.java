@@ -84,10 +84,7 @@ public class HttpClientFactory
             AuthScope authScope = new AuthScope(AuthScope.ANY_HOST,
                     AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME);
             Credentials credentials = proxyProperties.getCredentials();
-            if (credentials != null)
-            {
-                client.getState().setProxyCredentials(authScope, credentials);
-            }
+            client.getState().setProxyCredentials(authScope, credentials);
         }
 
         return client;

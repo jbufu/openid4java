@@ -97,6 +97,11 @@ public class ProxyProperties
         this.userName = userName;
     }
 
+    /**
+	 * Get the proxy credentials.
+	 * 
+	 * @return the proxy credentials
+	 */
     public Credentials getCredentials() {
         Credentials credentials = null;
         if (this.getDomain().equals(ANONYMOUS))
