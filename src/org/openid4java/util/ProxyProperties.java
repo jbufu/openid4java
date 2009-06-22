@@ -4,12 +4,18 @@
 
 package org.openid4java.util;
 
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.NTCredentials;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+
 /**
  * Utility bean for setting transport properties in runtime.
  */
 
 public class ProxyProperties
 {
+    private static final String ANONYMOUS = "anonymous";
+
     protected int proxyPort = -1;
     protected String domain;
     protected String password;
@@ -24,7 +30,7 @@ public class ProxyProperties
     {
         if (domain == null || domain.length() == 0)
         {
-            return "anonymous";
+            return ANONYMOUS;
         }
         else
         {
@@ -41,7 +47,7 @@ public class ProxyProperties
     {
         if (password == null || password.length() == 0)
         {
-            return "anonymous";
+            return ANONYMOUS;
         }
         else
         {
@@ -78,7 +84,7 @@ public class ProxyProperties
     {
         if (userName == null || userName.length() == 0)
         {
-            return "anonymous";
+            return ANONYMOUS;
         }
         else
         {
@@ -89,6 +95,25 @@ public class ProxyProperties
     public void setUserName(String userName)
     {
         this.userName = userName;
+    }
+
+    public Credentials getCredentials() {
+        Credentials credentials = null;
+        if (this.getDomain().equals(ANONYMOUS))
+        {
+            credentials = new UsernamePasswordCredentials(
+                    this.getUserName(),
+                    this.getPassword());
+        }
+        else
+        {
+            credentials = new NTCredentials(
+                    this.getUserName(),
+                    this.getPassword(),
+                    this.getProxyHostName(),
+                    this.getDomain());
+        }
+        return credentials;
     }
 }
 
