@@ -26,11 +26,11 @@ public class AssociationError extends DirectError
             "ns",
             "error_code",
             "error",
-            "session_type"
     });
 
     protected final static List optionalFields = Arrays.asList( new String[] {
-            "assoc_type"
+            "assoc_type",
+            "session_type"
     });
 
     protected AssociationError(String msg, AssociationSessionType type)
