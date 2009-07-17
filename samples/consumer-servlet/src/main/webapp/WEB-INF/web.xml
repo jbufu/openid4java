@@ -19,15 +19,15 @@
 		</init-param>
 		<init-param>
 			<param-name>proxy.username</param-name>
-			<param-value>sutra</param-value>
+			<param-value>yourUsername</param-value>
 		</init-param>
 		<init-param>
 			<param-name>proxy.password</param-name>
-			<param-value>Password123</param-value>
+			<param-value>yourPassword</param-value>
 		</init-param>
 		<init-param>
 			<param-name>proxy.domain</param-name>
-			<param-value>EXAMPLE</param-value>
+			<param-value>yourDomain</param-value>
 		</init-param>
 		-->
 	</servlet>
