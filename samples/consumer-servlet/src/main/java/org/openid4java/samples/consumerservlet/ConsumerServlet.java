@@ -1,5 +1,5 @@
 /**
- * Created on 2007-4-14 上午12:54:50
+ * Created on 2007-4-14 00:54:50
  */
 package org.openid4java.samples.consumerservlet;
 
@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.openid4java.association.AssociationSessionType;
 import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.consumer.InMemoryConsumerAssociationStore;
@@ -34,10 +35,11 @@ import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
+import org.openid4java.util.HttpClientFactory;
+import org.openid4java.util.ProxyProperties;
 
 /**
  * @author Sutra Zhou
- * 
  */
 public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
@@ -45,55 +47,50 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = -5998885243419513055L;
-
-	private final Log log = LogFactory.getLog(this.getClass());
+	private static final String OPTIONAL_VALUE = "0";
+	private static final String REQUIRED_VALUE = "1";
+	private static final Log LOG = LogFactory.getLog(ConsumerServlet.class);
 
 	private ServletContext context;
-
 	private ConsumerManager manager;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
+	/**
+	 * {@inheritDoc}
 	 */
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
 		context = config.getServletContext();
 
-		log.debug("context: " + context);
+		LOG.debug("context: " + context);
 
 		try {
 			// --- Forward proxy setup (only if needed) ---
-			// ProxyProperties proxyProps = new ProxyProperties();
-			// proxyProps.setProxyName("proxy.example.com");
-			// proxyProps.setProxyPort(8080);
-			// HttpClientFactory.setProxyProperties(proxyProps);
+			ProxyProperties proxyProps = getProxyProperties(config);
+			if (proxyProps != null) {
+				LOG.debug("ProxyProperties: " + proxyProps);
+				HttpClientFactory.setProxyProperties(proxyProps);
+			}
+
 			this.manager = new ConsumerManager();
 			manager.setAssociations(new InMemoryConsumerAssociationStore());
 			manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
+			manager.setMinAssocSessEnc(AssociationSessionType.DH_SHA256);
 		} catch (ConsumerException e) {
 			throw new ServletException(e);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
-	 *      javax.servlet.http.HttpServletResponse)
+	/**
+	 * {@inheritDoc}
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		doPost(req, resp);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
-	 *      javax.servlet.http.HttpServletResponse)
+	/**
+	 * {@inheritDoc}
 	 */
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -113,7 +110,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	private void processReturn(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		Identifier identifier = this.verifyResponse(req);
-		log.debug("identifier: " + identifier);
+		LOG.debug("identifier: " + identifier);
 		if (identifier == null) {
 			this.getServletContext().getRequestDispatcher("/index.jsp")
 					.forward(req, resp);
@@ -149,53 +146,19 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
 
 			// Attribute Exchange example: fetching the 'email' attribute
-			FetchRequest fetch = FetchRequest.createFetchRequest();
+			// FetchRequest fetch = FetchRequest.createFetchRequest();
 			SRegRequest sregReq = SRegRequest.createFetchRequest();
 
-			if ("1".equals(httpReq.getParameter("nickname"))) {
-				// fetch.addAttribute("nickname",
-				// "http://schema.openid.net/contact/nickname", false);
-				sregReq.addAttribute("nickname", false);
-			}
-			if ("1".equals(httpReq.getParameter("email"))) {
-				fetch.addAttribute("email",
-						"http://schema.openid.net/contact/email", false);
-				sregReq.addAttribute("email", false);
-			}
-			if ("1".equals(httpReq.getParameter("fullname"))) {
-				fetch.addAttribute("fullname",
-						"http://schema.openid.net/contact/fullname", false);
-				sregReq.addAttribute("fullname", false);
-			}
-			if ("1".equals(httpReq.getParameter("dob"))) {
-				fetch.addAttribute("dob",
-						"http://schema.openid.net/contact/dob", true);
-				sregReq.addAttribute("dob", false);
-			}
-			if ("1".equals(httpReq.getParameter("gender"))) {
-				fetch.addAttribute("gender",
-						"http://schema.openid.net/contact/gender", false);
-				sregReq.addAttribute("gender", false);
-			}
-			if ("1".equals(httpReq.getParameter("postcode"))) {
-				fetch.addAttribute("postcode",
-						"http://schema.openid.net/contact/postcode", false);
-				sregReq.addAttribute("postcode", false);
-			}
-			if ("1".equals(httpReq.getParameter("country"))) {
-				fetch.addAttribute("country",
-						"http://schema.openid.net/contact/country", false);
-				sregReq.addAttribute("country", false);
-			}
-			if ("1".equals(httpReq.getParameter("language"))) {
-				fetch.addAttribute("language",
-						"http://schema.openid.net/contact/language", false);
-				sregReq.addAttribute("language", false);
-			}
-			if ("1".equals(httpReq.getParameter("timezone"))) {
-				fetch.addAttribute("timezone",
-						"http://schema.openid.net/contact/timezone", false);
-				sregReq.addAttribute("timezone", false);
+			String[] attributes = { "nickname", "email", "fullname", "dob",
+					"gender", "postcode", "country", "language", "timezone" };
+			for (int i = 0, l = attributes.length; i < l; i++) {
+				String attribute = attributes[i];
+				String value = httpReq.getParameter(attribute);
+				if (OPTIONAL_VALUE.equals(value)) {
+					sregReq.addAttribute(attribute, false);
+				} else if (REQUIRED_VALUE.equals(value)) {
+					sregReq.addAttribute(attribute, true);
+				}
 			}
 
 			// attach the extension to the authentication request
@@ -222,13 +185,15 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			}
 		} catch (OpenIDException e) {
 			// present error to the user
+			throw new ServletException(e);
 		}
 
 		return null;
 	}
 
 	// --- processing the authentication response ---
-	public Identifier verifyResponse(HttpServletRequest httpReq) {
+	public Identifier verifyResponse(HttpServletRequest httpReq)
+			throws ServletException {
 		try {
 			// extract the parameters from the authentication response
 			// (which comes in as a HTTP request from the OpenID provider)
@@ -282,7 +247,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 						String alias = (String) iter.next();
 						List values = fetchResp.getAttributeValues(alias);
 						if (values.size() > 0) {
-							log.debug(alias + " : " + values.get(0));
+							LOG.debug(alias + " : " + values.get(0));
 							httpReq.setAttribute(alias, values.get(0));
 						}
 					}
@@ -292,8 +257,35 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			}
 		} catch (OpenIDException e) {
 			// present error to the user
+			throw new ServletException(e);
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get proxy properties from the context init params.
+	 * 
+	 * @return proxy properties
+	 */
+	private static ProxyProperties getProxyProperties(ServletConfig config) {
+		ProxyProperties proxyProps;
+		String host = config.getInitParameter("proxy.host");
+		LOG.debug("proxy.host: " + host);
+		if (host == null) {
+			proxyProps = null;
+		} else {
+			proxyProps = new ProxyProperties();
+			String port = config.getInitParameter("proxy.port");
+			String username = config.getInitParameter("proxy.username");
+			String password = config.getInitParameter("proxy.password");
+			String domain = config.getInitParameter("proxy.domain");
+			proxyProps.setProxyHostName(host);
+			proxyProps.setProxyPort(Integer.parseInt(port));
+			proxyProps.setUserName(username);
+			proxyProps.setPassword(password);
+			proxyProps.setDomain(domain);
+		}
+		return proxyProps;
 	}
 }
