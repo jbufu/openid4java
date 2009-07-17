@@ -55,9 +55,9 @@ public class ProxyProperties
         }
     }
 
-    public void setPassword(String passWord)
+    public void setPassword(String password)
     {
-        this.password = passWord;
+        this.password = password;
     }
 
     public String getProxyHostName()
@@ -119,6 +119,16 @@ public class ProxyProperties
                     this.getDomain());
         }
         return credentials;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return this.getDomain() + "\\" + this.getUserName()
+            + ":" + this.getPassword()
+            + "@" + this.getProxyHostName() + ":" + this.getProxyPort();
     }
 }
 
