@@ -335,9 +335,10 @@ public abstract class AxPayload extends AxMessage {
 
             if ( ! _parameters.hasParameter("count." + alias) )
             {
-                if ( ! _parameters.hasParameter("value." + alias) )
+                if (_parameters.hasParameterPrefix("value." + alias + "."))
                 {
-                    _log.warn("Value missing for attribute alias: " + alias);
+                    _log.warn("Count parameter not present for alias: " + alias
+                              + "; value." + alias + ".[index] format is not allowed.");
                     return false;
                 }
             }
@@ -346,7 +347,7 @@ public abstract class AxPayload extends AxMessage {
                 if (_parameters.hasParameter("value." + alias))
                 {
                     _log.warn("Count parameter present for alias: " + alias
-                              + "; should use " + alias + ".[index] format");
+                              + "; should use value." + alias + ".[index] format.");
                     return false;
                 }
 

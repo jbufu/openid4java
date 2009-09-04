@@ -149,6 +149,16 @@ public class ParameterList implements Serializable
         return _parameterMap.containsKey(name);
     }
 
+    public boolean hasParameterPrefix(String prefix) {
+        Iterator keysIter = _parameterMap.keySet().iterator();
+        while (keysIter.hasNext())
+        {
+            if (((String)keysIter.next()).startsWith(prefix))
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Create a parameter list based on a URL encoded HTTP query string.
      */
