@@ -81,7 +81,7 @@ public class StoreResponse extends AxMessage
      * @param       description     Describes the error condition leading to
      *                              the failure response
      */
-    public void setFailure(String description)
+    protected void setFailure(String description)
     {
         _parameters.set(new Parameter("mode", "store_response_failure"));
 

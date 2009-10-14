@@ -11,6 +11,9 @@ import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.Association;
 import org.openid4java.OpenIDException;
 
+import java.util.Vector;
+import org.openid4java.util.AttributeProviderDriver;
+
 import java.net.URL;
 import java.net.MalformedURLException;
 
@@ -102,6 +105,10 @@ public class ServerManager
      */
     private String _opEndpointUrl;
 
+    /**
+     * AttributeProviderDriver instance used for managing all attribute providers.
+     */
+    private AttributeProviderDriver _attrProviderDriver;
 
     /**
      * Gets the store implementation used for keeping track of the generated
@@ -362,6 +369,29 @@ public class ServerManager
         // initialize a default realm verifier
         _realmVerifier = new RealmVerifier(true);
         _realmVerifier.setEnforceRpId(false);
+
+        // initialize default Attribute Provider Driver instance
+        _attrProviderDriver = new AttributeProviderDriver();
+    }
+
+    /**
+     * Returns the ServerManager's list of attributeProviders that's
+     * been previously set using setAttributeProviders.
+     */
+    public Vector getAttributeProviders()
+    {
+        return this._attrProviderDriver.getAttributeProviders();
+    }
+
+    /**
+     * Sets a persistent list of attributeProviders in this
+     * ServerManager instance that will be used to retrieve attributes
+     * in addition to any attribute providers that are found through
+     * dynamic configuration.
+     */
+    public void setAttributeProviders(Vector attrProviders)
+    {
+        this._attrProviderDriver.setAttributeProviders(attrProviders);
     }
 
 
@@ -758,6 +788,8 @@ public class ServerManager
 
                 _log.info("Returning positive assertion for " +
                           response.getReturnTo());
+
+                this._attrProviderDriver.addAttributesToResponse(response, id);
 
                 return response;
             }
