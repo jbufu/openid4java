@@ -1,0 +1,66 @@
+... OpenID Infocards / Infocard-OP : INSTALL
+
+========================================================================
+
+INSTALLATION AND CONFIGURATION INSTRUCTIONS
+
+
+Introduction:
+
+This document describes how to install, configure and use the Infocard
+OpenID Provider, a stripped-down version of an OpenID Provider.
+
+Used together with an STS that can issue RSTRs with OpenID tokens
+(as specified by OpenID Infocards 1.0), this OP module only handles
+direct OpenID verification requests (openid.mode=check_authentication).
+   
+For general information about the OpenID Infocards package please see the
+README document in the package root folder.
+
+
+Configuration:
+
+  1. SQL/JDBC
+
+    a) A JDBC Connector library installed into your application server:
+
+        MySQL and Tomcat example:
+            http://dev.mysql.com/downloads/connector/j/
+            mysql-connector-java-*.jar installed in CATALINA_HOME/common/lib/
+
+    b) Database with one table for storing OpenID private associations,
+       with the following schema:
+
+      CREATE TABLE `private_assoc` (
+          `handle` varchar(255) NOT NULL,
+          `type` varchar(255) NOT NULL,
+          `mackey` varchar(255) NOT NULL,
+          `expdate` datetime NOT NULL,
+          PRIMARY KEY  (`handle`)
+      ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+      This database needs to be shared with the 'higgins-sts' webapp.
+
+    c) Application server configured with a JDBC data source
+       with the following JNDI name:
+
+            java:comp/env/jdbc/infocardop
+
+       Tomcat example:
+       infocardop/project/www/META-INF/context.xml
+
+         <Resource name="jdbc/infocardop" auth="Container"
+            type="javax.sql.DataSource"
+            maxActive="100" maxIdle="30" maxWait="10000"
+            username="infocardop" password="infocardop"
+            driverClassName="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost/infocardop?autoReconnect=true"/>
+
+
+Build and Installation:
+
+  In the project/ folder, run
+
+    ant
+
+  This will create deployable dist/infocardop.war file.
