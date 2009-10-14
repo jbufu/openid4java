@@ -51,14 +51,18 @@ public class Association implements Serializable
     }
 
     private Association(String type, String handle, SecretKey macKey, int expiryIn)
-    {
+    {                                                                                 
         this(type, handle, macKey, new Date(System.currentTimeMillis() + expiryIn * 1000));
+    }
+
+    public static Association getFailedAssociation(Date expiry)
+    {
+        return new Association(null, FAILED_ASSOC_HANDLE, null, expiry);
     }
 
     public static Association getFailedAssociation(int expiryIn)
     {
-        return new Association(null, FAILED_ASSOC_HANDLE, null,
-                new Date(System.currentTimeMillis() + expiryIn * 1000));
+        return getFailedAssociation(new Date(System.currentTimeMillis() + expiryIn * 1000));
     }
 
     public static Association generate(String type, String handle, int expiryIn) throws AssociationException
@@ -258,7 +262,10 @@ public class Association implements Serializable
 
         try
         {
-            return new String(Base64.encodeBase64(sign(text.getBytes("utf-8"))), "utf-8");
+            String signature = new String(Base64.encodeBase64(sign(text.getBytes("utf-8"))), "utf-8");
+            if (DEBUG)
+                _log.debug("Calculated signature: " + signature);
+            return signature;
         }
         catch (UnsupportedEncodingException e)
         {

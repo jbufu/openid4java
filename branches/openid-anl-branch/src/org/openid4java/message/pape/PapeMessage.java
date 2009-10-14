@@ -8,6 +8,10 @@ import org.openid4java.message.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+
 /**
  * Base class for the OpenID Provider Authentication Policy extension
  * implementation.
@@ -34,6 +38,13 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
         "http://schemas.openid.net/pape/policies/2007/06/multi-factor";
     public static final String PAPE_POLICY_MULTI_FACTOR_PHYSICAL =
         "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical";
+
+    protected static final String AUTH_LEVEL_PREFIX       = "auth_level.";
+    protected static final String AUTH_LEVEL_NS_PREFIX    = "auth_level.ns.";
+    private   static final String AUTH_LEVEL_ALIAS_PREFIX = "papeauthlevel";
+
+    protected Map authLevelAliases = new HashMap(); // auth level URL -> alias
+    private int authLevelAliasCounter = 0;
 
     /**
      * The OpenID Provider Authentication Policy extension URI.
@@ -67,7 +78,7 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
      */
     public PapeMessage(ParameterList params)
     {
-        _parameters = params;
+        setParameters(params);
 
         if (DEBUG)
             _log.debug("Created PapeMessage from parameter list:\n" + params);
@@ -108,6 +119,9 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
     public void setParameters(ParameterList params)
     {
         _parameters = params;
+        Iterator iter = params.getParameters().iterator();
+        while(iter.hasNext())
+            checkAddAuthLevelExtension((Parameter) iter.next());
     }
 
     /**
@@ -131,7 +145,45 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
      */
     protected void set(String name, String value)
     {
-        _parameters.set(new Parameter(name, value));
+        Parameter param = new Parameter(name, value);
+        _parameters.set(param);
+        checkAddAuthLevelExtension(param);
+    }
+
+    private void checkAddAuthLevelExtension(Parameter param) {
+        String key = param == null ? null : param.getKey();
+        String value = param == null ? null : param.getValue();
+        if (key != null && key.startsWith(AUTH_LEVEL_NS_PREFIX))
+            addAuthLevelExtension(value, key.substring(AUTH_LEVEL_NS_PREFIX.length()));
+    }
+
+    private synchronized String newAuthLevelAlias()
+    {
+        return AUTH_LEVEL_ALIAS_PREFIX + ++authLevelAliasCounter;
+    }
+
+    protected String addAuthLevelExtension(String authLevelTypeUri)
+    {
+        return addAuthLevelExtension(authLevelTypeUri, null);
+    }
+
+    private String addAuthLevelExtension(String authLevelTypeUri, String alias)
+    {
+        if (!authLevelAliases.containsKey(authLevelTypeUri)) {
+            String authLevelAlias = alias == null ? newAuthLevelAlias() : alias;
+            authLevelAliases.put(authLevelTypeUri, authLevelAlias);
+        }
+        return (String) authLevelAliases.get(authLevelTypeUri);
+    }
+
+    public boolean hasCustomAuthLevel(String authLevelTypeUri)
+    {
+        return authLevelAliases.containsKey(authLevelTypeUri);
+    }
+
+    protected String getCustomAuthLevelAlias(String authLevelTypeUri)
+    {
+        return (String) authLevelAliases.get(authLevelTypeUri);
     }
 
     /**

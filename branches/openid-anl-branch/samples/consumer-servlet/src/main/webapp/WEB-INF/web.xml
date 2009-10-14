@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-  <display-name>Consumer Servlet Web Application</display-name>
-  <servlet>
-    <servlet-name>Consumer Servlet</servlet-name>
-    <servlet-class>org.openid4java.samples.consumerservlet.ConsumerServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Consumer Servlet</servlet-name>
-    <url-pattern>/consumer</url-pattern>
-  </servlet-mapping>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>Consumer Servlet Web Application</display-name>
+	<servlet>
+		<servlet-name>Consumer Servlet</servlet-name>
+		<servlet-class>org.openid4java.samples.consumerservlet.ConsumerServlet</servlet-class>
+
+		<!-- Forward proxy setup (only if needed) -->
+		<!--
+		<init-param>
+			<param-name>proxy.host</param-name>
+			<param-value>proxy.example.com</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxy.port</param-name>
+			<param-value>8080</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxy.username</param-name>
+			<param-value>yourUsername</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxy.password</param-name>
+			<param-value>yourPassword</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxy.domain</param-name>
+			<param-value>yourDomain</param-value>
+		</init-param>
+		-->
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Consumer Servlet</servlet-name>
+		<url-pattern>/consumer</url-pattern>
+	</servlet-mapping>
 </web-app>

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.openid4java</groupId>
     <artifactId>openid4java-parent</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6-SNAPSHOT</version>
   </parent>
   <artifactId>openid4java</artifactId>
   <packaging>jar</packaging>
@@ -25,11 +25,6 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>openid4java-server</artifactId>
-      <version>${version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${groupId}</groupId>
-      <artifactId>openid4java-infocard</artifactId>
       <version>${version}</version>
     </dependency>
     <dependency>

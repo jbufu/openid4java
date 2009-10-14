@@ -42,7 +42,8 @@ public class ParameterList implements Serializable
 
     /**
      * Constructs a ParameterList from a Map of parameters, ideally obtained
-     * with ServletRequest.getParameterMap().
+     * with ServletRequest.getParameterMap(). The parameter keys and values
+     * must be in URL-decoded format.
      *
      * @param parameterMap  Map<String,String[]> or Map<String,String>
      */
@@ -148,6 +149,16 @@ public class ParameterList implements Serializable
         return _parameterMap.containsKey(name);
     }
 
+    public boolean hasParameterPrefix(String prefix) {
+        Iterator keysIter = _parameterMap.keySet().iterator();
+        while (keysIter.hasNext())
+        {
+            if (((String)keysIter.next()).startsWith(prefix))
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Create a parameter list based on a URL encoded HTTP query string.
      */
@@ -206,7 +217,9 @@ public class ParameterList implements Serializable
         return parameterList;
     }
 
-    // todo: same as Message.keyValueFormEncoding()
+    /**
+     * @return The key-value form encoding of for this ParameterList.
+     */
     public String toString()
     {
         StringBuffer allParams = new StringBuffer("");

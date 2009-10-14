@@ -24,10 +24,19 @@ import org.cyberneko.html.parsers.DOMParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.html.HTMLHtmlElement;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 /**
- * @author Sutra Zhou
+ * A DOMParser extends from Cyberneko HTML.
+ * <p>
+ * This extended parser marks that a(or more) HTML element <code>head</code> is
+ * ignored while parsing.
+ * </p>
  * 
+ * @author Sutra Zhou
+ * @see <a href="http://nekohtml.sourceforge.net/index.html">NekoHTML</a>
+ * @since 0.9.4
  */
 public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingListener
 {
@@ -53,7 +62,15 @@ public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingL
         }
     }
 
-    public static String toXmlString(Document doc)
+    /**
+     * Transform the document to string.
+     * 
+     * @param doc the document
+     * @return a string
+     * @throws TransformerException If an unrecoverable error occurs
+     *   during the course of the transformation.
+     */
+    public static String toXmlString(Document doc) throws TransformerException
     {
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer;
@@ -72,18 +89,29 @@ public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingL
         DOMSource source = new DOMSource(doc);
         StringWriter xmlString = new StringWriter();
         StreamResult streamResult = new StreamResult(xmlString);
-        try
-        {
-            transformer.transform(source, streamResult);
-        }
-        catch (TransformerException e)
-        {
-            throw new RuntimeException(e);
-        }
+        transformer.transform(source, streamResult);
         return xmlString.toString();
     }
 
     private boolean ignoredHeadStartElement;
+
+    /**
+     * @see <a href="http://nekohtml.sourceforge.net/settings.html">NekoHTML | Parser Settings</a>
+     */
+    public OpenID4JavaDOMParser() {
+        try
+        {
+            this.setFeature("http://xml.org/sax/features/namespaces", false);
+        }
+        catch (SAXNotRecognizedException e)
+        {
+            // Do nothing as this exception will not happen.
+        }
+        catch (SAXNotSupportedException e)
+        {
+            // Do nothing as this exception will not happen.
+        }
+    }
 
     public boolean isIgnoredHeadStartElement()
     {

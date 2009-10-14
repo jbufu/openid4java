@@ -7,34 +7,49 @@
  */
 package org.openid4java.util;
 
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 
 /**
  * This class handles all HTTPClient connections for the
  * org.openid4java packages.
- * <p/>
  *
  * @author Kevin
  */
 public class HttpClientFactory
 {
+    private HttpClientFactory() {}
+
     /**
      * proxy properties for HTTPClient calls
      */
     private static ProxyProperties proxyProperties = null;
+
+    private static boolean multiThreadedHttpClient = true;
 
     public static ProxyProperties getProxyProperties()
     {
         return proxyProperties;
     }
 
-    public static void setProxyProperties(ProxyProperties properties)
+    public static void setProxyProperties(ProxyProperties proxyProperties)
     {
-        proxyProperties = properties;
+        HttpClientFactory.proxyProperties = proxyProperties;
+    }
+
+    public static boolean isMultiThreadedHttpClient() {
+        return multiThreadedHttpClient;
+    }
+
+    /**
+     * Configures the type of HttpClient's constructed by the factory.
+     *
+     * @param multiThreadedHttpClient if true, MultiThreadedHttpConnectionManager's are constructed;
+     *                                if false - SimpleHttpConnectionManager's.
+     *
+     */
+    public static void setMultiThreadedHttpClient(boolean multiThreadedHttpClient) {
+        HttpClientFactory.multiThreadedHttpClient = multiThreadedHttpClient;
     }
 
     public static HttpClient getInstance(int maxRedirects,
@@ -42,7 +57,13 @@ public class HttpClientFactory
                                          int connTimeout, int socketTimeout,
                                          String cookiePolicy)
     {
-        HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
+        HttpConnectionManager connManager;
+        if (multiThreadedHttpClient)
+            connManager = new MultiThreadedHttpConnectionManager();
+        else
+            connManager = new SimpleHttpConnectionManager();
+
+        HttpClient client = new HttpClient(connManager);
 
         client.getParams().setParameter(
                 "http.protocol.max-redirects", new Integer(maxRedirects));
@@ -62,10 +83,8 @@ public class HttpClientFactory
             //now set headers for auth
             AuthScope authScope = new AuthScope(AuthScope.ANY_HOST,
                     AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME);
-            client.getState().setProxyCredentials(authScope,
-                    new UsernamePasswordCredentials(
-                            proxyProperties.getUserName(),
-                            proxyProperties.getPassword()));
+            Credentials credentials = proxyProperties.getCredentials();
+            client.getState().setProxyCredentials(authScope, credentials);
         }
 
         return client;
