@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-parent</artifactId>
-  <version>0.9.5-SNAPSHOT</version>
+  <version>0.9.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -17,6 +17,8 @@
     <module>openid4java-consumer</module>
     <module>openid4java-server</module>
     <module>openid4java-infocard</module>
+    <module>openid4java-xri</module>
+    <module>openid4java-full</module>
     <module>openid4java-consumer-JdbcConsumerAssociationStore</module>
     <module>openid4java-consumer-JdbcNonceVerifier</module>
     <module>openid4java-server-JdbcServerAssociationStore</module>
@@ -40,18 +42,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <configuration>
-          <inputEncoding>UTF-8</inputEncoding>
-          <outputEncoding>UTF-8</outputEncoding>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 
   <name>OpenID4Java Parent</name>
   <description>
@@ -214,21 +204,7 @@
       <dependency>
         <groupId>org.openxri</groupId>
         <artifactId>openxri-syntax</artifactId>
-        <version>1.0.1</version>
-      </dependency>
-      <!--
-        Overwrite the dependency of openxri-syntax-1.0.1
-        as icu4j-3.4.1 not found in maven's central repository.
-      -->
-      <dependency>
-        <groupId>com.ibm.icu</groupId>
-        <artifactId>icu4j</artifactId>
-        <version>3.4.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openxri</groupId>
-        <artifactId>openxri-client</artifactId>
-        <version>1.0.1</version>
+        <version>1.2.0</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
@@ -236,14 +212,16 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <!--
-        Overwrite the dependency of openxri-client-1.0.1
-        as xmlapis-1.3.0 not found in maven's central repository.
-      -->
       <dependency>
-        <groupId>xml-apis</groupId>
-        <artifactId>xml-apis</artifactId>
-        <version>2.0.2</version>
+        <groupId>org.openxri</groupId>
+        <artifactId>openxri-client</artifactId>
+        <version>1.2.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>log4j</groupId>
@@ -265,6 +243,12 @@
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
         <version>3.0.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -323,6 +307,20 @@
     </dependencies>
   </dependencyManagement>
 
+  <distributionManagement>
+    <!-- https://docs.sonatype.com/display/NX/OSS+Repository+Hosting -->
+    <repository>
+      <id>openid4java-staging</id>
+      <name>OpenID4Java Staging Repository</name>
+      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>openid4java-snapshots</id>
+      <name>OpenID4Java Snapshot Repository</name>
+      <url>http://oss.sonatype.org/content/repositories/openid4java-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <profiles>
     <profile>
       <id>alchim-deploy</id>
@@ -344,6 +342,26 @@
           <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/openid4java</url>
         </site>
       </distributionManagement>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

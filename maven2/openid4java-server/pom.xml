@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.openid4java</groupId>
     <artifactId>openid4java-parent</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6-SNAPSHOT</version>
   </parent>
   <artifactId>openid4java-server</artifactId>
   <packaging>jar</packaging>
@@ -23,46 +23,12 @@
       <version>${version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
       <groupId>net.sourceforge.nekohtml</groupId>
       <artifactId>nekohtml</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.openxri</groupId>
-      <artifactId>openxri-syntax</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.openxri</groupId>
-      <artifactId>openxri-client</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!--
-      Overwrite the dependency of openxri-client-1.0.1
-      as xmlapis-1.3.0 not found in maven's central repository.
-    -->
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
-    <!--
-      Overwrite the dependency of openxri-syntax-1.0.1
-      as icu4j-3.4.1 not found in maven's central repository.
-    -->
-    <dependency>
-      <groupId>com.ibm.icu</groupId>
-      <artifactId>icu4j</artifactId>
     </dependency>
   </dependencies>
 </project>

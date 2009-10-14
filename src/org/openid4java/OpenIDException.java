@@ -38,8 +38,8 @@ public class OpenIDException extends Exception
     public static final int YADIS_GET_NO_XRDS = 0x0709;
     public static final int YADIS_HTMLMETA_DOWNLOAD_ERROR = 0x070A;
     public static final int YADIS_HTMLMETA_INVALID_RESPONSE = 0x070B;
-    public static final int YADIS_XRDS_DOWNLOAD_ERROR = 0x070C;
-    public static final int YADIS_XRDS_PARSING_ERROR = 0x070D;
+    public static final int XRDS_DOWNLOAD_ERROR = 0x070C;
+    public static final int XRDS_PARSING_ERROR = 0x070D;
     public static final int YADIS_XRDS_SIZE_EXCEEDED = 0x070E;
 
     public static final int XRI_ERROR = 0x0800;

@@ -147,29 +147,35 @@ public class JdbcConsumerAssociationStore
 			String macKey = (String) res.get ( "mackey" ) ;
 			Date expDate = (Date) res.get ( "expdate" ) ;
 
-			if ( type == null || macKey == null || expDate == null )
+			Association assoc ;
+
+            if ( expDate == null || ( type == null || macKey == null ) &&
+                 ! Association.FAILED_ASSOC_HANDLE.equals(handle) ) {
 				throw new AssociationException (
-													"Invalid association data retrived from database; cannot create Association "
+													"Invalid expiry date retrived from database; cannot create Association "
 															+ "object for handle: "
 															+ handle ) ;
 
-			Association assoc ;
+            } else if (Association.FAILED_ASSOC_HANDLE.equals(handle)) {
+                assoc = Association.getFailedAssociation(expDate);
 
-			if ( Association.TYPE_HMAC_SHA1.equals ( type ) )
+            } else if ( Association.TYPE_HMAC_SHA1.equals ( type ) ) {
 				assoc = Association.createHmacSha1 (	handle,
 														Base64.decodeBase64 ( macKey.getBytes ( ) ),
 														expDate ) ;
 
-			else if ( Association.TYPE_HMAC_SHA256.equals ( type ) )
+            } else if ( Association.TYPE_HMAC_SHA256.equals ( type ) ) {
 				assoc = Association.createHmacSha256 (	handle,
 														Base64.decodeBase64 ( macKey.getBytes ( ) ),
 														expDate ) ;
 
-			else
+            } else {
 				throw new AssociationException (
 													"Invalid association type "
 															+ "retrieved from database: "
 															+ type ) ;
+
+            }
 
 			if ( _log.isDebugEnabled ( ) )
 				_log.debug ( "Retrieved association for handle: " + handle
@@ -228,7 +234,8 @@ public class JdbcConsumerAssociationStore
 												 	opUrl,
 													association.getHandle ( ),
 													association.getType ( ),
-													new String (
+													association.getMacKey ( ) == null ? null :
+													    new String (
 																	Base64.encodeBase64 ( association.getMacKey ( ).getEncoded ( ) ) ),
 													association.getExpiry ( ) } ) ;
 		}

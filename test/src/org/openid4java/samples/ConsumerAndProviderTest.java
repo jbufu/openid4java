@@ -93,10 +93,7 @@ public class ConsumerAndProviderTest extends TestCase
         }
         catch (Exception exc)
         {
-            if (wc != null)
-            {
-                System.err.println("last page before exception :" + wc.getPageSource());
-            }
+            System.err.println("last page before exception :" + wc.getPageSource());
             if (HttpServletSupport.lastException != null)
             {
                 throw HttpServletSupport.lastException;
@@ -126,10 +123,7 @@ public class ConsumerAndProviderTest extends TestCase
         }
         catch (Exception exc)
         {
-            if (wc != null)
-            {
-                System.err.println("last page before exception :" + wc.getPageSource());
-            }
+            System.err.println("last page before exception :" + wc.getPageSource());
             if (HttpServletSupport.lastException != null)
             {
                 throw HttpServletSupport.lastException;
@@ -140,47 +134,4 @@ public class ConsumerAndProviderTest extends TestCase
             }
         }
     }
-
-    // Ignore this test as `java.net.UnknownHostException: demouser.videntity.org' now.
-    // TODO: add another test to replace this.
-    public void _testCycleWithDemoUserOnVidentity() throws Exception
-    {
-        HttpServletSupport.lastException = null;
-        HttpServletSupport.count_ = 0;
-        WebTester wc = new WebTester();
-        try
-        {
-            wc.setScriptingEnabled(false);
-            wc.beginAt(_baseUrl + "/login");
-            wc.setTextField("openid_identifier", "http://demouser.videntity.org/");
-            wc.submit();
-
-            wc.assertFormPresent("form1");
-            wc.setTextField("password", "demoPwd");
-            wc.submit("submit:serverlogin:login");
-
-            wc.assertFormPresent("form1");
-            wc.submit("submit:allow:yes");
-
-            wc.assertTextPresent("success");
-            // wc.assertTextPresent("lastEmailFromFetch:demouser@foo.bar");
-            // wc.assertTextPresent("lastEmailFromSReg:demouser@foo.bar");
-        }
-        catch (Exception exc)
-        {
-            if (wc != null)
-            {
-                System.err.println("last page before exception :" + wc.getPageSource());
-            }
-            if (HttpServletSupport.lastException != null)
-            {
-                throw HttpServletSupport.lastException;
-            }
-            else
-            {
-                throw exc;
-            }
-        }
-    }
-
 }

@@ -12,7 +12,7 @@ The library currently supports the following OpenID specifications:
 	- OpenID Authentication 2.0
 	- OpenID Attribute Exchange 1.0
 	- OpenID Simple Registration 1.0 and 1.1
-	- OpenID Provider Authentication Policy Extension 1.0, draft 2
+	- OpenID Provider Authentication Policy Extension 1.0
 	- OpenID Information Cards 1.0, draft 1
 
 OpenID starts with the concept that anyone can identify themselves on the 
@@ -28,14 +28,15 @@ other credentials) stays safely stored on your OpenID Provider (which you
 can run yourself, or use a third-party identity provider).
 
 For more information about the OpenID protocol please refer to the
-specification at: http://openid.net/specs.bml
+specification at:
+              http://openid.net/developers/specs/
 
 
 The Latest Version:
 
-Details of the latest version can be found on the OpenID4Java library 
-distribution project page at: http://code.sxip.com
-
+Details of the latest version can be found on the OpenID4Java library
+distribution project page at:
+              http://code.google.com/p/openid4java/downloads/
 
 Package contents:
 
@@ -55,6 +56,8 @@ VERSION       : The released version of this package.
 
 apidoc/       : JavaDoc API documentation.
 
+samples/      : Sample implementation projects. See samples/README for details.
+
 src/          : Source code.
 
 test/         : Test cases source code and test data.
@@ -70,17 +73,16 @@ maven2/       : Maven2 build scripts; see maven2/README.txt.
 ========================================================================
 Copyright 2006-2008 Sxip Identity Corporation
 
-Package distribution:
-  => http://code.sxip.com
-
-Source code and defect management:
+Project home page and package distribution:
   => http://code.google.com/p/openid4java
+  => http://code.google.com/p/openid4java/downloads/
 
-For support, please join the Google Groups!
-  => http://groups.google.com/group/openid4java
+For support, please visit the wiki and join the Google Groups!
+  => http://groups.google.com/group/openid4java/
+  => http://code.google.com/p/openid4java/w/
 
 OpenID
-  => http://openid.net
+  => http://openid.net/
 
 Released under the Apache License 2.0
   => see LICENSE

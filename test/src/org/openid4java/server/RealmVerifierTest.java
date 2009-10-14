@@ -61,7 +61,7 @@ public class RealmVerifierTest extends TestCase
 
     public void setUp() throws Exception
     {
-        _realmVerifier = new RealmVerifier();
+        _realmVerifier = new RealmVerifier(false);
     }
 
     public void testXmlFile() throws IOException, JDOMException

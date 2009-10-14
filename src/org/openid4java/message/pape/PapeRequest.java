@@ -26,7 +26,7 @@ public class PapeRequest extends PapeMessage
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
-            "preferred_auth_policies", "max_auth_age"
+            "preferred_auth_policies", "preferred_auth_level_types", "max_auth_age"
     });
 
     /**
@@ -56,7 +56,7 @@ public class PapeRequest extends PapeMessage
      */
     protected PapeRequest(ParameterList params)
     {
-        _parameters = params;
+        super(params);
     }
 
     /**
@@ -186,12 +186,19 @@ public class PapeRequest extends PapeMessage
         while (it.hasNext())
         {
             String paramName = ((Parameter) it.next()).getKey();
-            if (! PAPE_FIELDS.contains(paramName) )
+            if (! PAPE_FIELDS.contains(paramName) && ! paramName.startsWith(PapeMessage.AUTH_LEVEL_NS_PREFIX))
             {
                 throw new MessageException(
                     "Invalid parameter name in PAPE request: " + paramName,
                     OpenIDException.PAPE_ERROR);
             }
         }
+    }
+
+    public void addPreferredCustomAuthLevel(String authLevelTypeUri)
+    {
+        String alias = addAuthLevelExtension(authLevelTypeUri);
+        String preferred = getParameterValue("preferred_auth_level_types");
+        set("preferred_auth_level_types", preferred == null ? alias : preferred + " " + alias);
     }
 }

@@ -71,9 +71,12 @@ public class Message
         Iterator iter = _params.getParameters().iterator();
 
         // simple registration is a special case; we support only:
-        // SREG1.0 (no namespace, "sreg" alias hardcoded) in OpenID1 messages
+        // SREG1.0 (no namespace, "sreg" alias hardcoded) in :
+        //   - OpenID1 messages
+        //   - OpenID2 messages (against the 2.0 spec),
+        //     to accomodate Yahoo's non-2.0-compliant implementation
         // SREG1.1 (namespace, any possible alias) in OpenID2 messages
-        boolean hasSReg10 = false;
+        boolean hasOpenidDotSreg = false;
 
         while (iter.hasNext())
         {
@@ -83,11 +86,12 @@ public class Message
                         key.substring(10));
 
             if (key.startsWith("openid.sreg."))
-                hasSReg10 = true;
+                hasOpenidDotSreg = true;
         }
 
         // only do the workaround for OpenID1 messages
-        if ( hasSReg10 && ! hasParameter("openid.ns") )
+        if ( hasOpenidDotSreg && ! _extAliases.values().contains("sreg")
+             /*! todo: revert this: hasParameter("openid.ns")*/ )
             _extAliases.put(SRegMessage.OPENID_NS_SREG, "sreg");
 
         _extCounter = _extAliases.size();
@@ -193,20 +197,7 @@ public class Message
 
     public String keyValueFormEncoding()
     {
-        StringBuffer allParams = new StringBuffer("");
-
-        List parameters = _params.getParameters();
-        Iterator iterator = parameters.iterator();
-        while (iterator.hasNext())
-        {
-            Parameter parameter = (Parameter) iterator.next();
-            allParams.append(parameter.getKey());
-            allParams.append(':');
-            allParams.append(parameter.getValue());
-            allParams.append('\n');
-        }
-
-        return allParams.toString();
+        return _params.toString();
     }
 
     public String wwwFormEncoding()

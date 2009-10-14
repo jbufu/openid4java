@@ -7,25 +7,31 @@ The maven2(http://maven.apache.org/) scripts are the another choice for maven us
 Sub projects:
 
 openid4java:
-	All of openid4java.
+	Official OpenID4Java distribution.
 
 openid4java-consumer:
-	OpenID consumer.
+	OpenID consumer / Relying Party.
 
 openid4java-server:
-	OpenID server.
+	OpenID server / OpenID Provider.
 
 openid4java-infocard:
-	Infocard support.
+	OpenID4Java distribution with OpenID-Infocard support.
+
+openid4java-xri:
+	OpenID4Java distribution with local XRI resolver support.
+
+openid4java-full:
+	Complete OpenID4Java distribution with local XRI resolver and OpenID-Infocard support.
 
 openid4java-server-JdbcServerAssociationStore:
 	An association store implementention with springframework(http://www.springframework.org/) jdbc.
 
 openid4java-consumer-SampleConsumer:
-	Sample code of consumer.
+	Sample code of consumer / Relying Party.
 
 openid4java-server-SampleServer:
-	Sample code of server.
+	Sample code of server / OpenID Provider.
 
 openid4java-nodeps
 	Holds all java source of OpenID4Java, but without any dependencies.

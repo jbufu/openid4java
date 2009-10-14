@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.openid4java</groupId>
     <artifactId>openid4java-parent</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6-SNAPSHOT</version>
     <relativePath>maven2/pom.xml</relativePath>
   </parent>
   <artifactId>openid4java-nodeps</artifactId>
@@ -19,7 +19,7 @@
 
   <properties>
     <encoding>UTF-8</encoding>
-    <java.src.version>1.4</java.src.version>
+    <java.src.version>1.5</java.src.version>
     <jetty.version>6.0.2</jetty.version>
     <test.servlet.port>8989</test.servlet.port>
     <test.data.src>${basedir}/test/yadisdata/</test.data.src>
@@ -168,6 +168,17 @@
         </reportSets>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>${basedir}/openid4java_checks.xml</configLocation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
         <configuration>
           <linkXref>true</linkXref>
@@ -223,22 +234,6 @@
       <artifactId>ehcache</artifactId>
       <version>1.3.0</version>
       <scope>provided</scope>
-    </dependency>
-    <!--
-      Overwrite the dependency of openxri-client-1.0.1
-      as xmlapis-1.3.0 not found in maven's central repository.
-    -->
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
-    <!--
-      Overwrite the dependency of openxri-syntax-1.0.1
-      as icu4j-3.4.1 not found in maven's central repository.
-    -->
-    <dependency>
-      <groupId>com.ibm.icu</groupId>
-      <artifactId>icu4j</artifactId>
     </dependency>
 
     <!-- higgins -->

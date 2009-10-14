@@ -48,9 +48,13 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**
-     * The Simple Registration Type URI.
+     * The Simple Registration 1.0 namespace URI.
      */
     public static final String OPENID_NS_SREG = "http://openid.net/sreg/1.0";
+
+    /**
+     * The Simple Registration 1.1 namespace URI.
+     */
     public static final String OPENID_NS_SREG11 = "http://openid.net/extensions/sreg/1.1";
 
     /**

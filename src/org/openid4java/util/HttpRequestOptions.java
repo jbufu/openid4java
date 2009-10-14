@@ -40,7 +40,7 @@ public class HttpRequestOptions
     /**
      * Map with HTTP request headers to be used when placing the HTTP request.
      */
-    private Map _requestHeaders;
+    private Map _requestHeaders = new HashMap();
 
     /**
      * If set to false, a new HTTP request will be placed even if a cached copy
@@ -166,6 +166,14 @@ public class HttpRequestOptions
     public void setRequestHeaders(Map requestHeaders)
     {
         this._requestHeaders = requestHeaders;
+    }
+
+    /**
+     * Adds a new HTTP request header.
+     */
+    public void addRequestHeader(String headerName, String headerValue)
+    {
+       _requestHeaders.put(headerName, headerValue);
     }
 
     /**
