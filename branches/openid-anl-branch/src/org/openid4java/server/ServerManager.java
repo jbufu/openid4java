@@ -5,6 +5,7 @@
 package org.openid4java.server;
 
 import org.openid4java.message.*;
+
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.association.AssociationException;
 import org.openid4java.association.DiffieHellmanSession;
@@ -12,6 +13,7 @@ import org.openid4java.association.Association;
 import org.openid4java.OpenIDException;
 
 import java.util.Vector;
+
 import org.openid4java.util.AttributeProviderDriver;
 
 import java.net.URL;
@@ -777,6 +779,12 @@ public class ServerManager
                             isVersion2 ? _nonceGenerator.next() : null,
                             invalidateHandle, assoc, false);
 
+                MessageExtension mExt = authReq.getExtension(
+                    "http://openid.net/srv/ax/1.0");
+                ParameterList pl = new ParameterList(mExt.getParameters());
+
+                this._attrProviderDriver.addAttributesToResponse(response, id, pl);
+
                 if (_signFields != null)
                     response.setSignFields(_signFields);
 
@@ -788,8 +796,6 @@ public class ServerManager
 
                 _log.info("Returning positive assertion for " +
                           response.getReturnTo());
-
-                this._attrProviderDriver.addAttributesToResponse(response, id);
 
                 return response;
             }

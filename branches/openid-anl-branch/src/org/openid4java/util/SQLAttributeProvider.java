@@ -23,6 +23,7 @@ import java.sql.DriverManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.Attribute;
 
 import org.openid4java.util.ConfigException;
@@ -117,7 +118,7 @@ public class SQLAttributeProvider implements AttributeProvider
       create table TABLENAME(identity VARCHAR(255), attrAlias VARCHAR(255),
                              attrType VARCHAR(255), attrValue VARCHAR(255));
     */
-    public Attribute[] getAttributes(String idpIdentity)
+    public Attribute[] getAttributes(String idpIdentity, ParameterList requestParams)
         throws AttributeProviderException, ConfigException
     {
         if ((this.dbHost == null) || (this.dbUser == null) ||
@@ -158,9 +159,26 @@ public class SQLAttributeProvider implements AttributeProvider
             this.attributes = new Vector();
             while(rs.next())
             {
-                this.addAttribute(rs.getString("attrAlias"),
-                                  rs.getString("attrType"),
-                                  rs.getString("attrValue"));
+                String curParam = rs.getString("attrAlias");
+                String curType = rs.getString("attrType");
+                String curValue = rs.getString("attrValue");
+
+                if (requestParams != null)
+                {
+                    if (requestParams.hasParameter("type." + curParam))
+                    {
+                        // the value of the parameter name is the type in this case
+                        String paramType = requestParams.getParameterValue("type." + curParam);
+                        if (paramType.equals(curType))
+                        {
+                            this.addAttribute(curParam, curType, curValue);
+                        }
+                    }
+                }
+                else
+                {
+                    this.addAttribute(curParam, curType, curValue);
+                }
             }
         }
         catch(Exception e)
