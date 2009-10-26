@@ -19,6 +19,7 @@ import org.openid4java.util.IdPValidatorConfig;
 import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.ax.Attribute;
+import org.openid4java.message.ParameterList;
 
 import org.openid4java.discovery.Identifier;
 import org.openid4java.discovery.DiscoveryInformation;
@@ -52,7 +53,7 @@ public class AttributeProviderDriver
       called and any valid attrProviders found are appended to the
       initial list and run in addition.
      */
-    public void addAttributesToResponse(AuthSuccess response, String identifier)
+    public void addAttributesToResponse(AuthSuccess response, String identifier, ParameterList pl)
     {
         _log.debug("addAttributesToResponse called on id: " + identifier);
 
@@ -124,7 +125,7 @@ public class AttributeProviderDriver
                 attrProvider = (AttributeProvider)attrProviderIter.next();
                 try
                 {
-                    attributes = attrProvider.getAttributes(identifier);
+                    attributes = attrProvider.getAttributes(identifier, pl);
 
                     // add each attribute to the auth response
                     for(i = 0; i < attributes.length; i++)
