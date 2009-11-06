@@ -31,6 +31,12 @@ import junit.framework.TestCase;
 public class ConsumerAndProviderTest extends TestCase
 {
 
+    static
+    {
+        System.getProperties().put("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+        System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog", "trace");
+    }
+
     private Server _server;
     private String _baseUrl;
 

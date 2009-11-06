@@ -7,8 +7,22 @@
  */
 package org.openid4java.util;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.http.HttpHost;
+import org.apache.http.client.*;
+import org.apache.http.client.params.AllClientPNames;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 
 /**
  * This class handles all HTTPClient connections for the
@@ -57,34 +71,54 @@ public class HttpClientFactory
                                          int connTimeout, int socketTimeout,
                                          String cookiePolicy)
     {
-        HttpConnectionManager connManager;
+        HttpParams httpParams = new BasicHttpParams();
+
+        SchemeRegistry registry = new SchemeRegistry();
+
+        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        registry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+
+        ClientConnectionManager connManager;
         if (multiThreadedHttpClient)
-            connManager = new MultiThreadedHttpConnectionManager();
+            connManager = new ThreadSafeClientConnManager(httpParams, registry);
         else
-            connManager = new SimpleHttpConnectionManager();
+            connManager = new SingleClientConnManager(httpParams, registry);
 
-        HttpClient client = new HttpClient(connManager);
+        DefaultHttpClient client = new DefaultHttpClient(connManager, httpParams);
 
-        client.getParams().setParameter(
-                "http.protocol.max-redirects", new Integer(maxRedirects));
-        client.getParams().setParameter(
-                "http.protocol.allow-circular-redirects", allowCircularRedirects);
-        client.getParams().setSoTimeout(socketTimeout);
-        client.getHttpConnectionManager().getParams().setConnectionTimeout(connTimeout);
-        client.getParams().setParameter("http.protocol.cookie-policy",
-                cookiePolicy);
+        client.getParams().setParameter(AllClientPNames.MAX_REDIRECTS,
+                                        new Integer(maxRedirects));
+        client.getParams().setParameter(AllClientPNames.ALLOW_CIRCULAR_REDIRECTS,
+                                        allowCircularRedirects);
+        client.getParams().setParameter(AllClientPNames.SO_TIMEOUT,
+        								   new Integer(socketTimeout));
+        client.getParams().setParameter(AllClientPNames.CONNECTION_TIMEOUT,
+				   					   new Integer(connTimeout));
+
+        if (cookiePolicy == null)
+        {
+            client.setCookieStore(null);
+        }
+        else
+        {
+            client.getParams().setParameter(AllClientPNames.COOKIE_POLICY,
+                    cookiePolicy);
+        }
+        
 
         if (proxyProperties != null)
         {
-            HostConfiguration hostConf = client.getHostConfiguration();
+            HttpHost proxy = new HttpHost(
+                    proxyProperties.getProxyHostName(), 
+                    proxyProperties.getProxyPort()); 
 
-            hostConf.setProxy(proxyProperties.getProxyHostName(), proxyProperties.getProxyPort());
+	        client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 
             //now set headers for auth
             AuthScope authScope = new AuthScope(AuthScope.ANY_HOST,
                     AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME);
             Credentials credentials = proxyProperties.getCredentials();
-            client.getState().setProxyCredentials(authScope, credentials);
+            client.getCredentialsProvider().setCredentials(authScope, credentials);
         }
 
         return client;

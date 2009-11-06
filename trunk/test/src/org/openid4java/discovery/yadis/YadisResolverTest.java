@@ -31,6 +31,12 @@ public class YadisResolverTest extends TestCase
 
     public static Server _server;
 
+    static
+    {
+        System.getProperties().put("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+        System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog", "trace");
+    }
+
     public YadisResolverTest(final String testName) throws Exception
     {
         super(testName);

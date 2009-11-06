@@ -252,15 +252,9 @@
         <version>1.3</version>
       </dependency>
       <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>3.0.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.0</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>

@@ -4,18 +4,19 @@
 
 package org.openid4java.util;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
+import org.apache.http.client.HttpClient;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.params.AllClientPNames;
+import org.apache.http.util.EntityUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Map;
 import java.util.Iterator;
 import java.util.HashMap;
-import java.io.InputStream;
 import java.io.IOException;
 
 /**
@@ -67,7 +68,7 @@ public class HttpCache
                 Boolean.TRUE,
                 _defaultOptions.getSocketTimeout(),
                 _defaultOptions.getConnTimeout(),
-                CookiePolicy.IGNORE_COOKIES);
+                null);
     }
 
 
@@ -146,17 +147,16 @@ public class HttpCache
             }
         }
 
-        GetMethod get = new GetMethod(url);
+        HttpGet get = new HttpGet(url);
+        
+        org.apache.http.HttpResponse httpResponse = null;
+        HttpEntity responseEntity = null;
+        
         try
         {
-            get.setFollowRedirects(true);
-            _client.getParams().setParameter(
-                    "http.protocol.max-redirects",
-                    new Integer(requestOptions.getMaxRedirects()));
+            get.getParams().setParameter(AllClientPNames.HANDLE_REDIRECTS, Boolean.TRUE);
 
-            _client.getParams().setSoTimeout(requestOptions.getSocketTimeout());
-            _client.getHttpConnectionManager().getParams().setConnectionTimeout(
-                    requestOptions.getConnTimeout());
+            HttpUtils.setRequestOptions(get, requestOptions);
 
             Map requestHeaders = requestOptions.getRequestHeaders();
             if (requestHeaders != null)
@@ -166,47 +166,29 @@ public class HttpCache
                 while (iter.hasNext())
                 {
                     headerName = (String) iter.next();
-                    get.setRequestHeader(headerName,
+                    get.setHeader(headerName,
                             (String) requestHeaders.get(headerName));
                 }
             }
 
-            int statusCode = _client.executeMethod(get);
-            String statusLine = get.getStatusLine().toString();
+            httpResponse = _client.execute(get);
+            responseEntity = httpResponse.getEntity();
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
 
             String httpBody = null;
-            boolean bodySizeExceeded = false;
-            int maxBodySize = requestOptions.getMaxBodySize();
-            InputStream httpBodyInput = get.getResponseBodyAsStream();
-            if (httpBodyInput != null)
+            
+            boolean bodySizeExceeded = (responseEntity != null)
+                && (responseEntity.getContentLength() > 0)
+                && (responseEntity.getContentLength() > requestOptions.getMaxBodySize());
+
+            if (!bodySizeExceeded)
             {
-                byte data[] = new byte[maxBodySize];
-
-                int totalRead = 0;
-                int currentRead;
-                while (totalRead < maxBodySize)
-                {
-                    currentRead = httpBodyInput.read(
-                            data, totalRead, maxBodySize - totalRead);
-
-                    if (currentRead == -1) break;
-
-                    totalRead += currentRead;
-                }
-
-                if (httpBodyInput.read() > 0)
-                    bodySizeExceeded = true;
-
-                httpBodyInput.close();
-
-                if (DEBUG) _log.debug("Read " + totalRead + " bytes.");
-
-                httpBody = new String(data, 0, totalRead);
+                httpBody = EntityUtils.toString(responseEntity);
             }
 
-            resp = new HttpResponse(statusCode, statusLine,
+            resp = new HttpResponse(statusCode, httpResponse.getStatusLine().getReasonPhrase(),
                     requestOptions.getMaxRedirects(), get.getURI().toString(),
-                    get.getResponseHeaders(), httpBody);
+                    httpResponse.getAllHeaders(), httpBody);
             resp.setBodySizeExceeded(bodySizeExceeded);
 
             // save result in cache
@@ -214,7 +196,7 @@ public class HttpCache
         }
         finally
         {
-            get.releaseConnection();
+            HttpUtils.dispose(responseEntity);
         }
 
         return resp;
@@ -281,31 +263,32 @@ public class HttpCache
             }
         }
 
-        HeadMethod head = new HeadMethod(url);
+        HttpHead head = new HttpHead(url);
+        
+        org.apache.http.HttpResponse httpResponse = null;
+        HttpEntity responseEntity = null;
+        
         try
         {
-            head.setFollowRedirects(true);
-            _client.getParams().setParameter(
-                    "http.protocol.max-redirects",
-                    new Integer(requestOptions.getMaxRedirects()));
+            head.getParams().setParameter(AllClientPNames.HANDLE_REDIRECTS, Boolean.TRUE);
 
-            _client.getParams().setSoTimeout(requestOptions.getSocketTimeout());
-            _client.getHttpConnectionManager().getParams().setConnectionTimeout(
-                    requestOptions.getConnTimeout());
+            HttpUtils.setRequestOptions(head, requestOptions);
 
-            int statusCode = _client.executeMethod(head);
-            String statusLine = head.getStatusLine().toString();
+            httpResponse = _client.execute(head);
+            responseEntity = httpResponse.getEntity();
+            
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
 
-            resp = new HttpResponse(statusCode, statusLine,
+            resp = new HttpResponse(statusCode, httpResponse.getStatusLine().getReasonPhrase(),
                     requestOptions.getMaxRedirects(), head.getURI().toString(),
-                    head.getResponseHeaders(), null);
+                    httpResponse.getAllHeaders(), null);
 
             // save result in cache
             _headCache.put(url, resp);
         }
         finally
         {
-            head.releaseConnection();
+            HttpUtils.dispose(responseEntity);
         }
 
         return resp;
