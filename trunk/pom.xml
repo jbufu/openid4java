@@ -31,15 +31,20 @@
     <resources>
       <resource>
         <directory>${basedir}/src</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xsd</include>
+        </includes>
       </resource>
     </resources>
     <testSourceDirectory>${basedir}/test/src</testSourceDirectory>
     <testResources>
       <testResource>
         <directory>${basedir}/test/src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.html</include>
+        </includes>
       </testResource>
     </testResources>
     <plugins>
