@@ -10,7 +10,7 @@ import org.openid4java.util.HttpCache;
 import org.openid4java.util.HttpResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpStatus;
 
 import java.util.*;
 import java.io.IOException;

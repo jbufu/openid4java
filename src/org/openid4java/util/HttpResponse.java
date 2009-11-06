@@ -4,7 +4,7 @@
 
 package org.openid4java.util;
 
-import org.apache.commons.httpclient.Header;
+import org.apache.http.Header;
 
 import java.util.*;
 

@@ -4,11 +4,14 @@
 
 package org.openid4java.consumer;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.http.client.HttpClient;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.params.AllClientPNames;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.*;
@@ -25,6 +28,7 @@ import org.openid4java.server.IncrementalNonceGenerator;
 import org.openid4java.server.RealmVerifier;
 import org.openid4java.OpenIDException;
 import org.openid4java.util.HttpClientFactory;
+import org.openid4java.util.HttpUtils;
 
 import javax.crypto.spec.DHParameterSpec;
 import java.net.*;
@@ -160,7 +164,7 @@ public class ConsumerManager
         // global httpclient configuration parameters
         _httpClient = HttpClientFactory.getInstance(
                 _maxRedirects, Boolean.FALSE, _socketTimeout, _connectTimeout,
-                CookiePolicy.IGNORE_COOKIES);
+                null);
 
         _realmVerifier = new RealmVerifier(false);
 
@@ -567,15 +571,18 @@ public class ConsumerManager
     {
         _connectTimeout = connectTimeout;
 
-        _httpClient.getHttpConnectionManager()
-                .getParams().setConnectionTimeout(_connectTimeout);
+        _httpClient.getParams().setIntParameter(
+                AllClientPNames.CONNECTION_TIMEOUT,
+                connectTimeout);
     }
 
     public void setSocketTimeout(int socketTimeout)
     {
         _socketTimeout = socketTimeout;
 
-        _httpClient.getParams().setSoTimeout(_socketTimeout);
+        _httpClient.getParams().setIntParameter(
+                AllClientPNames.SO_TIMEOUT,
+                socketTimeout);
     }
 
     public void setMaxRedirects(int maxRedirects)
@@ -602,21 +609,31 @@ public class ConsumerManager
         int responseCode = -1;
 
         // build the post message with the parameters from the request
-        PostMethod post = new PostMethod(url);
+        HttpPost post = new HttpPost(url);
+        
+        HttpResponse httpResponse = null;
+        HttpEntity responseEntity = null;
 
         try
         {
             // can't follow redirects on a POST (w/o user intervention)
             //post.setFollowRedirects(true);
-            post.setRequestEntity(new StringRequestEntity(
-                    request.wwwFormEncoding(),
-                    "application/x-www-form-urlencoded", "UTF-8"));
+
+            StringEntity requestEntity = new StringEntity(request
+                    .wwwFormEncoding(), "UTF-8");
+            requestEntity.setContentType("application/x-www-form-urlencoded");
+
+            post.setEntity(requestEntity);
 
             // place the http call to the OP
             if (DEBUG) _log.debug("Performing HTTP POST on " + url);
-            responseCode = _httpClient.executeMethod(post);
+            httpResponse = _httpClient.execute(post);
+            
+            responseCode = httpResponse.getStatusLine().getStatusCode();
 
-            String postResponse = post.getResponseBodyAsString();
+            responseEntity = httpResponse.getEntity();
+            
+            String postResponse = EntityUtils.toString(responseEntity);
             response.copyOf(ParameterList.createFromKeyValueForm(postResponse));
 
             if (DEBUG) _log.debug("Retrived response:\n" + postResponse);
@@ -628,7 +645,7 @@ public class ConsumerManager
         }
         finally
         {
-            post.releaseConnection();
+            HttpUtils.dispose(responseEntity);
         }
 
         return responseCode;
