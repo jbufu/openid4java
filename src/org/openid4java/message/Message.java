@@ -491,6 +491,9 @@ public class Message
 
                     String alias = getExtensionAlias(typeUri);
 
+                    if (! signedParams.contains("ns." + alias))
+                        throw new MessageException("Namespace declaration for extension "
+                                                    + typeUri + " MUST be signed");
                     Iterator iter = extension.getParameters().getParameters().iterator();
                     while (iter.hasNext())
                     {
