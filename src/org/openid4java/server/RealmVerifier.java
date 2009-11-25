@@ -47,14 +47,18 @@ public class RealmVerifier
     private boolean _enforceRpId;
     private boolean _isOP;
 
-    public RealmVerifier(boolean isOP)
+    /**
+     * Non-public constructor. Use a {@link RealmVerifierFactory} to
+     * create a {@link RealmVerifier}.
+     */
+    RealmVerifier(boolean isOP, YadisResolver yadisResolver)
     {
         _deniedRealmDomains = new ArrayList();
 
         addDeniedRealmDomain("\\*\\.[^\\.]+");
         addDeniedRealmDomain("\\*\\.[a-z]{2}\\.[a-z]{2}");
 
-        _yadisResolver = new YadisResolver();
+        _yadisResolver = yadisResolver;
 
         _enforceRpId = true;
         _isOP = isOP;

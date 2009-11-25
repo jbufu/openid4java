@@ -5,29 +5,32 @@
 package org.openid4java.discovery.yadis;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.openid4java.OpenIDException;
+import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
-import org.openid4java.consumer.ConsumerManager;
-import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpCache;
+import org.openid4java.util.HttpFetcher;
+import org.openid4java.util.HttpFetcherFactory;
+import org.openid4java.util.HttpRequestOptions;
 
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class YadisResolverTest extends TestCase
 {
-    private YadisResolver _resolver;
     private int _servletPort;
+
+    private YadisResolver _resolver;
 
     public static Server _server;
 
@@ -46,7 +49,8 @@ public class YadisResolverTest extends TestCase
 
     public void setUp() throws Exception
     {
-        _resolver = new YadisResolver();
+
+        _resolver = new YadisResolver(new HttpFetcherFactory());
 
         _server = new Server(_servletPort);
 
@@ -85,7 +89,7 @@ public class YadisResolverTest extends TestCase
     public void testHeadersUrl() throws DiscoveryException
     {
         YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simpleheaders",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue(result.getEndpoints().size() > 0);
     }
@@ -93,7 +97,7 @@ public class YadisResolverTest extends TestCase
     public void testHeadersUrlToXmlContentTypeDocument() throws DiscoveryException
     {
         YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simpleheaders_xml",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue(result.getEndpoints().size() > 0);
     }
@@ -101,7 +105,7 @@ public class YadisResolverTest extends TestCase
     public void testHtmlUrl() throws DiscoveryException
     {
         YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?html=simplehtml",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue(result.getEndpoints().size() > 0);
     }
@@ -109,7 +113,7 @@ public class YadisResolverTest extends TestCase
     public void testRedirectToHeaderResponse() throws DiscoveryException
     {
         YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=redir_simpleheaders",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue(result.getEndpoints().size() > 0);
     }
@@ -117,7 +121,7 @@ public class YadisResolverTest extends TestCase
     public void testRedirectToHtmlResponse() throws DiscoveryException
     {
         YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=redir_simplehtml",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue(result.getEndpoints().size() > 0);
     }
@@ -125,7 +129,7 @@ public class YadisResolverTest extends TestCase
     public void testRedirectToXrdsResponse() throws DiscoveryException
     {
         YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?headers=redir_simplexrds",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue(result.getEndpoints().size() > 0);
     }
@@ -134,13 +138,14 @@ public class YadisResolverTest extends TestCase
     public void testIncompleteHtmlParsing() throws DiscoveryException
     {
         // stop reading from the received HTML body shortly after the Yadis tag
-        HttpCache cache = new HttpCache();
+        HttpFetcher cache = new HttpCache();
         HttpRequestOptions requestOptions = cache.getRequestOptions();
         requestOptions.setMaxBodySize(350);
         cache.setDefaultRequestOptions(requestOptions);
 
-        YadisResult result = _resolver.discover("http://localhost:" + _servletPort + "/?html=simplehtml",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+        YadisResolver resolver = new YadisResolver(cache);
+        YadisResult result = resolver.discover("http://localhost:" + _servletPort + "/?html=simplehtml",
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue(result.getEndpoints().size() > 0);
     }
@@ -308,7 +313,7 @@ public class YadisResolverTest extends TestCase
         try
         {
             YadisResult result = _resolver.discover("http://localhost:" +_servletPort + "/?html=extraheadinbody",
-                10, new HttpCache(), Collections.singleton("http://example.com/"));
+                10, Collections.singleton("http://example.com/"));
 
             assertTrue("Discovery should have ignored a html/body/head; " +
                        " we only care about spurious html/head's", result.getEndpoints().size() == 1);
@@ -382,13 +387,15 @@ public class YadisResolverTest extends TestCase
         HttpRequestOptions requestOptions = new HttpRequestOptions();
         requestOptions.setMaxBodySize(10);
 
-        HttpCache cache = new HttpCache();
+        HttpFetcher cache = new HttpCache();
         cache.setDefaultRequestOptions(requestOptions);
+
+        YadisResolver resolver = new YadisResolver(cache);
 
         try
         {
-            _resolver.discover("http://localhost:" +
-                _servletPort + "/?headers=simpleheaders", cache);
+            resolver.discover("http://localhost:" +
+                _servletPort + "/?headers=simpleheaders");
 
             fail("Should have failed with error code " +
                 OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
@@ -498,7 +505,7 @@ public class YadisResolverTest extends TestCase
         // empty string is a valid java.net.URI...
 
         YadisResult yadis = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simplexrds&xrds=malformedxrds6",
-            10, new HttpCache(), Collections.singleton("http://example.com/"));
+            10, Collections.singleton("http://example.com/"));
 
         assertTrue("XRDS with an empty URI is valid; Yadis should have succeeded",
                    yadis.getEndpoints().size() > 0);

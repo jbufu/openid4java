@@ -8,6 +8,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.AllClientPNames;
 
+import java.util.Iterator;
+import java.util.Map;
+
 public final class HttpUtils
 {
     private HttpUtils()
@@ -44,13 +47,26 @@ public final class HttpUtils
 
     public static void setRequestOptions(HttpRequestBase request, HttpRequestOptions requestOptions)
     {
-        request.getParams().setParameter(
-                AllClientPNames.MAX_REDIRECTS,
+        request.getParams().setParameter(AllClientPNames.MAX_REDIRECTS,
                 new Integer(requestOptions.getMaxRedirects()));
-
         request.getParams().setParameter(AllClientPNames.SO_TIMEOUT,
-                                            new Integer(requestOptions.getSocketTimeout()));
+                new Integer(requestOptions.getSocketTimeout()));
         request.getParams().setParameter(AllClientPNames.CONNECTION_TIMEOUT,
-                                            new Integer(requestOptions.getConnTimeout()));
+                new Integer(requestOptions.getConnTimeout()));
+        request.getParams().setParameter(AllClientPNames.ALLOW_CIRCULAR_REDIRECTS,
+                Boolean.valueOf(requestOptions.getAllowCircularRedirects()));
+
+        Map requestHeaders = requestOptions.getRequestHeaders();
+        if (requestHeaders != null)
+        {
+            Iterator iter = requestHeaders.keySet().iterator();
+            String headerName;
+            while (iter.hasNext())
+            {
+                headerName = (String) iter.next();
+                request.addHeader(headerName,
+                    (String) requestHeaders.get(headerName));
+            }
+        }
     }
 }

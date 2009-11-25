@@ -1,21 +1,29 @@
 package org.openid4java.discovery.xri;
 
-import org.openid4java.discovery.XriIdentifier;
-import org.openid4java.discovery.DiscoveryException;
-import org.openid4java.discovery.DiscoveryInformation;
-import org.openid4java.discovery.xrds.XrdsParser;
-import org.openid4java.discovery.xrds.XrdsServiceEndpoint;
-import org.openid4java.util.OpenID4JavaUtils;
-import org.openid4java.util.HttpCache;
-import org.openid4java.util.HttpResponse;
+import com.google.inject.Inject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
+import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.DiscoveryInformation;
+import org.openid4java.discovery.XriIdentifier;
+import org.openid4java.discovery.xrds.XrdsParser;
+import org.openid4java.discovery.xrds.XrdsServiceEndpoint;
+import org.openid4java.util.HttpCache;
+import org.openid4java.util.HttpFetcher;
+import org.openid4java.util.HttpFetcherFactory;
+import org.openid4java.util.HttpRequestOptions;
+import org.openid4java.util.HttpResponse;
+import org.openid4java.util.OpenID4JavaUtils;
 
-import java.util.*;
 import java.io.IOException;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author jbufu
@@ -25,7 +33,7 @@ public class XriDotNetProxyResolver implements XriResolver
     private static Log _log = LogFactory.getLog(XriDotNetProxyResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
-    private static HttpCache cache = new HttpCache();
+    private final HttpFetcher _httpFetcher;
 
     private final static String PROXY_URL = "https://xri.net/";
     private static final String XRDS_QUERY = "_xrd_r=application/xrds+xml";
@@ -45,8 +53,23 @@ public class XriDotNetProxyResolver implements XriResolver
         }
     }
 
+    /**
+     * Constructor for Guice installations. The default implementation
+     * of the {@link HttpFetcherFactory} returns {@link HttpCache}s.
+     */
+    @Inject
+    public XriDotNetProxyResolver(HttpFetcherFactory httpFetcherfactory) {
+      _httpFetcher = httpFetcherfactory.createFetcher(
+          HttpRequestOptions.getDefaultOptionsForDiscovery());
+    }
+
+    /**
+     * Public constructor for non-guice installations. In this case,
+     * we use the {@link HttpCache}-creating {@link HttpFetcherFactory}.
+     */
     public XriDotNetProxyResolver()
     {
+      this(new HttpFetcherFactory());
     }
 
     public List discover(XriIdentifier xri) throws DiscoveryException
@@ -56,7 +79,7 @@ public class XriDotNetProxyResolver implements XriResolver
 
         try
         {
-            HttpResponse resp = cache.get(hxri);
+            HttpResponse resp = _httpFetcher.get(hxri);
             if (resp == null || HttpStatus.SC_OK != resp.getStatusCode())
                 throw new DiscoveryException("Error retrieving HXRI: " + hxri);
 

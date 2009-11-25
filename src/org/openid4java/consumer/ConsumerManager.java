@@ -4,37 +4,59 @@
 
 package org.openid4java.consumer;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.params.AllClientPNames;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import com.google.inject.Inject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openid4java.message.*;
+import org.apache.http.HttpStatus;
+import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
-import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.AssociationException;
 import org.openid4java.association.AssociationSessionType;
-import org.openid4java.discovery.Identifier;
+import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.discovery.Discovery;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
-import org.openid4java.server.NonceGenerator;
+import org.openid4java.discovery.Identifier;
+import org.openid4java.discovery.yadis.YadisResolver;
+import org.openid4java.message.AssociationError;
+import org.openid4java.message.AssociationRequest;
+import org.openid4java.message.AssociationResponse;
+import org.openid4java.message.AuthFailure;
+import org.openid4java.message.AuthImmediateFailure;
+import org.openid4java.message.AuthRequest;
+import org.openid4java.message.AuthSuccess;
+import org.openid4java.message.DirectError;
+import org.openid4java.message.Message;
+import org.openid4java.message.MessageException;
+import org.openid4java.message.ParameterList;
+import org.openid4java.message.VerifyRequest;
+import org.openid4java.message.VerifyResponse;
 import org.openid4java.server.IncrementalNonceGenerator;
+import org.openid4java.server.NonceGenerator;
 import org.openid4java.server.RealmVerifier;
-import org.openid4java.OpenIDException;
-import org.openid4java.util.HttpClientFactory;
-import org.openid4java.util.HttpUtils;
+import org.openid4java.server.RealmVerifierFactory;
+import org.openid4java.util.HttpFetcher;
+import org.openid4java.util.HttpFetcherFactory;
+import org.openid4java.util.HttpRequestOptions;
+import org.openid4java.util.HttpResponse;
 
-import javax.crypto.spec.DHParameterSpec;
-import java.net.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
+import javax.crypto.spec.DHParameterSpec;
 
 /**
  * Manages OpenID communications with an OpenID Provider (Server).
@@ -52,7 +74,13 @@ public class ConsumerManager
     /**
      * Discovery process manager.
      */
-    private Discovery _discovery = new Discovery();
+    private Discovery _discovery;
+
+    /**
+     * Direct pointer to HttpFetcher, for association and signature
+     * verification requests.
+     */
+    private HttpFetcher _httpFetcher;
 
     /**
      * Store for keeping track of the established associations.
@@ -65,7 +93,7 @@ public class ConsumerManager
     private NonceGenerator _consumerNonceGenerator = new IncrementalNonceGenerator();
 
     /**
-     * Private association store used for signing consumer nonces when operating 
+     * Private association store used for signing consumer nonces when operating
      * in compatibility (v1.x) mode.
      */
     private ConsumerAssociationStore _privateAssociations = new InMemoryConsumerAssociationStore();
@@ -75,12 +103,6 @@ public class ConsumerManager
      * prevents replay attacks.
      */
     private NonceVerifier _nonceVerifier = new InMemoryNonceVerifier(60);
-
-    /**
-     * Handles HTTP calls to the Server / OpenID Provider.
-     */
-    private HttpClient _httpClient;
-
 
     // --- association preferences ---
 
@@ -137,39 +159,27 @@ public class ConsumerManager
      */
     private RealmVerifier _realmVerifier;
 
-
-    // --- verification preferences ---
-
-    /**
-     * Connect timeout for HTTP calls in miliseconds. Default 10s
-     */
-    private int _connectTimeout = 10000;
-
-    /**
-     * Socket (read) timeout for HTTP calls in miliseconds. Default 10s.
-     */
-    private int _socketTimeout = 10000;
-
-    /**
-     * Maximum number of redirects to be followed. Default 0.
-     */
-    private int _maxRedirects = 0;
-
-
     /**
      * Instantiates a ConsumerManager with default settings.
      */
-    public ConsumerManager() throws ConsumerException
+    public ConsumerManager()
     {
-        // global httpclient configuration parameters
-        _httpClient = HttpClientFactory.getInstance(
-                _maxRedirects, Boolean.FALSE, _socketTimeout, _connectTimeout,
-                null);
+        this(
+            new RealmVerifierFactory(new YadisResolver(new HttpFetcherFactory())),
+            new Discovery(),  // uses HttpCache internally
+            new HttpFetcherFactory());
+    }
 
-        _realmVerifier = new RealmVerifier(false);
-
+    @Inject
+    public ConsumerManager(RealmVerifierFactory realmFactory, Discovery discovery,
+        HttpFetcherFactory httpFetcherFactory)
+    {
+        _realmVerifier = realmFactory.getRealmVerifierForConsumer();
         // don't verify own (RP) identity, disable RP discovery
         _realmVerifier.setEnforceRpId(false);
+
+        _discovery = discovery;
+        _httpFetcher = httpFetcherFactory.createFetcher(HttpRequestOptions.getDefaultOptionsForOpCalls());
 
         if (Association.isHmacSha256Supported())
             _prefAssocSessEnc = AssociationSessionType.DH_SHA256;
@@ -215,6 +225,7 @@ public class ConsumerManager
      * @param associations              ConsumerAssociationStore implementation
      * @see ConsumerAssociationStore
      */
+    @Inject
     public void setAssociations(ConsumerAssociationStore associations)
     {
         this._associations = associations;
@@ -238,6 +249,7 @@ public class ConsumerManager
      * @param nonceVerifier         NonceVerifier implementation
      * @see NonceVerifier
      */
+    @Inject
     public void setNonceVerifier(NonceVerifier nonceVerifier)
     {
         this._nonceVerifier = nonceVerifier;
@@ -278,7 +290,6 @@ public class ConsumerManager
      * Associations and stateless mode cannot be both disabled at the same time.
      */
     public void setMaxAssocAttempts(int maxAssocAttempts)
-            throws ConsumerException
     {
         if (maxAssocAttempts > 0 || _allowStateless)
             this._maxAssocAttempts = maxAssocAttempts;
@@ -341,7 +352,7 @@ public class ConsumerManager
      * stateless mode when failing to associate with an OpenID Provider.
      *
      * @deprecated
-     * @see isAllowStateless()
+     * @see #isAllowStateless()
      */
     public boolean statelessAllowed()
     {
@@ -569,28 +580,20 @@ public class ConsumerManager
 
     public void setConnectTimeout(int connectTimeout)
     {
-        _connectTimeout = connectTimeout;
-
-        _httpClient.getParams().setIntParameter(
-                AllClientPNames.CONNECTION_TIMEOUT,
-                connectTimeout);
+        _httpFetcher.getDefaultRequestOptions()
+                .setConnTimeout(connectTimeout);
     }
 
     public void setSocketTimeout(int socketTimeout)
     {
-        _socketTimeout = socketTimeout;
-
-        _httpClient.getParams().setIntParameter(
-                AllClientPNames.SO_TIMEOUT,
-                socketTimeout);
+        _httpFetcher.getDefaultRequestOptions()
+                .setSocketTimeout(socketTimeout);
     }
 
     public void setMaxRedirects(int maxRedirects)
     {
-        _maxRedirects = maxRedirects;
-
-        _httpClient.getParams().setParameter(
-                "http.protocol.max-redirects", new Integer(_maxRedirects));
+        _httpFetcher.getDefaultRequestOptions()
+                .setMaxRedirects(maxRedirects);
     }
 
     /**
@@ -608,32 +611,14 @@ public class ConsumerManager
     {
         int responseCode = -1;
 
-        // build the post message with the parameters from the request
-        HttpPost post = new HttpPost(url);
-        
-        HttpResponse httpResponse = null;
-        HttpEntity responseEntity = null;
-
         try
         {
-            // can't follow redirects on a POST (w/o user intervention)
-            //post.setFollowRedirects(true);
 
-            StringEntity requestEntity = new StringEntity(request
-                    .wwwFormEncoding(), "UTF-8");
-            requestEntity.setContentType("application/x-www-form-urlencoded");
-
-            post.setEntity(requestEntity);
-
-            // place the http call to the OP
             if (DEBUG) _log.debug("Performing HTTP POST on " + url);
-            httpResponse = _httpClient.execute(post);
-            
-            responseCode = httpResponse.getStatusLine().getStatusCode();
+            HttpResponse resp = _httpFetcher.post(url, request.getParameterMap());
+            responseCode = resp.getStatusCode();
 
-            responseEntity = httpResponse.getEntity();
-            
-            String postResponse = EntityUtils.toString(responseEntity);
+            String postResponse = resp.getBody();
             response.copyOf(ParameterList.createFromKeyValueForm(postResponse));
 
             if (DEBUG) _log.debug("Retrived response:\n" + postResponse);
@@ -642,10 +627,6 @@ public class ConsumerManager
         {
             _log.error("Error talking to " + url +
                     " response code: " + responseCode, e);
-        }
-        finally
-        {
-            HttpUtils.dispose(responseEntity);
         }
 
         return responseCode;
@@ -726,7 +707,7 @@ public class ConsumerManager
 
         // check if there's an already established association
         Association a = _associations.load(opEndpoint);
-        if ( a != null &&  
+        if ( a != null &&
                 (Association.FAILED_ASSOC_HANDLE.equals(a.getHandle()) ||
                 a.getExpiry().getTime() - System.currentTimeMillis() > _preExpiryAssocLockInterval * 1000) )
         {
@@ -1375,7 +1356,7 @@ public class ConsumerManager
         String nonce = _consumerNonceGenerator.next();
 
         returnTo += (returnTo.indexOf('?') != -1) ? '&' : '?';
-        
+
         Association privateAssoc = _privateAssociations.load(opUrl);
         if( privateAssoc == null )
         {
@@ -1392,7 +1373,7 @@ public class ConsumerManager
 				return null;
 			}
         }
-        
+
         try
         {
             returnTo += "openid.rpnonce=" + URLEncoder.encode(nonce, "UTF-8");
@@ -1491,7 +1472,7 @@ public class ConsumerManager
                 _log.error("Null private association.");
                 return null;
             }
-            
+
             if (privateAssoc.verifySignature(signed, signature))
             {
                 _log.info("Consumer nonce signature verified.");
@@ -1827,7 +1808,7 @@ public class ConsumerManager
             {
                 VerifyResponse vrfyResp =
                         VerifyResponse.createVerifyResponse(responseParams);
-                
+
                 vrfyResp.validate();
 
                 if (vrfyResp.isSignatureVerified())
@@ -1871,5 +1852,11 @@ public class ConsumerManager
                        + " reason: " + result.getStatusMsg());
 
         return result;
+    }
+
+    /* visible for testing */
+    HttpFetcher getHttpFetcher()
+    {
+        return _httpFetcher;
     }
 }

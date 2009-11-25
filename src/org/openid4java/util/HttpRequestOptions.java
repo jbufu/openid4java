@@ -15,6 +15,31 @@ import java.util.HashMap;
  */
 public class HttpRequestOptions
 {
+
+    /**
+     * Returns an {@link HttpRequestOptions} object suitable to use for
+     * HTTP requests to perform discovery.
+     */
+    public static HttpRequestOptions getDefaultOptionsForDiscovery()
+    {
+        return new HttpRequestOptions();
+    }
+
+    /**
+     * Returns an {@link HttpRequestOptions} object suitable to use for
+     * HTTP requests to OP endpoints for the purpose of creating associations
+     * or verifying signatures.
+     */
+    public static HttpRequestOptions getDefaultOptionsForOpCalls()
+    {
+        HttpRequestOptions options = new HttpRequestOptions();
+        options.setConnTimeout(10000);
+        options.setSocketTimeout(10000);
+        options.setMaxRedirects(0);
+        options.setAllowCircularRedirects(false);
+        return options;
+    }
+
     /**
      * HTTP connect timeout, in milliseconds. Default 3000 miliseconds.
      */
@@ -51,6 +76,8 @@ public class HttpRequestOptions
      */
     private boolean _useCache = true;
 
+    private boolean _allowCircularRedirects = true;
+
     /**
      * If HttpRequestOptions' content type matches a cached HttpResponse's
      * content type, the cache copy is returned; otherwise a new HTTP request
@@ -82,6 +109,7 @@ public class HttpRequestOptions
             this._requestHeaders = new HashMap(other._requestHeaders);
         this._useCache = other._useCache;
         this._contentType = other._contentType;
+        this._allowCircularRedirects = other._allowCircularRedirects;
     }
 
     /**
@@ -215,5 +243,15 @@ public class HttpRequestOptions
     public void setContentType(String contentType)
     {
         this._contentType = contentType;
+    }
+
+    public boolean getAllowCircularRedirects()
+    {
+        return _allowCircularRedirects;
+    }
+
+    public void setAllowCircularRedirects(boolean allow)
+    {
+        _allowCircularRedirects = allow;
     }
 }
