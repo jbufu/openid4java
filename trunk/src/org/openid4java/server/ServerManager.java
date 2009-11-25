@@ -4,11 +4,16 @@
 
 package org.openid4java.server;
 
+import com.google.inject.Inject;
+
 import org.openid4java.message.*;
+import org.openid4java.util.HttpCache;
+import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.association.AssociationException;
 import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.Association;
+import org.openid4java.discovery.yadis.YadisResolver;
 import org.openid4java.OpenIDException;
 
 import java.net.URL;
@@ -357,10 +362,15 @@ public class ServerManager
     /**
      * Constructs a ServerManager with default settings.
      */
-    public ServerManager()
+    public ServerManager() {
+      this(new RealmVerifierFactory(new YadisResolver(new HttpFetcherFactory())));
+    }
+
+    @Inject
+    public ServerManager(RealmVerifierFactory factory)
     {
         // initialize a default realm verifier
-        _realmVerifier = new RealmVerifier(true);
+        _realmVerifier = factory.getRealmVerifierForServer();
         _realmVerifier.setEnforceRpId(false);
     }
 

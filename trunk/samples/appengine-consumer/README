@@ -1,0 +1,24 @@
+
+This directory contains a simple example for how to run an
+openid4java-based OpenID Relying Party on Google AppEngine.
+
+First, create the WAR directory:
+
+$ mvn package
+
+Now, test the server locally:
+
+$ $PATH_TO_APPENGINE/dev_appserver.sh -a <your-host-name> -p 8080 \
+  target/appengine-consumer
+
+Point your browser to http://<your-host-name>:8080 to test.
+
+Finally, to deploy on AppEngine, you have to first claim an application
+name for yourself, and then edit the configuration file
+src/main/webapp/WEB-INF/appengine-web.xml. Change the name of the
+application from "openid4java" to the name you own. Then, rebuild and
+upload the application: 
+
+$ mvn package
+$ $PATH_TO_APPENGINE/appcfg.sh update target/appengine-consumer
+

@@ -4,17 +4,18 @@
 
 package org.openid4java.discovery;
 
-import java.util.regex.Pattern;
-import java.util.List;
-
-import org.openid4java.util.HttpCache;
-import org.openid4java.util.OpenID4JavaUtils;
-import org.openid4java.discovery.html.HtmlResolver;
-import org.openid4java.discovery.yadis.YadisResolver;
-import org.openid4java.discovery.xri.XriResolver;
+import com.google.inject.Inject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.discovery.html.HtmlResolver;
+import org.openid4java.discovery.xri.XriResolver;
+import org.openid4java.discovery.yadis.YadisResolver;
+import org.openid4java.util.HttpFetcherFactory;
+import org.openid4java.util.OpenID4JavaUtils;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -29,24 +30,38 @@ public class Discovery
     private static final Pattern XRI_PATTERN =
             Pattern.compile("^[!=@\\$\\+\\(]", Pattern.CASE_INSENSITIVE);
 
-    private static HtmlResolver _htmlResolver = new HtmlResolver();
-    private static YadisResolver _yadisResolver = new YadisResolver();
-    
-    private static XriResolver _xriResolver;
+    private HtmlResolver _htmlResolver;
+    private YadisResolver _yadisResolver;
+    private XriResolver _xriResolver;
+
     private static final String XRI_RESOLVER_CLASS_NAME_KEY = "discovery.xri.resolver";
 
-    static {
+    private static XriResolver getXriResolver()
+    {
         String className = OpenID4JavaUtils.getProperty(XRI_RESOLVER_CLASS_NAME_KEY);
         if (DEBUG) _log.debug(XRI_RESOLVER_CLASS_NAME_KEY + ":" + className);
         try {
-            _xriResolver = (XriResolver) Class.forName(className).newInstance();
+            return (XriResolver) Class.forName(className).newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Error initializing XRI resolver.", e);
         }
     }
 
+    @Inject
+    public Discovery(HtmlResolver htmlResolver, YadisResolver yadisResolver,
+        XriResolver xriResolver)
+    {
+        _htmlResolver = htmlResolver;
+        _yadisResolver = yadisResolver;
+        _xriResolver = xriResolver;
+    }
+
     public Discovery()
     {
+      this(
+          new HtmlResolver(new HttpFetcherFactory()),
+          new YadisResolver(new HttpFetcherFactory()),
+          getXriResolver());
     }
 
     public void setXriResolver(XriResolver xriResolver)
@@ -129,9 +144,7 @@ public class Discovery
 
             UrlIdentifier urlId = (UrlIdentifier) identifier;
 
-            HttpCache cache = new HttpCache();
-
-            result = _yadisResolver.discover(urlId.getIdentifier(), cache);
+            result = _yadisResolver.discover(urlId.getIdentifier());
 
             // fall-back to HTML discovery
             if (result == null || result.size() == 0)
@@ -139,7 +152,7 @@ public class Discovery
                 _log.info("No OpenID service endpoints discovered through Yadis;" +
                         " attempting HTML discovery...");
 
-                result = _htmlResolver.discoverHtml(urlId, cache);
+                result = _htmlResolver.discoverHtml(urlId);
             }
         }
         else
@@ -169,5 +182,11 @@ public class Discovery
     {
         // don't follow redirects when doing RP discovery
         return yadisResolver.discoverRP(realm);
+    }
+
+    /* visible for testing */
+    public YadisResolver getYadisResolver()
+    {
+        return _yadisResolver;
     }
 }

@@ -1,11 +1,14 @@
 package org.openid4java.discovery.xri;
 
+import com.google.inject.ImplementedBy;
+
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.XriIdentifier;
 import org.openid4java.discovery.Identifier;
 
 import java.util.List;
 
+@ImplementedBy(XriDotNetProxyResolver.class)
 public interface XriResolver
 {
     /**

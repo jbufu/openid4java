@@ -18,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.AssociationSessionType;
-import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.consumer.InMemoryConsumerAssociationStore;
 import org.openid4java.consumer.InMemoryNonceVerifier;
@@ -30,7 +29,6 @@ import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.MessageExtension;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
-import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
@@ -44,7 +42,7 @@ import org.openid4java.util.ProxyProperties;
 public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5998885243419513055L;
 	private static final String OPTIONAL_VALUE = "0";
@@ -64,21 +62,17 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 		LOG.debug("context: " + context);
 
-		try {
-			// --- Forward proxy setup (only if needed) ---
-			ProxyProperties proxyProps = getProxyProperties(config);
-			if (proxyProps != null) {
-				LOG.debug("ProxyProperties: " + proxyProps);
-				HttpClientFactory.setProxyProperties(proxyProps);
-			}
-
-			this.manager = new ConsumerManager();
-			manager.setAssociations(new InMemoryConsumerAssociationStore());
-			manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
-			manager.setMinAssocSessEnc(AssociationSessionType.DH_SHA256);
-		} catch (ConsumerException e) {
-			throw new ServletException(e);
+		// --- Forward proxy setup (only if needed) ---
+		ProxyProperties proxyProps = getProxyProperties(config);
+		if (proxyProps != null) {
+			LOG.debug("ProxyProperties: " + proxyProps);
+			HttpClientFactory.setProxyProperties(proxyProps);
 		}
+
+		this.manager = new ConsumerManager();
+		manager.setAssociations(new InMemoryConsumerAssociationStore());
+		manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
+		manager.setMinAssocSessEnc(AssociationSessionType.DH_SHA256);
 	}
 
 	/**
@@ -265,7 +259,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 	/**
 	 * Get proxy properties from the context init params.
-	 * 
+	 *
 	 * @return proxy properties
 	 */
 	private static ProxyProperties getProxyProperties(ServletConfig config) {

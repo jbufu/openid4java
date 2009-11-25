@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="OpenID4Java Library" default="jar" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant"> 
+<project name="OpenID4Java Library" default="jar" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <property environment="env"/>
     <property file="local.properties"/>
@@ -165,7 +165,7 @@
         <antcall target="dist-full"/>
         <antcall target="clean"/>
     </target>
-    
+
     <target name="apidoc" depends="prepare"
             description="Builds Javadoc documentation">
         <mkdir dir="${apidoc}"/>

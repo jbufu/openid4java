@@ -4,9 +4,12 @@
 
 package org.openid4java.consumer;
 
+import com.google.inject.ImplementedBy;
+
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
+@ImplementedBy(InMemoryNonceVerifier.class)
 public interface NonceVerifier
 {
     /**

@@ -4,6 +4,9 @@
 
 package org.openid4java.discovery.yadis;
 
+import com.google.inject.Inject;
+
+import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
 import org.apache.http.Header;
 import org.apache.commons.logging.Log;
@@ -19,6 +22,8 @@ import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.xrds.XrdsParser;
 import org.openid4java.util.HttpCache;
+import org.openid4java.util.HttpFetcher;
+import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.OpenID4JavaUtils;
@@ -91,6 +96,7 @@ public class YadisResolver
      * Defalut 10.
      */
     private int _maxRedirects = 10;
+    private final HttpFetcher _httpFetcher;
 
     /**
      * Gets the internal limit configured for the maximum number of redirects
@@ -109,13 +115,16 @@ public class YadisResolver
         this._maxRedirects = maxRedirects;
     }
 
-    /**
-     * Instantiates a YadisResolver with default values for the internal
-     * parameters.
-     */
-    public YadisResolver()
+    @Inject
+    public YadisResolver(HttpFetcherFactory httpFetcherFactory)
     {
+        this(httpFetcherFactory.createFetcher(
+            HttpRequestOptions.getDefaultOptionsForDiscovery()));
+    }
 
+    public YadisResolver(HttpFetcher httpFetcher)
+    {
+        _httpFetcher = httpFetcher;
     }
 
     /**
@@ -127,7 +136,7 @@ public class YadisResolver
      */
     public List discoverRP(String url) throws DiscoveryException
     {
-        return discover(url, 0, new HttpCache(),
+        return discover(url, 0,
             Collections.singleton(DiscoveryInformation.OPENID2_RP))
             .getDiscoveredInformation(Collections.singleton(DiscoveryInformation.OPENID2_RP));
     }
@@ -151,9 +160,8 @@ public class YadisResolver
      */
     public List discover(String url) throws DiscoveryException
     {
-        return discover(url, _maxRedirects, new HttpCache() );
+        return discover(url, _maxRedirects, _httpFetcher);
     }
-
 
     /**
      * Performs Yadis discovery on the YadisURL.
@@ -168,14 +176,14 @@ public class YadisResolver
      * #_maxRedirects member field.
      *
      * @param url           YadisURL on which discovery will be performed
-     * @param cache         HttpCache object for optimizing HTTP requests.
+     * @param httpFetcher   {@link HttpFetcher} object to use for the call
      * @return              List of DiscoveryInformation entries discovered
      *                      obtained from the URL Identifier.
      * @see YadisResult #discover(String, int, HttpCache)
      */
-    public List discover(String url, HttpCache cache) throws DiscoveryException
+    public List discover(String url, HttpFetcher httpFetcher) throws DiscoveryException
     {
-        return discover(url, _maxRedirects, cache);
+        return discover(url, _maxRedirects, httpFetcher);
     }
 
     /**
@@ -189,51 +197,60 @@ public class YadisResolver
      *
      * @param url           YadisURL on which discovery will be performed
      * @param maxRedirects  The maximum number of redirects to be followed.
-     * @return              List of DiscoveryInformation entries discovered
-     *                      obtained from the URL Identifier.
-     * @see YadisResult #discover(String, int, HttpCache)
-     */
-    public List discover(String url, int maxRedirects) throws DiscoveryException
-    {
-        return discover(url, maxRedirects, new HttpCache());
-    }
-
-    /**
-     * Performs Yadis discovery on the YadisURL.
-     * <p>
-     * <ul>
-     * <li> tries to retrieve the XRDS location via a HEAD call on the Yadis URL
-     * <li> retrieves the XRDS document with a GET on the above if available,
-     *      or through a GET on the YadisURL otherwise
-     * </ul>
-     *
-     * @param url           YadisURL on which discovery will be performed
-     * @param maxRedirects  The maximum number of redirects to be followed.
-     * @param cache         HttpCache object for optimizing HTTP requests.
      * @return              List of DiscoveryInformation entries discovered
      *                      obtained from the URL Identifier.
      * @see YadisResult
      */
-    public List discover(String url, int maxRedirects, HttpCache cache)
+    public List discover(String url, int maxRedirects)
         throws DiscoveryException
     {
-        return discover(url, maxRedirects, cache, DiscoveryInformation.OPENID_OP_TYPES)
+      return discover(url, maxRedirects, _httpFetcher);
+    }
+
+      /**
+     * Performs Yadis discovery on the YadisURL.
+     * <p>
+     * <ul>
+     * <li> tries to retrieve the XRDS location via a HEAD call on the Yadis URL
+     * <li> retrieves the XRDS document with a GET on the above if available,
+     *      or through a GET on the YadisURL otherwise
+     * </ul>
+     *
+     * @param url           YadisURL on which discovery will be performed
+     * @param maxRedirects  The maximum number of redirects to be followed.
+     * @param httpFetcher   {@link HttpFetcher} object to use for the call.
+     * @return              List of DiscoveryInformation entries discovered
+     *                      obtained from the URL Identifier.
+     * @see YadisResult
+     */
+    public List discover(String url, int maxRedirects, HttpFetcher httpFetcher)
+        throws DiscoveryException
+    {
+        return discover(url, maxRedirects, httpFetcher, DiscoveryInformation.OPENID_OP_TYPES)
             .getDiscoveredInformation(DiscoveryInformation.OPENID_OP_TYPES);
     }
 
-    public YadisResult discover(String url, int maxRedirects, HttpCache cache, Set serviceTypes) throws DiscoveryException {
+    public YadisResult discover(String url, int maxRedirects, Set serviceTypes)
+        throws DiscoveryException
+    {
+      return discover(url, maxRedirects, _httpFetcher, serviceTypes);
+    }
+
+    public YadisResult discover(String url, int maxRedirects, HttpFetcher httpFetcher, Set serviceTypes)
+        throws DiscoveryException
+    {
         YadisUrl yadisUrl = new YadisUrl(url);
 
         // try to retrieve the Yadis Descriptor URL with a HEAD call first
-        YadisResult result = retrieveXrdsLocation(yadisUrl, false, cache, maxRedirects, serviceTypes);
+        YadisResult result = retrieveXrdsLocation(yadisUrl, false, maxRedirects, serviceTypes);
 
         // try GET
         if (result.getXrdsLocation() == null)
-            result = retrieveXrdsLocation(yadisUrl, true, cache, maxRedirects, serviceTypes);
+            result = retrieveXrdsLocation(yadisUrl, true, maxRedirects, serviceTypes);
 
         if (result.getXrdsLocation() != null)
         {
-            retrieveXrdsDocument(result, cache, maxRedirects, serviceTypes);
+            retrieveXrdsDocument(result, maxRedirects, serviceTypes);
         }
         else if (result.hasEndpoints())
         {
@@ -254,13 +271,13 @@ public class YadisResolver
      * @param cache        The HttpClient object to use for placing the call
      * @param maxRedirects
      */
-    private void retrieveXrdsDocument(YadisResult result, HttpCache cache, int maxRedirects, Set serviceTypes)
+    private void retrieveXrdsDocument(YadisResult result, int maxRedirects, Set serviceTypes)
         throws DiscoveryException {
 
-        cache.getRequestOptions().setMaxRedirects(maxRedirects);
+        _httpFetcher.getRequestOptions().setMaxRedirects(maxRedirects);
 
         try {
-            HttpResponse resp = cache.get(result.getXrdsLocation().toString());
+            HttpResponse resp = _httpFetcher.get(result.getXrdsLocation().toString());
 
             if (resp == null || HttpStatus.SC_OK != resp.getStatusCode())
                 throw new YadisException("GET failed on " + result.getXrdsLocation(),
@@ -275,7 +292,7 @@ public class YadisResolver
 
             if (resp.isBodySizeExceeded())
                 throw new YadisException(
-                    "More than " + cache.getRequestOptions().getMaxBodySize() +
+                    "More than " + _httpFetcher.getRequestOptions().getMaxBodySize() +
                     " bytes in HTTP response body from " + result.getXrdsLocation(),
                     OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
             result.setEndpoints(XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
@@ -339,7 +356,7 @@ public class YadisResolver
      */
 
     private YadisResult retrieveXrdsLocation(
-        YadisUrl url, boolean useGet, HttpCache cache, int maxRedirects, Set serviceTypes)
+        YadisUrl url, boolean useGet, int maxRedirects, Set serviceTypes)
         throws DiscoveryException
     {
         try
@@ -351,14 +368,14 @@ public class YadisResolver
                 "Performing HTTP " + (useGet ? "GET" : "HEAD") +
                 " on: " + url + " ...");
 
-            HttpRequestOptions requestOptions = cache.getRequestOptions();
+            HttpRequestOptions requestOptions = _httpFetcher.getRequestOptions();
             requestOptions.setMaxRedirects(maxRedirects);
             if (useGet)
                 requestOptions.addRequestHeader("Accept", YADIS_ACCEPT_HEADER);
 
             HttpResponse resp = useGet ?
-                cache.get(url.getUrl().toString(), requestOptions) :
-                cache.head(url.getUrl().toString(), requestOptions);
+                _httpFetcher.get(url.getUrl().toString(), requestOptions) :
+                _httpFetcher.head(url.getUrl().toString(), requestOptions);
 
             Header[] locationHeaders = resp.getResponseHeaders(YADIS_XRDS_LOCATION);
             Header contentType = resp.getResponseHeader("content-type");
@@ -368,14 +385,13 @@ public class YadisResolver
                 // won't be able to recover from a GET error, throw
                 if (useGet)
                     throw new YadisException("GET failed on " + url + " : " +
-                        resp.getStatusCode() + ":" + resp.getStatusLine(),
-                        OpenIDException.YADIS_GET_ERROR);
+                        resp.getStatusCode(), OpenIDException.YADIS_GET_ERROR);
 
                 // HEAD is optional, will fall-back to GET
                 if (DEBUG)
                     _log.debug("Cannot retrieve " + YADIS_XRDS_LOCATION +
                         " using HEAD from " + url.getUrl().toString() +
-                        "; status=" + resp.getStatusLine());
+                        "; status=" + resp.getStatusCode());
             }
             else if ((locationHeaders != null && locationHeaders.length > 1))
             {
@@ -426,5 +442,11 @@ public class YadisResolver
             throw new YadisException("I/O transport error: ",
                     OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
         }
+    }
+
+    /* visible for testing */
+    public HttpFetcher getHttpFetcher()
+    {
+        return _httpFetcher;
     }
 }

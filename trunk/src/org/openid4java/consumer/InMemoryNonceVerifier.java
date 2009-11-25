@@ -20,6 +20,10 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
 
     private Map _opMap = new HashMap();
 
+    public InMemoryNonceVerifier() {
+      this(60);
+    }
+
     public InMemoryNonceVerifier(int maxAge)
     {
         super(maxAge);

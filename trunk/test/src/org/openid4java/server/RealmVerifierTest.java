@@ -5,21 +5,23 @@
 package org.openid4java.server;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-import java.io.InputStream;
-import java.io.IOException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.openid4java.discovery.yadis.YadisResolver;
+import org.openid4java.util.HttpFetcherFactory;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-
-import org.jdom.input.SAXBuilder;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.Element;
 
 import javax.servlet.ServletException;
 
@@ -61,7 +63,7 @@ public class RealmVerifierTest extends TestCase
 
     public void setUp() throws Exception
     {
-        _realmVerifier = new RealmVerifier(false);
+        _realmVerifier = new RealmVerifier(false, new YadisResolver(new HttpFetcherFactory()));
     }
 
     public void testXmlFile() throws IOException, JDOMException

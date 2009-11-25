@@ -4,6 +4,7 @@
 
 package org.openid4java.discovery.html;
 
+import com.google.inject.Inject;
 import org.apache.http.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +17,8 @@ import org.openid4java.discovery.UrlIdentifier;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.util.HttpCache;
+import org.openid4java.util.HttpFetcher;
+import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.OpenID4JavaUtils;
@@ -32,6 +35,8 @@ public class HtmlResolver
     private static final String HTML_PARSER_CLASS_NAME_KEY = "discovery.html.parser";
     private static final HtmlParser HTML_PARSER;
 
+    private final HttpFetcher _httpFetcher;
+
     static {
         String className = OpenID4JavaUtils.getProperty(HTML_PARSER_CLASS_NAME_KEY);
         if (DEBUG) _log.debug(HTML_PARSER_CLASS_NAME_KEY + ":" + className);
@@ -43,6 +48,13 @@ public class HtmlResolver
         {
             throw new RuntimeException(e);
         }
+    }
+
+    @Inject
+    public HtmlResolver(HttpFetcherFactory httpFetcherFactory)
+    {
+        _httpFetcher = httpFetcherFactory.createFetcher(
+            HttpRequestOptions.getDefaultOptionsForDiscovery());
     }
 
     /**
@@ -73,35 +85,32 @@ public class HtmlResolver
      * @param identifier        The URL identifier.
      * @return                  List of DiscoveryInformation entries discovered
      *                          obtained from the URL Identifier.
-     *
-     * @see #discover(UrlIdentifier, HttpCache)
      */
     public List discoverHtml(UrlIdentifier identifier)
-        throws DiscoveryException
-    {
-        return discoverHtml(identifier, new HttpCache());
+        throws DiscoveryException {
+      return discoverHtml(identifier, _httpFetcher);
     }
 
     /**
      * Performs HTML discovery on the supplied URL identifier.
      *
      * @param identifier        The URL identifier.
-     * @param cache             HttpClient object to use for placing the call
+     * @param httpFetcher       {@link HttpFetcher} object to use for placing the call.
      * @return                  List of DiscoveryInformation entries discovered
      *                          obtained from the URL Identifier.
      */
-    public List discoverHtml(UrlIdentifier identifier, HttpCache cache)
-            throws DiscoveryException
+    public List discoverHtml(UrlIdentifier identifier, HttpFetcher httpFetcher)
+        throws DiscoveryException
     {
         // initialize the results of the HTML discovery
         HtmlResult result = new HtmlResult();
 
-        HttpRequestOptions requestOptions = cache.getRequestOptions();
+        HttpRequestOptions requestOptions = httpFetcher.getRequestOptions();
         requestOptions.setContentType("text/html");
 
         try
         {
-            HttpResponse resp = cache.get(identifier.toString(), requestOptions);
+            HttpResponse resp = httpFetcher.get(identifier.toString(), requestOptions);
 
             if (HttpStatus.SC_OK != resp.getStatusCode())
                 throw new DiscoveryException( "GET failed on " +
