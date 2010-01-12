@@ -779,11 +779,19 @@ public class ServerManager
                             isVersion2 ? _nonceGenerator.next() : null,
                             invalidateHandle, assoc, false);
 
-                MessageExtension mExt = authReq.getExtension(
-                    "http://openid.net/srv/ax/1.0");
-                ParameterList pl = new ParameterList(mExt.getParameters());
+                try
+                {
+                    MessageExtension mExt = authReq.getExtension(
+                        "http://openid.net/srv/ax/1.0");
+                    ParameterList pl = new ParameterList(mExt.getParameters());
 
-                this._attrProviderDriver.addAttributesToResponse(response, id, pl);
+                    this._attrProviderDriver.addAttributesToResponse(response, id, pl);
+                }
+                catch(MessageException me)
+                {
+                    // the case when the attribute exchange mode is
+                    // null and no attrs are being exchanged
+                }
 
                 if (_signFields != null)
                     response.setSignFields(_signFields);
