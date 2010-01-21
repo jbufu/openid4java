@@ -202,16 +202,17 @@ public class ParameterList implements Serializable
         StringTokenizer tokenizer = new StringTokenizer(keyValueForm, "\n");
         while (tokenizer.hasMoreTokens())
         {
-            String keyValue = tokenizer.nextToken();
+            String keyValue = tokenizer.nextToken().trim();
             int posColon = keyValue.indexOf(':');
 
-            if (posColon == -1)
-                throw new MessageException("Invalid Key-Value form, colon missing: " + keyValue);
-
-            String key   = keyValue.substring(0, posColon);
-            String value = keyValue.substring(posColon + 1);
-
-            parameterList.set(new Parameter(key, value));
+            //if (posColon == -1)
+            //    throw new MessageException("Invalid Key-Value form, colon missing: " + keyValue);
+            if (posColon != -1) {
+            	String key   = keyValue.substring(0, posColon);
+            	String value = keyValue.substring(posColon + 1);
+            	parameterList.set(new Parameter(key, value));
+            }
+            
         }
 
         return parameterList;
