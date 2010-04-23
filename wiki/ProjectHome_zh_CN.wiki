@@ -52,7 +52,7 @@ mvn jetty:run
 你也可以从源码库中[http://code.google.com/p/openid4java/source 取出代码]然后自己[BuildFromSource 编译]。
 =参见=
 
-[Requirements?wl=zh-Hans 必需环境]
+[Requirements 必需环境]
 
 [Installation 安装]
 
