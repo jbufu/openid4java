@@ -5,7 +5,9 @@ package org.openid4java.samples.consumerservlet;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -14,6 +16,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
@@ -26,9 +30,11 @@ import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthRequest;
 import org.openid4java.message.AuthSuccess;
+import org.openid4java.message.MessageException;
 import org.openid4java.message.MessageExtension;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
+import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
@@ -139,26 +145,11 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			// obtain a AuthRequest message to be sent to the OpenID provider
 			AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
 
-			// Attribute Exchange example: fetching the 'email' attribute
-			// FetchRequest fetch = FetchRequest.createFetchRequest();
-			SRegRequest sregReq = SRegRequest.createFetchRequest();
+			// Simple registration example
+			addSimpleRegistrationToAuthRequest(httpReq, authReq);
 
-			String[] attributes = { "nickname", "email", "fullname", "dob",
-					"gender", "postcode", "country", "language", "timezone" };
-			for (int i = 0, l = attributes.length; i < l; i++) {
-				String attribute = attributes[i];
-				String value = httpReq.getParameter(attribute);
-				if (OPTIONAL_VALUE.equals(value)) {
-					sregReq.addAttribute(attribute, false);
-				} else if (REQUIRED_VALUE.equals(value)) {
-					sregReq.addAttribute(attribute, true);
-				}
-			}
-
-			// attach the extension to the authentication request
-			if (!sregReq.getAttributes().isEmpty()) {
-				authReq.addExtension(sregReq);
-			}
+			// Attribute exchange example
+			addAttributeExchangeToAuthRequest(httpReq, authReq);
 
 			if (!discovered.isVersion2()) {
 				// Option 1: GET HTTP-redirect to the OpenID Provider endpoint
@@ -183,6 +174,66 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Simple Registration Extension example.
+	 * 
+	 * @param httpReq
+	 * @param authReq
+	 * @throws MessageException
+	 * @see <a href="http://code.google.com/p/openid4java/wiki/SRegHowTo">Simple Registration HowTo</a>
+	 * @see <a href="http://openid.net/specs/openid-simple-registration-extension-1_0.html">OpenID Simple Registration Extension 1.0</a>
+	 */
+	private void addSimpleRegistrationToAuthRequest(HttpServletRequest httpReq,
+			AuthRequest authReq) throws MessageException {
+		// Attribute Exchange example: fetching the 'email' attribute
+		// FetchRequest fetch = FetchRequest.createFetchRequest();
+		SRegRequest sregReq = SRegRequest.createFetchRequest();
+
+		String[] attributes = { "nickname", "email", "fullname", "dob",
+				"gender", "postcode", "country", "language", "timezone" };
+		for (int i = 0, l = attributes.length; i < l; i++) {
+			String attribute = attributes[i];
+			String value = httpReq.getParameter(attribute);
+			if (OPTIONAL_VALUE.equals(value)) {
+				sregReq.addAttribute(attribute, false);
+			} else if (REQUIRED_VALUE.equals(value)) {
+				sregReq.addAttribute(attribute, true);
+			}
+		}
+
+		// attach the extension to the authentication request
+		if (!sregReq.getAttributes().isEmpty()) {
+			authReq.addExtension(sregReq);
+		}
+	}
+
+	/**
+	 * Attribute exchange example.
+	 * 
+	 * @param httpReq
+	 * @param authReq
+	 * @throws MessageException
+	 * @see <a href="http://code.google.com/p/openid4java/wiki/AttributeExchangeHowTo">Attribute Exchange HowTo</a>
+	 * @see <a href="http://openid.net/specs/openid-attribute-exchange-1_0.html">OpenID Attribute Exchange 1.0 - Final</a>
+	 */
+	private void addAttributeExchangeToAuthRequest(HttpServletRequest httpReq,
+			AuthRequest authReq) throws MessageException {
+		String[] aliases = httpReq.getParameterValues("alias");
+		String[] typeUris = httpReq.getParameterValues("typeUri");
+		String[] counts = httpReq.getParameterValues("count");
+		FetchRequest fetch = FetchRequest.createFetchRequest();
+		for (int i = 0, l = typeUris == null ? 0 : typeUris.length; i < l; i++) {
+			String typeUri = typeUris[i];
+			if (StringUtils.isNotBlank(typeUri)) {
+				String alias = aliases[i];
+				boolean required = httpReq.getParameter("required" + i) != null;
+				int count = NumberUtils.toInt(counts[i], 1);
+				fetch.addAttribute(alias, typeUri, required, count);
+			}
+		}
+		authReq.addExtension(fetch);
 	}
 
 	// --- processing the authentication response ---
@@ -216,36 +267,9 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 				AuthSuccess authSuccess = (AuthSuccess) verification
 						.getAuthResponse();
 
-				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
-					MessageExtension ext = authSuccess
-							.getExtension(SRegMessage.OPENID_NS_SREG);
-					if (ext instanceof SRegResponse) {
-						SRegResponse sregResp = (SRegResponse) ext;
-						for (Iterator iter = sregResp.getAttributeNames()
-								.iterator(); iter.hasNext();) {
-							String name = (String) iter.next();
-							String value = sregResp.getParameterValue(name);
-							httpReq.setAttribute(name, value);
-						}
-					}
-				}
-				if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
-					FetchResponse fetchResp = (FetchResponse) authSuccess
-							.getExtension(AxMessage.OPENID_NS_AX);
+				receiveSimpleRegistration(httpReq, authSuccess);
 
-					// List emails = fetchResp.getAttributeValues("email");
-					// String email = (String) emails.get(0);
-
-					List aliases = fetchResp.getAttributeAliases();
-					for (Iterator iter = aliases.iterator(); iter.hasNext();) {
-						String alias = (String) iter.next();
-						List values = fetchResp.getAttributeValues(alias);
-						if (values.size() > 0) {
-							LOG.debug(alias + " : " + values.get(0));
-							httpReq.setAttribute(alias, values.get(0));
-						}
-					}
-				}
+				receiveAttributeExchange(httpReq, authSuccess);
 
 				return verified; // success
 			}
@@ -255,6 +279,57 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @param httpReq
+	 * @param authSuccess
+	 * @throws MessageException 
+	 */
+	private void receiveSimpleRegistration(HttpServletRequest httpReq,
+			AuthSuccess authSuccess) throws MessageException {
+		if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
+			MessageExtension ext = authSuccess
+					.getExtension(SRegMessage.OPENID_NS_SREG);
+			if (ext instanceof SRegResponse) {
+				SRegResponse sregResp = (SRegResponse) ext;
+				for (Iterator iter = sregResp.getAttributeNames()
+						.iterator(); iter.hasNext();) {
+					String name = (String) iter.next();
+					String value = sregResp.getParameterValue(name);
+					httpReq.setAttribute(name, value);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param httpReq
+	 * @param authSuccess
+	 * @throws MessageException 
+	 */
+	private void receiveAttributeExchange(HttpServletRequest httpReq,
+			AuthSuccess authSuccess) throws MessageException {
+		if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
+			FetchResponse fetchResp = (FetchResponse) authSuccess
+					.getExtension(AxMessage.OPENID_NS_AX);
+
+			// List emails = fetchResp.getAttributeValues("email");
+			// String email = (String) emails.get(0);
+
+			List aliases = fetchResp.getAttributeAliases();
+			Map<String, String> attributes = new LinkedHashMap<String, String>();
+			for (Iterator iter = aliases.iterator(); iter.hasNext();) {
+				String alias = (String) iter.next();
+				List values = fetchResp.getAttributeValues(alias);
+				if (values.size() > 0) {
+					String[] arr = new String[values.size()];
+					values.toArray(arr);
+					attributes.put(alias, StringUtils.join(arr));
+				}
+			}
+			httpReq.setAttribute("attributes", attributes);
+		}
 	}
 
 	/**
