@@ -276,7 +276,27 @@ public class Association implements Serializable
     public boolean verifySignature(String text, String signature) throws AssociationException
     {
         if (DEBUG) _log.debug("Verifying signature: " + signature);
+        // The Java String.equals() method returns on the first difference in
+        // its inputs, which allows a timing attack to recover signature values.
+        // This verification method will take the same amount of time for any
+        // two inputs of equal length.
+        try {
+            byte[] sigBytes = signature.getBytes("utf-8");
+            byte[] textSigBytes = sign(text).getBytes("utf-8");
+            if (sigBytes.length == 0 ||
+                sigBytes.length != textSigBytes.length) {
+                return false;
+            }
 
-        return signature.equals(sign(text));
+            int result = 0;
+            for (int i = 0; i < sigBytes.length; i++) {
+                result |= sigBytes[i] ^ textSigBytes[i];
+            }
+            return result == 0;
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new AssociationException("Unsupported encoding for signed text.", e);
+        }
     }
 }
