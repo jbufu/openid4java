@@ -280,23 +280,15 @@ public class Association implements Serializable
         // its inputs, which allows a timing attack to recover signature values.
         // This verification method will take the same amount of time for any
         // two inputs of equal length.
-        try {
-            byte[] sigBytes = signature.getBytes("utf-8");
-            byte[] textSigBytes = sign(text).getBytes("utf-8");
-            if (sigBytes.length == 0 ||
-                sigBytes.length != textSigBytes.length) {
-                return false;
-            }
+        String textSig = sign(text);
+        if (textSig.length() == 0 || textSig.length() != signature.length()) {
+          return false;
+        }
 
-            int result = 0;
-            for (int i = 0; i < sigBytes.length; i++) {
-                result |= sigBytes[i] ^ textSigBytes[i];
-            }
-            return result == 0;
+        int result = 0;
+        for (int i = 0; i < textSig.length(); i++) {
+          result |= textSig.charAt(i) ^ signature.charAt(i);
         }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new AssociationException("Unsupported encoding for signed text.", e);
-        }
+        return result == 0;
     }
 }
