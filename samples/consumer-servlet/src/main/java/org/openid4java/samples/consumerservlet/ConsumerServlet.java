@@ -318,7 +318,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			// String email = (String) emails.get(0);
 
 			List aliases = fetchResp.getAttributeAliases();
-			Map<String, String> attributes = new LinkedHashMap<String, String>();
+			Map attributes = new LinkedHashMap();
 			for (Iterator iter = aliases.iterator(); iter.hasNext();) {
 				String alias = (String) iter.next();
 				List values = fetchResp.getAttributeValues(alias);
