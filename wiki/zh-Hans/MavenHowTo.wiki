@@ -3,9 +3,9 @@
 在你的项目的 pom.xml 的 dependencies 节点下增加如下依赖关系：
 {{{
 <dependency>
-  <groupId>org.openid4java</groupId>
-  <artifactId>openid4java</artifactId>
-  <version>0.9.5</version>
+	<groupId>org.openid4java</groupId>
+	<artifactId>openid4java</artifactId>
+	<version>0.9.5</version>
 </dependency>
 }}}
 其中的 0.9.5 请替换成你需要的版本。
@@ -13,24 +13,24 @@
 如果你想使用 0.9.6-SNAPSHOT 版本，你可以在你的 pom.xml 中添加：
 {{{
 <project ...>
-    ...
-    <repositories>
-        <repository>
-            <id>openid4java snapshots repository</id>
-            <name>openid4java snapshots repository</name>
-            <url>https://oss.sonatype.org/content/repositories/openid4java-snapshots/</url>
-            <snapshots />
-        </repository>
-    </repositories>
-    ...
-    <dependency>
-        <groupId>org.openid4java</groupId>
-        <artifactId>openid4java-consumer</artifactId>
-        <!--artifactId>openid4java-server</artifactId-->
-        <!--artifactId>openid4java-infocard</artifactId-->
-        <!--artifactId>openid4java</artifactId-->
-        <version>0.9.6-SNAPSHOT</version>
-    </dependency>
-    ...
+	...
+	<repositories>
+		<repository>
+			<id>openid4java snapshots repository</id>
+			<name>openid4java snapshots repository</name>
+			<url>https://oss.sonatype.org/content/repositories/openid4java-snapshots/</url>
+			<snapshots />
+		</repository>
+	</repositories>
+	...
+	<dependency>
+		<groupId>org.openid4java</groupId>
+		<artifactId>openid4java-consumer</artifactId>
+		<!--artifactId>openid4java-server</artifactId-->
+		<!--artifactId>openid4java-infocard</artifactId-->
+		<!--artifactId>openid4java</artifactId-->
+		<version>0.9.6-SNAPSHOT</version>
+	</dependency>
+	...
 </project>
 }}}

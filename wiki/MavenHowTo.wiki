@@ -1,19 +1,19 @@
-﻿#summary This is just for maven2 users
+#summary This is just for maven2 users
 
 Add following to your project's pom.xml in section dependencies:
 {{{
 <project ...>
-    ...
-    <dependency>
-        <groupId>org.openid4java</groupId>
-        <artifactId>openid4java-consumer</artifactId>
-        <!--artifactId>openid4java-server</artifactId-->
-        <!--artifactId>openid4java-infocard</artifactId-->
-        <!--artifactId>openid4java-xri</artifactId-->
-        <!--artifactId>openid4java</artifactId-->
-        <version>0.9.5</version>
-    </dependency>
-    ...
+	...
+	<dependency>
+		<groupId>org.openid4java</groupId>
+		<artifactId>openid4java-consumer</artifactId>
+		<!--artifactId>openid4java-server</artifactId-->
+		<!--artifactId>openid4java-infocard</artifactId-->
+		<!--artifactId>openid4java-xri</artifactId-->
+		<!--artifactId>openid4java</artifactId-->
+		<version>0.9.5</version>
+	</dependency>
+	...
 </project>
 }}}
 
