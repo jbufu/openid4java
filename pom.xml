@@ -19,10 +19,8 @@
 
   <properties>
     <encoding>UTF-8</encoding>
-    <java.src.version>1.5</java.src.version>
     <jetty.version>6.0.2</jetty.version>
-    <test.servlet.port>8989</test.servlet.port>
-    <test.data.src>${basedir}/test/yadisdata/</test.data.src>
+    <test.data.src>${test.data}</test.data.src>
     <test.data.build>${basedir}/target/test-data</test.data.build>
   </properties>
 
@@ -52,11 +50,30 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>${java.src.version}</source>
-          <target>${java.src.version}</target>
+          <source>${jvm.ver}</source>
+          <target>${jvm.ver}</target>
           <debug>true</debug>
           <optimize>true</optimize>
         </configuration>
+      </plugin>
+      <!-- http://mojo.codehaus.org/properties-maven-plugin/ -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0-alpha-2</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>project.properties</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!-- clean coverage data before collecting -->
       <plugin>
@@ -189,7 +206,7 @@
           <linkXref>true</linkXref>
           <sourceEncoding>${encoding}</sourceEncoding>
           <minimumTokens>100</minimumTokens>
-          <targetJdk>${java.src.version}</targetJdk>
+          <targetJdk>${jvm.ver}</targetJdk>
         </configuration>
         <reportSets>
           <reportSet>
