@@ -9,7 +9,7 @@
     <version>0.9.6-SNAPSHOT</version>
   </parent>
   <artifactId>openid4java-consumer-JdbcNonceVerifier</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>OpenID4Java Consumer JdbcNonceVerifier</name>
 
   <reporting>
