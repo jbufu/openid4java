@@ -1,4 +1,4 @@
-#summary This is just for maven2 users
+﻿#summary This is just for maven2 users
 
 Add following to your project's pom.xml in section dependencies:
 {{{
@@ -14,5 +14,30 @@ Add following to your project's pom.xml in section dependencies:
         <version>0.9.5</version>
     </dependency>
     ...
+</project>
+}}}
+
+If you want to try the SNAPSHOT version, add the follow to your pom.xml:
+{{{
+<project ...>
+	...
+	<repositories>
+		<repository>
+			<id>openid4java snapshots repository</id>
+			<name>openid4java snapshots repository</name>
+			<url>https://oss.sonatype.org/content/repositories/openid4java-snapshots</url>
+			<snapshots />
+		</repository>
+	</repositories>
+	...
+	<dependency>
+		<groupId>org.openid4java</groupId>
+		<artifactId>openid4java-consumer</artifactId>
+		<!--artifactId>openid4java-server</artifactId-->
+		<!--artifactId>openid4java-infocard</artifactId-->
+		<!--artifactId>openid4java</artifactId-->
+		<version>0.9.6-SNAPSHOT</version>
+	</dependency>
+	...
 </project>
 }}}
