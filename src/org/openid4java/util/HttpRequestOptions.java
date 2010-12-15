@@ -87,6 +87,18 @@ public class HttpRequestOptions
 
 
     /**
+     * If set to a positive value, then new HTTP request will be placed if
+     * the cache is older than that positive value (in seconds)
+     * This applies to the internal HttpCache, not the HTTP protocol
+     * cache-control mechanisms.
+     *
+     * @see org.openid4java.util.HttpCache
+     */
+
+    
+    private long   _cacheTTLSeconds = -1;
+
+    /**
      * Constructs a set of HTTP request options with the default values.
      */
     public HttpRequestOptions()
@@ -110,6 +122,7 @@ public class HttpRequestOptions
         this._useCache = other._useCache;
         this._contentType = other._contentType;
         this._allowCircularRedirects = other._allowCircularRedirects;
+        this._cacheTTLSeconds = other._cacheTTLSeconds;
     }
 
     /**
@@ -254,4 +267,25 @@ public class HttpRequestOptions
     {
         _allowCircularRedirects = allow;
     }
+
+    /**
+     *
+     * Gets the TTL for the cached response in seconds
+     */
+    public long getCacheTTLSeconds()
+    {
+        return _cacheTTLSeconds;
+
+    }
+    /**
+     *
+     * Sets the TTL for the cached response in seconds
+     */
+
+    public void setCacheTTLSeconds(long ttl)
+    {
+        _cacheTTLSeconds = ttl;
+
+    }
+
 }
