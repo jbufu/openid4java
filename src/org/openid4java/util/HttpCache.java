@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Date;
 
 /**
  * Wrapper cache around HttpClient providing caching for HTTP requests.
@@ -241,6 +242,23 @@ public class HttpCache extends AbstractHttpFetcher
             return false;
         }
 
+        //is cache fresh?
+        if ( resp != null && (requestOptions.getCacheTTLSeconds() >= 0))
+        {
+            long cacheTTL = requestOptions.getCacheTTLSeconds() * 1000;
+            Date now = new Date();
+            long currentTime = now.getTime();
+            long cacheExpTime = resp.getTimestamp() + cacheTTL;
+            if (cacheExpTime < currentTime)
+            {
+
+                String cacheExpTimeStr = (new Date(cacheExpTime)).toString();
+                _log.info("Cache Expired at " + cacheExpTimeStr + "; removing cached copy");
+                return false;
+        		
+    	    }
+        }
+
         // content type rules
         String requiredContentType = requestOptions.getContentType();
         if (resp != null && requiredContentType != null)
@@ -362,7 +380,13 @@ public class HttpCache extends AbstractHttpFetcher
          */
         private boolean _bodySizeExceeded = false;
 
-        // todo: add timestamp
+        /**
+         * timestamp of creation 
+         * 
+         *(number of milliseconds since January 1, 1970, 00:00:00 GMT)
+         */
+        private long _timestamp;
+
 
         /**
          * Constructs a new HttpResponse with the provided parameters.
@@ -398,6 +422,8 @@ public class HttpCache extends AbstractHttpFetcher
             }
 
             _body = body;
+            Date now = new Date();
+            _timestamp = now.getTime();
         }
 
         /**
@@ -488,6 +514,13 @@ public class HttpCache extends AbstractHttpFetcher
         {
             this._bodySizeExceeded = bodySizeExceeded;
         }
+
+        public long getTimestamp()
+        {
+
+            return _timestamp;
+        }
+
     }
 
     private static class ResponseBody {
