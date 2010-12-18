@@ -341,7 +341,7 @@ public class YadisResolverTest extends TestCase
                 _servletPort + "/?html=empty");
 
             fail("Should have failed with error code " +
-                OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
+                OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
         }
         catch (DiscoveryException expected)
         {
