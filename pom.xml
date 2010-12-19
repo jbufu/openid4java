@@ -192,6 +192,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.6</version>
         <configuration>
           <configLocation>${basedir}/openid4java_checks.xml</configLocation>
         </configuration>
