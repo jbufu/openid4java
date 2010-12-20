@@ -11,6 +11,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.Header;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
 import java.util.Set;
@@ -27,6 +28,8 @@ import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.OpenID4JavaUtils;
+
+
 
 /**
  * Yadis discovery protocol implementation.
@@ -244,7 +247,7 @@ public class YadisResolver
         // try to retrieve the Yadis Descriptor URL with a HEAD call first
         YadisResult result = retrieveXrdsLocation(yadisUrl, false, maxRedirects, serviceTypes);
 
-        // try GET
+        // try GET 
         if (result.getXrdsLocation() == null)
             result = retrieveXrdsLocation(yadisUrl, true, maxRedirects, serviceTypes);
 
@@ -298,7 +301,7 @@ public class YadisResolver
             result.setEndpoints(XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
 
         } catch (IOException e) {
-            throw new YadisException("Fatal transport error: ",
+            throw new YadisException("Fatal transport error: " + e.getMessage(),
                     OpenIDException.YADIS_GET_TRANSPORT_ERROR, e);
         }
     }
@@ -359,89 +362,126 @@ public class YadisResolver
         YadisUrl url, boolean useGet, int maxRedirects, Set serviceTypes)
         throws DiscoveryException
     {
-        try
+
+        int maxattempts = 1;
+        
+        /*** 
+         * Need to try GET twice in some cases, because some major RPs do a redirect
+         * when Accept header is set to YADIS_ACCEPT_HEADER
+         * So, we need to retry with Accept header YADIS_CONTENT_TYPE 
+         */
+
+        if (useGet) maxattempts = 2;
+
+        YadisResult result = new YadisResult();
+       
+        for (int attempt = 1; attempt <= maxattempts; attempt++)
         {
-            YadisResult result = new YadisResult();
-            result.setYadisUrl(url);
-
-            if (DEBUG) _log.debug(
-                "Performing HTTP " + (useGet ? "GET" : "HEAD") +
-                " on: " + url + " ...");
-
-            HttpRequestOptions requestOptions = _httpFetcher.getRequestOptions();
-            requestOptions.setMaxRedirects(maxRedirects);
-            if (useGet)
-                requestOptions.addRequestHeader("Accept", YADIS_ACCEPT_HEADER);
-
-            HttpResponse resp = useGet ?
-                _httpFetcher.get(url.getUrl().toString(), requestOptions) :
-                _httpFetcher.head(url.getUrl().toString(), requestOptions);
-
-            Header[] locationHeaders = resp.getResponseHeaders(YADIS_XRDS_LOCATION);
-            Header contentType = resp.getResponseHeader("content-type");
-
-            if (HttpStatus.SC_OK != resp.getStatusCode())
+            try
             {
-                // won't be able to recover from a GET error, throw
-                if (useGet)
-                    throw new YadisException("GET failed on " + url + " : " +
-                        resp.getStatusCode(), OpenIDException.YADIS_GET_ERROR);
+                result.setYadisUrl(url);
 
-                // HEAD is optional, will fall-back to GET
-                if (DEBUG)
-                    _log.debug("Cannot retrieve " + YADIS_XRDS_LOCATION +
-                        " using HEAD from " + url.getUrl().toString() +
-                        "; status=" + resp.getStatusCode());
-            }
-            else if ((locationHeaders != null && locationHeaders.length > 1))
-            {
-                // fail if there are more than one YADIS_XRDS_LOCATION headers
-                throw new YadisException("Found " + locationHeaders.length +
-                    " " + YADIS_XRDS_LOCATION + " headers.",
-                    useGet ? OpenIDException.YADIS_GET_INVALID_RESPONSE :
-                        OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
-            }
-            else if (locationHeaders != null && locationHeaders.length > 0)
-            {
-                // we have exactly one xrds location header
-                result.setXrdsLocation(locationHeaders[0].getValue(),
-                    useGet ? OpenIDException.YADIS_GET_INVALID_RESPONSE :
-                        OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
-                result.setNormalizedUrl(resp.getFinalUri());
-            }
-            else if (contentType != null && contentType.getValue() != null &&
-                     contentType.getValue().split(";")[0].equalsIgnoreCase(YADIS_CONTENT_TYPE) &&
-                     resp.getBody() != null)
-            {
-                // no location, but got xrds document
-                result.setNormalizedUrl(resp.getFinalUri());
-                result.setContentType(contentType.getValue());
-                if (resp.isBodySizeExceeded())
-                    throw new YadisException(
-                        "More than " + requestOptions.getMaxBodySize() +
-                        " bytes in HTTP response body from " + url,
-                        OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
-                result.setEndpoints(XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
-            }
-            else if (resp.getBody() != null)
-            {
-                // fall-back to html-meta, if present
-                String xrdsLocation = getHtmlMeta(resp.getBody());
-                if (xrdsLocation != null)
-                {
-                    result.setNormalizedUrl(resp.getFinalUri());
-                    result.setXrdsLocation(xrdsLocation,
-                        OpenIDException.YADIS_GET_INVALID_RESPONSE);
+                if (DEBUG) _log.debug(
+                    "Performing HTTP " + (useGet ? "GET" : "HEAD") +
+                    " on: " + url + " ...");
+
+
+                HttpRequestOptions requestOptions = _httpFetcher.getRequestOptions();
+                requestOptions.setMaxRedirects(maxRedirects);
+               
+                if (useGet) 
+                { 
+                    if (attempt == 1)
+                        requestOptions.addRequestHeader("Accept", YADIS_ACCEPT_HEADER);
+                    else 
+                        requestOptions.addRequestHeader("Accept", YADIS_CONTENT_TYPE);
                 }
+
+                HttpResponse resp = useGet ?
+                    _httpFetcher.get(url.getUrl().toString(), requestOptions) :
+                    _httpFetcher.head(url.getUrl().toString(), requestOptions);
+
+                Header[] locationHeaders = resp.getResponseHeaders(YADIS_XRDS_LOCATION);
+                Header contentType = resp.getResponseHeader("content-type");
+
+                if (HttpStatus.SC_OK != resp.getStatusCode())
+                {
+                    // won't be able to recover from a GET error, throw
+                    if (useGet)
+                        throw new YadisException("GET failed on " + url + " : " +
+                            resp.getStatusCode(), OpenIDException.YADIS_GET_ERROR);
+
+                    // HEAD is optional, will fall-back to GET
+                    if (DEBUG)
+                        _log.debug("Cannot retrieve " + YADIS_XRDS_LOCATION +
+                            " using HEAD from " + url.getUrl().toString() +
+                            "; status=" + resp.getStatusCode());
+                }
+                else if ((locationHeaders != null && locationHeaders.length > 1))
+                {
+                    // fail if there are more than one YADIS_XRDS_LOCATION headers
+                    throw new YadisException("Found " + locationHeaders.length +
+                        " " + YADIS_XRDS_LOCATION + " headers.",
+                        useGet ? OpenIDException.YADIS_GET_INVALID_RESPONSE :
+                            OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
+                }
+                else if (locationHeaders != null && locationHeaders.length > 0)
+                {
+                    // we have exactly one xrds location header
+                    result.setXrdsLocation(locationHeaders[0].getValue(),
+                        useGet ? OpenIDException.YADIS_GET_INVALID_RESPONSE :
+                            OpenIDException.YADIS_HEAD_INVALID_RESPONSE);
+                    result.setNormalizedUrl(resp.getFinalUri());
+                }
+                else if (contentType != null && contentType.getValue() != null &&
+                         contentType.getValue().split(";")[0].equalsIgnoreCase(YADIS_CONTENT_TYPE) &&
+                         resp.getBody() != null)
+                {
+                    // no location, but got xrds document
+                    result.setNormalizedUrl(resp.getFinalUri());
+                    result.setContentType(contentType.getValue());
+                    if (resp.isBodySizeExceeded())
+                        throw new YadisException(
+                            "More than " + requestOptions.getMaxBodySize() +
+                            " bytes in HTTP response body from " + url,
+                            OpenIDException.YADIS_XRDS_SIZE_EXCEEDED);
+                    result.setEndpoints(XRDS_PARSER.parseXrds(resp.getBody(), serviceTypes));
+                }
+                else if (resp.getBody() != null)
+                {
+                    // fall-back to html-meta, if present
+                    String xrdsLocation = getHtmlMeta(resp.getBody());
+                    if (xrdsLocation != null)
+                    {
+                        result.setNormalizedUrl(resp.getFinalUri());
+                        result.setXrdsLocation(xrdsLocation,
+                            OpenIDException.YADIS_GET_INVALID_RESPONSE);
+                    }
+                }
+
+                return result;
+            }
+            catch (ClientProtocolException e)
+            {
+                if (useGet && attempt == 2)
+                    throw new YadisException("ClientProtocol error: " + e.getMessage(),
+                           OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
+                else if (useGet && attempt == 1)
+                    continue;
+
+                return result;
+
+            }
+            catch (IOException e)
+            {
+
+                throw new YadisException("I/O transport error: " + e.getMessage(),
+                        OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
             }
 
-            return result;
-        }
-        catch (IOException e)
-        {
-            throw new YadisException("I/O transport error: ",
-                    OpenIDException.YADIS_HEAD_TRANSPORT_ERROR, e);
-        }
+       } 
+
+       return result;
     }
 
     /* visible for testing */
@@ -449,4 +489,5 @@ public class YadisResolver
     {
         return _httpFetcher;
     }
+    
 }
