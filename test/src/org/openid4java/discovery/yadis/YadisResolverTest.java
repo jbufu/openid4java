@@ -280,7 +280,7 @@ public class YadisResolverTest extends TestCase
         }
     }
 
-    public void testHtmlHeadElements()
+    public void testHtmlHeadElementsNoHead()
     {
         try
         {
@@ -295,7 +295,9 @@ public class YadisResolverTest extends TestCase
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
         }
+    }
 
+    public void testHtmlHeadElementsTwoHeads() {
         try
         {
             _resolver.discover("http://localhost:" +
@@ -309,7 +311,9 @@ public class YadisResolverTest extends TestCase
             assertEquals(expected.getMessage(),
                 OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE, expected.getErrorCode());
         }
+    }
 
+    public void testHtmlHeadElementsExtraHeadInBody() {
         try
         {
             YadisResult result = _resolver.discover("http://localhost:" +_servletPort + "/?html=extraheadinbody",
