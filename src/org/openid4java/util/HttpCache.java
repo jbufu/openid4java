@@ -15,6 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.AllClientPNames;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Date;
+
+import javax.net.ssl.SSLContext;
 
 /**
  * Wrapper cache around HttpClient providing caching for HTTP requests.
@@ -56,13 +59,23 @@ public class HttpCache extends AbstractHttpFetcher
      */
     private Map _headCache = new HashMap();
 
+    public HttpCache()
+    {
+    	this(null);
+    }
+    
+    public HttpCache(SSLContext sslContext)
+    {
+    	this(sslContext, null);
+    }
+    
     /**
      * Constructs a new HttpCache object, that will be initialized with the
      * default set of HttpRequestOptions.
      *
      * @see HttpRequestOptions
      */
-    public HttpCache()
+    public HttpCache(SSLContext sslContext, X509HostnameVerifier hostnameVerifier)
     {
         super();
         _client = HttpClientFactory.getInstance(
@@ -70,7 +83,7 @@ public class HttpCache extends AbstractHttpFetcher
                 getDefaultRequestOptions().getAllowCircularRedirects(),
                 getDefaultRequestOptions().getSocketTimeout(),
                 getDefaultRequestOptions().getConnTimeout(),
-                null);
+                null, sslContext, hostnameVerifier);
     }
 
     /**
