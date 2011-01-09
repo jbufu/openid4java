@@ -7,6 +7,8 @@
  */
 package org.openid4java.util;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.HttpHost;
 import org.apache.http.client.*;
 import org.apache.http.client.params.AllClientPNames;
@@ -16,6 +18,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -67,17 +70,39 @@ public class HttpClientFactory
     }
 
     public static HttpClient getInstance(int maxRedirects,
+            Boolean allowCircularRedirects,
+            int connTimeout, int socketTimeout,
+            String cookiePolicy)
+    {
+    	return getInstance(maxRedirects, allowCircularRedirects, connTimeout, socketTimeout, cookiePolicy, null, null);
+    }
+    
+    public static HttpClient getInstance(int maxRedirects,
                                          Boolean allowCircularRedirects,
                                          int connTimeout, int socketTimeout,
-                                         String cookiePolicy)
+                                         String cookiePolicy, SSLContext sslContext,
+                                         X509HostnameVerifier hostnameVerifier)
     {
         HttpParams httpParams = new BasicHttpParams();
 
         SchemeRegistry registry = new SchemeRegistry();
 
         registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        registry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-
+        SSLSocketFactory sslSocketFactory;
+        if (null == sslContext)
+        {
+        	sslSocketFactory = SSLSocketFactory.getSocketFactory();
+        }
+        else
+        {
+        	sslSocketFactory = new SSLSocketFactory(sslContext);
+        }
+        if (null != hostnameVerifier)
+        {
+        	sslSocketFactory.setHostnameVerifier(hostnameVerifier);
+        }
+        registry.register(new Scheme("https", sslSocketFactory, 443));
+        
         ClientConnectionManager connManager;
         if (multiThreadedHttpClient)
             connManager = new ThreadSafeClientConnManager(httpParams, registry);

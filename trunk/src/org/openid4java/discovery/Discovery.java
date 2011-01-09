@@ -36,7 +36,7 @@ public class Discovery
 
     private static final String XRI_RESOLVER_CLASS_NAME_KEY = "discovery.xri.resolver";
 
-    private static XriResolver getXriResolver()
+    public static XriResolver getXriResolver()
     {
         String className = OpenID4JavaUtils.getProperty(XRI_RESOLVER_CLASS_NAME_KEY);
         if (DEBUG) _log.debug(XRI_RESOLVER_CLASS_NAME_KEY + ":" + className);
