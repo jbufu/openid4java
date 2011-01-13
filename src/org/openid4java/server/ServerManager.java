@@ -780,7 +780,7 @@ public class ServerManager
 
                     authReq.setImmediate(false);
 
-                    String separator = (_userSetupUrl.indexOf("?") >= 0) ? "&" : "?";
+                    String separator = _userSetupUrl.contains("?") ? "&" : "?";
 
                     return AuthImmediateFailure.createAuthImmediateFailure(
                         _userSetupUrl + separator + authReq.wwwFormEncoding(),
