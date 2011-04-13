@@ -19,7 +19,7 @@ The release process is documented below in order to provide for a consistent pac
   * commit changes and *svn update* (important for updating the last modification revision which is used as part of the ant package name and VERSION file inside the package)
   * test and package the artifact
    * *clean sub-projects*: ant's 'build' folders, maven's 'target' folders, etc.
-   * *ant:* trunk/: "ant clean test release" --> 4x java4java-<dist.type>-x.a.tar.gz
+   * *ant:* trunk/: "ant clean test release" --> 4x openid4java-<dist.type>-x.a.tar.gz
    * *maven:* trunk/maven2/: "mvn clean package"  --> openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar
   * if there are local changes, restart *Testing and Packaging*
  * *Tagging and Publishing*:
