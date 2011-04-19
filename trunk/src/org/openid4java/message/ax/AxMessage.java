@@ -124,13 +124,13 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     }
 
     /**
-     * Attribute exchange parameters are not REQUIRED to be signed.
+     * Attribute exchange parameters are required to be signed.
      *
-     * @return false
+     * @return true
      */
     public boolean signRequired()
     {
-        return false;
+        return true;
     }
 
     /**
