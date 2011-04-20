@@ -8,6 +8,18 @@ Please see the TODO file for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20110413:
+
+Notable changes since the previous release:
+
+HttpClient upgraded to 4.0.
+HttpClient is injectable, making Google AppEngine deployments possible.
+HttpCache supports configurable TTL.
+Attribute Exchange extension parameters are required to be signed.
+Java 1.5 for source and distributed bytecode.
+
+And a handful of bug fixes.
+
 20090614:
 
 A number of related specifications have been finalized since the previous
