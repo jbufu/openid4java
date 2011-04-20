@@ -28,7 +28,7 @@ The release process is documented below in order to provide for a consistent pac
    * *ant*: java-openid-sxip-x.a.tar.gz --> http://code.google.com/p/openid4java/downloads/list
    * *maven*: deploy to maven central repository(openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar --> maven central repository)
     * *cd maven2 && mvn clean deploy -Prelease
-    * *promote on http://oss.sonatype.org/ (https://docs.sonatype.com/display/NX/OSS+Repository+Hosting)
+    * *promote on http://oss.sonatype.org/ (http://nexus.sonatype.org/oss-repository-hosting.html)
   * announce new release
  * *Post Cleanup*:
   * *project.properties*: change/increment the version from *x.a* to *x.b-SNAPSHOT*
