@@ -1,0 +1,24 @@
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+  <application>openid4java</application>
+  <version>1</version>
+
+  <sessions-enabled>true</sessions-enabled>
+
+  <static-files>
+    <exclude path="**"/>
+  </static-files>
+
+  <resource-files>
+    <include path="**"/>
+  </resource-files>
+
+  <system-properties>
+    <property name="java.util.logging.config.file"
+              value="WEB-INF/logging.properties" />
+    <property name="org.apache.commons.logging.Log"
+              value="org.apache.commons.logging.impl.Jdk14Logger"/>
+    <property name="org.apache.commons.logging.LogFactory"
+              value="org.apache.commons.logging.impl.LogFactoryImpl"/>
+  </system-properties>
+
+</appengine-web-app>

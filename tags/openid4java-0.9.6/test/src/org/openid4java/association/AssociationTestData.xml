@@ -1,0 +1,19 @@
+<testSuite>
+
+    <test assoc_type="HMAC-SHA1"
+        mac_key="NxaHoi3V2kb8D6zkHlyOu+6+kdU="
+        sig="SpL3p1sXu5OLpR2dFau95j+0DrA=">
+        <text>key1:value1
+key2:value2
+</text>
+    </test>
+
+    <test assoc_type="HMAC-SHA256"
+        mac_key="uNCwqNe2y94cgds3+zgnyVXvjDB0UbHNwwD0b+EJb6o="
+        sig="kTbyQ0SQ6Mkp+94WyU4txVc6DxK69SeS7gS79bz1O84=">
+        <text>key1:value1
+key2:value2
+</text>
+    </test>
+
+</testSuite>
