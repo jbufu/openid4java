@@ -29,15 +29,21 @@
 		</repository>
 	</repositories>
 	...
-	<dependency>
-		<groupId>org.openid4java</groupId>
-		<artifactId>openid4java-consumer</artifactId>
-		<!--artifactId>openid4java-server</artifactId-->
-		<!--artifactId>openid4java-infocard</artifactId-->
-		<!--artifactId>openid4java</artifactId-->
-		<version>0.9.7-SNAPSHOT</version>
-		<type>pom</type>
-	</dependency>
+	<dependencies>
+		...
+		<dependency>
+			<groupId>org.openid4java</groupId>
+			<artifactId>openid4java-consumer</artifactId>
+			<!--artifactId>openid4java-server</artifactId-->
+			<!--artifactId>openid4java-infocard</artifactId-->
+			<!--artifactId>openid4java-xri</artifactId-->
+			<!--artifactId>openid4java</artifactId-->
+			<!--artifactId>openid4java-full</artifactId-->
+			<version>0.9.7-SNAPSHOT</version>
+			<type>pom</type>
+		</dependency>
+		...
+	<dependencies>
 	...
 </project>
 }}}
