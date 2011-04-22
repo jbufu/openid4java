@@ -4,14 +4,19 @@
 {{{
 <dependency>
 	<groupId>org.openid4java</groupId>
-	<artifactId>openid4java</artifactId>
-	<version>0.9.5</version>
+	<artifactId>openid4java-consumer</artifactId>
+	<!--artifactId>openid4java-server</artifactId-->
+	<!--artifactId>openid4java-infocard</artifactId-->
+	<!--artifactId>openid4java-xri</artifactId-->
+	<!--artifactId>openid4java</artifactId-->
+	<!--artifactId>openid4java-full</artifactId-->
+	<version>0.9.6</version>
 	<type>pom</type>
 </dependency>
 }}}
-其中的 0.9.5 请替换成你需要的版本。
+其中的 0.9.6 请替换成你需要的版本。
 
-如果你想使用 0.9.6-SNAPSHOT 版本，你可以在你的 pom.xml 中添加：
+如果你想使用 0.9.7-SNAPSHOT 版本，你可以在你的 pom.xml 中添加：
 {{{
 <project ...>
 	...

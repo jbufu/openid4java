@@ -2,20 +2,17 @@
 
 Add following to your project's pom.xml in section dependencies:
 {{{
-<project ...>
-	...
-	<dependency>
-		<groupId>org.openid4java</groupId>
-		<artifactId>openid4java-consumer</artifactId>
-		<!--artifactId>openid4java-server</artifactId-->
-		<!--artifactId>openid4java-infocard</artifactId-->
-		<!--artifactId>openid4java-xri</artifactId-->
-		<!--artifactId>openid4java</artifactId-->
-		<version>0.9.6</version>
-		<type>pom</type>
-	</dependency>
-	...
-</project>
+<dependency>
+	<groupId>org.openid4java</groupId>
+	<artifactId>openid4java-consumer</artifactId>
+	<!--artifactId>openid4java-server</artifactId-->
+	<!--artifactId>openid4java-infocard</artifactId-->
+	<!--artifactId>openid4java-xri</artifactId-->
+	<!--artifactId>openid4java</artifactId-->
+	<!--artifactId>openid4java-full</artifactId-->
+	<version>0.9.6</version>
+	<type>pom</type>
+</dependency>
 }}}
 
 If you want to try the SNAPSHOT version, add the follow to your pom.xml:
@@ -31,15 +28,19 @@ If you want to try the SNAPSHOT version, add the follow to your pom.xml:
 		</repository>
 	</repositories>
 	...
-	<dependency>
-		<groupId>org.openid4java</groupId>
-		<artifactId>openid4java-consumer</artifactId>
-		<!--artifactId>openid4java-server</artifactId-->
-		<!--artifactId>openid4java-infocard</artifactId-->
-		<!--artifactId>openid4java</artifactId-->
-		<version>0.9.7-SNAPSHOT</version>
-		<type>pom</type>
-	</dependency>
+	<dependencies>
+		...
+		<dependency>
+			<groupId>org.openid4java</groupId>
+			<artifactId>openid4java-consumer</artifactId>
+			<!--artifactId>openid4java-server</artifactId-->
+			<!--artifactId>openid4java-infocard</artifactId-->
+			<!--artifactId>openid4java</artifactId-->
+			<version>0.9.7-SNAPSHOT</version>
+			<type>pom</type>
+		</dependency>
+		...
+	</dependencies>
 	...
 </project>
 }}}
