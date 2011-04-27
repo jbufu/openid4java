@@ -276,7 +276,7 @@
         <replaceregexp byline="false">
             <regexp pattern="&lt;artifactId>openid4java-parent&lt;/artifactId>(\s*)&lt;version>([^&lt;]*)&lt;/version>"/>
             <substitution expression="&lt;artifactId>openid4java-parent&lt;/artifactId>\1&lt;version>${component.ver}&lt;/version>"/>
-            <fileset dir="maven2" includes="**/pom.xml"/>
+            <fileset dir="." includes="**/pom.xml"/>
        </replaceregexp>
     </target>
 </project>
