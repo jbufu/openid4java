@@ -1,4 +1,4 @@
-#summary 如何安装本开发包
+﻿#summary 如何安装本开发包
 #labels Phase-Deploy
 
 = 安装 OpenID4Java 开发包 =
@@ -18,4 +18,4 @@ CATALINA_HOME/common/endorsed
 
   * 复制 lib/`*`.jar 和 java-openid-sxip-`*`.jar 到你的应用程序的 Java classpath 下。
 
-_[http://maven.apache.org/ maven2] 用户： [MavenHowTo_zh_CN]_
+_[http://maven.apache.org/ maven2] 用户： [MavenHowTo]_
