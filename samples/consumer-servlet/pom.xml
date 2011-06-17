@@ -62,6 +62,7 @@
       <groupId>org.openid4java</groupId>
       <artifactId>openid4java-consumer</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
   </dependencies>
 </project>
