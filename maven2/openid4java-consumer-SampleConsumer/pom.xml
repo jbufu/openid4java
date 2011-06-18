@@ -36,6 +36,7 @@
       <groupId>${groupId}</groupId>
       <artifactId>openid4java-consumer</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

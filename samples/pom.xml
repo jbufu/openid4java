@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.openid4java</groupId>
+    <artifactId>openid4java-parent</artifactId>
+    <version>0.9.7-SNAPSHOT</version>
+    <relativePath>../maven2/pom.xml</relativePath>
+  </parent>
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-samples</artifactId>
   <packaging>pom</packaging>
-  <version>0.9.6</version>
+  <version>0.9.7-SNAPSHOT</version>
   <name>OpenID4Java Samples</name>
   <modules>
     <module>simple-openid</module>
@@ -24,4 +30,20 @@
       </plugin>
     </plugins>
   </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.openid4java</groupId>
+        <artifactId>openid4java</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.openid4java</groupId>
+        <artifactId>openid4java-consumer</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>

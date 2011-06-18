@@ -21,32 +21,38 @@
       <groupId>${groupId}</groupId>
       <artifactId>openid4java</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>openid4java-infocard</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>openid4java-xri</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>openid4java-server-JdbcServerAssociationStore</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
 
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>openid4java-consumer-SampleConsumer</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>openid4java-server-SampleServer</artifactId>
       <version>${version}</version>
+      <type>pom</type>
     </dependency>
   </dependencies>
 </project>
