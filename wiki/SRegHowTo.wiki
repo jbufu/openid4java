@@ -48,6 +48,7 @@ if (authReq.hasExtension(SRegMessage.OPENID_NS_SREG))
     sregResp.addAttribute("email", "user@example.com");
 
     authSuccess.addExtension(sregResp);
+    serverManager.sign(authSuccess);
 }}}
 
 == Relying Party receives a SRegResponse ==
