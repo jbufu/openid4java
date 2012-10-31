@@ -29,7 +29,7 @@ import java.util.Date;
  * <ul>
  * <li>opurl : string</li>
  * <li>nonce : string</li>
- * <li>date : date</li>
+ * <li>date : datetime</li>
  * <li>primary key : opurl, nonce</li>
  * </ul>
  * </p>
@@ -83,7 +83,7 @@ public class JdbcNonceVerifier
 	public void setTableName ( String tableName )
 	{
 		this._tableName = tableName ;
-		this._deleteSQL = "DELETE FROM " + tableName + " WHERE date>?" ;
+		this._deleteSQL = "DELETE FROM " + tableName + " WHERE date<?" ;
 		this._insertSQL = "INSERT INTO " + tableName + " (opurl, nonce, date) VALUES (?,?,?)" ;
 	}
 
