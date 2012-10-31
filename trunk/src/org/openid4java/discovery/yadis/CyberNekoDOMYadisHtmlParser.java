@@ -4,19 +4,16 @@
 
 package org.openid4java.discovery.yadis;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
 import org.openid4java.util.OpenID4JavaDOMParser;
-import org.openid4java.discovery.yadis.YadisException;
-import org.openid4java.discovery.yadis.YadisHtmlParser;
-import org.openid4java.discovery.yadis.YadisResolver;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLMetaElement;
+
+import javax.xml.transform.TransformerException;
 
 /**
  * A {@link org.openid4java.discovery.yadis.YadisHtmlParser} implementation using the DOMParser of CyberNeko HTML.

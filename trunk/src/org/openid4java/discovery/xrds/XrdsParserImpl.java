@@ -1,21 +1,22 @@
 package org.openid4java.discovery.xrds;
 
-import org.openid4java.discovery.Discovery;
-import org.openid4java.discovery.DiscoveryException;
-import org.openid4java.OpenIDException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
+import org.openid4java.discovery.Discovery;
+import org.openid4java.discovery.DiscoveryException;
+import org.openid4java.discovery.RuntimeDiscoveryException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.*;
 
-import javax.xml.parsers.*;
-import java.util.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.*;
 
 /**
  * @author jbufu
@@ -165,6 +166,14 @@ public class XrdsParserImpl implements XrdsParser
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             dbf.setValidating(true);
+            dbf.setExpandEntityReferences(false);
+
+            dbf.setFeature("http://xml.org/sax/features/validation", true);
+            dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
             dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
             dbf.setAttribute(JAXP_SCHEMA_SOURCE, new Object[] {
                 Discovery.class.getResourceAsStream(XRD_SCHEMA),
@@ -185,6 +194,12 @@ public class XrdsParserImpl implements XrdsParser
                 }
             });
 
+            builder.setEntityResolver(new EntityResolver() {
+                public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                    throw new RuntimeDiscoveryException("External entity found in XRDS data");
+                }
+            });
+
             return builder.parse(new ByteArrayInputStream(input.getBytes()));
         }
         catch (ParserConfigurationException e)
@@ -201,6 +216,10 @@ public class XrdsParserImpl implements XrdsParser
         {
             throw new DiscoveryException("Error reading XRDS document",
                     OpenIDException.XRDS_DOWNLOAD_ERROR, e);
+        }
+        catch (RuntimeDiscoveryException rde)
+        {
+            throw new DiscoveryException(rde.getMessage());
         }
     }
 

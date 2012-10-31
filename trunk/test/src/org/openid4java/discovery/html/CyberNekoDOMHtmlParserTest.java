@@ -4,12 +4,11 @@
 
 package org.openid4java.discovery.html;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
-
 import org.apache.commons.io.IOUtils;
 import org.openid4java.discovery.DiscoveryException;
+
+import java.io.IOException;
 
 /**
  * @author Sutra Zhou
@@ -70,6 +69,14 @@ public class CyberNekoDOMHtmlParserTest extends TestCase
                 .getDelegate1());
         assertEquals("http://www.example.com:8080/openidserver/openid.server", result
                 .getOP1Endpoint().toExternalForm());
+    }
+
+    public void testParseHtmlXXE() throws Exception
+    {
+        String htmlData = IOUtils.toString(this.getClass().getResourceAsStream(
+                "identityPageWithExternalEntityReference.html"));
+        parser.parseHtml(htmlData, new HtmlResult());
+        // don't fail trying to read "/path/to/some/file" from the input data
     }
 
 }
