@@ -4,16 +4,17 @@
 
 package org.openid4java.message.ax;
 
-import org.openid4java.message.ParameterList;
-import org.openid4java.message.MessageException;
-import org.openid4java.message.Parameter;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.util.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.message.MessageException;
+import org.openid4java.message.Parameter;
+import org.openid4java.message.ParameterList;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the extension for Attribute Exchange fetch responses.
@@ -115,6 +116,8 @@ public class FetchResponse extends AxPayload
 
                 // only send up the the maximum requested number
                 int max = req.getCount(alias);
+                if (max == 0)
+                    max = ((List)values).size();
                 int count;
                 for (count = 0; count < max && values.hasNext(); count++)
                 {
