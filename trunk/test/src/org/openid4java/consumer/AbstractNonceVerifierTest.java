@@ -57,7 +57,7 @@ public abstract class AbstractNonceVerifierTest extends TestCase
     public void testExpired()
     {
         Date now = new Date();
-        Date past = new Date(now.getTime() - (MAX_AGE + 1) * 1000);
+        Date past = new Date(now.getTime() - 1000L * (MAX_AGE + 1));
 
         String nonce = _dateFormat.format(past) + "abc";
 

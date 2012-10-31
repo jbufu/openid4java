@@ -1,13 +1,13 @@
 
 package org.openid4java.consumer ;
 
-import java.util.Date ;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
-import org.apache.commons.logging.Log ;
-import org.apache.commons.logging.LogFactory ;
-import org.springframework.dao.DataIntegrityViolationException ;
-import org.springframework.jdbc.core.JdbcTemplate ;
-import org.springframework.jdbc.core.support.JdbcDaoSupport ;
+import java.util.Date;
 
 /**
  * 
@@ -135,7 +135,7 @@ public class JdbcNonceVerifier
 		{
 			try
 			{
-				Date boundary = new Date ( System.currentTimeMillis ( ) - _maxAgeSeconds * 1000 ) ;
+				Date boundary = new Date ( System.currentTimeMillis ( ) - 1000L * _maxAgeSeconds ) ;
 				JdbcTemplate jdbcTemplate = getJdbcTemplate ( ) ;
 				int cnt = jdbcTemplate.update ( _deleteSQL, new Object[]
 					{ boundary } ) ;

@@ -52,7 +52,7 @@ public class Association implements Serializable
 
     private Association(String type, String handle, SecretKey macKey, int expiryIn)
     {                                                                                 
-        this(type, handle, macKey, new Date(System.currentTimeMillis() + expiryIn * 1000));
+        this(type, handle, macKey, new Date(System.currentTimeMillis() + 1000L * expiryIn));
     }
 
     public static Association getFailedAssociation(Date expiry)
@@ -62,7 +62,7 @@ public class Association implements Serializable
 
     public static Association getFailedAssociation(int expiryIn)
     {
-        return getFailedAssociation(new Date(System.currentTimeMillis() + expiryIn * 1000));
+        return getFailedAssociation(new Date(System.currentTimeMillis() + 1000L * expiryIn));
     }
 
     public static Association generate(String type, String handle, int expiryIn) throws AssociationException
