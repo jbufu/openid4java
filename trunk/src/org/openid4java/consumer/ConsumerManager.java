@@ -5,7 +5,6 @@
 package org.openid4java.consumer;
 
 import com.google.inject.Inject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
@@ -19,19 +18,7 @@ import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.discovery.yadis.YadisResolver;
-import org.openid4java.message.AssociationError;
-import org.openid4java.message.AssociationRequest;
-import org.openid4java.message.AssociationResponse;
-import org.openid4java.message.AuthFailure;
-import org.openid4java.message.AuthImmediateFailure;
-import org.openid4java.message.AuthRequest;
-import org.openid4java.message.AuthSuccess;
-import org.openid4java.message.DirectError;
-import org.openid4java.message.Message;
-import org.openid4java.message.MessageException;
-import org.openid4java.message.ParameterList;
-import org.openid4java.message.VerifyRequest;
-import org.openid4java.message.VerifyResponse;
+import org.openid4java.message.*;
 import org.openid4java.server.IncrementalNonceGenerator;
 import org.openid4java.server.NonceGenerator;
 import org.openid4java.server.RealmVerifier;
@@ -41,22 +28,14 @@ import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
 
+import javax.crypto.spec.DHParameterSpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
-import javax.crypto.spec.DHParameterSpec;
+import java.util.*;
 
 /**
  * Manages OpenID communications with an OpenID Provider (Server).
@@ -229,6 +208,23 @@ public class ConsumerManager
     public void setAssociations(ConsumerAssociationStore associations)
     {
         this._associations = associations;
+    }
+
+    /**
+     * @return the configured nonce generator for consumer nonces
+     */
+    public NonceGenerator getConsumerNonceGenerator() {
+        return _consumerNonceGenerator;
+    }
+
+    /**
+     * Sets the nonce generator to be used for consumer nonces.
+     * Default implementation is a sequential/integer number generator, which may not be appropriate for cluster deployments.
+     *
+     * @param consumerNonceGenerator
+     */
+    public void setConsumerNonceGenerator(NonceGenerator consumerNonceGenerator) {
+        this._consumerNonceGenerator = consumerNonceGenerator;
     }
 
     /**
