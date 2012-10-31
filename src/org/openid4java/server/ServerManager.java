@@ -5,22 +5,19 @@
 package org.openid4java.server;
 
 import com.google.inject.Inject;
-
-import org.openid4java.message.*;
-import org.openid4java.util.HttpCache;
-import org.openid4java.util.HttpFetcherFactory;
-import org.openid4java.association.AssociationSessionType;
-import org.openid4java.association.AssociationException;
-import org.openid4java.association.DiffieHellmanSession;
-import org.openid4java.association.Association;
-import org.openid4java.discovery.yadis.YadisResolver;
-import org.openid4java.OpenIDException;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
+import org.openid4java.association.Association;
+import org.openid4java.association.AssociationException;
+import org.openid4java.association.AssociationSessionType;
+import org.openid4java.association.DiffieHellmanSession;
+import org.openid4java.discovery.yadis.YadisResolver;
+import org.openid4java.message.*;
+import org.openid4java.util.HttpFetcherFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Manages OpenID communications with an OpenID Relying Party (Consumer).
@@ -780,11 +777,13 @@ public class ServerManager
 
                     authReq.setImmediate(false);
 
-                    String separator = _userSetupUrl.contains("?") ? "&" : "?";
+                    String userSetupUrl = _userSetupUrl == null ? null :
+                            _userSetupUrl +
+                            (_userSetupUrl.contains("?") ? "&" : "?") +
+                            authReq.wwwFormEncoding();
 
                     return AuthImmediateFailure.createAuthImmediateFailure(
-                        _userSetupUrl + separator + authReq.wwwFormEncoding(),
-                        authReq.getReturnTo(), ! isVersion2);
+                        userSetupUrl, authReq.getReturnTo(), ! isVersion2);
                 }
                 else
                 {
