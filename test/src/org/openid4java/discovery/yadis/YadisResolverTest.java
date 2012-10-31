@@ -524,4 +524,15 @@ public class YadisResolverTest extends TestCase
                      0, results.size());
 
     }
+
+    public void testParseXmlXXE() throws Exception
+    {
+        try {
+            YadisResult yadis = _resolver.discover("http://localhost:" + _servletPort + "/?headers=simplexrds&xrds=xrdsxxe",
+                    10, Collections.singleton("http://example.com/"));
+            fail("Discovery on XRDS data containing external entity references should have failed.");
+        } catch (DiscoveryException expected) {
+            assertEquals("0x500: External entity found in XRDS data", expected.getMessage());
+        }
+    }
 }

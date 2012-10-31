@@ -4,12 +4,12 @@
 
 package org.openid4java.discovery.yadis;
 
+import junit.framework.TestCase;
+import org.apache.commons.io.IOUtils;
+import org.openid4java.discovery.html.CyberNekoDOMHtmlParserTest;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * @author Sutra Zhou
@@ -41,6 +41,12 @@ public class CyberNekoDOMYadisHtmlParserTest extends TestCase
         String htmlData = getResourceAsString("issue83.html");
         String s = parser.getHtmlMeta(htmlData);
         assertEquals("http://edevil.livejournal.com/data/yadis", s);
+    }
+
+    public void testParseHtmlMetaXXE() throws Exception {
+        parser.getHtmlMeta(IOUtils.toString(CyberNekoDOMHtmlParserTest.class.getResourceAsStream(
+                "identityPageWithExternalEntityReference.html")));
+        // don't fail trying to read "/path/to/some/file" from the input data
     }
 
     /**

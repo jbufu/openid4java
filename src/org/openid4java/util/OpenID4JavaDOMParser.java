@@ -4,28 +4,20 @@
 
 package org.openid4java.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.xerces.xni.Augmentations;
 import org.apache.xerces.xni.QName;
 import org.apache.xerces.xni.XMLAttributes;
 import org.cyberneko.html.HTMLTagBalancingListener;
 import org.cyberneko.html.parsers.DOMParser;
+import org.openid4java.discovery.RuntimeDiscoveryException;
 import org.w3c.dom.Document;
 import org.w3c.dom.html.HTMLHtmlElement;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.*;
+
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 
 /**
  * A DOMParser extends from Cyberneko HTML.
@@ -102,6 +94,16 @@ public class OpenID4JavaDOMParser extends DOMParser implements HTMLTagBalancingL
         try
         {
             this.setFeature("http://xml.org/sax/features/namespaces", false);
+            this.setFeature("http://xml.org/sax/features/validation", false);
+            this.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            this.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            this.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            this.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            this.setEntityResolver(new EntityResolver() {
+                public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                    throw new RuntimeDiscoveryException("External entity found in input data" );
+                }
+            });
         }
         catch (SAXNotRecognizedException e)
         {

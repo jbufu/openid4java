@@ -4,20 +4,18 @@
 
 package org.openid4java.discovery.html;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
-import org.openid4java.util.OpenID4JavaDOMParser;
 import org.openid4java.discovery.DiscoveryException;
-import org.openid4java.discovery.html.HtmlParser;
-import org.openid4java.discovery.html.HtmlResult;
+import org.openid4java.util.OpenID4JavaDOMParser;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLLinkElement;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A {@link HtmlParser} implementation using the DOMParser of CyberNeko HTML.
