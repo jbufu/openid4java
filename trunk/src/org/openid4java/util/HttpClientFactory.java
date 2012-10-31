@@ -7,10 +7,10 @@
  */
 package org.openid4java.util;
 
-import javax.net.ssl.SSLContext;
-
 import org.apache.http.HttpHost;
-import org.apache.http.client.*;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.AllClientPNames;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
@@ -24,8 +24,8 @@ import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
+
+import javax.net.ssl.SSLContext;
 
 /**
  * This class handles all HTTPClient connections for the
@@ -87,7 +87,7 @@ public class HttpClientFactory
 
         SchemeRegistry registry = new SchemeRegistry();
 
-        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
         SSLSocketFactory sslSocketFactory;
         if (null == sslContext)
         {
@@ -101,13 +101,13 @@ public class HttpClientFactory
         {
         	sslSocketFactory.setHostnameVerifier(hostnameVerifier);
         }
-        registry.register(new Scheme("https", sslSocketFactory, 443));
+        registry.register(new Scheme("https", 443, sslSocketFactory));
         
         ClientConnectionManager connManager;
         if (multiThreadedHttpClient)
-            connManager = new ThreadSafeClientConnManager(httpParams, registry);
+            connManager = new ThreadSafeClientConnManager(registry);
         else
-            connManager = new SingleClientConnManager(httpParams, registry);
+            connManager = new SingleClientConnManager(registry);
 
         DefaultHttpClient client = new DefaultHttpClient(connManager, httpParams);
 
