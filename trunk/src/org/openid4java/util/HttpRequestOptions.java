@@ -85,7 +85,6 @@ public class HttpRequestOptions
      */
     private String _contentType = null;
 
-
     /**
      * If set to a positive value, then new HTTP request will be placed if
      * the cache is older than that positive value (in seconds)
@@ -94,9 +93,7 @@ public class HttpRequestOptions
      *
      * @see org.openid4java.util.HttpCache
      */
-
-    
-    private long   _cacheTTLSeconds = -1;
+    private long   _cacheTTLSeconds = 60;
 
     /**
      * Constructs a set of HTTP request options with the default values.
