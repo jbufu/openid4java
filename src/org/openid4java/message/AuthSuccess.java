@@ -4,19 +4,20 @@
 
 package org.openid4java.message;
 
-import org.openid4java.discovery.DiscoveryException;
-import org.openid4java.util.InternetDateFormat;
-import org.openid4java.association.Association;
-import org.openid4java.association.AssociationException;
-import org.openid4java.OpenIDException;
-
-import java.util.*;
-import java.text.ParseException;
-import java.net.URL;
-import java.net.MalformedURLException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
+import org.openid4java.association.Association;
+import org.openid4java.association.AssociationException;
+import org.openid4java.util.InternetDateFormat;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -161,7 +162,7 @@ public class AuthSuccess extends Message
         set("openid.identity", id);
     }
 
-    public String getIdentity() throws DiscoveryException
+    public String getIdentity()
     {
         return getParameterValue("openid.identity");
     }
