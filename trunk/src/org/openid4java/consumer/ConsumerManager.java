@@ -1420,6 +1420,10 @@ public class ConsumerManager
         }
 
         String query = returnToUrl.getQuery();
+        if (query == null) {
+            _log.error("Missing nonce in return_to query parameters, required for v1 responses");
+            return null;
+        }
 
         String[] params = query.split("&");
 
