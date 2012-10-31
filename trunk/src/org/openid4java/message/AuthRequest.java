@@ -4,18 +4,17 @@
 
 package org.openid4java.message;
 
-import org.openid4java.association.Association;
-import org.openid4java.server.RealmVerifier;
-import org.openid4java.OpenIDException;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.net.URL;
-import java.net.MalformedURLException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.OpenIDException;
+import org.openid4java.association.Association;
+import org.openid4java.server.RealmVerifier;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -340,7 +339,7 @@ public class AuthRequest extends Message
         else if ( ! compatibility && ! hasParameter("openid.claimed_id") )
         {
             throw new MessageException(
-                "openid.clamied_id must be present in OpenID2 auth requests",
+                "openid.claimed_id must be present in OpenID2 auth requests",
                 OpenIDException.AUTH_ERROR);
         }
 
