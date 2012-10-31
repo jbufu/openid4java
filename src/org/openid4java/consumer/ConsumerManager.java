@@ -1785,10 +1785,11 @@ public class ConsumerManager
                 result.setVerifiedId(claimedId);
                 if (DEBUG) _log.debug("Local signature verification succeeded.");
             }
-            else if (DEBUG)
+            else
             {
-                _log.debug("Local signature verification failed.");
                 result.setStatusMsg("Local signature verification failed");
+                if (DEBUG)
+                    _log.debug("Local signature verification failed.");
             }
 
         }
