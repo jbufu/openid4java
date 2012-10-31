@@ -1140,8 +1140,6 @@ public class ConsumerManager
         AuthSuccess authResp = AuthSuccess.createAuthSuccess(response);
         _log.info("Received positive auth response.");
 
-        authResp.validate();
-
         result.setAuthResponse(authResp);
 
         // [1/4] return_to verification
