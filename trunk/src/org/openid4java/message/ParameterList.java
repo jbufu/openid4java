@@ -63,7 +63,7 @@ public class ParameterList implements Serializable
                 String[] values = (String[]) v;
                 if (values.length > 1 && name.startsWith("openid."))
                     throw new IllegalArgumentException(
-                            "Multiple parameters with the same name: " + values);
+                            "Multiple parameters with the same name: " + Arrays.toString(values));
 
                 value = values.length > 0 ? values[0] : null;
             }
