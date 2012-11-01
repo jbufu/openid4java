@@ -729,8 +729,10 @@ public class ConsumerManager
             requests.put(AssociationSessionType.DH_COMPAT_SHA1, null);
         }
 
-        if (_prefAssocSessEnc.isVersion2() == discovered.isVersion2())
+        if (_prefAssocSessEnc.isVersion2() == discovered.isVersion2()) {
+        	requests.remove(_prefAssocSessEnc);
             requests.put(_prefAssocSessEnc, null);
+        }
 
         // build a stack of Association Request objects
         // and keep only the allowed by the configured preferences
