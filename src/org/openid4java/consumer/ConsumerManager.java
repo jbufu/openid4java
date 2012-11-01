@@ -676,7 +676,7 @@ public class ConsumerManager
         }
         else
         {
-            _log.error("Association attempt, but no discovey endpoints provided.");
+            _log.error("Association attempt, but no discovery endpoints provided.");
             return null;
         }
     }
