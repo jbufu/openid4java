@@ -157,9 +157,11 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
             addAuthLevelExtension(value, key.substring(AUTH_LEVEL_NS_PREFIX.length()));
     }
 
-    private synchronized String newAuthLevelAlias()
+    private synchronized String newAuthLevelAlias(String authLevelUri)
     {
-        return AUTH_LEVEL_ALIAS_PREFIX + ++authLevelAliasCounter;
+        String newAlias = AUTH_LEVEL_ALIAS_PREFIX + ++authLevelAliasCounter;
+        _parameters.set(new Parameter(newAlias, authLevelUri));
+        return newAlias;
     }
 
     protected String addAuthLevelExtension(String authLevelTypeUri)
@@ -170,7 +172,7 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
     private String addAuthLevelExtension(String authLevelTypeUri, String alias)
     {
         if (!authLevelAliases.containsKey(authLevelTypeUri)) {
-            String authLevelAlias = alias == null ? newAuthLevelAlias() : alias;
+            String authLevelAlias = alias == null ? newAuthLevelAlias(authLevelTypeUri) : alias;
             authLevelAliases.put(authLevelTypeUri, authLevelAlias);
         }
         return (String) authLevelAliases.get(authLevelTypeUri);
