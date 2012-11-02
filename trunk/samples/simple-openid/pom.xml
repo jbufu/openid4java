@@ -36,7 +36,7 @@
     </dependency>
     <dependency>
       <groupId>org.openid4java</groupId>
-      <artifactId>openid4java-nodeps</artifactId>
+      <artifactId>openid4java</artifactId>
       <type>pom</type>
     </dependency>
   </dependencies>
