@@ -26,6 +26,8 @@
     <!-- Samples -->
     <module>openid4java-consumer-SampleConsumer</module>
     <module>openid4java-server-SampleServer</module>
+
+    <module>../samples</module>
   </modules>
 
   <build>
