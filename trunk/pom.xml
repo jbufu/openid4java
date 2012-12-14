@@ -58,7 +58,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0-alpha-2</version>
         <executions>
           <execution>
             <phase>initialize</phase>
@@ -75,9 +74,8 @@
       </plugin>
       <!-- clean coverage data before collecting -->
       <plugin>
-        <artifactId>cobertura-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>2.0</version>
+        <artifactId>cobertura-maven-plugin</artifactId>
         <executions>
           <execution>
             <goals>
@@ -135,10 +133,14 @@
     <outputDirectory>${basedir}/maven2/target/site/${project.artifactId}/</outputDirectory>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.3.1</version>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
         <configuration>
           <minmemory>128m</minmemory>
           <maxmemory>512m</maxmemory>
@@ -148,7 +150,9 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.2</version>
         <configuration>
           <inputEncoding>${encoding}</inputEncoding>
           <outputEncoding>${encoding}</outputEncoding>
@@ -159,6 +163,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
+        <version>2.4</version>
         <configuration>
           <tags>
             <tag>TODO</tag>
@@ -171,11 +176,12 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
-        <!-- version 2.1 is bugged ouput coverage 100% or 0% -->
-        <version>2.0</version>
+        <version>2.5</version>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.10</version>
         <configuration>
           <showSuccess>false</showSuccess>
         </configuration>
@@ -198,9 +204,12 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
+        <version>2.3.2</version>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <version>2.5</version>
         <configuration>
           <linkXref>true</linkXref>
           <sourceEncoding>${encoding}</sourceEncoding>
