@@ -251,7 +251,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.code.guice</groupId>
+      <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -404,10 +404,4 @@
     <tag>HEAD</tag>
     <url>http://openid4java.googlecode.com/svn/trunk/</url>
   </scm>
-  <repositories>
-    <repository>
-    <id>guice</id>
-    <url>http://guice-maven.googlecode.com/svn/trunk</url>	
-    </repository>	
-  </repositories>
 </project>

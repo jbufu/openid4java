@@ -31,7 +31,7 @@
       <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/appengine-api-1.0-sdk-1.2.5.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>com.google.code.guice</groupId>
+      <groupId>com.google.inject</groupId>
       <artifactId>guice-servlet</artifactId>
       <version>2.0</version>
     </dependency>
@@ -54,10 +54,4 @@
       </plugin> 
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>guice</id>
-      <url>http://guice-maven.googlecode.com/svn/trunk</url>
-    </repository>
-  </repositories>
 </project>
