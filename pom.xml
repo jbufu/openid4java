@@ -20,7 +20,7 @@
   <properties>
     <encoding>UTF-8</encoding>
     <jetty.version>6.0.2</jetty.version>
-    <test.data.src>${test.data}</test.data.src>
+    <test.data.src>${basedir}/test/yadisdata</test.data.src>
     <test.data.build>${basedir}/target/test-data</test.data.build>
   </properties>
 
