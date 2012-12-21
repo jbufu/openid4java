@@ -199,8 +199,6 @@
             uri="antlib:org.apache.maven.artifact.ant"
             classpathref="maven.lib.path"
         />
-        <artifact:pom id="project-parent" file="maven2/pom.xml" />
-        <artifact:install pomRefId="project-parent"/>
         <artifact:pom id="project" file="pom.xml" />
         <artifact:dependencies verbose="true" pathId="classpath.test" pomRefId="project" useScope="test"/>
     </target>
