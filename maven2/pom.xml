@@ -353,6 +353,12 @@
   </scm>
 
   <repositories>
+    <repository>
+      <id>openid4java-snapshots</id>
+      <name>OpenID4Java Snapshot Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/openid4java-snapshots/</url>
+      <snapshots />
+    </repository>
     <!-- for org.eclipse.higgins -->
     <repository>
       <id>alchim.snapshots</id>
