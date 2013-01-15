@@ -8,6 +8,23 @@ Please see the TODO file for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20120115:
+
+Notable changes:
+
+Fixed XML external entity injection vulnerability when parsing discovery data.
+Fixed maven2 dependency declarations for easy inclusion in maven projects.
+HttpClient dependency upgraded to 4.2.2.
+Google Guice dependency updated to use the current com.google.inject id.
+Configurable consumer nonces.
+Default HttpCache limited to 1 minute.
+Fixed Attribute Exchange handling of unlimited count request.
+Fixed JdbcNonceVerifier database cleanup.
+Fixed handling of declared preferred association types.
+Fixed handling of PAPE custom auth level.
+
+Plus a few minor bugs.
+
 20110413:
 
 Notable changes since the previous release:

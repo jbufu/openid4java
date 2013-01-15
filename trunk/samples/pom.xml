@@ -4,13 +4,13 @@
   <parent>
     <groupId>org.openid4java</groupId>
     <artifactId>openid4java-parent</artifactId>
-    <version>0.9.7-SNAPSHOT</version>
+    <version>0.9.7</version>
     <relativePath>../maven2/pom.xml</relativePath>
   </parent>
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java-samples</artifactId>
   <packaging>pom</packaging>
-  <version>0.9.7-SNAPSHOT</version>
+  <version>0.9.7</version>
   <name>OpenID4Java Samples</name>
   <modules>
     <module>simple-openid</module>
