@@ -4,17 +4,16 @@
 
 package org.openid4java.message;
 
-import org.openid4java.message.ax.AxMessage;
-import org.openid4java.message.sreg.SRegMessage;
-import org.openid4java.message.sreg.SReg11ExtensionFactory;
-import org.openid4java.message.pape.PapeMessage;
-
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-import java.net.URLEncoder;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openid4java.message.ax.AxMessage;
+import org.openid4java.message.pape.PapeMessage;
+import org.openid4java.message.sreg.SReg11ExtensionFactory;
+import org.openid4java.message.sreg.SRegMessage;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
@@ -491,7 +490,7 @@ public class Message
 
                     String alias = getExtensionAlias(typeUri);
 
-                    if (! signedParams.contains("ns." + alias))
+                    if ( hasParameter("openid.ns") && ! signedParams.contains("ns." + alias))
                         throw new MessageException("Namespace declaration for extension "
                                                     + typeUri + " MUST be signed");
                     Iterator iter = extension.getParameters().getParameters().iterator();
