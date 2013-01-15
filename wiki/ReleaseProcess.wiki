@@ -15,6 +15,7 @@ The release process is documented below in order to provide for a consistent pac
   * *project.properties:* change the version on local copy from *x.a-SNAPSHOT* to *x.a*
   * *ant sync-pom-version* to update version number in every pom.xml under maven2/
   * check for version in other POM files possibly missed by sync-pom-version
+  * update CHANGELOG
  * *Testing and Packaging*:
   * commit changes and *svn update* (important for updating the last modification revision which is used as part of the ant package name and VERSION file inside the package)
   * test and package the artifact
