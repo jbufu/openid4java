@@ -60,8 +60,7 @@
     </dependency>
     <dependency>
       <groupId>org.openid4java</groupId>
-      <artifactId>openid4java-consumer</artifactId>
-      <type>pom</type>
+      <artifactId>openid4java</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -15,7 +15,7 @@ Requirements:
    - Java 1.5 JVM (or higher)
 
    - Ant (optional: needed for building the package and running the tests)
-   - Maven2 (optional: alternative to Ant; see maven2/README.txt)
+   - Maven (optional: alternative to Ant)
    - JUnit (optional: needed for running the tests)
 
 

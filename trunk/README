@@ -68,7 +68,7 @@ lib/          : Library dependencies.
 build.xml     : Ant build file; see INSTALL / Building the package.
 project.properties
 
-maven2/       : Maven2 build scripts; see maven2/README.txt.
+pom.xml       : Maven POM.
 
 ========================================================================
 Copyright 2006-2008 Sxip Identity Corporation
