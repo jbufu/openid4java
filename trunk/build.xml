@@ -16,12 +16,14 @@
                 <equals arg1="-full" arg2="${dist.type}"/>
             </or>
         </condition>
-        <condition property="include.infocard">
-            <or>
-                <equals arg1="-infocard" arg2="${dist.type}"/>
-                <equals arg1="-full" arg2="${dist.type}"/>
-            </or>
-        </condition>
+      <!--
+              <condition property="include.infocard">
+                  <or>
+                      <equals arg1="-infocard" arg2="${dist.type}"/>
+                      <equals arg1="-full" arg2="${dist.type}"/>
+                  </or>
+              </condition>
+      -->
     </target>
 
     <target name="set_full_dist">
@@ -33,7 +35,7 @@
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
                 <exclude name="lib/xri/**" unless="include.xri"/>
-                <exclude name="lib/infocard/**" unless="include.infocard"/>
+                <exclude name="lib/infocard/**"/>
             </fileset>
         </path>
     </target>
@@ -67,7 +69,7 @@
             <src path="${src}"/>
             <classpath refid="classpath"/>
             <exclude name="**/LocalXriResolver.java" unless="include.xri"/>
-            <exclude name="**/infocard/**" unless="include.infocard"/>
+            <exclude name="**/infocard/**"/>
         </javac>
         <copy todir="${classes}">
             <fileset dir="${src}" includes="**/*.properties"/>
@@ -116,7 +118,7 @@
         <tar destfile="${component.name}${dist.type}-${version}.tar.gz" compression="gzip">
             <tarfileset dir="${basedir}" prefix="${component.name}${dist.type}-${version}">
                 <exclude name="lib/xri/**" unless="include.xri"/>
-                <exclude name="lib/infocard/**" unless="include.infocard"/>
+                <exclude name="lib/infocard/**"/>
                 <exclude name="*ipr"/>
                 <exclude name="*iml"/>
                 <exclude name="*iws"/>
@@ -142,12 +144,6 @@
         <antcall target="dist"/>
     </target>
 
-    <target name="dist-infocard"
-            description="Packages distributable archive with OpenID-Infocard support">
-        <property name="dist.type" value="-infocard"/>
-        <antcall target="dist"/>
-    </target>
-
     <target name="dist-full"
             description="Packages full distributable archive (local XRI resolver and OpenID-Infocard support)">
         <property name="dist.type" value="-full"/>
@@ -160,8 +156,10 @@
         <antcall target="clean"/>
         <antcall target="dist-xri"/>
         <antcall target="clean"/>
-        <antcall target="dist-infocard"/>
-        <antcall target="clean"/>
+      <!--
+              <antcall target="dist-infocard"/>
+              <antcall target="clean"/>
+      -->
         <antcall target="dist-full"/>
         <antcall target="clean"/>
     </target>
@@ -207,6 +205,7 @@
             description="Compiles test classes">
         <mkdir dir="${classes.test}"/>
         <javac srcdir="${test.src}"
+               excludes="org/openid4java/infocard/**"
                destdir="${classes.test}"
                source="${jvm.ver}"
                target="${jvm.ver}"
@@ -251,6 +250,7 @@
                 <fileset dir="${test.src}">
                     <include name="**/*Test.java"/>
                     <exclude name="**/Abstract*.java"/>
+                    <exclude name="**/OpenIDTokenTest.java"/>
                 </fileset>
             </batchtest>
         </junit>
