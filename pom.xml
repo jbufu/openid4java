@@ -182,6 +182,26 @@
           </testExcludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestSections>
+              <manifestSection>
+                <name>openid4java</name>
+                <manifestEntries>
+                  <Specification-Title>OpenID Authentication</Specification-Title>
+                  <Specification-Version>2.0,1.1</Specification-Version>
+                  <Specification-Vendor>openid.net</Specification-Vendor>
+                  <Implementation-Title>openid4java</Implementation-Title>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                </manifestEntries>
+              </manifestSection>
+            </manifestSections>
+          </archive>
+        </configuration>
+      </plugin>
       <!-- http://mojo.codehaus.org/properties-maven-plugin/ -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
