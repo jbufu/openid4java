@@ -12,7 +12,7 @@
     OpenID4Java library offers support for OpenID-enabling a
     consumer site or implementing an OpenID Provider server.
   </description>
-  <url>http://code.sxip.com/openid4java</url>
+  <url>http://code.google.com/p/openid4java/</url>
 
   <prerequisites>
     <maven>2.2.1</maven>
@@ -623,7 +623,7 @@
   </licenses>
   <organization>
     <name>Sxip</name>
-    <url>http://code.sxip.com/</url>
+    <url>http://sxip.com/</url>
   </organization>
   <developers>
     <developer>
