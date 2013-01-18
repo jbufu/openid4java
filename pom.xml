@@ -19,7 +19,8 @@
   </prerequisites>
 
   <properties>
-    <encoding>UTF-8</encoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jetty.version>6.0.2</jetty.version>
     <test.data.src>${basedir}/test/yadisdata</test.data.src>
     <test.data.build>${basedir}/target/test-data</test.data.build>
@@ -329,9 +330,6 @@
         <configuration>
           <minmemory>128m</minmemory>
           <maxmemory>512m</maxmemory>
-          <encoding>${encoding}</encoding>
-          <docencoding>${encoding}</docencoding>
-          <charset>${encoding}</charset>
         </configuration>
       </plugin>
       <plugin>
@@ -339,8 +337,6 @@
         <artifactId>maven-jxr-plugin</artifactId>
         <version>2.2</version>
         <configuration>
-          <inputEncoding>${encoding}</inputEncoding>
-          <outputEncoding>${encoding}</outputEncoding>
           <linkJavadoc>true</linkJavadoc>
           <javadocDir>apidocs</javadocDir>
         </configuration>
@@ -397,7 +393,6 @@
         <version>2.5</version>
         <configuration>
           <linkXref>true</linkXref>
-          <sourceEncoding>${encoding}</sourceEncoding>
           <minimumTokens>100</minimumTokens>
           <targetJdk>${jvm.ver}</targetJdk>
         </configuration>
