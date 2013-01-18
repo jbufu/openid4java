@@ -4,7 +4,7 @@
 Official OpenID4Java packages can be downloaded from the projects download page:
  http://code.google.com/p/openid4java/downloads/
 
-The packaging is done with Ant, which is also the officially supported method for building the library from source. Maven2 is also provided as an alternate building and installation method.
+The packaging is done with Ant, which is also the officially supported method for building the library from source. Maven is also provided as an alternate building and installation method.
 
 The release process is documented below in order to provide for a consistent package.
 
@@ -21,14 +21,16 @@ The release process is documented below in order to provide for a consistent pac
   * test and package the artifact
    * *clean sub-projects*: ant's 'build' folders, maven's 'target' folders, etc.
    * *ant:* trunk/: "ant clean test release" --> 4x openid4java-<dist.type>-x.a.tar.gz
-   * *maven:* trunk/maven2/: "mvn clean package"  --> openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar
+   * *maven:* build openid4java and the samples using maven
+    * trunk/: "mvn clean install"  --> target/openid4java-x.a.jar
+    * trunk/samples/: "mvn clean package"
   * if there are local changes, restart *Testing and Packaging*
  * *Tagging and Publishing*:
   * tag the version on SVN: *tags/openid4java-x.a/*
   * publish the artifacts
    * *ant*: java-openid-sxip-x.a.tar.gz --> http://code.google.com/p/openid4java/downloads/list
-   * *maven*: deploy to maven central repository(openid4java-SUB_PROJECT/target/SUB_PROJECT-x.a.jar --> maven central repository)
-    * *cd maven2 && mvn clean deploy -Prelease
+   * *maven*: deploy to maven central repository(target/openid4java-x.a.jar --> maven central repository)
+    * *mvn clean deploy -Prelease
     * *promote on http://oss.sonatype.org/ (http://nexus.sonatype.org/oss-repository-hosting.html)
   * announce new release
  * *Post Cleanup*:
