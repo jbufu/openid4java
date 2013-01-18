@@ -174,7 +174,7 @@
           <debug>true</debug>
           <optimize>true</optimize>
           <excludes>
-            <exluce>**/xri/**</exluce>
+            <exclude>**/xri/**</exclude>
             <exclude>**/infocard/**</exclude>
           </excludes>
           <testExcludes>
@@ -235,7 +235,7 @@
         </executions>
         <configuration>
           <excludes>
-            <exluce>**/xri/**</exluce>
+            <exclude>**/xri/**</exclude>
             <exclude>**/infocard/**</exclude>
           </excludes>
         </configuration>
