@@ -52,6 +52,13 @@
         <configuration>
           <debug>true</debug>
           <optimize>true</optimize>
+          <excludes>
+            <exluce>**/xri/**</exluce>
+            <exclude>**/infocard/**</exclude>
+          </excludes>
+          <testExcludes>
+            <testExclude>**/infocard/**</testExclude>
+          </testExcludes>
         </configuration>
       </plugin>
       <!-- http://mojo.codehaus.org/properties-maven-plugin/ -->
@@ -105,6 +112,12 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <excludes>
+            <exluce>**/xri/**</exluce>
+            <exclude>**/infocard/**</exclude>
+          </excludes>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
