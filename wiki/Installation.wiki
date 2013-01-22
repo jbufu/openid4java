@@ -29,5 +29,3 @@ openid4java-*.jar
 == See Also ==
 
 RelyingPartyDiscovery
-
-_For [http://maven.apache.org/ maven2] users: [MavenHowTo]_
