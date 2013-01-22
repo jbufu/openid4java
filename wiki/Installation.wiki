@@ -3,7 +3,9 @@
 
 = Installing the package =
 
-See also the INSTALL file from the official packages.
+For including the openid4java as a dependency using maven, see MavenHowTo.
+
+This page describes manual installation of the openid4java jar and its dependencies. See also the INSTALL file from the official packages.
 
 == OpenID4Java library ==
 
