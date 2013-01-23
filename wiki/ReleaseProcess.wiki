@@ -29,9 +29,9 @@ The release process is documented below in order to provide for a consistent pac
   * tag the version on SVN: *tags/openid4java-x.a/*
   * publish the artifacts
    * *ant*: java-openid-sxip-x.a.tar.gz --> http://code.google.com/p/openid4java/downloads/list
-   * *maven*: deploy to maven central repository(target/openid4java-x.a.jar --> maven central repository)
-    * *mvn clean deploy -Prelease
-    * *promote on [https://oss.sonatype.org/ Sonatype OSS] ([https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide Sonatype OSS Maven Repository Usage Guide])
+   * *maven*:
+    * *mvn clean deploy -Prelease* deploys target/openid4java-x.a`*`.jar to Sonatype OSS
+    * [https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide#SonatypeOSSMavenRepositoryUsageGuide-8a.ReleaseIt promote] from Sonatye OSS to Maven Central
   * announce new release
  * *Post Cleanup*:
   * *project.properties*: change/increment the version from *x.a* to *x.b-SNAPSHOT*
