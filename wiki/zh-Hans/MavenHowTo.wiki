@@ -1,22 +1,18 @@
 #summary 下面的安装使用方法仅适用于Maven2用户
 
+= 正式版 =
 在你的项目的 pom.xml 的 dependencies 节点下增加如下依赖关系：
 {{{
 <dependency>
 	<groupId>org.openid4java</groupId>
-	<artifactId>openid4java-consumer</artifactId>
-	<!--artifactId>openid4java-server</artifactId-->
-	<!--artifactId>openid4java-infocard</artifactId-->
-	<!--artifactId>openid4java-xri</artifactId-->
-	<!--artifactId>openid4java</artifactId-->
-	<!--artifactId>openid4java-full</artifactId-->
-	<version>0.9.6</version>
-	<type>pom</type>
+	<artifactId>openid4java</artifactId>
+	<version>0.9.7</version>
 </dependency>
 }}}
-其中的 0.9.6 请替换成你需要的版本。
 
-如果你想使用 0.9.7-SNAPSHOT 版本，你可以在你的 pom.xml 中添加：
+= 快照版 =
+
+如果你想使用 SNAPSHOT 版本，你可以在你的 pom.xml 中添加：
 {{{
 <project ...>
 	...
@@ -33,14 +29,8 @@
 		...
 		<dependency>
 			<groupId>org.openid4java</groupId>
-			<artifactId>openid4java-consumer</artifactId>
-			<!--artifactId>openid4java-server</artifactId-->
-			<!--artifactId>openid4java-infocard</artifactId-->
-			<!--artifactId>openid4java-xri</artifactId-->
-			<!--artifactId>openid4java</artifactId-->
-			<!--artifactId>openid4java-full</artifactId-->
-			<version>0.9.7-SNAPSHOT</version>
-			<type>pom</type>
+			<artifactId>openid4java</artifactId>
+			<version>0.9.8-SNAPSHOT</version>
 		</dependency>
 		...
 	<dependencies>
