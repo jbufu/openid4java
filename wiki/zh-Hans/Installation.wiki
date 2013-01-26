@@ -3,19 +3,29 @@
 
 = 安装 OpenID4Java 开发包 =
 
-复制目录 endorsed/ 下的 jar 到你的环境的信任类库目录。如果你是在一个 web 应用程序容器如 Apache Tomcat 下使用本开发包，这个目录在：
+使用 maven 来添加 openid4java 作为依赖，请阅读 MavenHowTo。
+
+这个页面描述了如何手动安装 openid4java jar 和依赖。另请阅读官方发行包里的 INSTALL 文件。
+
+== OpenID4Java 类库 ==
+
+要想在（web）应用程序中使用 OpenID4Java 类库，需要将下列 JAR 文件复制到应用程序的 classpath：
 {{{
-JAVA_HOME/lib/endorsed
-}}}
-或
-{{{
-CATALINA_HOME/common/endorsed
-}}}
+openid4java-*.jar
+}}}}
 
-对于其他的应用程序服务器或者运行环境，请查看他们的文档来配置信任类库。
+== 类库依赖 ==
 
-如果你想在你的 web 应用程序中使用本开发包，你必须做如下操作：
+  * *lib/`*`jar : 必须。* OpenID4Java 核心类库依赖。
 
-  * 复制 lib/`*`.jar 和 java-openid-sxip-`*`.jar 到你的应用程序的 Java classpath 下。
+  * *lib/optional/`*`.jar : 可选。* 可选部署的支持类库。
 
-_[http://maven.apache.org/ maven2] 用户： [MavenHowTo]_
+  * *lib/extra/`*`.jar : 可选。* 额外类库，不需要部署（JUnit 测试、Jetty servlet 容器、SVN/ANT 工具）
+
+  * *lib/xri/`*`.jar : 可选。* Local OpenXRI resolver 依赖。仅包含在“openid4java-xri“和“openid4java-full“包内。（标准包里包含一个没有依赖的代理 XRI resolver）
+
+  * *lib/infocard/`*`.jar : 可选。* OpenID-Infocards/Higgins STS 依赖。仅包含在“openid4java-infocard“和"openid4java-full“包内。
+
+== 另请参见 ==
+
+RelyingPartyDiscovery
