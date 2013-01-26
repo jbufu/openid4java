@@ -12,7 +12,7 @@
 要想在（web）应用程序中使用 OpenID4Java 类库，需要将下列 JAR 文件复制到应用程序的 classpath：
 {{{
 openid4java-*.jar
-}}}}
+}}}
 
 == 类库依赖 ==
 
