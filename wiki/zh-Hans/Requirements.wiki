@@ -3,7 +3,8 @@
 
 = 必需环境 =
 
-  * Java 1.4 JVM （或更高）
+  * Java 1.5 JVM （或更高）
 
   * Ant （可选的: 用来编译本程序库和其单元测试）
+  * Maven2 （可选的：作为 Ant 的替代；参见 MavenHowTo）
   * JUnit （可选的: 用来做OpenID4Java 内部代码的单元测试）
