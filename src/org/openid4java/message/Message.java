@@ -378,12 +378,36 @@ public class Message
      */
     public void addExtension(MessageExtension extension) throws MessageException
     {
+       addExtension(extension, null);
+    }
+
+    /**
+     * Adds a set of extension-specific parameters to a message,
+     * trying to use the supplied preferredAlias
+     * if the supplied alias is not already taken.
+     *
+     * Allows adding pseude-extensions to v1 messages
+     * but only if the supplied preferredAlias can be used;
+     * MessageException is thrown otherwise.
+     *
+     * @param extension the extension to be added to this message
+     * @param preferredAlias the preferred alias to use for the extension's parameters
+     * @return the actual alias that was used for the extension
+     * @throws MessageException if the preferredAlias could not be used
+     * and this is a v1 message
+     */
+    public String addExtension(MessageExtension extension, String preferredAlias) throws MessageException
+    {
         String typeUri = extension.getTypeUri();
 
         if (hasExtension(typeUri))
             throw new MessageException("Extension already present: " + typeUri);
 
-        String alias = "ext" + Integer.toString(++ _extCounter);
+        String alias = preferredAlias != null && ! _extAliases.containsValue(preferredAlias) ?
+                preferredAlias : "ext" + Integer.toString(++ _extCounter);
+
+        if (! hasParameter("openid.ns") && preferredAlias != null && ! alias.equals(preferredAlias))
+            throw new MessageException("Cannot add (pseudo) extension to v1 message for alias: " + preferredAlias);
 
         // use the hardcoded "sreg" alias for SREG, for seamless interoperation
         // between SREG10/OpenID1 and SREG11/OpenID2
@@ -395,7 +419,8 @@ public class Message
         if (DEBUG) _log.debug("Adding extension; type URI: "
                               + typeUri + " alias: " +alias);
 
-        set("openid.ns." + alias, typeUri);
+        //if (hasParameter("openid.ns"))
+            set("openid.ns." + alias, typeUri);
 
         Iterator iter = extension.getParameters().getParameters().iterator();
         while (iter.hasNext())
@@ -418,6 +443,8 @@ public class Message
             if ( ((AuthSuccess)this).getSignExtensions().contains(typeUri) )
                 ((AuthSuccess)this).buildSignedList();
         }
+
+        return alias;
     }
 
     /**
