@@ -673,55 +673,55 @@ public class ServerManager
 
         boolean isVersion2 = authReq.isVersion2();
 
-        try
+        if (authReq.getReturnTo() == null)
         {
-            new URL(opEndpoint);
-        }
-        catch (MalformedURLException e)
-        {
-            String errMsg = "Invalid OP-endpoint configured; " +
-                  "cannot issue authentication responses." + opEndpoint;
-
-            _log.error(errMsg, e);
-
-            return DirectError.createDirectError(
-                new ServerException(errMsg, e), isVersion2);
+            _log.error("No return_to in the received (valid) auth request; "
+                    + "returning null auth response.");
+            return null;
         }
 
         try
         {
-            if (authReq.getReturnTo() == null)
-            {
-                _log.error("No return_to in the received (valid) auth request; "
-                           + "returning null auth response.");
-                return null;
-            }
-
-            String id;
-            String claimed;
-
-            if (AuthRequest.SELECT_ID.equals(authReq.getIdentity()))
-            {
-                id = userSelId;
-                claimed = userSelClaimed;
-            }
-            else
-            {
-                id = userSelId != null ? userSelId : authReq.getIdentity();
-                claimed = userSelClaimed != null ? userSelClaimed :
-                        authReq.getClaimed();
-            }
-
-            if (id == null)
-                throw new ServerException(
-                        "No identifier provided by the authntication request" +
-                        "or by the OpenID Provider");
-
-            if (DEBUG) _log.debug("Using ClaimedID: " + claimed +
-                                  " OP-specific ID: " + id);
-
             if (authenticatedAndApproved) // positive response
             {
+                try
+                {
+                    new URL(opEndpoint);
+                }
+                catch (MalformedURLException e)
+                {
+                    String errMsg = "Invalid OP-endpoint configured; " +
+                            "cannot issue authentication responses." + opEndpoint;
+
+                    _log.error(errMsg, e);
+
+                    return DirectError.createDirectError(
+                            new ServerException(errMsg, e), isVersion2);
+                }
+
+                String id;
+                String claimed;
+
+                if (AuthRequest.SELECT_ID.equals(authReq.getIdentity()))
+                {
+                    id = userSelId;
+                    claimed = userSelClaimed;
+                }
+                else
+                {
+                    id = userSelId != null ? userSelId : authReq.getIdentity();
+                    claimed = userSelClaimed != null ? userSelClaimed :
+                            authReq.getClaimed();
+                }
+
+                if (id == null)
+                    throw new ServerException(
+                            "No identifier provided by the authentication request " +
+                                    "or by the OpenID Provider");
+
+                if (DEBUG) _log.debug("Using ClaimedID: " + claimed +
+                        " OP-specific ID: " + id);
+
                 Association assoc = null;
                 String handle = authReq.getHandle();
                 String invalidateHandle = null;
