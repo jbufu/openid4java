@@ -71,9 +71,7 @@ public class ServerManager
      * the user should be directed when a immediate authentication request
      * fails.
      * <p>
-     * MUST be configured in order for the OpenID provider to be able to
-     * respond correctly with AuthImmediateFailure messages in compatibility
-     * mode.
+     * If not configured, the OP endpoint URL is used.
      */
     private String _userSetupUrl = null;
 
@@ -777,10 +775,8 @@ public class ServerManager
 
                     authReq.setImmediate(false);
 
-                    String userSetupUrl = _userSetupUrl == null ? null :
-                            _userSetupUrl +
-                            (_userSetupUrl.contains("?") ? "&" : "?") +
-                            authReq.wwwFormEncoding();
+                    String userSetupUrl = _userSetupUrl == null ? opEndpoint : _userSetupUrl;
+                    userSetupUrl += (userSetupUrl.contains("?") ? "&" : "?") + authReq.wwwFormEncoding();
 
                     return AuthImmediateFailure.createAuthImmediateFailure(
                         userSetupUrl, authReq.getReturnTo(), ! isVersion2);
