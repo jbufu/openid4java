@@ -41,6 +41,14 @@ public class ServerManager
     private ServerAssociationStore _privateAssociations = new InMemoryServerAssociationStore();
 
     /**
+     * Flag for checking that shared associations are not accepted as or mixed with
+     * the private ones.
+     *
+     * Default true - check is performed at the expense of one extra association store query.
+     */
+    private boolean _checkPrivateSharedAssociations = true;
+
+    /**
      * Nonce generator implementation.
      */
     private NonceGenerator _nonceGenerator = new IncrementalNonceGenerator();
@@ -149,6 +157,24 @@ public class ServerManager
     public void setPrivateAssociations(ServerAssociationStore privateAssociations)
     {
         _privateAssociations = privateAssociations;
+    }
+
+    /**
+     * Gets the _checkPrivateSharedAssociations flag.
+     *
+     * @see ServerManager#_checkPrivateSharedAssociations
+     */
+    public boolean isCheckPrivateSharedAssociations() {
+        return _checkPrivateSharedAssociations;
+    }
+
+    /**
+     * Sets the _checkPrivateSharedAssociations flag.
+     *
+     * @see ServerManager#_checkPrivateSharedAssociations
+     */
+    public void setCheckPrivateSharedAssociations(boolean _checkPrivateSharedAssociations) {
+        this._checkPrivateSharedAssociations = _checkPrivateSharedAssociations;
     }
 
     /**
@@ -864,8 +890,15 @@ public class ServerManager
             boolean verified = false;
 
             Association assoc = _privateAssociations.load(handle);
-            if (assoc != null) // verify the signature
+
+            if (_checkPrivateSharedAssociations && _sharedAssociations.load(handle) != null)
             {
+                _log.warn("association for handle: " + handle + " expected to be private " +
+                "but was found in shared association store, denying direct verification request");
+            }
+            else if (assoc != null)
+            {
+                // verify the signature
                 _log.info("Loaded private association; handle: " + handle);
 
                 verified = assoc.verifySignature(
