@@ -8,6 +8,16 @@ Please see the TODO file for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20130513:
+
+Notable changes:
+
+Updated API documentation for private/shared association stores.
+Add flag and check that shared associations are not accepted as private in direct verification requests.
+Don't mandate that a separate userSetupUrl must be provided to the ServerManager, fall-back to the OP endpoint URL.
+Shuffled ServerManager.authResponse processing to only raise (some) errors when they affect the response.
+Allow specifying a preferred alias when adding an extension.
+
 20120115:
 
 Notable changes:
