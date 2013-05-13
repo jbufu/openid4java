@@ -104,13 +104,7 @@
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
-      <configuration>
-        <options>
-          <option name="enableValidation" value="false" />
-          <option name="reportErrorsAsWarnings" value="true" />
-        </options>
-        <customNs />
-      </configuration>
+      <configuration />
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
@@ -287,7 +281,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="openid4java" />
-    <orderEntryProperties />
   </component>
   <component name="copyright">
     <Base>
