@@ -31,12 +31,18 @@ public class ServerManager
 
     /**
      * Keeps track of the associations established with consumer sites.
+     *
+     * MUST be a different store than ServerAssociationStore#_privateAssociations,
+     * otherwise openid responses can be forged and user accounts hijacked.
      */
     private ServerAssociationStore _sharedAssociations = new InMemoryServerAssociationStore();
 
     /**
      * Keeps track of private (internal) associations created for signing
      * authentication responses for stateless consumer sites.
+     *
+     * MUST be a different store than ServerAssociationStore#_sharedAssociations,
+     * otherwise openid responses can be forged and user accounts hijacked.
      */
     private ServerAssociationStore _privateAssociations = new InMemoryServerAssociationStore();
 
@@ -44,7 +50,9 @@ public class ServerManager
      * Flag for checking that shared associations are not accepted as or mixed with
      * the private ones.
      *
-     * Default true - check is performed at the expense of one extra association store query.
+     * Default true: check is performed at the expense of one extra association store query
+     * to ensure that ServerManager#_sharedAssociations and ServerManager#_privateAssociations
+     * are different store/instances.
      */
     private boolean _checkPrivateSharedAssociations = true;
 
@@ -894,7 +902,8 @@ public class ServerManager
             if (_checkPrivateSharedAssociations && _sharedAssociations.load(handle) != null)
             {
                 _log.warn("association for handle: " + handle + " expected to be private " +
-                "but was found in shared association store, denying direct verification request");
+                "but was found in shared association store, denying direct verification request; " +
+                "please configure different association store/instances for private vs shared associations");
             }
             else if (assoc != null)
             {
