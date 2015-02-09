@@ -39,7 +39,7 @@ public class UrlIdentifier implements Identifier
         UNRESERVED_CHARACTERS.add(new Character('~'));
     }
 
-    private URL _urlIdentifier;
+    private final URL _urlIdentifier;
 
     public UrlIdentifier(String identifier) throws DiscoveryException
     {
@@ -60,14 +60,45 @@ public class UrlIdentifier implements Identifier
         if (o == null || getClass() != o.getClass())
             return false;
 
-        final UrlIdentifier that = (UrlIdentifier) o;
+        final URL thisUrl = _urlIdentifier;
+        final URL thatUrl = ((UrlIdentifier) o)._urlIdentifier;
 
-        return _urlIdentifier.equals(that._urlIdentifier);
+        if (thisUrl == null || thatUrl == null)
+            return thisUrl == thatUrl;
+        else
+            return stringsEqualIgnoreCase(thisUrl.getProtocol(), thatUrl.getProtocol()) &&
+                   stringsEqualIgnoreCase(thisUrl.getHost(), thatUrl.getHost()) &&
+                   (
+                       (thisUrl.getPort() == -1 ? thisUrl.getDefaultPort() : thisUrl.getPort())
+                        ==
+                       (thatUrl.getPort() == -1 ? thatUrl.getDefaultPort() : thatUrl.getPort())
+                   ) &&
+                   stringsEqual(thisUrl.getFile(), thatUrl.getFile()) &&
+                   stringsEqual(thisUrl.getRef(), thatUrl.getRef());
     }
 
     public int hashCode()
     {
-        return _urlIdentifier.hashCode();
+        int result = 0;
+
+        if (_urlIdentifier.getProtocol() != null)
+            result += _urlIdentifier.getProtocol().hashCode();
+
+        if (_urlIdentifier.getHost() != null)
+            result += _urlIdentifier.getHost().toLowerCase().hashCode();
+
+        if (_urlIdentifier.getFile() != null)
+            result += _urlIdentifier.getFile().hashCode();
+
+        if (_urlIdentifier.getPort() == -1)
+            result += _urlIdentifier.getDefaultPort();
+        else
+            result += _urlIdentifier.getPort();
+
+        if (_urlIdentifier.getRef() != null)
+            result += _urlIdentifier.getRef().hashCode();
+
+        return result;
     }
 
     public String getIdentifier()
@@ -135,6 +166,14 @@ public class UrlIdentifier implements Identifier
             throw new DiscoveryException("Invalid URL identifier", e);
         }
 
+    }
+
+    private static boolean stringsEqual(String s1, String s2) {
+        return s1 == null ? s2 == null : s1.equals(s2);
+    }
+
+    private static boolean stringsEqualIgnoreCase(String s1, String s2) {
+        return s1 == null ? s2 == null : s1.equalsIgnoreCase(s2);
     }
 
     private static String normalizeUrlEncoding(String text)
