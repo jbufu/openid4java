@@ -8,6 +8,10 @@ Please see the TODO file for outstanding items.
     For the detailed logs please see the commit comments at:
     - http://code.google.com/p/openid4java
 
+20150208:
+
+Security bug fix for URL identifiers comparison - use custom, proper implementation instead of relying on java.net.URL.
+
 20130513:
 
 Notable changes:
