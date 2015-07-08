@@ -1,4 +1,6 @@
-![http://openid4java.googlecode.com/svn/trunk/openid4java.png](http://openid4java.googlecode.com/svn/trunk/openid4java.png) **[中文(简体)](http://code.google.com/p/openid4java/wiki/ProjectHome_zh_CN)**
+![OpenID4Java](openid4java.png)
+
+**[中文(简体)](http://code.google.com/p/openid4java/wiki/ProjectHome_zh_CN)**
 
 
 # What is this package? #
@@ -71,6 +73,49 @@ SampleConsumer
 
 SampleServer
 
+# Package contents #
 
-## Developed with lots of pleasure from: ##
-[![](http://www.jetbrains.com/img/logos/logo_intellij_idea.gif)](http://www.jetbrains.com/idea/)
+[CHANGELOG](CHANGELOG)
+Version highlight changes.
+
+[INSTALL](INSTALL)
+Installation and usage instructions.
+
+[LICENSE](LICENSE)
+OpenID4Java Library license (Apache 2.0).
+
+[MAINTAINERS](MAINTAINERS)
+List of code and documentation maintainers.
+
+[README.md](README.md)
+This file!
+
+[TODO](TODO)
+Tasks remaining and/or ongoing.
+
+[VERSION](VERSION)
+The released version of this package.
+
+[apidoc/](apidoc)
+JavaDoc API documentation.
+
+[samples/](samples)
+Sample implementation projects. See samples/README for details.
+
+[src/](src)
+Source code.
+
+[test/](test)
+Test cases source code and test data.
+
+[lib/](lib)
+Library dependencies.
+
+[build.xml](build.xml)
+Ant build file; see INSTALL / Building the package.
+
+[project.properties](project.properties)
+Build properties file.
+
+[pom.xml](pom.xml)
+Maven POM.
