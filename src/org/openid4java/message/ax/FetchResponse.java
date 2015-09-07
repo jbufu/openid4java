@@ -117,7 +117,7 @@ public class FetchResponse extends AxPayload
                 // only send up the the maximum requested number
                 int max = req.getCount(alias);
                 if (max == 0)
-                    max = ((List)values).size();
+                    max = ((List)value).size();
                 int count;
                 for (count = 0; count < max && values.hasNext(); count++)
                 {
