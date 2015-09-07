@@ -18,7 +18,6 @@ public class FetchResponseTest
     {
         ParameterList params = new ParameterList();
         params.set(new Parameter("required", "key"));
-        params.set(new Parameter("key", "value"));
         params.set(new Parameter("count.key", "unlimited"));
 
         FetchRequest req = new FetchRequest(params);
