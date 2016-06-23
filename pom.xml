@@ -6,7 +6,7 @@
   <groupId>org.openid4java</groupId>
   <artifactId>openid4java</artifactId>
   <version>1.0.0</version>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>OpenID4Java</name>
   <description>
     OpenID4Java library offers support for OpenID-enabling a
@@ -183,23 +183,13 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
         <configuration>
-          <archive>
-            <manifestSections>
-              <manifestSection>
-                <name>openid4java</name>
-                <manifestEntries>
-                  <Specification-Title>OpenID Authentication</Specification-Title>
-                  <Specification-Version>2.0,1.1</Specification-Version>
-                  <Specification-Vendor>openid.net</Specification-Vendor>
-                  <Implementation-Title>openid4java</Implementation-Title>
-                  <Implementation-Version>${project.version}</Implementation-Version>
-                </manifestEntries>
-              </manifestSection>
-            </manifestSections>
-          </archive>
+          <instructions>
+            <Import-Package>!org.openid4java.*,*</Import-Package>
+          </instructions>
         </configuration>
       </plugin>
       <!-- http://mojo.codehaus.org/properties-maven-plugin/ -->
