@@ -9,8 +9,6 @@ import com.google.inject.Inject;
 import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
 import org.apache.http.Header;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
@@ -28,6 +26,8 @@ import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.OpenID4JavaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -55,7 +55,7 @@ import org.openid4java.util.OpenID4JavaUtils;
  */
 public class YadisResolver
 {
-    private static Log _log = LogFactory.getLog(YadisResolver.class);
+    private static Logger _log = LoggerFactory.getLogger(YadisResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     // Yadis constants

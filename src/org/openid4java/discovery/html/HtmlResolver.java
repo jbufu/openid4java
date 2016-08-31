@@ -6,8 +6,6 @@ package org.openid4java.discovery.html;
 
 import com.google.inject.Inject;
 import org.apache.http.HttpStatus;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,13 +21,15 @@ import org.openid4java.util.HttpResponse;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.OpenID4JavaUtils;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu, Sutra Zhou
  */
 public class HtmlResolver
 {
-    private static Log _log = LogFactory.getLog(HtmlResolver.class);
+    private static Logger _log = LoggerFactory.getLogger(HtmlResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static final String HTML_PARSER_CLASS_NAME_KEY = "discovery.html.parser";

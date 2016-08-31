@@ -4,11 +4,11 @@
 
 package org.openid4java.message.ax;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class FetchResponse extends AxPayload
 {
-    private static Log _log = LogFactory.getLog(FetchResponse.class);
+    private static Logger _log = LoggerFactory.getLogger(FetchResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

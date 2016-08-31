@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Load properties from classpath:<code>org.openid4java.util.openid4java-default.properties</code>,
@@ -22,7 +22,7 @@ import org.openid4java.OpenIDException;
  */
 public class OpenID4JavaUtils
 {
-    private static Log _log = LogFactory.getLog(OpenID4JavaUtils.class);
+    private static Logger _log = LoggerFactory.getLogger(OpenID4JavaUtils.class);
 
     private static final Properties _appProperties;
 

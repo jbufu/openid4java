@@ -4,12 +4,12 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.pape.PapeMessage;
 import org.openid4java.message.sreg.SReg11ExtensionFactory;
 import org.openid4java.message.sreg.SRegMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class Message
 {
-    private static Log _log = LogFactory.getLog(Message.class);
+    private static Logger _log = LoggerFactory.getLogger(Message.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     // message constants

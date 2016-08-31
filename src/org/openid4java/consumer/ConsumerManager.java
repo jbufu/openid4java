@@ -5,8 +5,7 @@
 package org.openid4java.consumer;
 
 import com.google.inject.Inject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.apache.http.HttpStatus;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
@@ -27,6 +26,8 @@ import org.openid4java.util.HttpFetcher;
 import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.spec.DHParameterSpec;
 import java.io.IOException;
@@ -47,7 +48,7 @@ import java.util.*;
  */
 public class ConsumerManager
 {
-    private static Log _log = LogFactory.getLog(ConsumerManager.class);
+    private static Logger _log = LoggerFactory.getLogger(ConsumerManager.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

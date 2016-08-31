@@ -5,8 +5,7 @@
 package org.openid4java.server;
 
 import com.google.inject.Inject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
@@ -15,6 +14,8 @@ import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.discovery.yadis.YadisResolver;
 import org.openid4java.message.*;
 import org.openid4java.util.HttpFetcherFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,7 +27,7 @@ import java.net.URL;
  */
 public class ServerManager
 {
-    private static Log _log = LogFactory.getLog(ServerManager.class);
+    private static Logger _log = LoggerFactory.getLogger(ServerManager.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

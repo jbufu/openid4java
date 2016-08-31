@@ -5,10 +5,10 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,7 +32,7 @@ public class JdbcConsumerAssociationStore
 		extends JdbcDaoSupport
 		implements ConsumerAssociationStore
 {
-	private static Log _log = LogFactory.getLog ( JdbcConsumerAssociationStore.class ) ;
+	private static Logger _log = LoggerFactory.getLogger ( JdbcConsumerAssociationStore.class ) ;
 
 	private String _tableName ;
 	private String _sqlInsert ;

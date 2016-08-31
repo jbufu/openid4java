@@ -8,13 +8,14 @@ import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
 
 import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * JDBC implementation for the ServerAssociationStore interface.
@@ -37,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 public class JdbcServerAssociationStore extends JdbcDaoSupport
         implements ServerAssociationStore
 {
-    private static Log _log = LogFactory.getLog(JdbcServerAssociationStore.class);
+    private static Logger _log = LoggerFactory.getLogger(JdbcServerAssociationStore.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static Random _random = new Random(System.currentTimeMillis());

@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
@@ -23,10 +21,12 @@ import org.openxri.xml.Service;
 import org.openxri.xml.Status;
 import org.openxri.xml.XRD;
 import org.openxri.xml.XRDS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalXriResolver implements XriResolver
 {
-    private static Log _log = LogFactory.getLog(LocalXriResolver.class);
+    private static Logger _log = LoggerFactory.getLogger(LocalXriResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private Resolver _openXriResolver;

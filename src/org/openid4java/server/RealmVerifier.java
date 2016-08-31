@@ -4,12 +4,12 @@
 
 package org.openid4java.server;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.discovery.Discovery;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.yadis.YadisResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
  */
 public class RealmVerifier
 {
-    private static Log _log = LogFactory.getLog(RealmVerifier.class);
+    private static Logger _log = LoggerFactory.getLogger(RealmVerifier.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final int OK = 0;

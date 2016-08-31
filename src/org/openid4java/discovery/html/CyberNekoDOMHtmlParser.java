@@ -4,12 +4,12 @@
 
 package org.openid4java.discovery.html;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.util.OpenID4JavaDOMParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLLinkElement;
@@ -19,14 +19,14 @@ import java.util.List;
 
 /**
  * A {@link HtmlParser} implementation using the DOMParser of CyberNeko HTML.
- * 
+ *
  * @author Sutra Zhou
  * @since 0.9.4
  * @see org.openid4java.util.OpenID4JavaDOMParser
  */
 public class CyberNekoDOMHtmlParser implements HtmlParser
 {
-    private static final Log _log = LogFactory.getLog(CyberNekoDOMHtmlParser.class);
+    private static final Logger _log = LoggerFactory.getLogger(CyberNekoDOMHtmlParser.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /*

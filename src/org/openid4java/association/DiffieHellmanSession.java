@@ -9,18 +9,20 @@ import javax.crypto.spec.DHGenParameterSpec;
 import javax.crypto.spec.DHPublicKeySpec;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.interfaces.DHPrivateKey;
+
 import java.math.BigInteger;
 import java.security.*;
+
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class DiffieHellmanSession
 {
-    private static Log _log = LogFactory.getLog(DiffieHellmanSession.class);
+    private static Logger _log = LoggerFactory.getLogger(DiffieHellmanSession.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String DEFAULT_MODULUS_HEX =
@@ -120,8 +122,7 @@ public class DiffieHellmanSession
 
             AlgorithmParameters params = paramGen.generateParameters();
 
-            DHParameterSpec result = (DHParameterSpec)
-                    params.getParameterSpec(DHParameterSpec.class);
+            DHParameterSpec result = params.getParameterSpec(DHParameterSpec.class);
 
             if (DEBUG) _log.debug("Generated random DHParameterSpec, base: "
                     + result.getG() + ", modulus: " + result.getP());

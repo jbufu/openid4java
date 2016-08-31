@@ -6,19 +6,18 @@ package org.openid4java.message;
 
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class AssociationError extends DirectError
 {
-    private static Log _log = LogFactory.getLog(AssociationError.class);
+    private static Logger _log = LoggerFactory.getLogger(AssociationError.class);
 
     public static final String ASSOC_ERR = "unsupported-type";
 

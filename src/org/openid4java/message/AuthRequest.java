@@ -4,11 +4,11 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
 import org.openid4java.server.RealmVerifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class AuthRequest extends Message
 {
-    private static Log _log = LogFactory.getLog(AuthRequest.class);
+    private static Logger _log = LoggerFactory.getLogger(AuthRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String MODE_SETUP = "checkid_setup";

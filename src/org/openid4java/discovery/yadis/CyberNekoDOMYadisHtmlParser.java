@@ -4,11 +4,11 @@
 
 package org.openid4java.discovery.yadis;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
 import org.openid4java.util.OpenID4JavaDOMParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLMetaElement;
@@ -24,7 +24,7 @@ import javax.xml.transform.TransformerException;
  */
 public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
 {
-    private static final Log _log = LogFactory.getLog(CyberNekoDOMYadisHtmlParser.class);
+    private static final Logger _log = LoggerFactory.getLogger(CyberNekoDOMYadisHtmlParser.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /*

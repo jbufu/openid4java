@@ -5,8 +5,8 @@
 package org.openid4java.message.sreg;
 
 import org.openid4java.message.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for the Simple Registration implementation.
@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SRegMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Log _log = LogFactory.getLog(SRegMessage.class);
+    private static Logger _log = LoggerFactory.getLogger(SRegMessage.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

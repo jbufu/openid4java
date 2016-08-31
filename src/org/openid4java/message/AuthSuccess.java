@@ -4,12 +4,12 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
 import org.openid4java.util.InternetDateFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class AuthSuccess extends Message
 {
-    private static Log _log = LogFactory.getLog(AuthSuccess.class);
+    private static Logger _log = LoggerFactory.getLogger(AuthSuccess.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List requiredFields = Arrays.asList( new String[] {

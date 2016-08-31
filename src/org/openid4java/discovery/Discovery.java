@@ -6,13 +6,13 @@ package org.openid4java.discovery;
 
 import com.google.inject.Inject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.discovery.html.HtmlResolver;
 import org.openid4java.discovery.xri.XriResolver;
 import org.openid4java.discovery.yadis.YadisResolver;
 import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.OpenID4JavaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class Discovery
 {
-    private static Log _log = LogFactory.getLog(Discovery.class);
+    private static Logger _log = LoggerFactory.getLogger(Discovery.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static final Pattern URL_PATTERN =

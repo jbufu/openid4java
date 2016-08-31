@@ -1,8 +1,8 @@
 
 package org.openid4java.consumer ;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -41,7 +41,7 @@ public class JdbcNonceVerifier
 		extends JdbcDaoSupport
 		implements NonceVerifier
 {
-	private static Log _log = LogFactory.getLog ( JdbcNonceVerifier.class ) ;
+	private static Logger _log = LoggerFactory.getLogger ( JdbcNonceVerifier.class ) ;
 
 	private NonceVerifier _verifier ;
 	private String _tableName ;

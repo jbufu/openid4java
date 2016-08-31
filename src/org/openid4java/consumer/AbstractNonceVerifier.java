@@ -5,19 +5,18 @@
 package org.openid4java.consumer;
 
 import org.openid4java.util.InternetDateFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.text.ParseException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public abstract class AbstractNonceVerifier implements NonceVerifier
 {
-    private static Log _log = LogFactory.getLog(AbstractNonceVerifier.class);
+    private static Logger _log = LoggerFactory.getLogger(AbstractNonceVerifier.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected static InternetDateFormat _dateFormat = new InternetDateFormat();

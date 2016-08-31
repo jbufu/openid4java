@@ -7,13 +7,12 @@ package org.openid4java.message.sreg;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for Simple Registration fetch requests.
@@ -23,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SRegRequest extends SRegMessage
 {
-    private static Log _log = LogFactory.getLog(SRegRequest.class);
+    private static Logger _log = LoggerFactory.getLogger(SRegRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

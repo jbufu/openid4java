@@ -9,12 +9,11 @@ import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.util.InternetDateFormat;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.text.ParseException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for OpenID Provider Authentication Policy responses.
@@ -23,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PapeResponse extends PapeMessage
 {
-    private static Log _log = LogFactory.getLog(PapeResponse.class);
+    private static Logger _log = LoggerFactory.getLogger(PapeResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
