@@ -2,8 +2,6 @@ package org.openid4java.discovery.xri;
 
 import com.google.inject.Inject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
@@ -16,6 +14,8 @@ import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.OpenID4JavaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class XriDotNetProxyResolver implements XriResolver
 {
-    private static Log _log = LogFactory.getLog(XriDotNetProxyResolver.class);
+    private static Logger _log = LoggerFactory.getLogger(XriDotNetProxyResolver.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private final HttpFetcher _httpFetcher;

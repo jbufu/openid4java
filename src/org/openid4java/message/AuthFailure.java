@@ -4,9 +4,9 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.Arrays;
  */
 public class AuthFailure extends Message
 {
-    private static Log _log = LogFactory.getLog(AuthFailure.class);
+    private static Logger _log = LoggerFactory.getLogger(AuthFailure.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List requiredFields = Arrays.asList( new String[] {

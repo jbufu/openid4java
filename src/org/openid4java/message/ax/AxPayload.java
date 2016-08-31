@@ -2,8 +2,8 @@ package org.openid4java.message.ax;
 
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ import java.util.*;
  */
 public abstract class AxPayload extends AxMessage {
 
-    private static Log _log = LogFactory.getLog(AxPayload.class);
+    private static Logger _log = LoggerFactory.getLogger(AxPayload.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private int _attrAliasCounter = 0;

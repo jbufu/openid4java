@@ -1,11 +1,11 @@
 package org.openid4java.discovery.xrds;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.Discovery;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.RuntimeDiscoveryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class XrdsParserImpl implements XrdsParser
 {
-    private static final Log _log = LogFactory.getLog(XrdsParserImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(XrdsParserImpl.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";

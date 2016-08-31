@@ -7,11 +7,10 @@ package org.openid4java.message.ax;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for Attribute Exchange store responses.
@@ -20,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StoreResponse extends AxMessage
 {
-    private static Log _log = LogFactory.getLog(StoreResponse.class);
+    private static Logger _log = LoggerFactory.getLogger(StoreResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

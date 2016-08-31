@@ -6,18 +6,17 @@ package org.openid4java.server;
 
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryServerAssociationStore implements ServerAssociationStore
 {
-    private static Log _log = LogFactory.getLog(InMemoryServerAssociationStore.class);
+    private static Logger _log = LoggerFactory.getLogger(InMemoryServerAssociationStore.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private String _timestamp;

@@ -4,10 +4,10 @@
 
 package org.openid4java.infocard.rp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.infocard.OpenIDTokenType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.Iterator;
  */
 public class InfocardInvocation
 {
-    private static Log _log = LogFactory.getLog(InfocardInvocation.class);
+    private static Logger _log = LoggerFactory.getLogger(InfocardInvocation.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

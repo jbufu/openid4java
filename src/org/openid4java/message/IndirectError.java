@@ -4,16 +4,16 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class IndirectError extends Message
 {
-    private static Log _log = LogFactory.getLog(IndirectError.class);
+    private static Logger _log = LoggerFactory.getLogger(IndirectError.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected IndirectError(String msg, String returnTo)

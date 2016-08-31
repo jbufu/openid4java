@@ -9,13 +9,13 @@ import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.AssociationException;
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * The OpenID Association Response message.
@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AssociationResponse extends Message
 {
-    private static Log _log = LogFactory.getLog(AssociationResponse.class);
+    private static Logger _log = LoggerFactory.getLogger(AssociationResponse.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List requiredFields = Arrays.asList( new String[] {

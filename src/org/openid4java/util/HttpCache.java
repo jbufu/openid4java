@@ -4,8 +4,6 @@
 
 package org.openid4java.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -17,6 +15,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.AllClientPNames;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import javax.net.ssl.SSLContext;
  */
 public class HttpCache extends AbstractHttpFetcher
 {
-    private static Log _log = LogFactory.getLog(HttpCache.class);
+    private static Logger _log = LoggerFactory.getLogger(HttpCache.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

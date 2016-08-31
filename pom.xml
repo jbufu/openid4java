@@ -304,7 +304,7 @@
         </executions>
         <configuration>
           <excludes>
-            <exluce>**/xri/**</exluce>
+            <exlude>**/xri/**</exlude>
             <exclude>**/infocard/**</exclude>
           </excludes>
         </configuration>
@@ -493,7 +493,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>3.8.2</version>
+        <version>4.12</version>
       </dependency>
       <dependency>
         <groupId>jdom</groupId>
@@ -542,8 +542,20 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.10</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jcl</artifactId>
+      <version>1.7.10</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

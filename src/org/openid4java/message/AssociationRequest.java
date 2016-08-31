@@ -8,12 +8,11 @@ import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.association.AssociationException;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * The OpenID Association Request message.
@@ -25,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AssociationRequest extends Message
 {
-    private static Log _log = LogFactory.getLog(AssociationRequest.class);
+    private static Logger _log = LoggerFactory.getLogger(AssociationRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String MODE_ASSOC = "associate";

@@ -8,11 +8,10 @@ import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for OpenID Provider Authentication Policy requests.
@@ -22,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PapeRequest extends PapeMessage
 {
-    private static Log _log = LogFactory.getLog(PapeRequest.class);
+    private static Logger _log = LoggerFactory.getLogger(PapeRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     protected final static List PAPE_FIELDS = Arrays.asList( new String[] {

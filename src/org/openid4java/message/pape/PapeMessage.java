@@ -5,8 +5,8 @@
 package org.openid4java.message.pape;
 
 import org.openid4java.message.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import java.util.Iterator;
  */
 public class PapeMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Log _log = LogFactory.getLog(PapeMessage.class);
+    private static Logger _log = LoggerFactory.getLogger(PapeMessage.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     public static final String PAPE_POLICY_PHISHING_RESISTANT =

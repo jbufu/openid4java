@@ -9,15 +9,15 @@ import net.sf.ehcache.Element;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class EhcacheNonceVerifier extends AbstractNonceVerifier
 {
-    private static Log _log = LogFactory.getLog(EhcacheNonceVerifier.class);
+    private static Logger _log = LoggerFactory.getLogger(EhcacheNonceVerifier.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private Cache _cache;

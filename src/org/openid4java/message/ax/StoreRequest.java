@@ -7,9 +7,8 @@ package org.openid4java.message.ax;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the extension for Attribute Exchange store requests.
@@ -18,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StoreRequest extends AxPayload
 {
-    private static Log _log = LogFactory.getLog(StoreRequest.class);
+    private static Logger _log = LoggerFactory.getLogger(StoreRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     /**

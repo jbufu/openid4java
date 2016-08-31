@@ -7,6 +7,8 @@ package org.openid4java.message.ax;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -14,9 +16,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for Attribute Exchange fetch requests.
@@ -26,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FetchRequest extends AxMessage
 {
-    private static Log _log = LogFactory.getLog(FetchRequest.class);
+    private static Logger _log = LoggerFactory.getLogger(FetchRequest.class);
     private static final boolean DEBUG = _log.isDebugEnabled();
 
     private int _aliasCounter = 0;
