@@ -61,17 +61,17 @@ For more details see the README.txt file included in that folder.
 
 # See also #
 
-[Requirements](Requirements.md)
+[Requirements](https://github.com/jbufu/openid4java/wiki/Requirements)
 
-[Installation](Installation.md)
+[Installation](https://github.com/jbufu/openid4java/wiki/Installation)
 
-[Documentation](Documentation.md)
+[Documentation](https://github.com/jbufu/openid4java/wiki/Documentation)
 
-BuildFromSource
+[BuildFromSource](https://github.com/jbufu/openid4java/wiki/BuildFromSource)
 
-SampleConsumer
+[SampleConsumer](https://github.com/jbufu/openid4java/wiki/SampleConsumer)
 
-SampleServer
+[SampleServer](https://github.com/jbufu/openid4java/wiki/SampleServer)
 
 # Package contents #
 
